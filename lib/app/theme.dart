@@ -216,7 +216,6 @@ class AppTheme {
       tertiary: AppColors.primaryBlue,
       surface: AppColors.darkSurface,
       error: AppColors.errorRed,
-      background: AppColors.darkBackground,
     ),
 
     // Scaffold
