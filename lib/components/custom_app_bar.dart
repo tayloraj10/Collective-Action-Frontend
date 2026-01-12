@@ -42,17 +42,15 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
               ),
             )
           : null,
-      title: Flexible(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: isMobile ? 4 : 8),
-          child: Text(
-            isMobile ? 'Collective' : 'Collective Action Network',
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-            style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
-              fontWeight: FontWeight.bold,
-              letterSpacing: isMobile ? 0 : 0.5,
-            ),
+      title: Padding(
+        padding: EdgeInsets.symmetric(horizontal: isMobile ? 4 : 8),
+        child: Text(
+          isMobile ? 'Collective' : 'Collective Action Network',
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+          style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
+            fontWeight: FontWeight.bold,
+            letterSpacing: isMobile ? 0 : 0.5,
           ),
         ),
       ),
