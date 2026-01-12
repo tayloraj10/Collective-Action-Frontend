@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
+import 'providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,10 +20,13 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
+    final themeMode = ref.watch(themeProvider);
 
     return MaterialApp(
       title: 'Collective Action Network',
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
       debugShowCheckedModeBanner: false,
       home: authState.when(
         data: (user) => user != null ? DashboardScreen() : LoginScreen(),

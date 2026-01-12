@@ -24,12 +24,12 @@ class AppColors {
   static const textTertiary = Color(0xFF94A3B8);
 
   // Dark Mode Colors
-  static const darkBackground = Color(0xFF0F172A);
-  static const darkSurface = Color(0xFF1E293B);
-  static const darkSurfaceVariant = Color(0xFF334155);
-  static const textPrimaryDark = Color(0xFFF1F5F9);
-  static const textSecondaryDark = Color(0xFFCBD5E1);
-  static const textTertiaryDark = Color(0xFF94A3B8);
+  static const darkBackground = Color(0xFF1A1A1A);
+  static const darkSurface = Color(0xFF2D2D2D);
+  static const darkSurfaceVariant = Color(0xFF3F3F3F);
+  static const textPrimaryDark = Color(0xFFE8E8E8);
+  static const textSecondaryDark = Color(0xFFB0B0B0);
+  static const textTertiaryDark = Color(0xFF808080);
 }
 
 class AppTheme {
@@ -51,7 +51,7 @@ class AppTheme {
 
     // AppBar
     appBarTheme: const AppBarTheme(
-      backgroundColor: AppColors.primaryBlue,
+      backgroundColor: AppColors.lightBlue,
       foregroundColor: AppColors.white,
       elevation: 0,
       centerTitle: true,
@@ -223,12 +223,12 @@ class AppTheme {
 
     // AppBar
     appBarTheme: const AppBarTheme(
-      backgroundColor: AppColors.darkSurface,
-      foregroundColor: AppColors.textPrimaryDark,
+      backgroundColor: AppColors.lightBlue,
+      foregroundColor: AppColors.white,
       elevation: 0,
       centerTitle: true,
       titleTextStyle: TextStyle(
-        color: AppColors.textPrimaryDark,
+        color: AppColors.white,
         fontSize: 20,
         fontWeight: FontWeight.w600,
       ),
