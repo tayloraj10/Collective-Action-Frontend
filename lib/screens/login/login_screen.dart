@@ -138,18 +138,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   children: [
                     // Logo
                     Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.white.withAlpha(25),
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       child: Icon(
                         Icons.handshake,
-                        size: 80,
+                        size: 60,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 16),
 
                     // Title
                     Text(
@@ -161,7 +161,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
 
                     // Subtitle
                     Text(
@@ -171,11 +171,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         context,
                       ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
                     ),
-                    const SizedBox(height: 48),
+                    const SizedBox(height: 24),
 
                     // Auth Form Card
                     Container(
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
@@ -216,7 +216,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             keyboardType: TextInputType.emailAddress,
                             enabled: !_isLoading,
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
 
                           // Password Field
                           Text(
@@ -257,12 +257,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                             enabled: !_isLoading,
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 16),
 
                           // Error Message
                           if (_errorMessage != null)
                             Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
                                 color: Colors.red.shade50,
                                 borderRadius: BorderRadius.circular(8),
@@ -287,12 +287,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ],
                               ),
                             ),
-                          if (_errorMessage != null) const SizedBox(height: 16),
+                          if (_errorMessage != null) const SizedBox(height: 12),
 
                           // Submit Button
                           SizedBox(
                             width: double.infinity,
-                            height: 52,
+                            height: 48,
                             child: ElevatedButton(
                               onPressed: _isLoading ? null : _handleSubmit,
                               style: ElevatedButton.styleFrom(
@@ -322,7 +322,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     ),
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 10),
 
                           // Or separator
                           Row(
@@ -339,12 +339,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               Expanded(child: Divider(color: AppColors.silver)),
                             ],
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 10),
 
                           // Google Sign-In Button (custom builder - no asset issues)
                           SizedBox(
                             width: double.infinity,
-                            height: 52,
+                            height: 48,
                             child: SignInButton(
                               Buttons.Google,
 
@@ -353,7 +353,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   : _handleGoogleSignIn,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
 
                           // Toggle Sign Up/In
                           Row(
@@ -392,7 +392,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 20),
 
                     // Footer
                     Text(
