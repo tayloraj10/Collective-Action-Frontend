@@ -1,5 +1,7 @@
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/app_bar_icon_button.dart';
+import 'package:collective_action_frontend/components/confirmation_dialog.dart';
+import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:collective_action_frontend/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
@@ -14,9 +16,12 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authService = ref.watch(authServiceProvider);
+    final authState = ref.watch(authStateProvider);
     final themeMode = ref.watch(themeProvider);
     final isDarkMode = themeMode == ThemeMode.dark;
     final isMobile = MediaQuery.of(context).size.width < 600;
+
+    final user = authState.value;
 
     return AppBar(
       elevation: 2,
@@ -49,17 +54,39 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
           backgroundColor: Colors.white.withAlpha(38),
         ),
 
-        // User Profile Button - Hide on mobile
-        AppBarIconButton(
-          icon: Icons.person_outline,
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Profile feature coming soon!')),
-            );
-          },
-          tooltip: 'Profile',
-          backgroundColor: Colors.white.withAlpha(38),
-        ),
+        // User Profile Button - Show Google photo if available
+        user?.photoURL != null
+            ? Padding(
+                padding: const EdgeInsets.all(4),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        CustomSnackBar.info('Profile feature coming soon!'),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundImage: NetworkImage(user!.photoURL!),
+                        backgroundColor: Colors.white.withAlpha(38),
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            : AppBarIconButton(
+                icon: Icons.person_outline,
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    CustomSnackBar.info('Profile feature coming soon!'),
+                  );
+                },
+                tooltip: 'Profile',
+                backgroundColor: Colors.white.withAlpha(38),
+              ),
 
         // Logout Button
         AppBarIconButton(
@@ -67,22 +94,10 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
           onPressed: () async {
             final shouldLogout = await showDialog<bool>(
               context: context,
-              builder: (context) => AlertDialog(
-                title: const Text('Confirm Logout'),
-                content: const Text('Are you sure you want to log out?'),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    child: const Text('Cancel'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(true),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.errorRed,
-                    ),
-                    child: const Text('Logout'),
-                  ),
-                ],
+              builder: (context) => ConfirmationDialog(
+                title: 'Confirm Logout',
+                content: 'Are you sure you want to log out?',
+                confirmColor: AppColors.errorRed,
               ),
             );
 

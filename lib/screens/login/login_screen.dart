@@ -1,4 +1,5 @@
 import 'package:collective_action_frontend/app/theme.dart';
+import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +82,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         await authService.registerWithEmail(email, password);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Account created successfully!')),
+            CustomSnackBar.success(
+              'Account created successfully! Please log in.',
+            ),
           );
           setState(() => _isSignUp = false);
           _emailController.clear();
