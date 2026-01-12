@@ -1,25 +1,135 @@
-import 'package:collective_action_frontend/providers/auth_provider.dart';
+import 'package:collective_action_frontend/app/theme.dart';
+import 'package:collective_action_frontend/components/custom_app_bar.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/navigation_button.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/summary_pane.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authService = ref.watch(authServiceProvider);
+    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Dashboard"),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () async => await authService.signOut(),
+      appBar: const CustomAppBar(),
+      body: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 8 : 16,
+              vertical: 12,
+            ),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  NavigationButton(
+                    icon: Icons.trending_up,
+                    label: 'Initiatives',
+                    color: AppColors.lightBlue,
+                    onTap: () {
+                      context.go('/initiatives');
+                    },
+                  ),
+                  SizedBox(width: isMobile ? 8 : 12),
+                  NavigationButton(
+                    icon: Icons.assignment_outlined,
+                    label: 'Projects',
+                    color: AppColors.errorRed,
+                    onTap: () {
+                      context.go('/projects');
+                    },
+                  ),
+                  SizedBox(width: isMobile ? 8 : 12),
+                  NavigationButton(
+                    icon: Icons.map_outlined,
+                    label: 'Maps',
+                    color: AppColors.successGreen,
+                    onTap: () {
+                      context.go('/maps');
+                    },
+                  ),
+                  SizedBox(width: isMobile ? 8 : 12),
+                  NavigationButton(
+                    icon: Icons.people_outline,
+                    label: 'Social',
+                    color: AppColors.warningOrange,
+                    onTap: () {
+                      context.go('/social');
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Divider(height: 1),
+          // 4-Pane Layout
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.all(isMobile ? 8 : 10),
+              child: const PaneLayout(),
+            ),
           ),
         ],
       ),
-      body: Center(child: Text("Welcome to Collective Action Network!")),
+    );
+  }
+}
+
+class PaneLayout extends StatelessWidget {
+  const PaneLayout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: Row(
+            children: const [
+              Expanded(
+                child: SummaryPane(
+                  title: 'Initiatives',
+                  icon: Icons.lightbulb_outline,
+                  color: AppColors.lightBlue,
+                ),
+              ),
+              SizedBox(width: 6),
+              Expanded(
+                child: SummaryPane(
+                  title: 'Projects',
+                  icon: Icons.assignment_outlined,
+                  color: AppColors.errorRed,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        Expanded(
+          child: Row(
+            children: const [
+              Expanded(
+                child: SummaryPane(
+                  title: 'Maps',
+                  icon: Icons.map_outlined,
+                  color: AppColors.successGreen,
+                ),
+              ),
+              SizedBox(width: 6),
+              Expanded(
+                child: SummaryPane(
+                  title: 'Social',
+                  icon: Icons.people_outline,
+                  color: AppColors.warningOrange,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
