@@ -1,3 +1,4 @@
+import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/screens/dashboard/dashboard_screen.dart';
 import 'package:collective_action_frontend/screens/login/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,8 @@ class MyApp extends ConsumerWidget {
 
     return MaterialApp(
       title: 'Collective Action Network',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: AppTheme.lightTheme,
+      debugShowCheckedModeBanner: false,
       home: authState.when(
         data: (user) => user != null ? DashboardScreen() : LoginScreen(),
         loading: () => const CircularProgressIndicator(),
