@@ -1,3 +1,4 @@
+import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/app_bar_icon_button.dart';
 import 'package:collective_action_frontend/components/confirmation_dialog.dart';
@@ -6,6 +7,7 @@ import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:collective_action_frontend/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key});
@@ -19,26 +21,37 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final authState = ref.watch(authStateProvider);
     final themeMode = ref.watch(themeProvider);
     final isDarkMode = themeMode == ThemeMode.dark;
-    final isMobile = MediaQuery.of(context).size.width < 600;
+    final isMobile = AppConstants.isMobile(context);
+    final currentLocation = GoRouterState.of(context).matchedLocation;
+    final isHomeRoute = currentLocation == '/';
 
     final user = authState.value;
 
     return AppBar(
       elevation: 2,
+      centerTitle: isMobile ? false : true,
+      leadingWidth: !isHomeRoute ? 72 : null,
+      leading: !isHomeRoute
+          ? Padding(
+              padding: const EdgeInsets.only(left: 12),
+              child: AppBarIconButton(
+                icon: Icons.home,
+                onPressed: () => context.go('/'),
+                tooltip: 'Home',
+                backgroundColor: Colors.white.withAlpha(38),
+              ),
+            )
+          : null,
       title: Flexible(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: isMobile ? 4 : 8),
-          child: Align(
-            alignment: isMobile ? Alignment.centerLeft : Alignment.center,
-            child: Text(
-              isMobile ? 'Collective' : 'Collective Action Network',
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-              style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
-                fontWeight: FontWeight.bold,
-                letterSpacing: isMobile ? 0 : 0.5,
-                fontSize: isMobile ? 18 : null,
-              ),
+          child: Text(
+            isMobile ? 'Collective' : 'Collective Action Network',
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
+              fontWeight: FontWeight.bold,
+              letterSpacing: isMobile ? 0 : 0.5,
             ),
           ),
         ),

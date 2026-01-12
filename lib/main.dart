@@ -1,17 +1,17 @@
 import 'package:collective_action_frontend/app/theme.dart';
-import 'package:collective_action_frontend/screens/dashboard/dashboard_screen.dart';
-import 'package:collective_action_frontend/screens/login/login_screen.dart';
+import 'package:collective_action_frontend/app/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'firebase_options.dart';
-import 'providers/auth_provider.dart';
 import 'providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  usePathUrlStrategy();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(ProviderScope(child: MyApp()));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
@@ -19,20 +19,16 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authStateProvider);
     final themeMode = ref.watch(themeProvider);
+    final router = ref.watch(goRouterProvider);
 
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Collective Action Network',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
       debugShowCheckedModeBanner: false,
-      home: authState.when(
-        data: (user) => user != null ? DashboardScreen() : LoginScreen(),
-        loading: () => const CircularProgressIndicator(),
-        error: (_, _) => LoginScreen(),
-      ),
+      routerConfig: router,
     );
   }
 }
