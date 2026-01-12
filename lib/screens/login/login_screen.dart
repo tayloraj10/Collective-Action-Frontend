@@ -3,6 +3,7 @@ import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -52,6 +53,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         return 'Too many attempts. Please try again later';
       case 'network-request-failed':
         return 'Network error. Please check your connection';
+      case 'popup-closed-by-user':
+      case 'canceled':
+        return 'Google sign-in was canceled';
       default:
         return 'Login failed. Please check your credentials and try again';
     }
@@ -90,6 +94,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       setState(() => _errorMessage = _getFriendlyErrorMessage(e));
     } catch (e) {
       setState(() => _errorMessage = 'An error occurred. Please try again.');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    setState(() => _errorMessage = null);
+    setState(() => _isLoading = true);
+
+    try {
+      final authService = ref.read(authServiceProvider);
+      await authService.signInWithGoogle();
+    } on FirebaseAuthException catch (e) {
+      setState(() => _errorMessage = _getFriendlyErrorMessage(e));
+    } catch (e) {
+      setState(
+        () =>
+            _errorMessage = 'Unable to sign in with Google. Please try again.',
+      );
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -295,6 +320,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                         color: Colors.white,
                                       ),
                                     ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Or separator
+                          Row(
+                            children: [
+                              Expanded(child: Divider(color: AppColors.silver)),
+                              const SizedBox(width: 8),
+                              Text(
+                                'or',
+                                style: TextStyle(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(child: Divider(color: AppColors.silver)),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Google Sign-In Button (custom builder - no asset issues)
+                          SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: SignInButton(
+                              Buttons.Google,
+
+                              onPressed: _isLoading
+                                  ? null
+                                  : _handleGoogleSignIn,
                             ),
                           ),
                           const SizedBox(height: 16),
