@@ -44,6 +44,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 # Firebase configuration files (contains sensitive credentials)
-firebase.json
 google-services.json
 GoogleService-Info.plist
