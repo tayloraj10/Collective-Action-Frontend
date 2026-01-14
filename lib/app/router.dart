@@ -4,6 +4,7 @@ import 'package:collective_action_frontend/screens/projects/project_list_screen.
 import 'package:collective_action_frontend/screens/maps/map_screen.dart';
 import 'package:collective_action_frontend/screens/social/social_screen.dart';
 import 'package:collective_action_frontend/screens/login/login_screen.dart';
+import 'package:collective_action_frontend/screens/health_check_screen.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,6 +42,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/social',
         builder: (context, state) => const SocialScreen(),
+      ),
+      GoRoute(
+        path: '/health',
+        builder: (context, state) => const HealthCheckScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
