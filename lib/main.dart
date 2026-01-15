@@ -7,7 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'firebase_options.dart';
 import 'providers/theme_provider.dart';
-import 'services/api_service.dart';
+import 'services/health_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
