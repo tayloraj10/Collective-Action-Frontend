@@ -2,7 +2,7 @@
     "openapi": "3.1.0",
     "info": {
         "title": "Collective Action Backend",
-        "version": "0.1.0"
+        "version": "1.0.0"
     },
     "paths": {
         "/health": {
@@ -71,16 +71,6 @@
                                 }
                             }
                         }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -139,16 +129,6 @@
                                 }
                             }
                         }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -177,16 +157,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ActionSchema"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
                                 }
                             }
                         }
@@ -224,16 +194,6 @@
                                 }
                             }
                         }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -264,16 +224,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ActionSchema"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
                                 }
                             }
                         }
@@ -311,16 +261,6 @@
                                         "$ref": "#/components/schemas/ActionSchema"
                                     },
                                     "title": "Response Get Actions By Initiative Actions By Initiative  Initiative Id  Get"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
                                 }
                             }
                         }
@@ -378,16 +318,6 @@
                                 }
                             }
                         }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -417,16 +347,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/CategorySchema"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
                                 }
                             }
                         }
@@ -470,16 +390,6 @@
                                 }
                             }
                         }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
                     }
                 }
             },
@@ -506,16 +416,6 @@
                         "content": {
                             "application/json": {
                                 "schema": {}
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
                             }
                         }
                     }
@@ -572,16 +472,6 @@
                                 }
                             }
                         }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -611,16 +501,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/StatusSchema"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
                                 }
                             }
                         }
@@ -664,16 +544,6 @@
                                 }
                             }
                         }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
                     }
                 }
             },
@@ -700,16 +570,6 @@
                         "content": {
                             "application/json": {
                                 "schema": {}
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
                             }
                         }
                     }
@@ -766,16 +626,6 @@
                                 }
                             }
                         }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -805,16 +655,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ActionTypeSchema"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
                                 }
                             }
                         }
@@ -858,16 +698,6 @@
                                 }
                             }
                         }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
                     }
                 }
             },
@@ -894,16 +724,6 @@
                         "content": {
                             "application/json": {
                                 "schema": {}
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
                             }
                         }
                     }
@@ -962,16 +782,6 @@
                                 }
                             }
                         }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -1003,16 +813,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/UserSchema"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
                                 }
                             }
                         }
@@ -1058,16 +858,6 @@
                                 }
                             }
                         }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
                     }
                 }
             },
@@ -1093,16 +883,6 @@
                 "responses": {
                     "204": {
                         "description": "Successful Response"
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -1346,19 +1126,6 @@
                     "Fitness"
                 ],
                 "title": "CategoryValuesEnum"
-            },
-            "HTTPValidationError": {
-                "properties": {
-                    "detail": {
-                        "items": {
-                            "$ref": "#/components/schemas/ValidationError"
-                        },
-                        "type": "array",
-                        "title": "Detail"
-                    }
-                },
-                "type": "object",
-                "title": "HTTPValidationError"
             },
             "InitiativeCreateSchema": {
                 "properties": {
@@ -1865,39 +1632,6 @@
                     "group"
                 ],
                 "title": "UserType"
-            },
-            "ValidationError": {
-                "properties": {
-                    "loc": {
-                        "items": {
-                            "anyOf": [
-                                {
-                                    "type": "string"
-                                },
-                                {
-                                    "type": "integer"
-                                }
-                            ]
-                        },
-                        "type": "array",
-                        "title": "Location"
-                    },
-                    "msg": {
-                        "type": "string",
-                        "title": "Message"
-                    },
-                    "type": {
-                        "type": "string",
-                        "title": "Error Type"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "loc",
-                    "msg",
-                    "type"
-                ],
-                "title": "ValidationError"
             }
         }
     }
