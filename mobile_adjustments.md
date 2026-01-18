@@ -4,7 +4,7 @@
 
 | Module Name | iOS | Android | Status | Notes |
 |-------------|:---:|:-------:|:------:|-------|
-| | ⭕ | ⭕ | Pending | |
+|url_launcher | ⭕ | ⭕ | Pending | |
 | | ⭕ | ⭕ | Pending | |
 | | ⭕ | ⭕ | Pending | |
 
