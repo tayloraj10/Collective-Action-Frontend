@@ -92,7 +92,9 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
                 // Riverpod AsyncNotifierProvider usage
                 Builder(
                   builder: (context) {
-                    final initiativesAsync = ref.watch(initiativeProvider);
+                    final initiativesAsync = ref.watch(
+                      activeInitiativeProvider,
+                    );
                     return initiativesAsync.when(
                       loading: () => const Text(
                         'Loading...',

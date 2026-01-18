@@ -16,4 +16,12 @@ class InitiativesService {
       throw Exception('Failed to fetch initiatives: $e');
     }
   }
+
+  Future<List<InitiativeSchema>?> fetchActiveInitiatives() async {
+    try {
+      return await _api.listActiveInitiativesInitiativesActiveGet();
+    } catch (e) {
+      throw Exception('Failed to fetch initiatives: $e');
+    }
+  }
 }
