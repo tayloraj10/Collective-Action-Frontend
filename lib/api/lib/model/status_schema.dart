@@ -15,25 +15,30 @@ class StatusSchema {
   StatusSchema({
     this.id,
     required this.name,
+    required this.statusType,
   });
 
   String? id;
 
   StatusValuesEnum name;
 
+  StatusTypeEnum statusType;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is StatusSchema &&
     other.id == id &&
-    other.name == name;
+    other.name == name &&
+    other.statusType == statusType;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (id == null ? 0 : id!.hashCode) +
-    (name.hashCode);
+    (name.hashCode) +
+    (statusType.hashCode);
 
   @override
-  String toString() => 'StatusSchema[id=$id, name=$name]';
+  String toString() => 'StatusSchema[id=$id, name=$name, statusType=$statusType]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -43,6 +48,7 @@ class StatusSchema {
       json[r'id'] = null;
     }
       json[r'name'] = this.name;
+      json[r'status_type'] = this.statusType;
     return json;
   }
 
@@ -67,6 +73,7 @@ class StatusSchema {
       return StatusSchema(
         id: mapValueOfType<String>(json, r'id'),
         name: StatusValuesEnum.fromJson(json[r'name'])!,
+        statusType: StatusTypeEnum.fromJson(json[r'status_type'])!,
       );
     }
     return null;
@@ -115,6 +122,7 @@ class StatusSchema {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'name',
+    'status_type',
   };
 }
 

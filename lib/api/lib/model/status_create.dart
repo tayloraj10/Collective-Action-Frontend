@@ -14,25 +14,31 @@ class StatusCreate {
   /// Returns a new [StatusCreate] instance.
   StatusCreate({
     required this.name,
+    required this.statusType,
   });
 
   StatusValuesEnum name;
 
+  StatusTypeEnum statusType;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is StatusCreate &&
-    other.name == name;
+    other.name == name &&
+    other.statusType == statusType;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (name.hashCode);
+    (name.hashCode) +
+    (statusType.hashCode);
 
   @override
-  String toString() => 'StatusCreate[name=$name]';
+  String toString() => 'StatusCreate[name=$name, statusType=$statusType]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'name'] = this.name;
+      json[r'status_type'] = this.statusType;
     return json;
   }
 
@@ -56,6 +62,7 @@ class StatusCreate {
 
       return StatusCreate(
         name: StatusValuesEnum.fromJson(json[r'name'])!,
+        statusType: StatusTypeEnum.fromJson(json[r'status_type'])!,
       );
     }
     return null;
@@ -104,6 +111,7 @@ class StatusCreate {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'name',
+    'status_type',
   };
 }
 

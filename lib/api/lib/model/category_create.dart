@@ -16,7 +16,7 @@ class CategoryCreate {
     required this.name,
   });
 
-  CategoryValuesEnum name;
+  String name;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is CategoryCreate &&
@@ -55,7 +55,7 @@ class CategoryCreate {
       }());
 
       return CategoryCreate(
-        name: CategoryValuesEnum.fromJson(json[r'name'])!,
+        name: mapValueOfType<String>(json, r'name')!,
       );
     }
     return null;

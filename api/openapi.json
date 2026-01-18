@@ -268,13 +268,13 @@
                 }
             }
         },
-        "/config/categories": {
+        "/categories/": {
             "get": {
                 "tags": [
-                    "config"
+                    "categories"
                 ],
                 "summary": "List Categories",
-                "operationId": "list_categories_config_categories_get",
+                "operationId": "list_categories_categories__get",
                 "responses": {
                     "200": {
                         "description": "Successful Response",
@@ -285,7 +285,7 @@
                                         "$ref": "#/components/schemas/CategorySchema"
                                     },
                                     "type": "array",
-                                    "title": "Response List Categories Config Categories Get"
+                                    "title": "Response List Categories Categories  Get"
                                 }
                             }
                         }
@@ -294,10 +294,10 @@
             },
             "post": {
                 "tags": [
-                    "config"
+                    "categories"
                 ],
                 "summary": "Create Category",
-                "operationId": "create_category_config_categories_post",
+                "operationId": "create_category_categories__post",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -322,13 +322,13 @@
                 }
             }
         },
-        "/config/categories/{category_id}": {
+        "/categories/{category_id}": {
             "get": {
                 "tags": [
-                    "config"
+                    "categories"
                 ],
                 "summary": "Get Category",
-                "operationId": "get_category_config_categories__category_id__get",
+                "operationId": "get_category_categories__category_id__get",
                 "parameters": [
                     {
                         "name": "category_id",
@@ -355,10 +355,10 @@
             },
             "put": {
                 "tags": [
-                    "config"
+                    "categories"
                 ],
                 "summary": "Update Category",
-                "operationId": "update_category_config_categories__category_id__put",
+                "operationId": "update_category_categories__category_id__put",
                 "parameters": [
                     {
                         "name": "category_id",
@@ -395,10 +395,10 @@
             },
             "delete": {
                 "tags": [
-                    "config"
+                    "categories"
                 ],
                 "summary": "Delete Category",
-                "operationId": "delete_category_config_categories__category_id__delete",
+                "operationId": "delete_category_categories__category_id__delete",
                 "parameters": [
                     {
                         "name": "category_id",
@@ -422,13 +422,13 @@
                 }
             }
         },
-        "/config/statuses": {
+        "/statuses/": {
             "get": {
                 "tags": [
-                    "config"
+                    "statuses"
                 ],
                 "summary": "List Statuses",
-                "operationId": "list_statuses_config_statuses_get",
+                "operationId": "list_statuses_statuses__get",
                 "responses": {
                     "200": {
                         "description": "Successful Response",
@@ -439,7 +439,7 @@
                                         "$ref": "#/components/schemas/StatusSchema"
                                     },
                                     "type": "array",
-                                    "title": "Response List Statuses Config Statuses Get"
+                                    "title": "Response List Statuses Statuses  Get"
                                 }
                             }
                         }
@@ -448,10 +448,10 @@
             },
             "post": {
                 "tags": [
-                    "config"
+                    "statuses"
                 ],
                 "summary": "Create Status",
-                "operationId": "create_status_config_statuses_post",
+                "operationId": "create_status_statuses__post",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -476,13 +476,13 @@
                 }
             }
         },
-        "/config/statuses/{status_id}": {
+        "/statuses/{status_id}": {
             "get": {
                 "tags": [
-                    "config"
+                    "statuses"
                 ],
                 "summary": "Get Status",
-                "operationId": "get_status_config_statuses__status_id__get",
+                "operationId": "get_status_statuses__status_id__get",
                 "parameters": [
                     {
                         "name": "status_id",
@@ -509,10 +509,10 @@
             },
             "put": {
                 "tags": [
-                    "config"
+                    "statuses"
                 ],
                 "summary": "Update Status",
-                "operationId": "update_status_config_statuses__status_id__put",
+                "operationId": "update_status_statuses__status_id__put",
                 "parameters": [
                     {
                         "name": "status_id",
@@ -549,10 +549,10 @@
             },
             "delete": {
                 "tags": [
-                    "config"
+                    "statuses"
                 ],
                 "summary": "Delete Status",
-                "operationId": "delete_status_config_statuses__status_id__delete",
+                "operationId": "delete_status_statuses__status_id__delete",
                 "parameters": [
                     {
                         "name": "status_id",
@@ -576,13 +576,49 @@
                 }
             }
         },
-        "/config/action_types": {
+        "/statuses/by_type/{status_type}": {
             "get": {
                 "tags": [
-                    "config"
+                    "statuses"
+                ],
+                "summary": "Get Statuses By Type",
+                "operationId": "get_statuses_by_type_statuses_by_type__status_type__get",
+                "parameters": [
+                    {
+                        "name": "status_type",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Status Type"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/StatusSchema"
+                                    },
+                                    "title": "Response Get Statuses By Type Statuses By Type  Status Type  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/action_types/": {
+            "get": {
+                "tags": [
+                    "action_types"
                 ],
                 "summary": "List Action Types",
-                "operationId": "list_action_types_config_action_types_get",
+                "operationId": "list_action_types_action_types__get",
                 "responses": {
                     "200": {
                         "description": "Successful Response",
@@ -593,7 +629,7 @@
                                         "$ref": "#/components/schemas/ActionTypeSchema"
                                     },
                                     "type": "array",
-                                    "title": "Response List Action Types Config Action Types Get"
+                                    "title": "Response List Action Types Action Types  Get"
                                 }
                             }
                         }
@@ -602,10 +638,10 @@
             },
             "post": {
                 "tags": [
-                    "config"
+                    "action_types"
                 ],
                 "summary": "Create Action Type",
-                "operationId": "create_action_type_config_action_types_post",
+                "operationId": "create_action_type_action_types__post",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -630,13 +666,13 @@
                 }
             }
         },
-        "/config/action_types/{action_type_id}": {
+        "/action_types/{action_type_id}": {
             "get": {
                 "tags": [
-                    "config"
+                    "action_types"
                 ],
                 "summary": "Get Action Type",
-                "operationId": "get_action_type_config_action_types__action_type_id__get",
+                "operationId": "get_action_type_action_types__action_type_id__get",
                 "parameters": [
                     {
                         "name": "action_type_id",
@@ -663,10 +699,10 @@
             },
             "put": {
                 "tags": [
-                    "config"
+                    "action_types"
                 ],
                 "summary": "Update Action Type",
-                "operationId": "update_action_type_config_action_types__action_type_id__put",
+                "operationId": "update_action_type_action_types__action_type_id__put",
                 "parameters": [
                     {
                         "name": "action_type_id",
@@ -703,10 +739,10 @@
             },
             "delete": {
                 "tags": [
-                    "config"
+                    "action_types"
                 ],
                 "summary": "Delete Action Type",
-                "operationId": "delete_action_type_config_action_types__action_type_id__delete",
+                "operationId": "delete_action_type_action_types__action_type_id__delete",
                 "parameters": [
                     {
                         "name": "action_type_id",
@@ -1083,7 +1119,8 @@
             "CategoryCreate": {
                 "properties": {
                     "name": {
-                        "$ref": "#/components/schemas/CategoryValuesEnum"
+                        "type": "string",
+                        "title": "Name"
                     }
                 },
                 "type": "object",
@@ -1107,7 +1144,8 @@
                         "title": "Id"
                     },
                     "name": {
-                        "$ref": "#/components/schemas/CategoryValuesEnum"
+                        "type": "string",
+                        "title": "Name"
                     }
                 },
                 "type": "object",
@@ -1115,17 +1153,6 @@
                     "name"
                 ],
                 "title": "CategorySchema"
-            },
-            "CategoryValuesEnum": {
-                "type": "string",
-                "enum": [
-                    "Environment",
-                    "Nature",
-                    "Trash",
-                    "Animals",
-                    "Fitness"
-                ],
-                "title": "CategoryValuesEnum"
             },
             "InitiativeCreateSchema": {
                 "properties": {
@@ -1373,11 +1400,15 @@
                 "properties": {
                     "name": {
                         "$ref": "#/components/schemas/StatusValuesEnum"
+                    },
+                    "status_type": {
+                        "$ref": "#/components/schemas/StatusTypeEnum"
                     }
                 },
                 "type": "object",
                 "required": [
-                    "name"
+                    "name",
+                    "status_type"
                 ],
                 "title": "StatusCreate"
             },
@@ -1397,13 +1428,25 @@
                     },
                     "name": {
                         "$ref": "#/components/schemas/StatusValuesEnum"
+                    },
+                    "status_type": {
+                        "$ref": "#/components/schemas/StatusTypeEnum"
                     }
                 },
                 "type": "object",
                 "required": [
-                    "name"
+                    "name",
+                    "status_type"
                 ],
                 "title": "StatusSchema"
+            },
+            "StatusTypeEnum": {
+                "type": "string",
+                "enum": [
+                    "Status",
+                    "Project Status"
+                ],
+                "title": "StatusTypeEnum"
             },
             "StatusValuesEnum": {
                 "type": "string",

@@ -28,10 +28,12 @@ part 'auth/oauth.dart';
 part 'auth/http_basic_auth.dart';
 part 'auth/http_bearer_auth.dart';
 
+part 'api/action_types_api.dart';
 part 'api/actions_api.dart';
-part 'api/config_api.dart';
+part 'api/categories_api.dart';
 part 'api/default_api.dart';
 part 'api/initiatives_api.dart';
+part 'api/statuses_api.dart';
 part 'api/users_api.dart';
 
 part 'model/action_create_schema.dart';
@@ -41,13 +43,13 @@ part 'model/action_type_schema.dart';
 part 'model/action_type_values_enum.dart';
 part 'model/category_create.dart';
 part 'model/category_schema.dart';
-part 'model/category_values_enum.dart';
 part 'model/initiative_create_schema.dart';
 part 'model/initiative_schema.dart';
 part 'model/location_schema.dart';
 part 'model/social_links_schema.dart';
 part 'model/status_create.dart';
 part 'model/status_schema.dart';
+part 'model/status_type_enum.dart';
 part 'model/status_values_enum.dart';
 part 'model/user_create.dart';
 part 'model/user_schema.dart';

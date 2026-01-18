@@ -196,8 +196,6 @@ class ApiClient {
           return CategoryCreate.fromJson(value);
         case 'CategorySchema':
           return CategorySchema.fromJson(value);
-        case 'CategoryValuesEnum':
-          return CategoryValuesEnumTypeTransformer().decode(value);
         case 'InitiativeCreateSchema':
           return InitiativeCreateSchema.fromJson(value);
         case 'InitiativeSchema':
@@ -210,6 +208,8 @@ class ApiClient {
           return StatusCreate.fromJson(value);
         case 'StatusSchema':
           return StatusSchema.fromJson(value);
+        case 'StatusTypeEnum':
+          return StatusTypeEnumTypeTransformer().decode(value);
         case 'StatusValuesEnum':
           return StatusValuesEnumTypeTransformer().decode(value);
         case 'UserCreate':

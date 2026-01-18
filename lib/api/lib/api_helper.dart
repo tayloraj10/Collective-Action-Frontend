@@ -58,8 +58,8 @@ String parameterToString(dynamic value) {
   if (value is ActionTypeValuesEnum) {
     return ActionTypeValuesEnumTypeTransformer().encode(value).toString();
   }
-  if (value is CategoryValuesEnum) {
-    return CategoryValuesEnumTypeTransformer().encode(value).toString();
+  if (value is StatusTypeEnum) {
+    return StatusTypeEnumTypeTransformer().encode(value).toString();
   }
   if (value is StatusValuesEnum) {
     return StatusValuesEnumTypeTransformer().encode(value).toString();

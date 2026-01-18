@@ -19,7 +19,7 @@ class CategorySchema {
 
   String? id;
 
-  CategoryValuesEnum name;
+  String name;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is CategorySchema &&
@@ -66,7 +66,7 @@ class CategorySchema {
 
       return CategorySchema(
         id: mapValueOfType<String>(json, r'id'),
-        name: CategoryValuesEnum.fromJson(json[r'name'])!,
+        name: mapValueOfType<String>(json, r'name')!,
       );
     }
     return null;

@@ -41,14 +41,14 @@ Please follow the [installation procedure](#installation--usage) and then run th
 import 'package:collective_action_api/api.dart';
 
 
-final api_instance = ActionsApi();
-final actionCreateSchema = ActionCreateSchema(); // ActionCreateSchema | 
+final api_instance = ActionTypesApi();
+final actionTypeCreate = ActionTypeCreate(); // ActionTypeCreate | 
 
 try {
-    final result = api_instance.createActionActionsPost(actionCreateSchema);
+    final result = api_instance.createActionTypeActionTypesPost(actionTypeCreate);
     print(result);
 } catch (e) {
-    print('Exception when calling ActionsApi->createActionActionsPost: $e\n');
+    print('Exception when calling ActionTypesApi->createActionTypeActionTypesPost: $e\n');
 }
 
 ```
@@ -59,30 +59,31 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*ActionTypesApi* | [**createActionTypeActionTypesPost**](doc//ActionTypesApi.md#createactiontypeactiontypespost) | **POST** /action_types/ | Create Action Type
+*ActionTypesApi* | [**deleteActionTypeActionTypesActionTypeIdDelete**](doc//ActionTypesApi.md#deleteactiontypeactiontypesactiontypeiddelete) | **DELETE** /action_types/{action_type_id} | Delete Action Type
+*ActionTypesApi* | [**getActionTypeActionTypesActionTypeIdGet**](doc//ActionTypesApi.md#getactiontypeactiontypesactiontypeidget) | **GET** /action_types/{action_type_id} | Get Action Type
+*ActionTypesApi* | [**listActionTypesActionTypesGet**](doc//ActionTypesApi.md#listactiontypesactiontypesget) | **GET** /action_types/ | List Action Types
+*ActionTypesApi* | [**updateActionTypeActionTypesActionTypeIdPut**](doc//ActionTypesApi.md#updateactiontypeactiontypesactiontypeidput) | **PUT** /action_types/{action_type_id} | Update Action Type
 *ActionsApi* | [**createActionActionsPost**](doc//ActionsApi.md#createactionactionspost) | **POST** /actions/ | Create Action
 *ActionsApi* | [**getActionActionsActionIdGet**](doc//ActionsApi.md#getactionactionsactionidget) | **GET** /actions/{action_id} | Get Action
 *ActionsApi* | [**getActionsByInitiativeActionsByInitiativeInitiativeIdGet**](doc//ActionsApi.md#getactionsbyinitiativeactionsbyinitiativeinitiativeidget) | **GET** /actions/by_initiative/{initiative_id} | Get Actions By Initiative
 *ActionsApi* | [**listActionsActionsGet**](doc//ActionsApi.md#listactionsactionsget) | **GET** /actions/ | List Actions
-*ConfigApi* | [**createActionTypeConfigActionTypesPost**](doc//ConfigApi.md#createactiontypeconfigactiontypespost) | **POST** /config/action_types | Create Action Type
-*ConfigApi* | [**createCategoryConfigCategoriesPost**](doc//ConfigApi.md#createcategoryconfigcategoriespost) | **POST** /config/categories | Create Category
-*ConfigApi* | [**createStatusConfigStatusesPost**](doc//ConfigApi.md#createstatusconfigstatusespost) | **POST** /config/statuses | Create Status
-*ConfigApi* | [**deleteActionTypeConfigActionTypesActionTypeIdDelete**](doc//ConfigApi.md#deleteactiontypeconfigactiontypesactiontypeiddelete) | **DELETE** /config/action_types/{action_type_id} | Delete Action Type
-*ConfigApi* | [**deleteCategoryConfigCategoriesCategoryIdDelete**](doc//ConfigApi.md#deletecategoryconfigcategoriescategoryiddelete) | **DELETE** /config/categories/{category_id} | Delete Category
-*ConfigApi* | [**deleteStatusConfigStatusesStatusIdDelete**](doc//ConfigApi.md#deletestatusconfigstatusesstatusiddelete) | **DELETE** /config/statuses/{status_id} | Delete Status
-*ConfigApi* | [**getActionTypeConfigActionTypesActionTypeIdGet**](doc//ConfigApi.md#getactiontypeconfigactiontypesactiontypeidget) | **GET** /config/action_types/{action_type_id} | Get Action Type
-*ConfigApi* | [**getCategoryConfigCategoriesCategoryIdGet**](doc//ConfigApi.md#getcategoryconfigcategoriescategoryidget) | **GET** /config/categories/{category_id} | Get Category
-*ConfigApi* | [**getStatusConfigStatusesStatusIdGet**](doc//ConfigApi.md#getstatusconfigstatusesstatusidget) | **GET** /config/statuses/{status_id} | Get Status
-*ConfigApi* | [**listActionTypesConfigActionTypesGet**](doc//ConfigApi.md#listactiontypesconfigactiontypesget) | **GET** /config/action_types | List Action Types
-*ConfigApi* | [**listCategoriesConfigCategoriesGet**](doc//ConfigApi.md#listcategoriesconfigcategoriesget) | **GET** /config/categories | List Categories
-*ConfigApi* | [**listStatusesConfigStatusesGet**](doc//ConfigApi.md#liststatusesconfigstatusesget) | **GET** /config/statuses | List Statuses
-*ConfigApi* | [**updateActionTypeConfigActionTypesActionTypeIdPut**](doc//ConfigApi.md#updateactiontypeconfigactiontypesactiontypeidput) | **PUT** /config/action_types/{action_type_id} | Update Action Type
-*ConfigApi* | [**updateCategoryConfigCategoriesCategoryIdPut**](doc//ConfigApi.md#updatecategoryconfigcategoriescategoryidput) | **PUT** /config/categories/{category_id} | Update Category
-*ConfigApi* | [**updateStatusConfigStatusesStatusIdPut**](doc//ConfigApi.md#updatestatusconfigstatusesstatusidput) | **PUT** /config/statuses/{status_id} | Update Status
+*CategoriesApi* | [**createCategoryCategoriesPost**](doc//CategoriesApi.md#createcategorycategoriespost) | **POST** /categories/ | Create Category
+*CategoriesApi* | [**deleteCategoryCategoriesCategoryIdDelete**](doc//CategoriesApi.md#deletecategorycategoriescategoryiddelete) | **DELETE** /categories/{category_id} | Delete Category
+*CategoriesApi* | [**getCategoryCategoriesCategoryIdGet**](doc//CategoriesApi.md#getcategorycategoriescategoryidget) | **GET** /categories/{category_id} | Get Category
+*CategoriesApi* | [**listCategoriesCategoriesGet**](doc//CategoriesApi.md#listcategoriescategoriesget) | **GET** /categories/ | List Categories
+*CategoriesApi* | [**updateCategoryCategoriesCategoryIdPut**](doc//CategoriesApi.md#updatecategorycategoriescategoryidput) | **PUT** /categories/{category_id} | Update Category
 *DefaultApi* | [**healthHealthGet**](doc//DefaultApi.md#healthhealthget) | **GET** /health | Health
 *InitiativesApi* | [**createInitiativeInitiativesPost**](doc//InitiativesApi.md#createinitiativeinitiativespost) | **POST** /initiatives/ | Create Initiative
 *InitiativesApi* | [**getInitiativeInitiativesInitiativeIdGet**](doc//InitiativesApi.md#getinitiativeinitiativesinitiativeidget) | **GET** /initiatives/{initiative_id} | Get Initiative
 *InitiativesApi* | [**listActiveInitiativesInitiativesActiveGet**](doc//InitiativesApi.md#listactiveinitiativesinitiativesactiveget) | **GET** /initiatives/active | List Active Initiatives
 *InitiativesApi* | [**listInitiativesInitiativesGet**](doc//InitiativesApi.md#listinitiativesinitiativesget) | **GET** /initiatives/ | List Initiatives
+*StatusesApi* | [**createStatusStatusesPost**](doc//StatusesApi.md#createstatusstatusespost) | **POST** /statuses/ | Create Status
+*StatusesApi* | [**deleteStatusStatusesStatusIdDelete**](doc//StatusesApi.md#deletestatusstatusesstatusiddelete) | **DELETE** /statuses/{status_id} | Delete Status
+*StatusesApi* | [**getStatusStatusesStatusIdGet**](doc//StatusesApi.md#getstatusstatusesstatusidget) | **GET** /statuses/{status_id} | Get Status
+*StatusesApi* | [**getStatusesByTypeStatusesByTypeStatusTypeGet**](doc//StatusesApi.md#getstatusesbytypestatusesbytypestatustypeget) | **GET** /statuses/by_type/{status_type} | Get Statuses By Type
+*StatusesApi* | [**listStatusesStatusesGet**](doc//StatusesApi.md#liststatusesstatusesget) | **GET** /statuses/ | List Statuses
+*StatusesApi* | [**updateStatusStatusesStatusIdPut**](doc//StatusesApi.md#updatestatusstatusesstatusidput) | **PUT** /statuses/{status_id} | Update Status
 *UsersApi* | [**createUserUsersPost**](doc//UsersApi.md#createuseruserspost) | **POST** /users/ | Create User
 *UsersApi* | [**deleteUserUsersUserIdDelete**](doc//UsersApi.md#deleteuserusersuseriddelete) | **DELETE** /users/{user_id} | Delete User
 *UsersApi* | [**getUserUsersUserIdGet**](doc//UsersApi.md#getuserusersuseridget) | **GET** /users/{user_id} | Get User
@@ -99,13 +100,13 @@ Class | Method | HTTP request | Description
  - [ActionTypeValuesEnum](doc//ActionTypeValuesEnum.md)
  - [CategoryCreate](doc//CategoryCreate.md)
  - [CategorySchema](doc//CategorySchema.md)
- - [CategoryValuesEnum](doc//CategoryValuesEnum.md)
  - [InitiativeCreateSchema](doc//InitiativeCreateSchema.md)
  - [InitiativeSchema](doc//InitiativeSchema.md)
  - [LocationSchema](doc//LocationSchema.md)
  - [SocialLinksSchema](doc//SocialLinksSchema.md)
  - [StatusCreate](doc//StatusCreate.md)
  - [StatusSchema](doc//StatusSchema.md)
+ - [StatusTypeEnum](doc//StatusTypeEnum.md)
  - [StatusValuesEnum](doc//StatusValuesEnum.md)
  - [UserCreate](doc//UserCreate.md)
  - [UserSchema](doc//UserSchema.md)
