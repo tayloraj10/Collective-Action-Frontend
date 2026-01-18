@@ -38,7 +38,7 @@ class InitiativeCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
+        borderRadius: BorderRadius.circular(isMobile ? 10 : 16),
         border: initiative.priority == true
             ? Border.all(
                 color: AppColors.highlightYelllow,
@@ -47,17 +47,17 @@ class InitiativeCard extends StatelessWidget {
             : null,
         boxShadow: [
           BoxShadow(
-            color: cardColor.withAlpha((0.18 * 255).toInt()),
-            blurRadius: isMobile ? 4 : 8,
+            color: Colors.black.withAlpha(26),
+            blurRadius: isMobile ? 8 : 14,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       padding: EdgeInsets.fromLTRB(
         containerPadding,
-        containerPaddingTop,
+        containerPaddingTop + (isMobile ? 2 : 4),
         containerPadding,
-        containerPadding,
+        containerPadding + (isMobile ? 2 : 4),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,16 +79,16 @@ class InitiativeCard extends StatelessWidget {
                 ),
               ),
               if (initiative.priority == true) ...[
-                SizedBox(width: 6),
+                SizedBox(width: 8),
                 Tooltip(
                   message: 'Priority Initiative',
                   child: SizedBox(
-                    width: isMobile ? 16 : 18,
-                    height: isMobile ? 16 : 18,
+                    width: isMobile ? 18 : 20,
+                    height: isMobile ? 18 : 20,
                     child: Icon(
                       Icons.star,
                       color: AppColors.highlightYelllow,
-                      size: isMobile ? 14 : 16,
+                      size: isMobile ? 16 : 18,
                       semanticLabel: 'Priority',
                     ),
                   ),
@@ -97,7 +97,7 @@ class InitiativeCard extends StatelessWidget {
             ],
           ),
           if (initiative.link != null && initiative.link!.isNotEmpty) ...[
-            SizedBox(height: isMobile ? 4 : 6),
+            SizedBox(height: isMobile ? 2 : 4),
             GestureDetector(
               onTap: () async {
                 final url = initiative.link!;
@@ -119,14 +119,14 @@ class InitiativeCard extends StatelessWidget {
             center: Text(
               '${(progress * 100).toStringAsFixed(2)}%',
               style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+                fontWeight: FontWeight.w600,
                 fontSize: progressFontSize,
               ),
             ),
             progressColor: Colors.white,
-            backgroundColor: Colors.grey.shade300,
-            barRadius: Radius.circular(40),
+            backgroundColor: Colors.white.withAlpha(46),
+            barRadius: Radius.circular(24),
           ),
         ],
       ),

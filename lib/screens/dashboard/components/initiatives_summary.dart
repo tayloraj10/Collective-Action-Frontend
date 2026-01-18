@@ -124,8 +124,8 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
                             children: [
                               Expanded(
                                 child: Scrollbar(
-                                  thumbVisibility: true,
                                   controller: _scrollController,
+                                  thickness: isMobile ? 4 : 6,
                                   child: isMobile
                                       ? ListView.separated(
                                           controller: _scrollController,
