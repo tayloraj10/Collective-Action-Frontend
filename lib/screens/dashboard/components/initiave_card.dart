@@ -1,4 +1,7 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
+import 'package:collective_action_frontend/app/constants.dart';
+import 'package:collective_action_frontend/app/theme.dart';
+import 'package:collective_action_frontend/components/link.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
@@ -36,6 +39,12 @@ class InitiativeCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
+        border: initiative.priority == true
+            ? Border.all(
+                color: AppColors.highlightYelllow,
+                width: isMobile ? 1.5 : 2.5,
+              )
+            : null,
         boxShadow: [
           BoxShadow(
             color: cardColor.withAlpha((0.18 * 255).toInt()),
@@ -53,31 +62,55 @@ class InitiativeCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            initiative.title,
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-              fontSize: titleFontSize,
-              letterSpacing: 0.1,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          if (initiative.action.isNotEmpty) ...[
-            SizedBox(height: isMobile ? 4 : 6),
-            Text(
-              initiative.action,
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: descFontSize,
-                fontWeight: FontWeight.w400,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  initiative.title,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: titleFontSize,
+                    letterSpacing: 0.1,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+              if (initiative.priority == true) ...[
+                SizedBox(width: 6),
+                Tooltip(
+                  message: 'Priority Initiative',
+                  child: SizedBox(
+                    width: isMobile ? 16 : 18,
+                    height: isMobile ? 16 : 18,
+                    child: Icon(
+                      Icons.star,
+                      color: AppColors.highlightYelllow,
+                      size: isMobile ? 14 : 16,
+                      semanticLabel: 'Priority',
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          if (initiative.link != null && initiative.link!.isNotEmpty) ...[
+            SizedBox(height: isMobile ? 4 : 6),
+            GestureDetector(
+              onTap: () async {
+                final url = initiative.link!;
+                AppConstants.openUrl(url);
+              },
+              child: LinkText(
+                text: initiative.link!,
+                fontSize: descFontSize,
+                color: AppColors.blueAccent,
+              ),
             ),
           ],
-          SizedBox(height: spacing),
+          isMobile ? SizedBox(height: isMobile ? 8 : 12) : Spacer(),
           LinearPercentIndicator(
             animation: true,
             lineHeight: progressHeight,
