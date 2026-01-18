@@ -1,3 +1,5 @@
+import 'package:collective_action_frontend/screens/dashboard/components/initiatives_summary.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
 import 'package:flutter/material.dart';
 
 class SummaryPane extends StatelessWidget {
@@ -14,6 +16,12 @@ class SummaryPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (title == 'Initiatives') {
+      // Show a different widget for Initiatives with live count
+      return InitiativesSummary(icon: icon, color: color);
+    }
+
+    // Default summary pane
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -47,7 +55,7 @@ class SummaryPane extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              Text('0 active', style: Theme.of(context).textTheme.bodyMedium),
+              InitiativeCount(count: 0),
             ],
           ),
         ),
