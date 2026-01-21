@@ -62,6 +62,46 @@ class SummaryPane extends StatelessWidget {
                   ),
                 ],
               ),
+              // Centered Under Construction text
+              Expanded(
+                child: Center(
+                  child: Text(
+                    'Under Construction',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: isMobile ? 30 : 40,
+                      letterSpacing: 2.5,
+                      foreground: Paint()
+                        ..shader =
+                            LinearGradient(
+                              colors: [Colors.black, Colors.grey.shade600],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ).createShader(
+                              Rect.fromLTWH(
+                                0,
+                                0,
+                                isMobile ? 180 : 260,
+                                isMobile ? 40 : 60,
+                              ),
+                            ),
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withAlpha(89),
+                          blurRadius: 12,
+                          offset: Offset(0, 4),
+                        ),
+                        Shadow(
+                          color: Colors.white.withAlpha(77),
+                          blurRadius: 2,
+                          offset: Offset(0, 0),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 16),
               SummaryCount(count: 0),
             ],
