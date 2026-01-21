@@ -35,7 +35,6 @@ class _LinkTextState extends State<LinkText> {
             color: widget.color,
             fontSize: widget.fontSize,
             fontWeight: widget.fontWeight,
-            decoration: TextDecoration.underline,
             overflow: TextOverflow.ellipsis,
           ),
           maxLines: widget.maxLines,

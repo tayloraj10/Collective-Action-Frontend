@@ -1,6 +1,6 @@
 import 'package:collective_action_frontend/screens/dashboard/components/initiatives_summary.dart';
-import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
 import 'package:flutter/material.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
 
 class SummaryPane extends StatelessWidget {
   final String title;
@@ -55,7 +55,7 @@ class SummaryPane extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              InitiativeCount(count: 0),
+              SummaryCount(count: 0),
             ],
           ),
         ),

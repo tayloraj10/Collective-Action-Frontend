@@ -1,4 +1,5 @@
 // Widget to fetch and display initiatives count
+import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/initiave_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,8 +32,9 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isMobile = constraints.maxWidth < 500;
-        final double cardPadding = isMobile ? 10 : 20;
+        final isMobile = AppConstants.isMobile(context);
+        final double cardPaddingHeight = isMobile ? 4 : 6;
+        final double cardPaddingWidth = isMobile ? 6 : 10;
         final double containerPadding = isMobile ? 8 : 14;
         final double containerPaddingTop = isMobile ? 8 : 14;
         final double titleFontSize = isMobile ? 14 : 18;
@@ -58,7 +60,10 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Padding(
-            padding: EdgeInsets.all(cardPadding),
+            padding: EdgeInsets.symmetric(
+              horizontal: cardPaddingWidth,
+              vertical: cardPaddingHeight,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -88,7 +93,7 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
                     ),
                   ],
                 ),
-                SizedBox(height: isMobile ? 8 : 16),
+                SizedBox(height: isMobile ? 8 : 8),
                 // Riverpod AsyncNotifierProvider usage
                 Builder(
                   builder: (context) {
@@ -105,7 +110,7 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
                         style: const TextStyle(color: Colors.red),
                       ),
                       data: (initiatives) {
-                        final countWidget = InitiativeCount(
+                        final countWidget = SummaryCount(
                           count: initiatives.length,
                         );
                         if (initiatives.isEmpty) {
@@ -191,7 +196,7 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
                                         ),
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 4),
                               countWidget,
                             ],
                           ),

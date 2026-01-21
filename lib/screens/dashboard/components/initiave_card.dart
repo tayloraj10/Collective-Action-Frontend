@@ -86,7 +86,7 @@ class InitiativeCard extends StatelessWidget {
                     width: isMobile ? 18 : 20,
                     height: isMobile ? 18 : 20,
                     child: Icon(
-                      Icons.star,
+                      Icons.flare,
                       color: AppColors.highlightYelllow,
                       size: isMobile ? 16 : 18,
                       semanticLabel: 'Priority',
