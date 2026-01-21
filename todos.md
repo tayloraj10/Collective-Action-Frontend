@@ -2,8 +2,8 @@
 
 ## Tasks
 
-- [ ] Task 1
-- [ ] Task 2
+- [ Make user record on signup ] Task 1
+- [ Fetch user info on page load ] Task 2
 - [ ] Task 3
 - [ ] Task 4
 - [ ] Task 5

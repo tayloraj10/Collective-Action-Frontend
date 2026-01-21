@@ -1,0 +1,5 @@
+pubName: collective_action_api
+pubLibrary: collective_action_api
+pubVersion: 1.0.0
+pubDescription: Collective Action API Client
+browserClient: false

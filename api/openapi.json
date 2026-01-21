@@ -1,0 +1,1791 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Collective Action Backend",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/health": {
+            "get": {
+                "summary": "Health",
+                "operationId": "health_health_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/initiatives/": {
+            "get": {
+                "tags": [
+                    "initiatives"
+                ],
+                "summary": "List Initiatives",
+                "operationId": "list_initiatives_initiatives__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/InitiativeSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Initiatives Initiatives  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "initiatives"
+                ],
+                "summary": "Create Initiative",
+                "operationId": "create_initiative_initiatives__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InitiativeCreateSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InitiativeSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/initiatives/active": {
+            "get": {
+                "tags": [
+                    "initiatives"
+                ],
+                "summary": "List Active Initiatives",
+                "operationId": "list_active_initiatives_initiatives_active_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/InitiativeSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Active Initiatives Initiatives Active Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/initiatives/summary": {
+            "get": {
+                "tags": [
+                    "initiatives"
+                ],
+                "summary": "List Initiatives Summary",
+                "operationId": "list_initiatives_summary_initiatives_summary_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/InitiativeSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Initiatives Summary Initiatives Summary Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/initiatives/featured": {
+            "get": {
+                "tags": [
+                    "initiatives"
+                ],
+                "summary": "Get Featured Initiatives",
+                "operationId": "get_featured_initiatives_initiatives_featured_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/InitiativeSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Get Featured Initiatives Initiatives Featured Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/initiatives/{initiative_id}": {
+            "get": {
+                "tags": [
+                    "initiatives"
+                ],
+                "summary": "Get Initiative",
+                "operationId": "get_initiative_initiatives__initiative_id__get",
+                "parameters": [
+                    {
+                        "name": "initiative_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Initiative Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InitiativeSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/actions/": {
+            "post": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Create Action",
+                "operationId": "create_action_actions__post",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ActionCreateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "List Actions",
+                "operationId": "list_actions_actions__get",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Limit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ActionSchema"
+                                    },
+                                    "title": "Response List Actions Actions  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/actions/recent": {
+            "get": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Get Latest Action",
+                "operationId": "get_latest_action_actions_recent_get",
+                "parameters": [
+                    {
+                        "name": "days",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 7,
+                            "title": "Days"
+                        }
+                    },
+                    {
+                        "name": "action_type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/components/schemas/ActionTypeValuesEnum"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ActionSchema"
+                                    },
+                                    "title": "Response Get Latest Action Actions Recent Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/actions/{action_id}": {
+            "get": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Get Action",
+                "operationId": "get_action_actions__action_id__get",
+                "parameters": [
+                    {
+                        "name": "action_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Action Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Delete Action",
+                "operationId": "delete_action_actions__action_id__delete",
+                "parameters": [
+                    {
+                        "name": "action_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Action Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/actions/by_linked/{linked_id}": {
+            "get": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Get Actions By Linked",
+                "operationId": "get_actions_by_linked_actions_by_linked__linked_id__get",
+                "parameters": [
+                    {
+                        "name": "linked_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Linked Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ActionSchema"
+                                    },
+                                    "title": "Response Get Actions By Linked Actions By Linked  Linked Id  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/categories/": {
+            "get": {
+                "tags": [
+                    "categories"
+                ],
+                "summary": "List Categories",
+                "operationId": "list_categories_categories__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/CategorySchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Categories Categories  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Create Category",
+                "operationId": "create_category_categories__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CategoryCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CategorySchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/categories/{category_id}": {
+            "get": {
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Get Category",
+                "operationId": "get_category_categories__category_id__get",
+                "parameters": [
+                    {
+                        "name": "category_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Category Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CategorySchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Update Category",
+                "operationId": "update_category_categories__category_id__put",
+                "parameters": [
+                    {
+                        "name": "category_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Category Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CategoryCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CategorySchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Delete Category",
+                "operationId": "delete_category_categories__category_id__delete",
+                "parameters": [
+                    {
+                        "name": "category_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Category Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/statuses/": {
+            "get": {
+                "tags": [
+                    "statuses"
+                ],
+                "summary": "List Statuses",
+                "operationId": "list_statuses_statuses__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/StatusSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Statuses Statuses  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "statuses"
+                ],
+                "summary": "Create Status",
+                "operationId": "create_status_statuses__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StatusCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StatusSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/statuses/{status_id}": {
+            "get": {
+                "tags": [
+                    "statuses"
+                ],
+                "summary": "Get Status",
+                "operationId": "get_status_statuses__status_id__get",
+                "parameters": [
+                    {
+                        "name": "status_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Status Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StatusSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "statuses"
+                ],
+                "summary": "Update Status",
+                "operationId": "update_status_statuses__status_id__put",
+                "parameters": [
+                    {
+                        "name": "status_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Status Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StatusCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StatusSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "statuses"
+                ],
+                "summary": "Delete Status",
+                "operationId": "delete_status_statuses__status_id__delete",
+                "parameters": [
+                    {
+                        "name": "status_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Status Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/statuses/by_type/{status_type}": {
+            "get": {
+                "tags": [
+                    "statuses"
+                ],
+                "summary": "Get Statuses By Type",
+                "operationId": "get_statuses_by_type_statuses_by_type__status_type__get",
+                "parameters": [
+                    {
+                        "name": "status_type",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Status Type"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/StatusSchema"
+                                    },
+                                    "title": "Response Get Statuses By Type Statuses By Type  Status Type  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/action_types/": {
+            "get": {
+                "tags": [
+                    "action_types"
+                ],
+                "summary": "List Action Types",
+                "operationId": "list_action_types_action_types__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/ActionTypeSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Action Types Action Types  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "action_types"
+                ],
+                "summary": "Create Action Type",
+                "operationId": "create_action_type_action_types__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ActionTypeCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionTypeSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/action_types/{action_type_id}": {
+            "get": {
+                "tags": [
+                    "action_types"
+                ],
+                "summary": "Get Action Type",
+                "operationId": "get_action_type_action_types__action_type_id__get",
+                "parameters": [
+                    {
+                        "name": "action_type_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Action Type Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionTypeSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "action_types"
+                ],
+                "summary": "Update Action Type",
+                "operationId": "update_action_type_action_types__action_type_id__put",
+                "parameters": [
+                    {
+                        "name": "action_type_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Action Type Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ActionTypeCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionTypeSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "action_types"
+                ],
+                "summary": "Delete Action Type",
+                "operationId": "delete_action_type_action_types__action_type_id__delete",
+                "parameters": [
+                    {
+                        "name": "action_type_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Action Type Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/": {
+            "get": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "List Users",
+                "description": "Retrieve a list of all users from the database.",
+                "operationId": "list_users_users__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/UserSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Users Users  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Create User",
+                "description": "Create a new user in the database.\nValidates required fields and checks for duplicate emails.",
+                "operationId": "create_user_users__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{user_id}": {
+            "get": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get User",
+                "description": "Retrieve a user by their unique ID.\nRaises 404 if the user is not found.",
+                "operationId": "get_user_users__user_id__get",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "User Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update User",
+                "description": "Update an existing user's information.\nChecks for email uniqueness and applies partial updates.\nRaises 404 if the user is not found.",
+                "operationId": "update_user_users__user_id__patch",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "User Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Delete User",
+                "description": "Delete a user by their unique ID.\nRaises 404 if the user is not found.",
+                "operationId": "delete_user_users__user_id__delete",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "User Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ActionCreateSchema": {
+                "properties": {
+                    "action_type": {
+                        "type": "string",
+                        "title": "Action Type"
+                    },
+                    "amount": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Amount"
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    },
+                    "linked_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Linked Id"
+                    },
+                    "user_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "User Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "action_type"
+                ],
+                "title": "ActionCreateSchema"
+            },
+            "ActionSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "action_type": {
+                        "type": "string",
+                        "title": "Action Type"
+                    },
+                    "amount": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Amount"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Date"
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    },
+                    "linked_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Linked Id"
+                    },
+                    "user_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "User Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "action_type",
+                    "date"
+                ],
+                "title": "ActionSchema"
+            },
+            "ActionTypeCreate": {
+                "properties": {
+                    "name": {
+                        "$ref": "#/components/schemas/ActionTypeValuesEnum"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name"
+                ],
+                "title": "ActionTypeCreate"
+            },
+            "ActionTypeSchema": {
+                "properties": {
+                    "id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Id"
+                    },
+                    "name": {
+                        "$ref": "#/components/schemas/ActionTypeValuesEnum"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name"
+                ],
+                "title": "ActionTypeSchema"
+            },
+            "ActionTypeValuesEnum": {
+                "type": "string",
+                "enum": [
+                    "Initiative",
+                    "Map Submission"
+                ],
+                "title": "ActionTypeValuesEnum"
+            },
+            "CategoryCreate": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name"
+                ],
+                "title": "CategoryCreate"
+            },
+            "CategorySchema": {
+                "properties": {
+                    "id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Id"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name"
+                ],
+                "title": "CategorySchema"
+            },
+            "InitiativeCreateSchema": {
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "title": "Title"
+                    },
+                    "action": {
+                        "type": "string",
+                        "title": "Action"
+                    },
+                    "category_id": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Category Id"
+                    },
+                    "goal": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Goal"
+                    },
+                    "link": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Link"
+                    },
+                    "priority": {
+                        "type": "boolean",
+                        "title": "Priority",
+                        "default": false
+                    },
+                    "status_id": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Status Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "title",
+                    "action"
+                ],
+                "title": "InitiativeCreateSchema"
+            },
+            "InitiativeSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "title": {
+                        "type": "string",
+                        "title": "Title"
+                    },
+                    "action": {
+                        "type": "string",
+                        "title": "Action"
+                    },
+                    "category_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Category Id"
+                    },
+                    "goal": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Goal"
+                    },
+                    "complete": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Complete"
+                    },
+                    "link": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Link"
+                    },
+                    "priority": {
+                        "type": "boolean",
+                        "title": "Priority",
+                        "default": false
+                    },
+                    "status_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Status Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "title",
+                    "action"
+                ],
+                "title": "InitiativeSchema"
+            },
+            "LocationSchema": {
+                "properties": {
+                    "city": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "City"
+                    },
+                    "state": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "State"
+                    },
+                    "country": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Country"
+                    }
+                },
+                "type": "object",
+                "title": "LocationSchema"
+            },
+            "SocialLinksSchema": {
+                "properties": {
+                    "youtube": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Youtube"
+                    },
+                    "instagram": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Instagram"
+                    },
+                    "tiktok": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Tiktok"
+                    },
+                    "website": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Website"
+                    }
+                },
+                "type": "object",
+                "title": "SocialLinksSchema"
+            },
+            "StatusCreate": {
+                "properties": {
+                    "name": {
+                        "$ref": "#/components/schemas/StatusValuesEnum"
+                    },
+                    "status_type": {
+                        "$ref": "#/components/schemas/StatusTypeEnum"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "status_type"
+                ],
+                "title": "StatusCreate"
+            },
+            "StatusSchema": {
+                "properties": {
+                    "id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Id"
+                    },
+                    "name": {
+                        "$ref": "#/components/schemas/StatusValuesEnum"
+                    },
+                    "status_type": {
+                        "$ref": "#/components/schemas/StatusTypeEnum"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "status_type"
+                ],
+                "title": "StatusSchema"
+            },
+            "StatusTypeEnum": {
+                "type": "string",
+                "enum": [
+                    "Status",
+                    "Project Status"
+                ],
+                "title": "StatusTypeEnum"
+            },
+            "StatusValuesEnum": {
+                "type": "string",
+                "enum": [
+                    "In Progress",
+                    "Completed",
+                    "Active",
+                    "Inactive"
+                ],
+                "title": "StatusValuesEnum"
+            },
+            "UserCreate": {
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "title": "Email"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "photo_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Photo Url"
+                    },
+                    "user_type": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/UserType"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "is_active": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Is Active"
+                    },
+                    "location": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/LocationSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "social_links": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/SocialLinksSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "firebase_user_id": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Firebase User Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "email",
+                    "name"
+                ],
+                "title": "UserCreate"
+            },
+            "UserSchema": {
+                "properties": {
+                    "id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Id"
+                    },
+                    "email": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "email"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Email"
+                    },
+                    "name": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Name"
+                    },
+                    "photo_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Photo Url"
+                    },
+                    "user_type": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/UserType"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "is_active": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Is Active"
+                    },
+                    "location": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/LocationSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "social_links": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/SocialLinksSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "firebase_user_id": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Firebase User Id"
+                    },
+                    "created_at": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Created At"
+                    },
+                    "updated_at": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Updated At"
+                    }
+                },
+                "type": "object",
+                "title": "UserSchema"
+            },
+            "UserType": {
+                "type": "string",
+                "enum": [
+                    "person",
+                    "group"
+                ],
+                "title": "UserType"
+            }
+        }
+    }
+}

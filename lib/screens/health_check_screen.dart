@@ -1,4 +1,4 @@
-import 'package:collective_action_frontend/services/api_service.dart';
+import 'package:collective_action_frontend/services/health_service.dart';
 import 'package:flutter/material.dart';
 
 class HealthCheckScreen extends StatefulWidget {

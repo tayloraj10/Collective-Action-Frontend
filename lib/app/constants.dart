@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // App-wide constants
 
@@ -19,5 +20,13 @@ class AppConstants {
   // Helper method to check if device is mobile
   static bool isMobile(BuildContext context) {
     return MediaQuery.of(context).size.width < mobileBreakpoint;
+  }
+
+  // Opens a URL in an external application
+  static Future<void> openUrl(String url) async {
+    // You must import 'package:url_launcher/url_launcher.dart' in the file where you use this function.
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    }
   }
 }

@@ -22,48 +22,100 @@ class DashboardScreen extends ConsumerWidget {
               horizontal: isMobile ? 8 : 16,
               vertical: 12,
             ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  NavigationButton(
-                    icon: Icons.trending_up,
-                    label: 'Initiatives',
-                    color: AppColors.lightBlue,
-                    onTap: () {
-                      context.go('/initiatives');
-                    },
+            child: isMobile
+                ? Row(
+                    children: [
+                      Expanded(
+                        child: NavigationButton(
+                          icon: Icons.trending_up,
+                          label: 'Initiatives',
+                          color: AppColors.lightBlue,
+                          onTap: () {
+                            context.go('/initiatives');
+                          },
+                          small: true,
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      Expanded(
+                        child: NavigationButton(
+                          icon: Icons.assignment_outlined,
+                          label: 'Projects',
+                          color: AppColors.errorRed,
+                          onTap: () {
+                            context.go('/projects');
+                          },
+                          small: true,
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      Expanded(
+                        child: NavigationButton(
+                          icon: Icons.map_outlined,
+                          label: 'Maps',
+                          color: AppColors.successGreen,
+                          onTap: () {
+                            context.go('/maps');
+                          },
+                          small: true,
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      Expanded(
+                        child: NavigationButton(
+                          icon: Icons.people_outline,
+                          label: 'Social',
+                          color: AppColors.warningOrange,
+                          onTap: () {
+                            context.go('/social');
+                          },
+                          small: true,
+                        ),
+                      ),
+                    ],
+                  )
+                : SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        NavigationButton(
+                          icon: Icons.trending_up,
+                          label: 'Initiatives',
+                          color: AppColors.lightBlue,
+                          onTap: () {
+                            context.go('/initiatives');
+                          },
+                        ),
+                        SizedBox(width: 12),
+                        NavigationButton(
+                          icon: Icons.assignment_outlined,
+                          label: 'Projects',
+                          color: AppColors.errorRed,
+                          onTap: () {
+                            context.go('/projects');
+                          },
+                        ),
+                        SizedBox(width: 12),
+                        NavigationButton(
+                          icon: Icons.map_outlined,
+                          label: 'Maps',
+                          color: AppColors.successGreen,
+                          onTap: () {
+                            context.go('/maps');
+                          },
+                        ),
+                        SizedBox(width: 12),
+                        NavigationButton(
+                          icon: Icons.people_outline,
+                          label: 'Social',
+                          color: AppColors.warningOrange,
+                          onTap: () {
+                            context.go('/social');
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                  SizedBox(width: isMobile ? 8 : 12),
-                  NavigationButton(
-                    icon: Icons.assignment_outlined,
-                    label: 'Projects',
-                    color: AppColors.errorRed,
-                    onTap: () {
-                      context.go('/projects');
-                    },
-                  ),
-                  SizedBox(width: isMobile ? 8 : 12),
-                  NavigationButton(
-                    icon: Icons.map_outlined,
-                    label: 'Maps',
-                    color: AppColors.successGreen,
-                    onTap: () {
-                      context.go('/maps');
-                    },
-                  ),
-                  SizedBox(width: isMobile ? 8 : 12),
-                  NavigationButton(
-                    icon: Icons.people_outline,
-                    label: 'Social',
-                    color: AppColors.warningOrange,
-                    onTap: () {
-                      context.go('/social');
-                    },
-                  ),
-                ],
-              ),
-            ),
           ),
           Divider(height: 1),
           // 4-Pane Layout

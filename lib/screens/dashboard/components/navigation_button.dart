@@ -6,6 +6,7 @@ class NavigationButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
   final Color? color;
+  final bool small;
 
   const NavigationButton({
     super.key,
@@ -13,6 +14,7 @@ class NavigationButton extends StatelessWidget {
     required this.label,
     required this.onTap,
     this.color,
+    this.small = false,
   });
 
   @override
@@ -23,7 +25,10 @@ class NavigationButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(8),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: EdgeInsets.symmetric(
+            horizontal: small ? 6 : 12,
+            vertical: small ? 4 : 8,
+          ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
@@ -33,13 +38,18 @@ class NavigationButton extends StatelessWidget {
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: color ?? AppColors.lightBlue, size: 20),
-              const SizedBox(width: 6),
+              Icon(
+                icon,
+                color: color ?? AppColors.lightBlue,
+                size: small ? 16 : 20,
+              ),
+              SizedBox(width: small ? 4 : 6),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: small ? 12 : 14,
                   fontWeight: FontWeight.w500,
                   color: color ?? AppColors.lightBlue,
                 ),

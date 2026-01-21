@@ -5,6 +5,7 @@ class AppColors {
   static const primaryBlue = Color(0xFF1E40AF);
   static const lightBlue = Color(0xFF3B82F6);
   static const darkBlue = Color(0xFF1E3A8A);
+  static const blueAccent = Colors.lightBlueAccent;
 
   // Neutrals & Silver
   static const silver = Color(0xFFF1F5F9);
@@ -17,6 +18,7 @@ class AppColors {
   static const errorRed = Color(0xFFDC2626);
   static const successGreen = Color(0xFF16A34A);
   static const warningOrange = Color(0xFFEA580C);
+  static const highlightYelllow = Color(0xFFFFE082);
 
   // Text Colors
   static const textPrimary = Color(0xFF1E293B);
