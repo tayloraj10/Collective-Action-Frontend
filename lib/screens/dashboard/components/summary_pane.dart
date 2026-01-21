@@ -1,3 +1,4 @@
+import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/initiatives_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
@@ -21,14 +22,21 @@ class SummaryPane extends StatelessWidget {
       return InitiativesSummary(icon: icon, color: color);
     }
 
-    // Default summary pane
+    // Match InitiativesSummary padding
+    final isMobile = AppConstants.isMobile(context);
+    final double cardPaddingHeight = isMobile ? 4 : 6;
+    final double cardPaddingWidth = isMobile ? 6 : 10;
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.symmetric(
+            horizontal: cardPaddingWidth,
+            vertical: cardPaddingHeight,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
