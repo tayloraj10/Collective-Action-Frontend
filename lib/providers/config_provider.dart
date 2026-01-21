@@ -20,3 +20,22 @@ class StatusesNotifier extends AsyncNotifier<List<StatusSchema>> {
     });
   }
 }
+
+final categoriesProvider =
+    AsyncNotifierProvider<CategoriesNotifier, List<CategorySchema>>(
+      CategoriesNotifier.new,
+    );
+
+class CategoriesNotifier extends AsyncNotifier<List<CategorySchema>> {
+  @override
+  Future<List<CategorySchema>> build() async {
+    return await CategoryService().fetchCategoryOptions() ?? [];
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      return await CategoryService().fetchCategoryOptions() ?? [];
+    });
+  }
+}
