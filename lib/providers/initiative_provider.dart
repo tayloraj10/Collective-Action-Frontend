@@ -7,6 +7,11 @@ final activeInitiativeProvider =
       ActiveInitiativeNotifier.new,
     );
 
+final featuredInitiativeProvider =
+    AsyncNotifierProvider<FeaturedInitiativeNotifier, List<InitiativeSchema>>(
+      FeaturedInitiativeNotifier.new,
+    );
+
 class ActiveInitiativeNotifier extends AsyncNotifier<List<InitiativeSchema>> {
   @override
   Future<List<InitiativeSchema>> build() async {
@@ -17,6 +22,20 @@ class ActiveInitiativeNotifier extends AsyncNotifier<List<InitiativeSchema>> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       return await InitiativesService().fetchActiveInitiatives() ?? [];
+    });
+  }
+}
+
+class FeaturedInitiativeNotifier extends AsyncNotifier<List<InitiativeSchema>> {
+  @override
+  Future<List<InitiativeSchema>> build() async {
+    return await InitiativesService().fetchFeaturedInitiatives() ?? [];
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      return await InitiativesService().fetchFeaturedInitiatives() ?? [];
     });
   }
 }

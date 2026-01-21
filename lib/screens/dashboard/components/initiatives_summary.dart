@@ -98,7 +98,7 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
                 Builder(
                   builder: (context) {
                     final initiativesAsync = ref.watch(
-                      activeInitiativeProvider,
+                      featuredInitiativeProvider,
                     );
                     return initiativesAsync.when(
                       loading: () => const Text(
