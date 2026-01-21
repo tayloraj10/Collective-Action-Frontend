@@ -253,8 +253,8 @@
                 "tags": [
                     "actions"
                 ],
-                "summary": "Get Latest Action",
-                "operationId": "get_latest_action_actions_recent_get",
+                "summary": "Get Latest Actions",
+                "operationId": "get_latest_actions_actions_recent_get",
                 "parameters": [
                     {
                         "name": "days",
@@ -285,7 +285,7 @@
                                     "items": {
                                         "$ref": "#/components/schemas/ActionSchema"
                                     },
-                                    "title": "Response Get Latest Action Actions Recent Get"
+                                    "title": "Response Get Latest Actions Actions Recent Get"
                                 }
                             }
                         }

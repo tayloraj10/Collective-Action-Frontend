@@ -68,7 +68,7 @@ Class | Method | HTTP request | Description
 *ActionsApi* | [**deleteActionActionsActionIdDelete**](doc//ActionsApi.md#deleteactionactionsactioniddelete) | **DELETE** /actions/{action_id} | Delete Action
 *ActionsApi* | [**getActionActionsActionIdGet**](doc//ActionsApi.md#getactionactionsactionidget) | **GET** /actions/{action_id} | Get Action
 *ActionsApi* | [**getActionsByLinkedActionsByLinkedLinkedIdGet**](doc//ActionsApi.md#getactionsbylinkedactionsbylinkedlinkedidget) | **GET** /actions/by_linked/{linked_id} | Get Actions By Linked
-*ActionsApi* | [**getLatestActionActionsRecentGet**](doc//ActionsApi.md#getlatestactionactionsrecentget) | **GET** /actions/recent | Get Latest Action
+*ActionsApi* | [**getLatestActionsActionsRecentGet**](doc//ActionsApi.md#getlatestactionsactionsrecentget) | **GET** /actions/recent | Get Latest Actions
 *ActionsApi* | [**listActionsActionsGet**](doc//ActionsApi.md#listactionsactionsget) | **GET** /actions/ | List Actions
 *CategoriesApi* | [**createCategoryCategoriesPost**](doc//CategoriesApi.md#createcategorycategoriespost) | **POST** /categories/ | Create Category
 *CategoriesApi* | [**deleteCategoryCategoriesCategoryIdDelete**](doc//CategoriesApi.md#deletecategorycategoriescategoryiddelete) | **DELETE** /categories/{category_id} | Delete Category

@@ -13,7 +13,7 @@ Method | HTTP request | Description
 [**deleteActionActionsActionIdDelete**](ActionsApi.md#deleteactionactionsactioniddelete) | **DELETE** /actions/{action_id} | Delete Action
 [**getActionActionsActionIdGet**](ActionsApi.md#getactionactionsactionidget) | **GET** /actions/{action_id} | Get Action
 [**getActionsByLinkedActionsByLinkedLinkedIdGet**](ActionsApi.md#getactionsbylinkedactionsbylinkedlinkedidget) | **GET** /actions/by_linked/{linked_id} | Get Actions By Linked
-[**getLatestActionActionsRecentGet**](ActionsApi.md#getlatestactionactionsrecentget) | **GET** /actions/recent | Get Latest Action
+[**getLatestActionsActionsRecentGet**](ActionsApi.md#getlatestactionsactionsrecentget) | **GET** /actions/recent | Get Latest Actions
 [**listActionsActionsGet**](ActionsApi.md#listactionsactionsget) | **GET** /actions/ | List Actions
 
 
@@ -181,10 +181,10 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getLatestActionActionsRecentGet**
-> List<ActionSchema> getLatestActionActionsRecentGet(days, actionType)
+# **getLatestActionsActionsRecentGet**
+> List<ActionSchema> getLatestActionsActionsRecentGet(days, actionType)
 
-Get Latest Action
+Get Latest Actions
 
 ### Example
 ```dart
@@ -195,10 +195,10 @@ final days = 56; // int |
 final actionType = ; // ActionTypeValuesEnum | 
 
 try {
-    final result = api_instance.getLatestActionActionsRecentGet(days, actionType);
+    final result = api_instance.getLatestActionsActionsRecentGet(days, actionType);
     print(result);
 } catch (e) {
-    print('Exception when calling ActionsApi->getLatestActionActionsRecentGet: $e\n');
+    print('Exception when calling ActionsApi->getLatestActionsActionsRecentGet: $e\n');
 }
 ```
 

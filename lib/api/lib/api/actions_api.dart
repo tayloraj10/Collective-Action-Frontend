@@ -230,7 +230,7 @@ class ActionsApi {
     return null;
   }
 
-  /// Get Latest Action
+  /// Get Latest Actions
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -239,7 +239,7 @@ class ActionsApi {
   /// * [int] days:
   ///
   /// * [ActionTypeValuesEnum] actionType:
-  Future<Response> getLatestActionActionsRecentGetWithHttpInfo({ int? days, ActionTypeValuesEnum? actionType, }) async {
+  Future<Response> getLatestActionsActionsRecentGetWithHttpInfo({ int? days, ActionTypeValuesEnum? actionType, }) async {
     // ignore: prefer_const_declarations
     final path = r'/actions/recent';
 
@@ -271,15 +271,15 @@ class ActionsApi {
     );
   }
 
-  /// Get Latest Action
+  /// Get Latest Actions
   ///
   /// Parameters:
   ///
   /// * [int] days:
   ///
   /// * [ActionTypeValuesEnum] actionType:
-  Future<List<ActionSchema>?> getLatestActionActionsRecentGet({ int? days, ActionTypeValuesEnum? actionType, }) async {
-    final response = await getLatestActionActionsRecentGetWithHttpInfo( days: days, actionType: actionType, );
+  Future<List<ActionSchema>?> getLatestActionsActionsRecentGet({ int? days, ActionTypeValuesEnum? actionType, }) async {
+    final response = await getLatestActionsActionsRecentGetWithHttpInfo( days: days, actionType: actionType, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
