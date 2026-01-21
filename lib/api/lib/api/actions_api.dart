@@ -68,6 +68,59 @@ class ActionsApi {
     return null;
   }
 
+  /// Delete Action
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] actionId (required):
+  Future<Response> deleteActionActionsActionIdDeleteWithHttpInfo(String actionId,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/actions/{action_id}'
+      .replaceAll('{action_id}', actionId);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'DELETE',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Delete Action
+  ///
+  /// Parameters:
+  ///
+  /// * [String] actionId (required):
+  Future<ActionSchema?> deleteActionActionsActionIdDelete(String actionId,) async {
+    final response = await deleteActionActionsActionIdDeleteWithHttpInfo(actionId,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ActionSchema',) as ActionSchema;
+    
+    }
+    return null;
+  }
+
   /// Get Action
   ///
   /// Note: This method returns the HTTP [Response].
@@ -121,17 +174,17 @@ class ActionsApi {
     return null;
   }
 
-  /// Get Actions By Initiative
+  /// Get Actions By Linked
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
-  /// * [String] initiativeId (required):
-  Future<Response> getActionsByInitiativeActionsByInitiativeInitiativeIdGetWithHttpInfo(String initiativeId,) async {
+  /// * [String] linkedId (required):
+  Future<Response> getActionsByLinkedActionsByLinkedLinkedIdGetWithHttpInfo(String linkedId,) async {
     // ignore: prefer_const_declarations
-    final path = r'/actions/by_initiative/{initiative_id}'
-      .replaceAll('{initiative_id}', initiativeId);
+    final path = r'/actions/by_linked/{linked_id}'
+      .replaceAll('{linked_id}', linkedId);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -154,13 +207,79 @@ class ActionsApi {
     );
   }
 
-  /// Get Actions By Initiative
+  /// Get Actions By Linked
   ///
   /// Parameters:
   ///
-  /// * [String] initiativeId (required):
-  Future<List<ActionSchema>?> getActionsByInitiativeActionsByInitiativeInitiativeIdGet(String initiativeId,) async {
-    final response = await getActionsByInitiativeActionsByInitiativeInitiativeIdGetWithHttpInfo(initiativeId,);
+  /// * [String] linkedId (required):
+  Future<List<ActionSchema>?> getActionsByLinkedActionsByLinkedLinkedIdGet(String linkedId,) async {
+    final response = await getActionsByLinkedActionsByLinkedLinkedIdGetWithHttpInfo(linkedId,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final responseBody = await _decodeBodyBytes(response);
+      return (await apiClient.deserializeAsync(responseBody, 'List<ActionSchema>') as List)
+        .cast<ActionSchema>()
+        .toList(growable: false);
+
+    }
+    return null;
+  }
+
+  /// Get Latest Action
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [int] days:
+  ///
+  /// * [ActionTypeValuesEnum] actionType:
+  Future<Response> getLatestActionActionsRecentGetWithHttpInfo({ int? days, ActionTypeValuesEnum? actionType, }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/actions/recent';
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    if (days != null) {
+      queryParams.addAll(_queryParams('', 'days', days));
+    }
+    if (actionType != null) {
+      queryParams.addAll(_queryParams('', 'action_type', actionType));
+    }
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get Latest Action
+  ///
+  /// Parameters:
+  ///
+  /// * [int] days:
+  ///
+  /// * [ActionTypeValuesEnum] actionType:
+  Future<List<ActionSchema>?> getLatestActionActionsRecentGet({ int? days, ActionTypeValuesEnum? actionType, }) async {
+    final response = await getLatestActionActionsRecentGetWithHttpInfo( days: days, actionType: actionType, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

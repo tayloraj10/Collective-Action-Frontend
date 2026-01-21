@@ -18,26 +18,23 @@ class ActionSchema {
     this.amount,
     required this.date,
     this.imageUrl,
-    this.initiativeId,
-    required this.userId,
-    this.extraData = const {},
+    this.linkedId,
+    this.userId,
   });
 
   String id;
 
   String actionType;
 
-  int? amount;
+  num? amount;
 
   DateTime date;
 
   String? imageUrl;
 
-  String? initiativeId;
+  String? linkedId;
 
-  String userId;
-
-  Map<String, Object>? extraData;
+  String? userId;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is ActionSchema &&
@@ -46,9 +43,8 @@ class ActionSchema {
     other.amount == amount &&
     other.date == date &&
     other.imageUrl == imageUrl &&
-    other.initiativeId == initiativeId &&
-    other.userId == userId &&
-    _deepEquality.equals(other.extraData, extraData);
+    other.linkedId == linkedId &&
+    other.userId == userId;
 
   @override
   int get hashCode =>
@@ -58,12 +54,11 @@ class ActionSchema {
     (amount == null ? 0 : amount!.hashCode) +
     (date.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
-    (initiativeId == null ? 0 : initiativeId!.hashCode) +
-    (userId.hashCode) +
-    (extraData == null ? 0 : extraData!.hashCode);
+    (linkedId == null ? 0 : linkedId!.hashCode) +
+    (userId == null ? 0 : userId!.hashCode);
 
   @override
-  String toString() => 'ActionSchema[id=$id, actionType=$actionType, amount=$amount, date=$date, imageUrl=$imageUrl, initiativeId=$initiativeId, userId=$userId, extraData=$extraData]';
+  String toString() => 'ActionSchema[id=$id, actionType=$actionType, amount=$amount, date=$date, imageUrl=$imageUrl, linkedId=$linkedId, userId=$userId]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -80,16 +75,15 @@ class ActionSchema {
     } else {
       json[r'image_url'] = null;
     }
-    if (this.initiativeId != null) {
-      json[r'initiative_id'] = this.initiativeId;
+    if (this.linkedId != null) {
+      json[r'linked_id'] = this.linkedId;
     } else {
-      json[r'initiative_id'] = null;
+      json[r'linked_id'] = null;
     }
+    if (this.userId != null) {
       json[r'user_id'] = this.userId;
-    if (this.extraData != null) {
-      json[r'extra_data'] = this.extraData;
     } else {
-      json[r'extra_data'] = null;
+      json[r'user_id'] = null;
     }
     return json;
   }
@@ -115,12 +109,13 @@ class ActionSchema {
       return ActionSchema(
         id: mapValueOfType<String>(json, r'id')!,
         actionType: mapValueOfType<String>(json, r'action_type')!,
-        amount: mapValueOfType<int>(json, r'amount'),
+        amount: json[r'amount'] == null
+            ? null
+            : num.parse('${json[r'amount']}'),
         date: mapDateTime(json, r'date', r'')!,
         imageUrl: mapValueOfType<String>(json, r'image_url'),
-        initiativeId: mapValueOfType<String>(json, r'initiative_id'),
-        userId: mapValueOfType<String>(json, r'user_id')!,
-        extraData: mapCastOfType<String, Object>(json, r'extra_data') ?? const {},
+        linkedId: mapValueOfType<String>(json, r'linked_id'),
+        userId: mapValueOfType<String>(json, r'user_id'),
       );
     }
     return null;
@@ -171,7 +166,6 @@ class ActionSchema {
     'id',
     'action_type',
     'date',
-    'user_id',
   };
 }
 

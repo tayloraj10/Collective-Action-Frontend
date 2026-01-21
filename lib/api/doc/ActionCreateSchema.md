@@ -9,12 +9,10 @@ import 'package:collective_action_api/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **actionType** | **String** |  | 
-**amount** | **int** |  | [optional] 
-**date** | [**DateTime**](DateTime.md) |  | 
+**amount** | **num** |  | [optional] 
 **imageUrl** | **String** |  | [optional] 
-**initiativeId** | **String** |  | [optional] 
-**userId** | **String** |  | 
-**extraData** | [**Map<String, Object>**](Object.md) |  | [optional] [default to const {}]
+**linkedId** | **String** |  | [optional] 
+**userId** | **String** |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

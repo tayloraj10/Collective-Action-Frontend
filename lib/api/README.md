@@ -65,8 +65,10 @@ Class | Method | HTTP request | Description
 *ActionTypesApi* | [**listActionTypesActionTypesGet**](doc//ActionTypesApi.md#listactiontypesactiontypesget) | **GET** /action_types/ | List Action Types
 *ActionTypesApi* | [**updateActionTypeActionTypesActionTypeIdPut**](doc//ActionTypesApi.md#updateactiontypeactiontypesactiontypeidput) | **PUT** /action_types/{action_type_id} | Update Action Type
 *ActionsApi* | [**createActionActionsPost**](doc//ActionsApi.md#createactionactionspost) | **POST** /actions/ | Create Action
+*ActionsApi* | [**deleteActionActionsActionIdDelete**](doc//ActionsApi.md#deleteactionactionsactioniddelete) | **DELETE** /actions/{action_id} | Delete Action
 *ActionsApi* | [**getActionActionsActionIdGet**](doc//ActionsApi.md#getactionactionsactionidget) | **GET** /actions/{action_id} | Get Action
-*ActionsApi* | [**getActionsByInitiativeActionsByInitiativeInitiativeIdGet**](doc//ActionsApi.md#getactionsbyinitiativeactionsbyinitiativeinitiativeidget) | **GET** /actions/by_initiative/{initiative_id} | Get Actions By Initiative
+*ActionsApi* | [**getActionsByLinkedActionsByLinkedLinkedIdGet**](doc//ActionsApi.md#getactionsbylinkedactionsbylinkedlinkedidget) | **GET** /actions/by_linked/{linked_id} | Get Actions By Linked
+*ActionsApi* | [**getLatestActionActionsRecentGet**](doc//ActionsApi.md#getlatestactionactionsrecentget) | **GET** /actions/recent | Get Latest Action
 *ActionsApi* | [**listActionsActionsGet**](doc//ActionsApi.md#listactionsactionsget) | **GET** /actions/ | List Actions
 *CategoriesApi* | [**createCategoryCategoriesPost**](doc//CategoriesApi.md#createcategorycategoriespost) | **POST** /categories/ | Create Category
 *CategoriesApi* | [**deleteCategoryCategoriesCategoryIdDelete**](doc//CategoriesApi.md#deletecategorycategoriescategoryiddelete) | **DELETE** /categories/{category_id} | Delete Category
@@ -75,9 +77,11 @@ Class | Method | HTTP request | Description
 *CategoriesApi* | [**updateCategoryCategoriesCategoryIdPut**](doc//CategoriesApi.md#updatecategorycategoriescategoryidput) | **PUT** /categories/{category_id} | Update Category
 *DefaultApi* | [**healthHealthGet**](doc//DefaultApi.md#healthhealthget) | **GET** /health | Health
 *InitiativesApi* | [**createInitiativeInitiativesPost**](doc//InitiativesApi.md#createinitiativeinitiativespost) | **POST** /initiatives/ | Create Initiative
+*InitiativesApi* | [**getFeaturedInitiativesInitiativesFeaturedGet**](doc//InitiativesApi.md#getfeaturedinitiativesinitiativesfeaturedget) | **GET** /initiatives/featured | Get Featured Initiatives
 *InitiativesApi* | [**getInitiativeInitiativesInitiativeIdGet**](doc//InitiativesApi.md#getinitiativeinitiativesinitiativeidget) | **GET** /initiatives/{initiative_id} | Get Initiative
 *InitiativesApi* | [**listActiveInitiativesInitiativesActiveGet**](doc//InitiativesApi.md#listactiveinitiativesinitiativesactiveget) | **GET** /initiatives/active | List Active Initiatives
 *InitiativesApi* | [**listInitiativesInitiativesGet**](doc//InitiativesApi.md#listinitiativesinitiativesget) | **GET** /initiatives/ | List Initiatives
+*InitiativesApi* | [**listInitiativesSummaryInitiativesSummaryGet**](doc//InitiativesApi.md#listinitiativessummaryinitiativessummaryget) | **GET** /initiatives/summary | List Initiatives Summary
 *StatusesApi* | [**createStatusStatusesPost**](doc//StatusesApi.md#createstatusstatusespost) | **POST** /statuses/ | Create Status
 *StatusesApi* | [**deleteStatusStatusesStatusIdDelete**](doc//StatusesApi.md#deletestatusstatusesstatusiddelete) | **DELETE** /statuses/{status_id} | Delete Status
 *StatusesApi* | [**getStatusStatusesStatusIdGet**](doc//StatusesApi.md#getstatusstatusesstatusidget) | **GET** /statuses/{status_id} | Get Status

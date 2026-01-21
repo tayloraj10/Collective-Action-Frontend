@@ -10,12 +10,11 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **String** |  | 
 **actionType** | **String** |  | 
-**amount** | **int** |  | [optional] 
+**amount** | **num** |  | [optional] 
 **date** | [**DateTime**](DateTime.md) |  | 
 **imageUrl** | **String** |  | [optional] 
-**initiativeId** | **String** |  | [optional] 
-**userId** | **String** |  | 
-**extraData** | [**Map<String, Object>**](Object.md) |  | [optional] [default to const {}]
+**linkedId** | **String** |  | [optional] 
+**userId** | **String** |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

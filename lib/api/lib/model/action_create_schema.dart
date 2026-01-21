@@ -15,50 +15,40 @@ class ActionCreateSchema {
   ActionCreateSchema({
     required this.actionType,
     this.amount,
-    required this.date,
     this.imageUrl,
-    this.initiativeId,
-    required this.userId,
-    this.extraData = const {},
+    this.linkedId,
+    this.userId,
   });
 
   String actionType;
 
-  int? amount;
-
-  DateTime date;
+  num? amount;
 
   String? imageUrl;
 
-  String? initiativeId;
+  String? linkedId;
 
-  String userId;
-
-  Map<String, Object>? extraData;
+  String? userId;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is ActionCreateSchema &&
     other.actionType == actionType &&
     other.amount == amount &&
-    other.date == date &&
     other.imageUrl == imageUrl &&
-    other.initiativeId == initiativeId &&
-    other.userId == userId &&
-    _deepEquality.equals(other.extraData, extraData);
+    other.linkedId == linkedId &&
+    other.userId == userId;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (actionType.hashCode) +
     (amount == null ? 0 : amount!.hashCode) +
-    (date.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
-    (initiativeId == null ? 0 : initiativeId!.hashCode) +
-    (userId.hashCode) +
-    (extraData == null ? 0 : extraData!.hashCode);
+    (linkedId == null ? 0 : linkedId!.hashCode) +
+    (userId == null ? 0 : userId!.hashCode);
 
   @override
-  String toString() => 'ActionCreateSchema[actionType=$actionType, amount=$amount, date=$date, imageUrl=$imageUrl, initiativeId=$initiativeId, userId=$userId, extraData=$extraData]';
+  String toString() => 'ActionCreateSchema[actionType=$actionType, amount=$amount, imageUrl=$imageUrl, linkedId=$linkedId, userId=$userId]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -68,22 +58,20 @@ class ActionCreateSchema {
     } else {
       json[r'amount'] = null;
     }
-      json[r'date'] = this.date.toUtc().toIso8601String();
     if (this.imageUrl != null) {
       json[r'image_url'] = this.imageUrl;
     } else {
       json[r'image_url'] = null;
     }
-    if (this.initiativeId != null) {
-      json[r'initiative_id'] = this.initiativeId;
+    if (this.linkedId != null) {
+      json[r'linked_id'] = this.linkedId;
     } else {
-      json[r'initiative_id'] = null;
+      json[r'linked_id'] = null;
     }
+    if (this.userId != null) {
       json[r'user_id'] = this.userId;
-    if (this.extraData != null) {
-      json[r'extra_data'] = this.extraData;
     } else {
-      json[r'extra_data'] = null;
+      json[r'user_id'] = null;
     }
     return json;
   }
@@ -108,12 +96,12 @@ class ActionCreateSchema {
 
       return ActionCreateSchema(
         actionType: mapValueOfType<String>(json, r'action_type')!,
-        amount: mapValueOfType<int>(json, r'amount'),
-        date: mapDateTime(json, r'date', r'')!,
+        amount: json[r'amount'] == null
+            ? null
+            : num.parse('${json[r'amount']}'),
         imageUrl: mapValueOfType<String>(json, r'image_url'),
-        initiativeId: mapValueOfType<String>(json, r'initiative_id'),
-        userId: mapValueOfType<String>(json, r'user_id')!,
-        extraData: mapCastOfType<String, Object>(json, r'extra_data') ?? const {},
+        linkedId: mapValueOfType<String>(json, r'linked_id'),
+        userId: mapValueOfType<String>(json, r'user_id'),
       );
     }
     return null;
@@ -162,8 +150,6 @@ class ActionCreateSchema {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'action_type',
-    'date',
-    'user_id',
   };
 }
 

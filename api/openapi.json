@@ -100,6 +100,56 @@
                 }
             }
         },
+        "/initiatives/summary": {
+            "get": {
+                "tags": [
+                    "initiatives"
+                ],
+                "summary": "List Initiatives Summary",
+                "operationId": "list_initiatives_summary_initiatives_summary_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/InitiativeSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Initiatives Summary Initiatives Summary Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/initiatives/featured": {
+            "get": {
+                "tags": [
+                    "initiatives"
+                ],
+                "summary": "Get Featured Initiatives",
+                "operationId": "get_featured_initiatives_initiatives_featured_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/InitiativeSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Get Featured Initiatives Initiatives Featured Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/initiatives/{initiative_id}": {
             "get": {
                 "tags": [
@@ -198,6 +248,51 @@
                 }
             }
         },
+        "/actions/recent": {
+            "get": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Get Latest Action",
+                "operationId": "get_latest_action_actions_recent_get",
+                "parameters": [
+                    {
+                        "name": "days",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 7,
+                            "title": "Days"
+                        }
+                    },
+                    {
+                        "name": "action_type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/components/schemas/ActionTypeValuesEnum"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ActionSchema"
+                                    },
+                                    "title": "Response Get Latest Action Actions Recent Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/actions/{action_id}": {
             "get": {
                 "tags": [
@@ -229,24 +324,55 @@
                         }
                     }
                 }
-            }
-        },
-        "/actions/by_initiative/{initiative_id}": {
-            "get": {
+            },
+            "delete": {
                 "tags": [
                     "actions"
                 ],
-                "summary": "Get Actions By Initiative",
-                "operationId": "get_actions_by_initiative_actions_by_initiative__initiative_id__get",
+                "summary": "Delete Action",
+                "operationId": "delete_action_actions__action_id__delete",
                 "parameters": [
                     {
-                        "name": "initiative_id",
+                        "name": "action_id",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "string",
                             "format": "uuid",
-                            "title": "Initiative Id"
+                            "title": "Action Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/actions/by_linked/{linked_id}": {
+            "get": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Get Actions By Linked",
+                "operationId": "get_actions_by_linked_actions_by_linked__linked_id__get",
+                "parameters": [
+                    {
+                        "name": "linked_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Linked Id"
                         }
                     }
                 ],
@@ -260,7 +386,7 @@
                                     "items": {
                                         "$ref": "#/components/schemas/ActionSchema"
                                     },
-                                    "title": "Response Get Actions By Initiative Actions By Initiative  Initiative Id  Get"
+                                    "title": "Response Get Actions By Linked Actions By Linked  Linked Id  Get"
                                 }
                             }
                         }
@@ -935,18 +1061,13 @@
                     "amount": {
                         "anyOf": [
                             {
-                                "type": "integer"
+                                "type": "number"
                             },
                             {
                                 "type": "null"
                             }
                         ],
                         "title": "Amount"
-                    },
-                    "date": {
-                        "type": "string",
-                        "format": "date-time",
-                        "title": "Date"
                     },
                     "image_url": {
                         "anyOf": [
@@ -959,39 +1080,34 @@
                         ],
                         "title": "Image Url"
                     },
-                    "initiative_id": {
+                    "linked_id": {
                         "anyOf": [
                             {
-                                "type": "string"
+                                "type": "string",
+                                "format": "uuid"
                             },
                             {
                                 "type": "null"
                             }
                         ],
-                        "title": "Initiative Id"
+                        "title": "Linked Id"
                     },
                     "user_id": {
-                        "type": "string",
-                        "title": "User Id"
-                    },
-                    "extra_data": {
                         "anyOf": [
                             {
-                                "additionalProperties": true,
-                                "type": "object"
+                                "type": "string",
+                                "format": "uuid"
                             },
                             {
                                 "type": "null"
                             }
                         ],
-                        "title": "Extra Data"
+                        "title": "User Id"
                     }
                 },
                 "type": "object",
                 "required": [
-                    "action_type",
-                    "date",
-                    "user_id"
+                    "action_type"
                 ],
                 "title": "ActionCreateSchema"
             },
@@ -1009,7 +1125,7 @@
                     "amount": {
                         "anyOf": [
                             {
-                                "type": "integer"
+                                "type": "number"
                             },
                             {
                                 "type": "null"
@@ -1033,7 +1149,7 @@
                         ],
                         "title": "Image Url"
                     },
-                    "initiative_id": {
+                    "linked_id": {
                         "anyOf": [
                             {
                                 "type": "string",
@@ -1043,32 +1159,26 @@
                                 "type": "null"
                             }
                         ],
-                        "title": "Initiative Id"
+                        "title": "Linked Id"
                     },
                     "user_id": {
-                        "type": "string",
-                        "format": "uuid",
-                        "title": "User Id"
-                    },
-                    "extra_data": {
                         "anyOf": [
                             {
-                                "additionalProperties": true,
-                                "type": "object"
+                                "type": "string",
+                                "format": "uuid"
                             },
                             {
                                 "type": "null"
                             }
                         ],
-                        "title": "Extra Data"
+                        "title": "User Id"
                     }
                 },
                 "type": "object",
                 "required": [
                     "id",
                     "action_type",
-                    "date",
-                    "user_id"
+                    "date"
                 ],
                 "title": "ActionSchema"
             },
