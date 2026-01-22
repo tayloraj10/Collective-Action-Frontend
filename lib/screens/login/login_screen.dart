@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -92,6 +93,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         }
       } else {
         await authService.signInWithEmail(email, password);
+        if (mounted) {
+          context.go('/');
+        }
       }
     } on FirebaseAuthException catch (e) {
       setState(() => _errorMessage = _getFriendlyErrorMessage(e));
@@ -111,6 +115,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       final authService = ref.read(authServiceProvider);
       await authService.signInWithGoogle();
+      if (mounted) {
+        context.go('/');
+      }
     } on FirebaseAuthException catch (e) {
       setState(() => _errorMessage = _getFriendlyErrorMessage(e));
     } catch (e) {
