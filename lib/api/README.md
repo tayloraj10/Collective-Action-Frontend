@@ -90,7 +90,7 @@ Class | Method | HTTP request | Description
 *StatusesApi* | [**updateStatusStatusesStatusIdPut**](doc//StatusesApi.md#updatestatusstatusesstatusidput) | **PUT** /statuses/{status_id} | Update Status
 *UsersApi* | [**createUserUsersPost**](doc//UsersApi.md#createuseruserspost) | **POST** /users/ | Create User
 *UsersApi* | [**deleteUserUsersUserIdDelete**](doc//UsersApi.md#deleteuserusersuseriddelete) | **DELETE** /users/{user_id} | Delete User
-*UsersApi* | [**getUserUsersUserIdGet**](doc//UsersApi.md#getuserusersuseridget) | **GET** /users/{user_id} | Get User
+*UsersApi* | [**getUserByFirebaseIdUsersFirebaseIdGet**](doc//UsersApi.md#getuserbyfirebaseidusersfirebaseidget) | **GET** /users/{firebase_id} | Get User By Firebase Id
 *UsersApi* | [**listUsersUsersGet**](doc//UsersApi.md#listusersusersget) | **GET** /users/ | List Users
 *UsersApi* | [**updateUserUsersUserIdPatch**](doc//UsersApi.md#updateuserusersuseridpatch) | **PATCH** /users/{user_id} | Update User
 

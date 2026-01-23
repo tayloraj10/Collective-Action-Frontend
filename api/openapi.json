@@ -948,23 +948,22 @@
                 }
             }
         },
-        "/users/{user_id}": {
+        "/users/{firebase_id}": {
             "get": {
                 "tags": [
                     "users"
                 ],
-                "summary": "Get User",
+                "summary": "Get User By Firebase Id",
                 "description": "Retrieve a user by their unique ID.\nRaises 404 if the user is not found.",
-                "operationId": "get_user_users__user_id__get",
+                "operationId": "get_user_by_firebase_id_users__firebase_id__get",
                 "parameters": [
                     {
-                        "name": "user_id",
+                        "name": "firebase_id",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "string",
-                            "format": "uuid",
-                            "title": "User Id"
+                            "title": "Firebase Id"
                         }
                     }
                 ],
@@ -980,7 +979,9 @@
                         }
                     }
                 }
-            },
+            }
+        },
+        "/users/{user_id}": {
             "patch": {
                 "tags": [
                     "users"
@@ -1582,7 +1583,14 @@
                         "title": "Email"
                     },
                     "name": {
-                        "type": "string",
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
                         "title": "Name"
                     },
                     "photo_url": {
@@ -1651,8 +1659,7 @@
                 },
                 "type": "object",
                 "required": [
-                    "email",
-                    "name"
+                    "email"
                 ],
                 "title": "UserCreate"
             },

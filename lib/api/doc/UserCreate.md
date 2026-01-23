@@ -9,7 +9,7 @@ import 'package:collective_action_api/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **email** | **String** |  | 
-**name** | **String** |  | 
+**name** | **String** |  | [optional] 
 **photoUrl** | **String** |  | [optional] 
 **userType** | [**UserType**](UserType.md) |  | [optional] 
 **isActive** | **bool** |  | [optional] 

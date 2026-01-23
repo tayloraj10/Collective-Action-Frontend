@@ -121,7 +121,7 @@ class UsersApi {
     }
   }
 
-  /// Get User
+  /// Get User By Firebase Id
   ///
   /// Retrieve a user by their unique ID. Raises 404 if the user is not found.
   ///
@@ -129,11 +129,11 @@ class UsersApi {
   ///
   /// Parameters:
   ///
-  /// * [String] userId (required):
-  Future<Response> getUserUsersUserIdGetWithHttpInfo(String userId,) async {
+  /// * [String] firebaseId (required):
+  Future<Response> getUserByFirebaseIdUsersFirebaseIdGetWithHttpInfo(String firebaseId,) async {
     // ignore: prefer_const_declarations
-    final path = r'/users/{user_id}'
-      .replaceAll('{user_id}', userId);
+    final path = r'/users/{firebase_id}'
+      .replaceAll('{firebase_id}', firebaseId);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -156,15 +156,15 @@ class UsersApi {
     );
   }
 
-  /// Get User
+  /// Get User By Firebase Id
   ///
   /// Retrieve a user by their unique ID. Raises 404 if the user is not found.
   ///
   /// Parameters:
   ///
-  /// * [String] userId (required):
-  Future<UserSchema?> getUserUsersUserIdGet(String userId,) async {
-    final response = await getUserUsersUserIdGetWithHttpInfo(userId,);
+  /// * [String] firebaseId (required):
+  Future<UserSchema?> getUserByFirebaseIdUsersFirebaseIdGet(String firebaseId,) async {
+    final response = await getUserByFirebaseIdUsersFirebaseIdGetWithHttpInfo(firebaseId,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
