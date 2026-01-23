@@ -1,6 +1,8 @@
+import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
+import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -80,7 +82,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final authService = ref.read(authServiceProvider);
 
       if (_isSignUp) {
-        await authService.registerWithEmail(email, password);
+        final userCredential = await authService.registerWithEmail(
+          email,
+          password,
+        );
+        final firebaseUser = userCredential;
+        if (firebaseUser != null) {
+          // Create user in backend
+          final userCreate = UserCreate(
+            email: email,
+            firebaseUserId: firebaseUser.uid,
+          );
+          await ref.read(activeUserProvider.notifier).createUser(userCreate);
+        }
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             CustomSnackBar.success(
@@ -92,7 +106,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           _passwordController.clear();
         }
       } else {
-        await authService.signInWithEmail(email, password);
+        final userCredential = await authService.signInWithEmail(
+          email,
+          password,
+        );
+        final firebaseUser = userCredential;
+        if (firebaseUser != null) {
+          // Fetch user data from backend
+          await ref
+              .read(activeUserProvider.notifier)
+              .build(userId: firebaseUser.uid);
+        }
         if (mounted) {
           context.go('/');
         }
@@ -114,7 +138,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     try {
       final authService = ref.read(authServiceProvider);
-      await authService.signInWithGoogle();
+      final userCredential = await authService.signInWithGoogle();
+      final firebaseUser = userCredential;
+      if (firebaseUser != null) {
+        // Try to fetch user from backend, but if 404 or error, treat as not found
+        List userList = [];
+        try {
+          userList = await ref
+              .read(activeUserProvider.notifier)
+              .build(userId: firebaseUser.uid);
+        } catch (e) {
+          // 404 or any error: treat as user not found
+          userList = [];
+        }
+        if (userList.isEmpty) {
+          // User not found, create in backend
+          final userCreate = UserCreate(
+            email: firebaseUser.email ?? '',
+            name: firebaseUser.displayName ?? '',
+            firebaseUserId: firebaseUser.uid,
+          );
+          await ref.read(activeUserProvider.notifier).createUser(userCreate);
+          // Fetch again to ensure state is up to date
+          try {
+            userList = await ref
+                .read(activeUserProvider.notifier)
+                .build(userId: firebaseUser.uid);
+          } catch (e) {
+            // Still error, just leave as empty
+            userList = [];
+          }
+        }
+      }
       if (mounted) {
         context.go('/');
       }
@@ -212,6 +267,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           const SizedBox(height: 8),
                           TextField(
                             controller: _emailController,
+                            style: TextStyle(color: AppColors.textPrimary),
                             decoration: InputDecoration(
                               hintText: 'Enter your email',
                               filled: true,
@@ -240,6 +296,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           const SizedBox(height: 8),
                           TextField(
                             controller: _passwordController,
+                            style: TextStyle(color: AppColors.textPrimary),
                             obscureText: !_showPassword,
                             decoration: InputDecoration(
                               hintText: 'Enter your password',
@@ -384,8 +441,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                         setState(() {
                                           _isSignUp = !_isSignUp;
                                           _errorMessage = null;
-                                          _emailController.clear();
-                                          _passwordController.clear();
                                         });
                                       },
                                 child: Text(
