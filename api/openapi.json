@@ -1059,14 +1059,7 @@
                         "title": "Action Type"
                     },
                     "amount": {
-                        "anyOf": [
-                            {
-                                "type": "number"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
+                        "type": "number",
                         "title": "Amount"
                     },
                     "image_url": {
@@ -1103,11 +1096,24 @@
                             }
                         ],
                         "title": "User Id"
+                    },
+                    "date": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Date"
                     }
                 },
                 "type": "object",
                 "required": [
-                    "action_type"
+                    "action_type",
+                    "amount"
                 ],
                 "title": "ActionCreateSchema"
             },
