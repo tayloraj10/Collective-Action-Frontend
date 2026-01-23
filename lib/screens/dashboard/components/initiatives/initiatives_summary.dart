@@ -1,6 +1,6 @@
 // Widget to fetch and display initiatives count
 import 'package:collective_action_frontend/app/constants.dart';
-import 'package:collective_action_frontend/screens/dashboard/components/initiave_card.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/initiatives/initiative_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/providers/initiative_provider.dart';
@@ -36,7 +36,7 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
         final double cardPaddingHeight = isMobile ? 4 : 6;
         final double cardPaddingWidth = isMobile ? 6 : 10;
         final double containerPadding = isMobile ? 8 : 14;
-        final double containerPaddingTop = isMobile ? 8 : 14;
+        final double containerPaddingTop = 2;
         final double titleFontSize = isMobile ? 14 : 18;
         final double descFontSize = isMobile ? 11 : 13;
         final double progressHeight = isMobile ? 16 : 24;
@@ -100,11 +100,110 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
                     final initiativesAsync = ref.watch(
                       featuredInitiativeProvider,
                     );
+                    final previousData = initiativesAsync.asData?.value;
                     return initiativesAsync.when(
-                      loading: () => const Text(
-                        'Loading...',
-                        style: TextStyle(color: Colors.grey),
-                      ),
+                      loading: () {
+                        if (previousData != null) {
+                          final countWidget = SummaryCount(
+                            count: previousData.length,
+                          );
+                          if (previousData.isEmpty) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('No initiatives found.'),
+                                const SizedBox(height: 8),
+                                countWidget,
+                              ],
+                            );
+                          }
+                          return Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Scrollbar(
+                                    controller: _scrollController,
+                                    thickness: isMobile ? 4 : 6,
+                                    child: isMobile
+                                        ? ListView.separated(
+                                            controller: _scrollController,
+                                            scrollDirection: Axis.vertical,
+                                            itemCount: previousData.length,
+                                            separatorBuilder: (context, idx) =>
+                                                SizedBox(height: 12),
+                                            itemBuilder: (context, idx) {
+                                              final initiative =
+                                                  previousData[idx];
+                                              final cardColor =
+                                                  palette[idx % palette.length];
+                                              return InitiativeCard(
+                                                initiative: initiative,
+                                                cardColor: cardColor,
+                                                isMobile: isMobile,
+                                                titleFontSize: titleFontSize,
+                                                descFontSize: descFontSize,
+                                                progressHeight: progressHeight,
+                                                progressFontSize:
+                                                    progressFontSize,
+                                                spacing: spacing,
+                                                containerPadding:
+                                                    containerPadding,
+                                                containerPaddingTop:
+                                                    containerPaddingTop,
+                                              );
+                                            },
+                                          )
+                                        : GridView.builder(
+                                            controller: _scrollController,
+                                            gridDelegate:
+                                                SliverGridDelegateWithFixedCrossAxisCount(
+                                                  crossAxisCount: 2,
+                                                  crossAxisSpacing: 12,
+                                                  mainAxisSpacing: 12,
+                                                  childAspectRatio:
+                                                      (constraints.maxWidth /
+                                                          2) /
+                                                      ((constraints.maxHeight -
+                                                              60) /
+                                                          2),
+                                                ),
+                                            itemCount: previousData.length,
+                                            itemBuilder: (context, idx) {
+                                              final initiative =
+                                                  previousData[idx];
+                                              final cardColor =
+                                                  palette[idx % palette.length];
+                                              return InitiativeCard(
+                                                initiative: initiative,
+                                                cardColor: cardColor,
+                                                isMobile: isMobile,
+                                                titleFontSize: titleFontSize,
+                                                descFontSize: descFontSize,
+                                                progressHeight: progressHeight,
+                                                progressFontSize:
+                                                    progressFontSize,
+                                                spacing: spacing,
+                                                containerPadding:
+                                                    containerPadding,
+                                                containerPaddingTop:
+                                                    containerPaddingTop,
+                                              );
+                                            },
+                                          ),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                countWidget,
+                              ],
+                            ),
+                          );
+                        }
+                        return const Text(
+                          'Loading...',
+                          style: TextStyle(color: Colors.grey),
+                        );
+                      },
                       error: (err, stack) => Text(
                         'Error: $err',
                         style: const TextStyle(color: Colors.red),

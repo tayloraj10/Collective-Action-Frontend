@@ -83,6 +83,7 @@ class InitiativeCard extends StatelessWidget {
             ],
           ),
           if (initiative.link != null && initiative.link!.isNotEmpty) ...[
+            // SizedBox(height: isMobile ? 2 : 4),
             GestureDetector(
               onTap: () async {
                 final url = initiative.link!;
