@@ -1,4 +1,6 @@
+import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
+import 'package:collective_action_frontend/components/custom_app_bar.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -66,7 +68,7 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
 
   // Track initial values for dirty check
   Map<String, String?> _initialValues = {};
-  final Set<String> _dirtyFields = {};
+  // final Set<String> _dirtyFields = {};
 
   String? _currentUserId;
 
@@ -102,7 +104,7 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
           'tiktok': _tiktok,
           'website': _website,
         };
-        _dirtyFields.clear();
+        // _dirtyFields.clear();
       }
     }
   }
@@ -154,11 +156,14 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
             'tiktok': _tiktok,
             'website': _website,
           };
-          _dirtyFields.clear();
+          // _dirtyFields.clear();
         });
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Settings saved!')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Center(child: Text('Settings saved!')),
+            backgroundColor: Colors.green,
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -172,32 +177,34 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
   @override
   Widget build(BuildContext context) {
     OutlineInputBorder? getBorder(String field) {
-      if (!_dirtyFields.contains(field)) return null;
-      return const OutlineInputBorder(
-        borderSide: BorderSide(color: AppColors.warningOrange, width: 2),
-      );
+      return null;
+      // if (!_dirtyFields.contains(field)) return null;
+      // return const OutlineInputBorder(
+      //   borderSide: BorderSide(color: AppColors.warningOrange, width: 2),
+      // );
     }
 
     // Card border for any dirty field
     BoxDecoration? getCardBorder() {
-      if (_dirtyFields.isEmpty) return null;
-      return BoxDecoration(
-        border: Border.all(color: AppColors.warningOrange, width: 2),
-        borderRadius: BorderRadius.circular(18),
-      );
+      return null;
+      // if (_dirtyFields.isEmpty) return null;
+      // return BoxDecoration(
+      //   border: Border.all(color: AppColors.warningOrange, width: 2),
+      //   borderRadius: BorderRadius.circular(18),
+      // );
     }
 
     void onChanged(String field, String? value) {
       final initial = _initialValues[field] ?? '';
-      if ((value ?? '') != (initial)) {
-        setState(() {
-          _dirtyFields.add(field);
-        });
-      } else {
-        setState(() {
-          _dirtyFields.remove(field);
-        });
-      }
+      // if ((value ?? '') != (initial)) {
+      //   setState(() {
+      //     _dirtyFields.add(field);
+      //   });
+      // } else {
+      //   setState(() {
+      //     _dirtyFields.remove(field);
+      //   });
+      // }
     }
 
     return ref
@@ -232,9 +239,9 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
                 firebaseUser.photoURL!.isNotEmpty) {
               displayPhotoUrl = firebaseUser.photoURL;
             }
-            final width = MediaQuery.of(context).size.width;
-            final isMobile = width < 600;
-            final cardMaxWidth = isMobile ? 500.0 : 700.0;
+            // final width = MediaQuery.of(context).size.width;
+            final isMobile = AppConstants.isMobile(context);
+            final cardMaxWidth = isMobile ? 500.0 : 900.0;
             final cardPadding = isMobile
                 ? const EdgeInsets.symmetric(horizontal: 16, vertical: 24)
                 : const EdgeInsets.symmetric(horizontal: 48, vertical: 48);
@@ -242,11 +249,7 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
                 ? const EdgeInsets.all(20.0)
                 : const EdgeInsets.all(40.0);
             return Scaffold(
-              appBar: AppBar(
-                title: const Text('User Settings'),
-                elevation: 2,
-                backgroundColor: Theme.of(context).colorScheme.surface,
-              ),
+              appBar: const CustomAppBar(),
               body: Center(
                 child: Container(
                   constraints: BoxConstraints(maxWidth: cardMaxWidth),
@@ -287,19 +290,50 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
                                           : null,
                                     ),
                                     Positioned(
-                                      top: 0,
+                                      bottom: 0,
                                       right: 0,
                                       child: Material(
                                         color: Colors.transparent,
-                                        child: IconButton(
-                                          icon: const Icon(
-                                            Icons.edit,
-                                            color: Colors.blueAccent,
+                                        child: Container(
+                                          width: 32,
+                                          height: 32,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color(0xFF4FC3F7), // Light blue
+                                                Color(0xFF1976D2), // Deep blue
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                            border: Border.all(
+                                              color: AppColors.white,
+                                              width: 2.2,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withAlpha(
+                                                  46,
+                                                ),
+                                                blurRadius: 10,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
                                           ),
-                                          onPressed: () {
-                                            // Optionally implement photo picker
-                                          },
-                                          tooltip: 'Change Photo',
+                                          child: IconButton(
+                                            icon: const Icon(
+                                              Icons.edit,
+                                              color: Colors.white,
+                                              size: 17,
+                                            ),
+                                            onPressed: () {
+                                              // Optionally implement photo picker
+                                            },
+                                            tooltip: 'Change Photo',
+                                            splashRadius: 18,
+                                            padding: EdgeInsets.zero,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -313,18 +347,16 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
                                     ?.copyWith(fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 4),
-                              if (_dirtyFields.isNotEmpty)
-                                _unsavedChangesWarning(),
+                              // if (_dirtyFields.isNotEmpty)
+                              //   _unsavedChangesWarning(),
                               const SizedBox(height: 12),
                               TextFormField(
                                 initialValue: user.name,
                                 decoration: InputDecoration(
                                   labelText: 'Name',
-
                                   prefixIcon: const Icon(Icons.person_outline),
                                   enabledBorder: getBorder('name'),
                                 ),
-
                                 onChanged: (v) => onChanged('name', v),
                                 onSaved: (v) => _name = v,
                               ),
@@ -512,8 +544,8 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
                                 onSaved: (v) => _website = v,
                               ),
                               const SizedBox(height: 32),
-                              if (_dirtyFields.isNotEmpty)
-                                _unsavedChangesWarning(),
+                              // if (_dirtyFields.isNotEmpty)
+                              //   _unsavedChangesWarning(),
                               SizedBox(
                                 width: double.infinity,
                                 height: 48,
