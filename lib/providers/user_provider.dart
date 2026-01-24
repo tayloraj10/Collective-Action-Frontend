@@ -1,21 +1,50 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/api/lib/api.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/services/user_service.dart';
 
+/// Global provider for the currently active backend user
+final currentUserProvider =
+    AsyncNotifierProvider<CurrentUserNotifier, UserSchema?>(
+      CurrentUserNotifier.new,
+    );
+
+class CurrentUserNotifier extends AsyncNotifier<UserSchema?> {
+  @override
+  Future<UserSchema?> build() async {
+    // Initially no user is loaded
+    return null;
+  }
+
+  /// Set the current user (after login or user creation)
+  Future<void> setUser(UserSchema user) async {
+    state = AsyncValue.data(user);
+  }
+
+  /// Clear the current user (on logout)
+  Future<void> clearUser() async {
+    state = const AsyncValue.data(null);
+  }
+
+  /// Optionally, refresh user from backend
+  Future<void> refreshUser(String userId) async {
+    state = const AsyncLoading();
+    final user = await UserService().fetchUser(userId: userId);
+    state = AsyncValue.data(user);
+  }
+}
+
 final activeUserProvider =
-    AsyncNotifierProvider<ActiveUserNotifier, List<UserSchema>>(
-      ActiveUserNotifier.new,
+    AsyncNotifierProvider.family<ActiveUserNotifier, List<UserSchema>, String>(
+      (userId) => ActiveUserNotifier(userId),
     );
 
 class ActiveUserNotifier extends AsyncNotifier<List<UserSchema>> {
-  String? userId;
+  final String userId;
+
+  ActiveUserNotifier(this.userId);
 
   @override
-  Future<List<UserSchema>> build({String? userId}) async {
-    this.userId = userId;
-    if (userId == null) {
-      return [];
-    }
+  Future<List<UserSchema>> build() async {
     final user = await UserService().fetchUser(userId: userId);
     if (user != null) {
       return [user];
@@ -27,8 +56,7 @@ class ActiveUserNotifier extends AsyncNotifier<List<UserSchema>> {
   Future<void> refresh() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      if (userId == null) return <UserSchema>[];
-      final user = await UserService().fetchUser(userId: userId!);
+      final user = await UserService().fetchUser(userId: userId);
       if (user != null) {
         return [user];
       } else {
@@ -37,26 +65,38 @@ class ActiveUserNotifier extends AsyncNotifier<List<UserSchema>> {
     });
   }
 
-  Future<UserSchema?> createUser(UserCreate action) async {
+  Future<UserSchema?> createUser(UserCreate userData) async {
     state = const AsyncLoading();
     try {
-      final created = await UserService().createUser(action);
-      // Optionally refresh the list after creation
+      final created = await UserService().createUser(userData);
       state = await AsyncValue.guard(() async {
-        if (userId == null) return <UserSchema>[];
-        try {
-          final user = await UserService().fetchUser(userId: userId!);
-          if (user != null) {
-            return [user];
-          } else {
-            return <UserSchema>[];
-          }
-        } catch (e) {
-          // If 404, just return empty list, don't throw
+        final user = await UserService().fetchUser(userId: userId);
+        if (user != null) {
+          return [user];
+        } else {
           return <UserSchema>[];
         }
       });
       return created;
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      rethrow;
+    }
+  }
+
+  Future<UserSchema?> updateUser(UserCreate userData) async {
+    state = const AsyncLoading();
+    try {
+      final updated = await UserService().updateUser(userId, userData);
+      state = await AsyncValue.guard(() async {
+        final user = await UserService().fetchUser(userId: userId);
+        if (user != null) {
+          return [user];
+        } else {
+          return <UserSchema>[];
+        }
+      });
+      return updated;
     } catch (e, st) {
       state = AsyncError(e, st);
       rethrow;

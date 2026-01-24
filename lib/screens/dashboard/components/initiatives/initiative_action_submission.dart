@@ -1,5 +1,6 @@
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/providers/initiative_provider.dart';
+import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/api/lib/api.dart';
@@ -55,12 +56,13 @@ class _InitiativeActionSubmissionState
     final notifier = ref.read(activeActionProvider.notifier);
     final featuredInitiatives = ref.read(featuredInitiativeProvider.notifier);
     final int? amount = int.tryParse(_amountController.text);
+    final user = ref.read(currentUserProvider).value;
     final action = ActionCreateSchema(
       actionType: ActionTypeValuesEnum.initiative.value,
       amount: amount as int,
       imageUrl: null,
       linkedId: widget.initiative.id,
-      userId: null,
+      userId: user?.id,
       date: _selectedDate,
     );
     try {

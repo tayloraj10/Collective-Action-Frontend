@@ -17,11 +17,19 @@ class UserService {
     }
   }
 
-  Future<UserSchema?> createUser(UserCreate action) async {
+  Future<UserSchema?> createUser(UserCreate userData) async {
     try {
-      return await _api.createUserUsersPost(action);
+      return await _api.createUserUsersPost(userData);
     } catch (e) {
       throw Exception('Failed to create user: $e');
+    }
+  }
+
+  Future<UserSchema?> updateUser(String userId, UserCreate userData) async {
+    try {
+      return await _api.updateUserUsersUserIdPatch(userId, userData);
+    } catch (e) {
+      throw Exception('Failed to update user: $e');
     }
   }
 }

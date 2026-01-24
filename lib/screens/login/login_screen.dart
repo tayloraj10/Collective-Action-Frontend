@@ -93,7 +93,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             email: email,
             firebaseUserId: firebaseUser.uid,
           );
-          await ref.read(activeUserProvider.notifier).createUser(userCreate);
+          final createdUser = await ref
+              .read(activeUserProvider(firebaseUser.uid).notifier)
+              .createUser(userCreate);
+          // Set global currentUserProvider
+          if (createdUser != null) {
+            await ref.read(currentUserProvider.notifier).setUser(createdUser);
+          }
         }
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -106,16 +112,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           _passwordController.clear();
         }
       } else {
-        final userCredential = await authService.signInWithEmail(
-          email,
-          password,
-        );
-        final firebaseUser = userCredential;
+        final firebaseUser = await authService.signInWithEmail(email, password);
+        // Fetch app user and set global provider
         if (firebaseUser != null) {
-          // Fetch user data from backend
-          await ref
-              .read(activeUserProvider.notifier)
-              .build(userId: firebaseUser.uid);
+          final appUserList = await ref
+              .read(activeUserProvider(firebaseUser.uid).notifier)
+              .build();
+          final appUser = appUserList.isNotEmpty ? appUserList.first : null;
+          if (appUser != null) {
+            await ref.read(currentUserProvider.notifier).setUser(appUser);
+          }
         }
         if (mounted) {
           context.go('/');
@@ -141,33 +147,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final userCredential = await authService.signInWithGoogle();
       final firebaseUser = userCredential;
       if (firebaseUser != null) {
-        // Try to fetch user from backend, but if 404 or error, treat as not found
-        List userList = [];
+        // Try to fetch user from backend
+        List<UserSchema>? appUserList;
         try {
-          userList = await ref
-              .read(activeUserProvider.notifier)
-              .build(userId: firebaseUser.uid);
+          appUserList = await ref
+              .read(activeUserProvider(firebaseUser.uid).notifier)
+              .build();
         } catch (e) {
-          // 404 or any error: treat as user not found
-          userList = [];
+          appUserList = null;
         }
-        if (userList.isEmpty) {
-          // User not found, create in backend
+        UserSchema? appUser = (appUserList != null && appUserList.isNotEmpty)
+            ? appUserList.first
+            : null;
+        if (appUser == null) {
+          // Only create user if not found
           final userCreate = UserCreate(
             email: firebaseUser.email ?? '',
             name: firebaseUser.displayName ?? '',
             firebaseUserId: firebaseUser.uid,
           );
-          await ref.read(activeUserProvider.notifier).createUser(userCreate);
-          // Fetch again to ensure state is up to date
-          try {
-            userList = await ref
-                .read(activeUserProvider.notifier)
-                .build(userId: firebaseUser.uid);
-          } catch (e) {
-            // Still error, just leave as empty
-            userList = [];
-          }
+          appUser = await ref
+              .read(activeUserProvider(firebaseUser.uid).notifier)
+              .createUser(userCreate);
+        }
+        // Set global currentUserProvider
+        if (appUser != null) {
+          await ref.read(currentUserProvider.notifier).setUser(appUser);
         }
       }
       if (mounted) {
