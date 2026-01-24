@@ -2,9 +2,9 @@ import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/app_bar_icon_button.dart';
 import 'package:collective_action_frontend/components/confirmation_dialog.dart';
-import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:collective_action_frontend/providers/theme_provider.dart';
+import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -74,9 +74,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          CustomSnackBar.info('Profile feature coming soon!'),
-                        );
+                        context.go('/settings');
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(4),
@@ -92,9 +90,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
               : AppBarIconButton(
                   icon: Icons.person_outline,
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      CustomSnackBar.info('Profile feature coming soon!'),
-                    );
+                    context.go('/settings');
                   },
                   tooltip: 'Profile',
                   backgroundColor: Colors.white.withAlpha(38),
@@ -125,6 +121,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
               if (shouldLogout == true) {
                 await authService.signOut();
+                ref.read(currentUserProvider.notifier).clearUser();
               }
             },
             tooltip: 'Logout',
