@@ -115,10 +115,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         final firebaseUser = await authService.signInWithEmail(email, password);
         // Fetch app user and set global provider
         if (firebaseUser != null) {
-          final appUserList = await ref
+          final appUser = await ref
               .read(activeUserProvider(firebaseUser.uid).notifier)
               .build();
-          final appUser = appUserList.isNotEmpty ? appUserList.first : null;
           if (appUser != null) {
             await ref.read(currentUserProvider.notifier).setUser(appUser);
           }
@@ -148,17 +147,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final firebaseUser = userCredential;
       if (firebaseUser != null) {
         // Try to fetch user from backend
-        List<UserSchema>? appUserList;
+        UserSchema? appUser;
         try {
-          appUserList = await ref
+          appUser = await ref
               .read(activeUserProvider(firebaseUser.uid).notifier)
               .build();
         } catch (e) {
-          appUserList = null;
+          appUser = null;
         }
-        UserSchema? appUser = (appUserList != null && appUserList.isNotEmpty)
-            ? appUserList.first
-            : null;
         if (appUser == null) {
           // Only create user if not found
           final userCreate = UserCreate(

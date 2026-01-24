@@ -1,5 +1,8 @@
+import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
+import 'package:collective_action_frontend/providers/auth_provider.dart';
+import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/navigation_button.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_pane.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +14,24 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isMobile = MediaQuery.of(context).size.width < 600;
+    final isMobile = AppConstants.isMobile(context);
+    final authUser = ref.watch(authStateProvider).value;
+
+    // Fetch and set user data if logged in
+    if (authUser != null) {
+      Future.microtask(() async {
+        final appUser = await ref
+            .read(activeUserProvider(authUser.uid).notifier)
+            .build();
+        if (appUser != null) {
+          await ref.read(currentUserProvider.notifier).setUser(appUser);
+        }
+      });
+    } else {
+      Future.microtask(() async {
+        await ref.read(currentUserProvider.notifier).clearUser();
+      });
+    }
 
     return Scaffold(
       appBar: const CustomAppBar(),

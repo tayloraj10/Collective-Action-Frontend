@@ -34,34 +34,24 @@ class CurrentUserNotifier extends AsyncNotifier<UserSchema?> {
 }
 
 final activeUserProvider =
-    AsyncNotifierProvider.family<ActiveUserNotifier, List<UserSchema>, String>(
+    AsyncNotifierProvider.family<ActiveUserNotifier, UserSchema?, String>(
       (userId) => ActiveUserNotifier(userId),
     );
 
-class ActiveUserNotifier extends AsyncNotifier<List<UserSchema>> {
+class ActiveUserNotifier extends AsyncNotifier<UserSchema?> {
   final String userId;
 
   ActiveUserNotifier(this.userId);
 
   @override
-  Future<List<UserSchema>> build() async {
-    final user = await UserService().fetchUser(userId: userId);
-    if (user != null) {
-      return [user];
-    } else {
-      return [];
-    }
+  Future<UserSchema?> build() async {
+    return await UserService().fetchUser(userId: userId);
   }
 
   Future<void> refresh() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final user = await UserService().fetchUser(userId: userId);
-      if (user != null) {
-        return [user];
-      } else {
-        return <UserSchema>[];
-      }
+      return await UserService().fetchUser(userId: userId);
     });
   }
 
@@ -70,12 +60,7 @@ class ActiveUserNotifier extends AsyncNotifier<List<UserSchema>> {
     try {
       final created = await UserService().createUser(userData);
       state = await AsyncValue.guard(() async {
-        final user = await UserService().fetchUser(userId: userId);
-        if (user != null) {
-          return [user];
-        } else {
-          return <UserSchema>[];
-        }
+        return await UserService().fetchUser(userId: userId);
       });
       return created;
     } catch (e, st) {
@@ -89,12 +74,7 @@ class ActiveUserNotifier extends AsyncNotifier<List<UserSchema>> {
     try {
       final updated = await UserService().updateUser(userId, userData);
       state = await AsyncValue.guard(() async {
-        final user = await UserService().fetchUser(userId: userId);
-        if (user != null) {
-          return [user];
-        } else {
-          return <UserSchema>[];
-        }
+        return await UserService().fetchUser(userId: userId);
       });
       return updated;
     } catch (e, st) {
