@@ -113,19 +113,26 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
     final user = ref.read(currentUserProvider).value;
     if (user == null || user.id == null) return;
 
+    String? nullIfBlank(String? v) =>
+        (v == null || v.trim().isEmpty) ? null : v.trim();
     final userData = UserCreate(
       email: _email!,
-      name: _name,
-      photoUrl: _photoUrl,
+      name: nullIfBlank(_name),
+      photoUrl: nullIfBlank(_photoUrl),
       userType: user.userType,
-      location: LocationSchema(city: _city, state: _state, country: _country),
+      location: LocationSchema(
+        city: nullIfBlank(_city),
+        state: nullIfBlank(_state),
+        country: nullIfBlank(_country),
+      ),
       socialLinks: SocialLinksSchema(
-        youtube: _youtube,
-        instagram: _instagram,
-        tiktok: _tiktok,
-        website: _website,
+        youtube: nullIfBlank(_youtube),
+        instagram: nullIfBlank(_instagram),
+        tiktok: nullIfBlank(_tiktok),
+        website: nullIfBlank(_website),
       ),
       firebaseUserId: user.firebaseUserId,
+      isActive: user.isActive,
     );
 
     try {
@@ -157,7 +164,7 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Failed to save settings: $e')));
+        ).showSnackBar(SnackBar(content: Text('Failed to save settings')));
       }
     }
   }
