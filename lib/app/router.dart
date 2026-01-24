@@ -37,6 +37,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/settings',
         builder: (context, state) => const UserSettingsPage(),
       ),
+      // Catch-all route for unknown paths
+      GoRoute(path: '/:notFound(.*)', redirect: (_, __) => '/'),
     ],
     errorBuilder: (context, state) => Scaffold(
       body: Center(
