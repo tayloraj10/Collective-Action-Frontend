@@ -22,20 +22,34 @@ final _initiativeLinkedIdsProvider = Provider.autoDispose<List<String>>((ref) {
   return List.unmodifiable(linkedIds);
 });
 
-class SocialSummary extends ConsumerWidget {
+class SocialSummary extends ConsumerStatefulWidget {
   final IconData? icon;
   final Color? color;
   const SocialSummary({super.key, this.icon, this.color});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SocialSummary> createState() => _SocialSummaryState();
+}
+
+class _SocialSummaryState extends ConsumerState<SocialSummary> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ref = this.ref;
     final actionsAsync = ref.watch(activeActionProvider);
     final linkedIds = ref.watch(_initiativeLinkedIdsProvider);
     final initiativesMapAsync = linkedIds.isEmpty
         ? const AsyncValue.data(<String, InitiativeSchema>{})
         : ref.watch(initiativesByIdsProvider(linkedIds));
     final isMobile = AppConstants.isMobile(context);
-    final cardColor = color ?? Theme.of(context).colorScheme.primary;
+    final cardColor = widget.color ?? Theme.of(context).colorScheme.primary;
 
     return Card(
       elevation: 2,
@@ -76,10 +90,11 @@ class SocialSummary extends ConsumerWidget {
                   return _buildSocialList(
                     context,
                     cardColor,
-                    icon,
+                    widget.icon,
                     isMobile,
                     actions,
                     initiativesMap,
+                    _scrollController,
                   );
                 },
               );
@@ -97,6 +112,7 @@ class SocialSummary extends ConsumerWidget {
     bool isMobile,
     List<ActionSchema> actions,
     Map<String, InitiativeSchema> initiativesMap,
+    ScrollController scrollController,
   ) {
     // Sort actions by most recent date
     final sortedActions = [...actions]
@@ -136,7 +152,9 @@ class SocialSummary extends ConsumerWidget {
             Expanded(
               child: Scrollbar(
                 thumbVisibility: true,
+                controller: scrollController,
                 child: SingleChildScrollView(
+                  controller: scrollController,
                   scrollDirection: Axis.vertical,
                   child: Wrap(
                     alignment: WrapAlignment.start,
