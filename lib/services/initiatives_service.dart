@@ -32,4 +32,15 @@ class InitiativesService {
       throw Exception('Failed to fetch initiatives: $e');
     }
   }
+
+  Future<List<InitiativeSchema>> fetchInitiativesByIds(List<String> ids) async {
+    if (ids.isEmpty) return [];
+    try {
+      // Check the correct parameter name and usage for the generated API method
+      final result = await _api.getInitiativesByIdsInitiativesByIdsGet(ids);
+      return result ?? [];
+    } catch (e) {
+      throw Exception('Failed to batch fetch initiatives: $e');
+    }
+  }
 }

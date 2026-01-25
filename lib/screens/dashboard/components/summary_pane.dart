@@ -1,6 +1,7 @@
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/initiatives/initiatives_summary.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/social/social_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
 
@@ -21,6 +22,10 @@ class SummaryPane extends StatelessWidget {
     if (title == 'Initiatives') {
       // Show a different widget for Initiatives with live count
       return InitiativesSummary(icon: icon, color: color);
+    }
+
+    if (title == "Social") {
+      return SocialSummary(icon: icon, color: color);
     }
 
     if (title == 'Maps') {
