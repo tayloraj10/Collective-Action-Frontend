@@ -245,7 +245,6 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
                 return const Scaffold();
               }
               final user = ref.watch(currentUserProvider).value;
-              print('user: $user');
               if (user == null) {
                 Future.microtask(() async {
                   if (!mounted) return;
