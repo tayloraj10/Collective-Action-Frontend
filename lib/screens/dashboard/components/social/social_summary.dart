@@ -98,6 +98,9 @@ class SocialSummary extends ConsumerWidget {
     List<ActionSchema> actions,
     Map<String, InitiativeSchema> initiativesMap,
   ) {
+    // Sort actions by most recent date
+    final sortedActions = [...actions]
+      ..sort((a, b) => b.date.compareTo(a.date));
     return LayoutBuilder(
       builder: (context, constraints) {
         return Column(
@@ -129,22 +132,28 @@ class SocialSummary extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 8),
+            // Left-to-right, top-to-bottom layout for cards
             Expanded(
               child: Scrollbar(
                 thumbVisibility: true,
-                child: ListView.builder(
-                  itemCount: actions.length,
-                  itemBuilder: (context, idx) {
-                    final action = actions[idx];
-                    InitiativeSchema? initiative;
-                    if (action.actionType ==
-                            ActionTypeValuesEnum.initiative.value &&
-                        action.linkedId != null &&
-                        action.linkedId!.isNotEmpty) {
-                      initiative = initiativesMap[action.linkedId!];
-                    }
-                    return ActionCard(action: action, initiative: initiative);
-                  },
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Wrap(
+                    alignment: WrapAlignment.start,
+                    spacing: 0,
+                    runSpacing: 0,
+                    children: List.generate(sortedActions.length, (idx) {
+                      final action = sortedActions[idx];
+                      InitiativeSchema? initiative;
+                      if (action.actionType ==
+                              ActionTypeValuesEnum.initiative.value &&
+                          action.linkedId != null &&
+                          action.linkedId!.isNotEmpty) {
+                        initiative = initiativesMap[action.linkedId!];
+                      }
+                      return ActionCard(action: action, initiative: initiative);
+                    }),
+                  ),
                 ),
               ),
             ),

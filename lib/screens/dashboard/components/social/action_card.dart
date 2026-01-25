@@ -1,5 +1,6 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
+import 'package:collective_action_frontend/app/theme.dart';
 import 'package:flutter/material.dart';
 
 class ActionCard extends StatelessWidget {
@@ -15,103 +16,165 @@ class ActionCard extends StatelessWidget {
     final theme = Theme.of(context);
     final avatarUrl = action.imageUrl;
     final hasAvatar = avatarUrl != null && avatarUrl.isNotEmpty;
-    final cardColor = Color.alphaBlend(
-      theme.colorScheme.surfaceContainerHighest.withAlpha(179),
-      theme.colorScheme.surface,
-    );
-    final borderColor = theme.brightness == Brightness.dark
-        ? Colors.white.withAlpha(33)
-        : Colors.black.withAlpha(33);
+    final isDark = theme.brightness == Brightness.dark;
 
-    // Use initiative if provided
+    // Use AppColors from theme.dart
+    final cardColor = isDark ? AppColors.darkSurface : AppColors.white;
+    final accentColor = isDark ? AppColors.lightBlue : AppColors.primaryBlue;
+    final subtleAccent = isDark
+        ? AppColors.lightBlue.withAlpha(130)
+        : AppColors.primaryBlue.withAlpha(130);
+
     InitiativeSchema? linkedInitiative = initiative;
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      width: isMobile ? 150 : 180,
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor, width: 1.7),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(8),
-            blurRadius: 10,
+            color: isDark
+                ? AppColors.black.withAlpha(60)
+                : AppColors.black.withAlpha(12),
+            blurRadius: 7,
             offset: const Offset(0, 2),
+            spreadRadius: 0,
           ),
         ],
       ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 12 : 18,
-          vertical: isMobile ? 10 : 16,
-        ),
-        child: Row(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Avatar
-            CircleAvatar(
-              radius: isMobile ? 22 : 28,
-              backgroundColor: Color.alphaBlend(
-                theme.colorScheme.primary.withAlpha(25),
-                theme.colorScheme.surface,
-              ),
-              backgroundImage: hasAvatar ? NetworkImage(avatarUrl) : null,
-              child: !hasAvatar
-                  ? Icon(
-                      Icons.person,
-                      color: theme.colorScheme.primary,
-                      size: isMobile ? 26 : 32,
-                    )
-                  : null,
-            ),
-            const SizedBox(width: 14),
-            // Main content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            // Header section with gradient
+            Container(
+              padding: EdgeInsets.all(isMobile ? 8 : 10),
+              color: subtleAccent,
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          linkedInitiative?.title ?? _titleForAction(action),
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: theme.colorScheme.onSurface,
-                          ),
-                        ),
+                  // Enhanced Avatar with ring
+                  Container(
+                    padding: const EdgeInsets.all(1),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [accentColor, accentColor.withAlpha(153)],
                       ),
-                      if (timeString.isNotEmpty)
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.access_time,
-                              size: isMobile ? 13 : 15,
-                              color: Colors.grey.shade500,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              timeString,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: Colors.grey.shade500,
-                                fontSize: isMobile ? 11 : 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                    ],
+                    ),
+                    child: CircleAvatar(
+                      radius: isMobile ? 14 : 16,
+                      backgroundColor: cardColor,
+                      backgroundImage: hasAvatar
+                          ? NetworkImage(avatarUrl)
+                          : null,
+                      child: !hasAvatar
+                          ? Icon(
+                              Icons.person_rounded,
+                              color: accentColor,
+                              size: isMobile ? 16 : 18,
+                            )
+                          : null,
+                    ),
                   ),
+                  const SizedBox(width: 8),
+                  // Title
+                  Expanded(
+                    child: Text(
+                      linkedInitiative?.title ?? _titleForAction(action),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
+                        fontSize: isMobile ? 12 : 13,
+                        height: 1.2,
+                        letterSpacing: -0.2,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Content section
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                isMobile ? 8 : 10,
+                isMobile ? 7 : 9,
+                isMobile ? 8 : 10,
+                isMobile ? 8 : 10,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Amount badge (if exists)
                   if (action.amount != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4.0),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [accentColor, accentColor.withAlpha(204)],
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: accentColor.withAlpha(40),
+                            blurRadius: 4,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                      ),
                       child: Text(
-                        'Amount: ${action.amount}',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w500,
-                          fontSize: isMobile ? 13 : 15,
+                        '${action.amount}',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: AppColors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: isMobile ? 10 : 11,
+                          letterSpacing: 0.3,
                         ),
                       ),
                     ),
+
+                  // Time indicator
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? AppColors.white.withAlpha(13)
+                          : AppColors.silver,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.schedule_rounded,
+                          size: isMobile ? 10 : 12,
+                          color: theme.colorScheme.onSurface.withAlpha(128),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          timeString,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withAlpha(153),
+                            fontSize: isMobile ? 9 : 10,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
