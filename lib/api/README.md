@@ -78,7 +78,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**healthHealthGet**](doc//DefaultApi.md#healthhealthget) | **GET** /health | Health
 *InitiativesApi* | [**createInitiativeInitiativesPost**](doc//InitiativesApi.md#createinitiativeinitiativespost) | **POST** /initiatives/ | Create Initiative
 *InitiativesApi* | [**getFeaturedInitiativesInitiativesFeaturedGet**](doc//InitiativesApi.md#getfeaturedinitiativesinitiativesfeaturedget) | **GET** /initiatives/featured | Get Featured Initiatives
-*InitiativesApi* | [**getInitiativeInitiativesInitiativeIdGet**](doc//InitiativesApi.md#getinitiativeinitiativesinitiativeidget) | **GET** /initiatives/{initiative_id} | Get Initiative
+*InitiativesApi* | [**getInitiativesByIdsInitiativesByIdsGet**](doc//InitiativesApi.md#getinitiativesbyidsinitiativesbyidsget) | **GET** /initiatives/by-ids | Get Initiatives By Ids
 *InitiativesApi* | [**listActiveInitiativesInitiativesActiveGet**](doc//InitiativesApi.md#listactiveinitiativesinitiativesactiveget) | **GET** /initiatives/active | List Active Initiatives
 *InitiativesApi* | [**listInitiativesInitiativesGet**](doc//InitiativesApi.md#listinitiativesinitiativesget) | **GET** /initiatives/ | List Initiatives
 *InitiativesApi* | [**listInitiativesSummaryInitiativesSummaryGet**](doc//InitiativesApi.md#listinitiativessummaryinitiativessummaryget) | **GET** /initiatives/summary | List Initiatives Summary
