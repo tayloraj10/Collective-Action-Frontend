@@ -17,6 +17,7 @@ class UserSettingsPage extends ConsumerStatefulWidget {
 }
 
 class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
+  UserType? _userType;
   Widget _unsavedChangesWarning() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
@@ -91,6 +92,7 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
         _instagram = user.socialLinks?.instagram;
         _tiktok = user.socialLinks?.tiktok;
         _website = user.socialLinks?.website;
+        _userType = user.userType ?? UserType.person;
         // Store initial values for dirty check
         _initialValues = {
           'name': _name,
@@ -127,7 +129,7 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
       email: _email!,
       name: nullIfBlank(_name),
       photoUrl: nullIfBlank(_photoUrl),
-      userType: user.userType,
+      userType: _userType ?? user.userType,
       location: LocationSchema(
         city: nullIfBlank(_city),
         state: nullIfBlank(_state),
@@ -179,6 +181,9 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
   }
 
   void onChanged(String field, String? value) {
+    if (field == 'userType') {
+      _userType = value == 'group' ? UserType.group : UserType.person;
+    }
     final initial = _initialValues[field] ?? '';
     final newDirtyFields = Set<String>.from(_dirtyFields.value);
 
@@ -240,6 +245,7 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
                 return const Scaffold();
               }
               final user = ref.watch(currentUserProvider).value;
+              print('user: $user');
               if (user == null) {
                 Future.microtask(() async {
                   if (!mounted) return;
@@ -280,6 +286,12 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
                     child: ValueListenableBuilder<Set<String>>(
                       valueListenable: _dirtyFields,
                       builder: (context, dirtyFields, child) {
+                        // Ensure userType always reflects loaded user data unless user has changed it
+                        if (!dirtyFields.contains('userType') &&
+                            user.userType != null &&
+                            _userType != user.userType) {
+                          _userType = user.userType;
+                        }
                         return Container(
                           decoration: dirtyFields.isNotEmpty
                               ? BoxDecoration(
@@ -302,6 +314,265 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
                                 child: ListView(
                                   shrinkWrap: true,
                                   children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 18.0,
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .surfaceContainerHighest
+                                                  .withAlpha(179),
+                                              borderRadius:
+                                                  BorderRadius.circular(24),
+                                              border: Border.all(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary
+                                                    .withAlpha(46),
+                                                width: 1.2,
+                                              ),
+                                            ),
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 4,
+                                              horizontal: 6,
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Expanded(
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        _userType =
+                                                            UserType.person;
+                                                        onChanged(
+                                                          'userType',
+                                                          'person',
+                                                        );
+                                                      });
+                                                    },
+                                                    child: AnimatedContainer(
+                                                      duration: const Duration(
+                                                        milliseconds: 180,
+                                                      ),
+                                                      curve: Curves.ease,
+                                                      decoration: BoxDecoration(
+                                                        color:
+                                                            (_userType ??
+                                                                    UserType
+                                                                        .person) ==
+                                                                UserType.person
+                                                            ? Theme.of(context)
+                                                                  .colorScheme
+                                                                  .primary
+                                                                  .withAlpha(33)
+                                                            : Colors
+                                                                  .transparent,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              20,
+                                                            ),
+                                                      ),
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            vertical: 8,
+                                                            horizontal: 0,
+                                                          ),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Icon(
+                                                            Icons
+                                                                .person_outline,
+                                                            color:
+                                                                (_userType ??
+                                                                        UserType
+                                                                            .person) ==
+                                                                    UserType
+                                                                        .person
+                                                                ? Theme.of(
+                                                                        context,
+                                                                      )
+                                                                      .colorScheme
+                                                                      .primary
+                                                                : Theme.of(
+                                                                        context,
+                                                                      )
+                                                                      .colorScheme
+                                                                      .onSurface
+                                                                      .withAlpha(
+                                                                        153,
+                                                                      ),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 6,
+                                                          ),
+                                                          Text(
+                                                            'Person',
+                                                            style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              color:
+                                                                  (_userType ??
+                                                                          UserType
+                                                                              .person) ==
+                                                                      UserType
+                                                                          .person
+                                                                  ? Theme.of(
+                                                                          context,
+                                                                        )
+                                                                        .colorScheme
+                                                                        .primary
+                                                                  : Theme.of(
+                                                                          context,
+                                                                        )
+                                                                        .colorScheme
+                                                                        .onSurface
+                                                                        .withAlpha(
+                                                                          179,
+                                                                        ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        _userType =
+                                                            UserType.group;
+                                                        onChanged(
+                                                          'userType',
+                                                          'group',
+                                                        );
+                                                      });
+                                                    },
+                                                    child: AnimatedContainer(
+                                                      duration: const Duration(
+                                                        milliseconds: 180,
+                                                      ),
+                                                      curve: Curves.ease,
+                                                      decoration: BoxDecoration(
+                                                        color:
+                                                            (_userType ??
+                                                                    UserType
+                                                                        .person) ==
+                                                                UserType.group
+                                                            ? Theme.of(context)
+                                                                  .colorScheme
+                                                                  .primary
+                                                                  .withAlpha(33)
+                                                            : Colors
+                                                                  .transparent,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              20,
+                                                            ),
+                                                      ),
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            vertical: 8,
+                                                            horizontal: 0,
+                                                          ),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Icon(
+                                                            Icons
+                                                                .groups_outlined,
+                                                            color:
+                                                                (_userType ??
+                                                                        UserType
+                                                                            .person) ==
+                                                                    UserType
+                                                                        .group
+                                                                ? Theme.of(
+                                                                        context,
+                                                                      )
+                                                                      .colorScheme
+                                                                      .primary
+                                                                : Theme.of(
+                                                                        context,
+                                                                      )
+                                                                      .colorScheme
+                                                                      .onSurface
+                                                                      .withAlpha(
+                                                                        153,
+                                                                      ),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 6,
+                                                          ),
+                                                          Text(
+                                                            'Group',
+                                                            style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              color:
+                                                                  (_userType ??
+                                                                          UserType
+                                                                              .person) ==
+                                                                      UserType
+                                                                          .group
+                                                                  ? Theme.of(
+                                                                          context,
+                                                                        )
+                                                                        .colorScheme
+                                                                        .primary
+                                                                  : Theme.of(
+                                                                          context,
+                                                                        )
+                                                                        .colorScheme
+                                                                        .onSurface
+                                                                        .withAlpha(
+                                                                          179,
+                                                                        ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 2.0,
+                                            ),
+                                            child: Text(
+                                              'A "Person" account is for individuals. A "Group" account is for organizations, collectives, or teams.',
+                                              style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface
+                                                    .withAlpha(174),
+                                                fontSize: 13.5,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                     Center(
                                       child: Stack(
                                         alignment: Alignment.topRight,
@@ -381,7 +652,9 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
                                     ),
                                     const SizedBox(height: 28),
                                     Text(
-                                      'Profile',
+                                      _userType == UserType.group
+                                          ? 'Group Profile'
+                                          : 'Profile',
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleLarge
@@ -389,6 +662,20 @@ class _UserSettingsPageState extends ConsumerState<UserSettingsPage> {
                                             fontWeight: FontWeight.bold,
                                           ),
                                     ),
+                                    if (_userType == UserType.group)
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 8.0,
+                                        ),
+                                        child: Text(
+                                          'This account represents a group or organization. Some fields may be different.',
+                                          style: TextStyle(
+                                            color: Colors.blueGrey.shade600,
+                                            fontSize: 13,
+                                          ),
+                                          // textAlign: TextAlign.center,
+                                        ),
+                                      ),
                                     const SizedBox(height: 4),
                                     ValueListenableBuilder<Set<String>>(
                                       valueListenable: _dirtyFields,
