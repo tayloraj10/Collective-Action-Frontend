@@ -150,23 +150,28 @@
                 }
             }
         },
-        "/initiatives/{initiative_id}": {
+        "/initiatives/by-ids": {
             "get": {
                 "tags": [
                     "initiatives"
                 ],
-                "summary": "Get Initiative",
-                "operationId": "get_initiative_initiatives__initiative_id__get",
+                "summary": "Get Initiatives By Ids",
+                "operationId": "get_initiatives_by_ids_initiatives_by_ids_get",
                 "parameters": [
                     {
-                        "name": "initiative_id",
-                        "in": "path",
+                        "name": "initiative_ids",
+                        "in": "query",
                         "required": true,
                         "schema": {
-                            "type": "string",
-                            "format": "uuid",
-                            "title": "Initiative Id"
-                        }
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "description": "List of initiative IDs",
+                            "title": "Initiative Ids"
+                        },
+                        "description": "List of initiative IDs"
                     }
                 ],
                 "responses": {
@@ -175,7 +180,11 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InitiativeSchema"
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/InitiativeSchema"
+                                    },
+                                    "title": "Response Get Initiatives By Ids Initiatives By Ids Get"
                                 }
                             }
                         }

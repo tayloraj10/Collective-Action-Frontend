@@ -115,17 +115,17 @@ class InitiativesApi {
     return null;
   }
 
-  /// Get Initiative
+  /// Get Initiatives By Ids
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
-  /// * [String] initiativeId (required):
-  Future<Response> getInitiativeInitiativesInitiativeIdGetWithHttpInfo(String initiativeId,) async {
+  /// * [List<String>] initiativeIds (required):
+  ///   List of initiative IDs
+  Future<Response> getInitiativesByIdsInitiativesByIdsGetWithHttpInfo(List<String> initiativeIds,) async {
     // ignore: prefer_const_declarations
-    final path = r'/initiatives/{initiative_id}'
-      .replaceAll('{initiative_id}', initiativeId);
+    final path = r'/initiatives/by-ids';
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -133,6 +133,8 @@ class InitiativesApi {
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
     final formParams = <String, String>{};
+
+      queryParams.addAll(_queryParams('multi', 'initiative_ids', initiativeIds));
 
     const contentTypes = <String>[];
 
@@ -148,13 +150,14 @@ class InitiativesApi {
     );
   }
 
-  /// Get Initiative
+  /// Get Initiatives By Ids
   ///
   /// Parameters:
   ///
-  /// * [String] initiativeId (required):
-  Future<InitiativeSchema?> getInitiativeInitiativesInitiativeIdGet(String initiativeId,) async {
-    final response = await getInitiativeInitiativesInitiativeIdGetWithHttpInfo(initiativeId,);
+  /// * [List<String>] initiativeIds (required):
+  ///   List of initiative IDs
+  Future<List<InitiativeSchema>?> getInitiativesByIdsInitiativesByIdsGet(List<String> initiativeIds,) async {
+    final response = await getInitiativesByIdsInitiativesByIdsGetWithHttpInfo(initiativeIds,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -162,8 +165,11 @@ class InitiativesApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'InitiativeSchema',) as InitiativeSchema;
-    
+      final responseBody = await _decodeBodyBytes(response);
+      return (await apiClient.deserializeAsync(responseBody, 'List<InitiativeSchema>') as List)
+        .cast<InitiativeSchema>()
+        .toList(growable: false);
+
     }
     return null;
   }
