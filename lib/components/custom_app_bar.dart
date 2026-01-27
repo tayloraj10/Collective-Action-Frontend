@@ -2,6 +2,7 @@ import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/app_bar_icon_button.dart';
 import 'package:collective_action_frontend/components/confirmation_dialog.dart';
+import 'package:collective_action_frontend/components/quote_bar.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:collective_action_frontend/providers/theme_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
@@ -44,14 +45,22 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
           : null,
       title: Padding(
         padding: EdgeInsets.symmetric(horizontal: isMobile ? 4 : 8),
-        child: Text(
-          isMobile ? 'Collective' : 'Collective Action Network',
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-          style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
-            fontWeight: FontWeight.bold,
-            letterSpacing: isMobile ? 0 : 0.5,
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              isMobile ? 'Collective' : 'Collective Action Network',
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
+                fontWeight: FontWeight.bold,
+                letterSpacing: isMobile ? 0 : 0.5,
+              ),
+            ),
+            // Quote below title
+            const QuoteBar(),
+          ],
         ),
       ),
       actions: [
