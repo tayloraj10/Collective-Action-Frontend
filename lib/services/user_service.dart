@@ -9,9 +9,17 @@ class UserService {
     _api = UsersApi(client);
   }
 
-  Future<UserSchema?> fetchUser({required String userId}) async {
+  Future<UserSchema?> fetchUserByFirebaseID({required String userId}) async {
     try {
       return await _api.getUserByFirebaseIdUsersFirebaseIdGet(userId);
+    } catch (e) {
+      throw Exception('Failed to fetch user: $e');
+    }
+  }
+
+  Future<UserSchema?> fetchUserByUserID({required String userId}) async {
+    try {
+      return await _api.getUserByUserIdUsersDbUserIdGet(userId);
     } catch (e) {
       throw Exception('Failed to fetch user: $e');
     }
