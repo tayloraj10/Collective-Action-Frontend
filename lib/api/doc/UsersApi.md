@@ -12,6 +12,7 @@ Method | HTTP request | Description
 [**createUserUsersPost**](UsersApi.md#createuseruserspost) | **POST** /users/ | Create User
 [**deleteUserUsersUserIdDelete**](UsersApi.md#deleteuserusersuseriddelete) | **DELETE** /users/{user_id} | Delete User
 [**getUserByFirebaseIdUsersFirebaseIdGet**](UsersApi.md#getuserbyfirebaseidusersfirebaseidget) | **GET** /users/{firebase_id} | Get User By Firebase Id
+[**getUserByUserIdUsersUserIdGet**](UsersApi.md#getuserbyuseridusersuseridget) | **GET** /users/{user_id} | Get User By User Id
 [**listUsersUsersGet**](UsersApi.md#listusersusersget) | **GET** /users/ | List Users
 [**updateUserUsersUserIdPatch**](UsersApi.md#updateuserusersuseridpatch) | **PATCH** /users/{user_id} | Update User
 
@@ -128,6 +129,49 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **firebaseId** | **String**|  | 
+
+### Return type
+
+[**UserSchema**](UserSchema.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getUserByUserIdUsersUserIdGet**
+> UserSchema getUserByUserIdUsersUserIdGet(userId)
+
+Get User By User Id
+
+Retrieve a user by their unique ID. Raises 404 if the user is not found.
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = UsersApi();
+final userId = userId_example; // String | 
+
+try {
+    final result = api_instance.getUserByUserIdUsersUserIdGet(userId);
+    print(result);
+} catch (e) {
+    print('Exception when calling UsersApi->getUserByUserIdUsersUserIdGet: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **userId** | **String**|  | 
 
 ### Return type
 
