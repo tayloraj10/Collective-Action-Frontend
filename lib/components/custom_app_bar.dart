@@ -55,6 +55,100 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
         ),
       ),
       actions: [
+        // Info Button
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2),
+          child: Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.info_outline_rounded),
+              tooltip: 'App Info',
+              onPressed: () async {
+                final RenderBox button =
+                    context.findRenderObject() as RenderBox;
+                final overlay =
+                    Overlay.of(context).context.findRenderObject() as RenderBox;
+                final position = RelativeRect.fromRect(
+                  Rect.fromPoints(
+                    button.localToGlobal(Offset.zero, ancestor: overlay),
+                    button.localToGlobal(
+                      button.size.bottomRight(Offset.zero),
+                      ancestor: overlay,
+                    ),
+                  ),
+                  Offset.zero & overlay.size,
+                );
+                await showMenu(
+                  context: context,
+                  position: position,
+                  items: [
+                    PopupMenuItem(
+                      enabled: false,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Support',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SelectableText(
+                            'support@collectiveaction.app',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Theme.of(context).colorScheme.primary,
+                              // decoration: TextDecoration.underline,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Version',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text('v1.0.0', style: TextStyle(fontSize: 13)),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Recent Features',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.successGreen,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              '- Dashboard\n- Profile Page',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.successGreen.withAlpha(179),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Upcoming Features',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.warningOrange,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              '- Projects\n- Maps\n- Events',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.warningOrange.withAlpha(179),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
         // Dark/Light Mode Toggle
         AppBarIconButton(
           icon: isDarkMode ? Icons.wb_sunny : Icons.nightlight_round,
