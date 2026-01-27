@@ -21,7 +21,10 @@ class ProjectListScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             Text('Projects', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 8),
-            Text('Coming Soon', style: Theme.of(context).textTheme.bodyMedium),
+            Text(
+              'Full Page Coming Soon',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ],
         ),
       ),

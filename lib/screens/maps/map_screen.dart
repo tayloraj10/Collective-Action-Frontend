@@ -17,7 +17,10 @@ class MapScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             Text('Maps', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 8),
-            Text('Coming Soon', style: Theme.of(context).textTheme.bodyMedium),
+            Text(
+              'Full Page Coming Soon',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ],
         ),
       ),
