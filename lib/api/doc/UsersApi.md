@@ -12,7 +12,7 @@ Method | HTTP request | Description
 [**createUserUsersPost**](UsersApi.md#createuseruserspost) | **POST** /users/ | Create User
 [**deleteUserUsersUserIdDelete**](UsersApi.md#deleteuserusersuseriddelete) | **DELETE** /users/{user_id} | Delete User
 [**getUserByFirebaseIdUsersFirebaseIdGet**](UsersApi.md#getuserbyfirebaseidusersfirebaseidget) | **GET** /users/{firebase_id} | Get User By Firebase Id
-[**getUserByUserIdUsersUserIdGet**](UsersApi.md#getuserbyuseridusersuseridget) | **GET** /users/{user_id} | Get User By User Id
+[**getUserByUserIdUsersDbUserIdGet**](UsersApi.md#getuserbyuseridusersdbuseridget) | **GET** /users/db/{user_id} | Get User By User Id
 [**listUsersUsersGet**](UsersApi.md#listusersusersget) | **GET** /users/ | List Users
 [**updateUserUsersUserIdPatch**](UsersApi.md#updateuserusersuseridpatch) | **PATCH** /users/{user_id} | Update User
 
@@ -145,8 +145,8 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getUserByUserIdUsersUserIdGet**
-> UserSchema getUserByUserIdUsersUserIdGet(userId)
+# **getUserByUserIdUsersDbUserIdGet**
+> UserSchema getUserByUserIdUsersDbUserIdGet(userId)
 
 Get User By User Id
 
@@ -160,10 +160,10 @@ final api_instance = UsersApi();
 final userId = userId_example; // String | 
 
 try {
-    final result = api_instance.getUserByUserIdUsersUserIdGet(userId);
+    final result = api_instance.getUserByUserIdUsersDbUserIdGet(userId);
     print(result);
 } catch (e) {
-    print('Exception when calling UsersApi->getUserByUserIdUsersUserIdGet: $e\n');
+    print('Exception when calling UsersApi->getUserByUserIdUsersDbUserIdGet: $e\n');
 }
 ```
 

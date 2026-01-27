@@ -91,7 +91,7 @@ Class | Method | HTTP request | Description
 *UsersApi* | [**createUserUsersPost**](doc//UsersApi.md#createuseruserspost) | **POST** /users/ | Create User
 *UsersApi* | [**deleteUserUsersUserIdDelete**](doc//UsersApi.md#deleteuserusersuseriddelete) | **DELETE** /users/{user_id} | Delete User
 *UsersApi* | [**getUserByFirebaseIdUsersFirebaseIdGet**](doc//UsersApi.md#getuserbyfirebaseidusersfirebaseidget) | **GET** /users/{firebase_id} | Get User By Firebase Id
-*UsersApi* | [**getUserByUserIdUsersUserIdGet**](doc//UsersApi.md#getuserbyuseridusersuseridget) | **GET** /users/{user_id} | Get User By User Id
+*UsersApi* | [**getUserByUserIdUsersDbUserIdGet**](doc//UsersApi.md#getuserbyuseridusersdbuseridget) | **GET** /users/db/{user_id} | Get User By User Id
 *UsersApi* | [**listUsersUsersGet**](doc//UsersApi.md#listusersusersget) | **GET** /users/ | List Users
 *UsersApi* | [**updateUserUsersUserIdPatch**](doc//UsersApi.md#updateuserusersuseridpatch) | **PATCH** /users/{user_id} | Update User
 

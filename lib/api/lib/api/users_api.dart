@@ -187,9 +187,9 @@ class UsersApi {
   /// Parameters:
   ///
   /// * [String] userId (required):
-  Future<Response> getUserByUserIdUsersUserIdGetWithHttpInfo(String userId,) async {
+  Future<Response> getUserByUserIdUsersDbUserIdGetWithHttpInfo(String userId,) async {
     // ignore: prefer_const_declarations
-    final path = r'/users/{user_id}'
+    final path = r'/users/db/{user_id}'
       .replaceAll('{user_id}', userId);
 
     // ignore: prefer_final_locals
@@ -220,8 +220,8 @@ class UsersApi {
   /// Parameters:
   ///
   /// * [String] userId (required):
-  Future<UserSchema?> getUserByUserIdUsersUserIdGet(String userId,) async {
-    final response = await getUserByUserIdUsersUserIdGetWithHttpInfo(userId,);
+  Future<UserSchema?> getUserByUserIdUsersDbUserIdGet(String userId,) async {
+    final response = await getUserByUserIdUsersDbUserIdGetWithHttpInfo(userId,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

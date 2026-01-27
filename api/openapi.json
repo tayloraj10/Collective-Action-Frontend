@@ -990,14 +990,14 @@
                 }
             }
         },
-        "/users/{user_id}": {
+        "/users/db/{user_id}": {
             "get": {
                 "tags": [
                     "users"
                 ],
                 "summary": "Get User By User Id",
                 "description": "Retrieve a user by their unique ID.\nRaises 404 if the user is not found.",
-                "operationId": "get_user_by_user_id_users__user_id__get",
+                "operationId": "get_user_by_user_id_users_db__user_id__get",
                 "parameters": [
                     {
                         "name": "user_id",
@@ -1021,7 +1021,9 @@
                         }
                     }
                 }
-            },
+            }
+        },
+        "/users/{user_id}": {
             "patch": {
                 "tags": [
                     "users"
