@@ -34,7 +34,10 @@ class InitiativeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = (initiative.complete ?? 0.0) / 100;
+    final goal = (initiative.goal == null || initiative.goal == 0)
+        ? 1
+        : initiative.goal!;
+    final progress = (initiative.complete ?? 0.0) / goal;
 
     return Container(
       decoration: BoxDecoration(
