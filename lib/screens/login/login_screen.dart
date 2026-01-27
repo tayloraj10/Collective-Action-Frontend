@@ -161,6 +161,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             email: firebaseUser.email ?? '',
             name: firebaseUser.displayName ?? '',
             firebaseUserId: firebaseUser.uid,
+            photoUrl: firebaseUser.photoURL,
           );
           appUser = await ref
               .read(activeUserProvider(firebaseUser.uid).notifier)

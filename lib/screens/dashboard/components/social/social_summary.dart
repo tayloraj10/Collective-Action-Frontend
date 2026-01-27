@@ -1,6 +1,6 @@
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/api/lib/api.dart';
-import 'package:collective_action_frontend/screens/dashboard/components/social/action_card.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/social/initiative_action_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
@@ -138,11 +138,33 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    'Social',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Social',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(width: isMobile ? 4 : 10),
+                      InkWell(
+                        onTap: () =>
+                            AppConstants.openUrl(AppConstants.discordLink),
+                        borderRadius: BorderRadius.circular(16),
+                        child: Tooltip(
+                          message: 'Join our Discord community',
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Icon(
+                              Icons
+                                  .discord, // If you have a custom Discord icon, use it here
+                              color: Colors.indigo,
+                              size: 22,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -169,7 +191,10 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                           action.linkedId!.isNotEmpty) {
                         initiative = initiativesMap[action.linkedId!];
                       }
-                      return ActionCard(action: action, initiative: initiative);
+                      return InitiativeActionCard(
+                        action: action,
+                        initiative: initiative,
+                      );
                     }),
                   ),
                 ),

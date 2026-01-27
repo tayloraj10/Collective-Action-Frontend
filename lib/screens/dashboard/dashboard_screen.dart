@@ -164,7 +164,7 @@ class PaneLayout extends StatelessWidget {
               Expanded(
                 child: SummaryPane(
                   title: 'Initiatives',
-                  icon: Icons.lightbulb_outline,
+                  icon: Icons.trending_up,
                   color: AppColors.lightBlue,
                 ),
               ),
