@@ -21,7 +21,7 @@ class DashboardScreen extends ConsumerWidget {
     if (authUser != null) {
       Future.microtask(() async {
         final appUser = await ref
-            .read(activeUserProvider(authUser.uid).notifier)
+            .read(userProvider(authUser.uid).notifier)
             .build();
         if (appUser != null) {
           await ref.read(currentUserProvider.notifier).setUser(appUser);

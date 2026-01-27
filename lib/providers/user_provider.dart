@@ -33,15 +33,15 @@ class CurrentUserNotifier extends AsyncNotifier<UserSchema?> {
   }
 }
 
-final activeUserProvider =
-    AsyncNotifierProvider.family<ActiveUserNotifier, UserSchema?, String>(
-      (userId) => ActiveUserNotifier(userId),
+final userProvider =
+    AsyncNotifierProvider.family<UserNotifier, UserSchema?, String>(
+      (userId) => UserNotifier(userId),
     );
 
-class ActiveUserNotifier extends AsyncNotifier<UserSchema?> {
+class UserNotifier extends AsyncNotifier<UserSchema?> {
   final String userId;
 
-  ActiveUserNotifier(this.userId);
+  UserNotifier(this.userId);
 
   @override
   Future<UserSchema?> build() async {

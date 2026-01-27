@@ -94,7 +94,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             firebaseUserId: firebaseUser.uid,
           );
           final createdUser = await ref
-              .read(activeUserProvider(firebaseUser.uid).notifier)
+              .read(userProvider(firebaseUser.uid).notifier)
               .createUser(userCreate);
           // Set global currentUserProvider
           if (createdUser != null) {
@@ -116,7 +116,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         // Fetch app user and set global provider
         if (firebaseUser != null) {
           final appUser = await ref
-              .read(activeUserProvider(firebaseUser.uid).notifier)
+              .read(userProvider(firebaseUser.uid).notifier)
               .build();
           if (appUser != null) {
             await ref.read(currentUserProvider.notifier).setUser(appUser);
@@ -150,7 +150,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         UserSchema? appUser;
         try {
           appUser = await ref
-              .read(activeUserProvider(firebaseUser.uid).notifier)
+              .read(userProvider(firebaseUser.uid).notifier)
               .build();
         } catch (e) {
           appUser = null;
@@ -164,7 +164,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             photoUrl: firebaseUser.photoURL,
           );
           appUser = await ref
-              .read(activeUserProvider(firebaseUser.uid).notifier)
+              .read(userProvider(firebaseUser.uid).notifier)
               .createUser(userCreate);
         }
         // Set global currentUserProvider
