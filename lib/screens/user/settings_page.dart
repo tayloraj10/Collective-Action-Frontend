@@ -1,6 +1,7 @@
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -575,22 +576,10 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                       child: Stack(
                                         alignment: Alignment.topRight,
                                         children: [
-                                          CircleAvatar(
-                                            radius: 48,
-                                            backgroundImage:
-                                                displayPhotoUrl != null &&
-                                                    displayPhotoUrl.isNotEmpty
-                                                ? NetworkImage(displayPhotoUrl)
-                                                : null,
-                                            child:
-                                                displayPhotoUrl == null ||
-                                                    displayPhotoUrl.isEmpty
-                                                ? Icon(
-                                                    Icons.person,
-                                                    size: 48,
-                                                    color: Colors.grey.shade400,
-                                                  )
-                                                : null,
+                                          UserAvatar(
+                                            userId: user.id,
+                                            radius: 50,
+                                            borderWidth: 1,
                                           ),
                                           Positioned(
                                             bottom: 0,
@@ -648,7 +637,7 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                         ],
                                       ),
                                     ),
-                                    const SizedBox(height: 28),
+                                    const SizedBox(height: 16),
                                     Text(
                                       _userType == UserType.group
                                           ? 'Group Profile'

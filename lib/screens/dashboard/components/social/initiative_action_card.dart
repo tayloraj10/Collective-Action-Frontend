@@ -61,7 +61,11 @@ class InitiativeActionCard extends StatelessWidget {
               child: Row(
                 children: [
                   // User avatar
-                  UserAvatar(userId: action.userId),
+                  UserAvatar(
+                    userId: action.userId,
+                    showTooltip: true,
+                    enableHero: true,
+                  ),
                   const SizedBox(width: 8),
                   // Title
                   Expanded(

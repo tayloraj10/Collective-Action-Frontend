@@ -6,6 +6,7 @@ import 'package:collective_action_frontend/components/quote_bar.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:collective_action_frontend/providers/theme_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -27,6 +28,10 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final isHomeRoute = currentLocation == '/';
 
     final user = authState.value;
+
+    final backendUser = user != null
+        ? ref.watch(userProvider(user.uid)).value
+        : null;
 
     return AppBar(
       elevation: 2,
@@ -170,34 +175,25 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
         // User Profile Button or Login Button
         if (authState.value != null)
-          (user?.photoURL != null
-              ? Padding(
+          Padding(
+            padding: const EdgeInsets.all(4),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  context.go('/settings');
+                },
+                child: Padding(
                   padding: const EdgeInsets.all(4),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        context.go('/settings');
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(4),
-                        child: CircleAvatar(
-                          radius: 20,
-                          backgroundImage: NetworkImage(user!.photoURL!),
-                          backgroundColor: Colors.white.withAlpha(38),
-                        ),
-                      ),
-                    ),
+                  child: UserAvatar(
+                    userId: backendUser?.id,
+                    radius: 20,
+                    borderWidth: 1.2,
                   ),
-                )
-              : AppBarIconButton(
-                  icon: Icons.person_outline,
-                  onPressed: () {
-                    context.go('/settings');
-                  },
-                  tooltip: 'Profile',
-                  backgroundColor: Colors.white.withAlpha(38),
-                ))
+                ),
+              ),
+            ),
+          )
         else
           AppBarIconButton(
             icon: Icons.login,
