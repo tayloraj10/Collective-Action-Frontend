@@ -202,6 +202,10 @@ class ApiClient {
           return InitiativeSchema.fromJson(value);
         case 'LocationSchema':
           return LocationSchema.fromJson(value);
+        case 'QuoteCreateSchema':
+          return QuoteCreateSchema.fromJson(value);
+        case 'QuoteSchema':
+          return QuoteSchema.fromJson(value);
         case 'SocialLinksSchema':
           return SocialLinksSchema.fromJson(value);
         case 'StatusCreate':

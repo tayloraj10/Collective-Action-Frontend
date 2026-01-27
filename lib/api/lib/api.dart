@@ -33,6 +33,7 @@ part 'api/actions_api.dart';
 part 'api/categories_api.dart';
 part 'api/default_api.dart';
 part 'api/initiatives_api.dart';
+part 'api/quotes_api.dart';
 part 'api/statuses_api.dart';
 part 'api/users_api.dart';
 
@@ -46,6 +47,8 @@ part 'model/category_schema.dart';
 part 'model/initiative_create_schema.dart';
 part 'model/initiative_schema.dart';
 part 'model/location_schema.dart';
+part 'model/quote_create_schema.dart';
+part 'model/quote_schema.dart';
 part 'model/social_links_schema.dart';
 part 'model/status_create.dart';
 part 'model/status_schema.dart';

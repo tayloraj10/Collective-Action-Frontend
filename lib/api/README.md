@@ -82,6 +82,12 @@ Class | Method | HTTP request | Description
 *InitiativesApi* | [**listActiveInitiativesInitiativesActiveGet**](doc//InitiativesApi.md#listactiveinitiativesinitiativesactiveget) | **GET** /initiatives/active | List Active Initiatives
 *InitiativesApi* | [**listInitiativesInitiativesGet**](doc//InitiativesApi.md#listinitiativesinitiativesget) | **GET** /initiatives/ | List Initiatives
 *InitiativesApi* | [**listInitiativesSummaryInitiativesSummaryGet**](doc//InitiativesApi.md#listinitiativessummaryinitiativessummaryget) | **GET** /initiatives/summary | List Initiatives Summary
+*QuotesApi* | [**createQuoteQuotesPost**](doc//QuotesApi.md#createquotequotespost) | **POST** /quotes/ | Create Quote
+*QuotesApi* | [**deleteQuoteQuotesQuoteIdDelete**](doc//QuotesApi.md#deletequotequotesquoteiddelete) | **DELETE** /quotes/{quote_id} | Delete Quote
+*QuotesApi* | [**getQuoteQuotesQuoteIdGet**](doc//QuotesApi.md#getquotequotesquoteidget) | **GET** /quotes/{quote_id} | Get Quote
+*QuotesApi* | [**getRandomQuoteQuotesRandomGet**](doc//QuotesApi.md#getrandomquotequotesrandomget) | **GET** /quotes/random | Get Random Quote
+*QuotesApi* | [**listQuotesQuotesGet**](doc//QuotesApi.md#listquotesquotesget) | **GET** /quotes/ | List Quotes
+*QuotesApi* | [**updateQuoteQuotesQuoteIdPatch**](doc//QuotesApi.md#updatequotequotesquoteidpatch) | **PATCH** /quotes/{quote_id} | Update Quote
 *StatusesApi* | [**createStatusStatusesPost**](doc//StatusesApi.md#createstatusstatusespost) | **POST** /statuses/ | Create Status
 *StatusesApi* | [**deleteStatusStatusesStatusIdDelete**](doc//StatusesApi.md#deletestatusstatusesstatusiddelete) | **DELETE** /statuses/{status_id} | Delete Status
 *StatusesApi* | [**getStatusStatusesStatusIdGet**](doc//StatusesApi.md#getstatusstatusesstatusidget) | **GET** /statuses/{status_id} | Get Status
@@ -108,6 +114,8 @@ Class | Method | HTTP request | Description
  - [InitiativeCreateSchema](doc//InitiativeCreateSchema.md)
  - [InitiativeSchema](doc//InitiativeSchema.md)
  - [LocationSchema](doc//LocationSchema.md)
+ - [QuoteCreateSchema](doc//QuoteCreateSchema.md)
+ - [QuoteSchema](doc//QuoteSchema.md)
  - [SocialLinksSchema](doc//SocialLinksSchema.md)
  - [StatusCreate](doc//StatusCreate.md)
  - [StatusSchema](doc//StatusSchema.md)

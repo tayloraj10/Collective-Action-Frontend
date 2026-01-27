@@ -901,6 +901,179 @@
                 }
             }
         },
+        "/quotes/": {
+            "get": {
+                "tags": [
+                    "quotes"
+                ],
+                "summary": "List Quotes",
+                "operationId": "list_quotes_quotes__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/QuoteSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Quotes Quotes  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "quotes"
+                ],
+                "summary": "Create Quote",
+                "operationId": "create_quote_quotes__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteCreateSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuoteSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/quotes/random": {
+            "get": {
+                "tags": [
+                    "quotes"
+                ],
+                "summary": "Get Random Quote",
+                "operationId": "get_random_quote_quotes_random_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuoteSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/quotes/{quote_id}": {
+            "get": {
+                "tags": [
+                    "quotes"
+                ],
+                "summary": "Get Quote",
+                "operationId": "get_quote_quotes__quote_id__get",
+                "parameters": [
+                    {
+                        "name": "quote_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Quote Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuoteSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "quotes"
+                ],
+                "summary": "Update Quote",
+                "operationId": "update_quote_quotes__quote_id__patch",
+                "parameters": [
+                    {
+                        "name": "quote_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Quote Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteCreateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuoteSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "quotes"
+                ],
+                "summary": "Delete Quote",
+                "operationId": "delete_quote_quotes__quote_id__delete",
+                "parameters": [
+                    {
+                        "name": "quote_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Quote Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
+                    }
+                }
+            }
+        },
         "/users/": {
             "get": {
                 "tags": [
@@ -1504,6 +1677,70 @@
                 },
                 "type": "object",
                 "title": "LocationSchema"
+            },
+            "QuoteCreateSchema": {
+                "properties": {
+                    "text": {
+                        "type": "string",
+                        "title": "Text"
+                    },
+                    "translation": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Translation"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "title": "Active",
+                        "default": true
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "text"
+                ],
+                "title": "QuoteCreateSchema"
+            },
+            "QuoteSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "text": {
+                        "type": "string",
+                        "title": "Text"
+                    },
+                    "translation": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Translation"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "title": "Active"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "text",
+                    "active"
+                ],
+                "title": "QuoteSchema"
             },
             "SocialLinksSchema": {
                 "properties": {
