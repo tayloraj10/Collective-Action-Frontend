@@ -36,7 +36,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
     return AppBar(
       elevation: 2,
       centerTitle: isMobile ? false : true,
-      leadingWidth: !isHomeRoute ? 72 : null,
+      leadingWidth: !isHomeRoute ? 66 : null,
       leading: !isHomeRoute
           ? Padding(
               padding: const EdgeInsets.only(left: 12),
@@ -49,9 +49,11 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
             )
           : null,
       title: Padding(
-        padding: EdgeInsets.symmetric(horizontal: isMobile ? 4 : 8),
+        padding: EdgeInsets.symmetric(horizontal: isMobile ? 0 : 8),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: isMobile
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
@@ -61,10 +63,11 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
               style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
                 fontWeight: FontWeight.bold,
                 letterSpacing: isMobile ? 0 : 0.5,
+                fontSize: isMobile ? 18 : null,
               ),
             ),
             // Quote below title
-            const QuoteBar(),
+            if (!isMobile || isHomeRoute) const QuoteBar(),
           ],
         ),
       ),

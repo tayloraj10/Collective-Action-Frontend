@@ -37,7 +37,7 @@ class InitiativeActionCard extends ConsumerWidget {
     InitiativeSchema? linkedInitiative = initiative;
 
     Widget card = Container(
-      width: isMobile ? 150 : 180,
+      width: isMobile ? double.infinity : 180,
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
       decoration: BoxDecoration(
         color: cardColor,
