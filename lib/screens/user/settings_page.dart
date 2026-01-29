@@ -1,6 +1,7 @@
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
+import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
@@ -165,17 +166,14 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
         };
         _dirtyFields.value = {};
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Center(child: Text('Settings saved!')),
-            backgroundColor: Colors.green,
-          ),
+          CustomSnackBar.success('Settings saved!'),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to save settings')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar.error('Failed to save settings'),
+        );
       }
     }
   }
