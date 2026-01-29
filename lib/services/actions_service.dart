@@ -30,4 +30,12 @@ class ActionsService {
       throw Exception('Failed to create action: $e');
     }
   }
+
+  Future<ActionSchema?> deleteAction(ActionSchema action) async {
+    try {
+      return await _api.deleteActionActionsActionIdDelete(action.id);
+    } catch (e) {
+      throw Exception('Failed to create action: $e');
+    }
+  }
 }
