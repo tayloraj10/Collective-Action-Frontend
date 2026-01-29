@@ -18,18 +18,28 @@ class DashboardScreen extends ConsumerWidget {
     final authUser = ref.watch(authStateProvider).value;
 
     // Fetch and set user data if logged in
+    // Capture refs before async operations to avoid unmount issues
     if (authUser != null) {
+      final userNotifier = ref.read(userProvider(authUser.uid).notifier);
+      final currentUserNotifier = ref.read(currentUserProvider.notifier);
       Future.microtask(() async {
-        final appUser = await ref
-            .read(userProvider(authUser.uid).notifier)
-            .build();
-        if (appUser != null) {
-          await ref.read(currentUserProvider.notifier).setUser(appUser);
+        try {
+          final appUser = await userNotifier.build();
+          if (appUser != null) {
+            await currentUserNotifier.setUser(appUser);
+          }
+        } catch (e) {
+          // Silently handle errors if widget is disposed
         }
       });
     } else {
+      final currentUserNotifier = ref.read(currentUserProvider.notifier);
       Future.microtask(() async {
-        await ref.read(currentUserProvider.notifier).clearUser();
+        try {
+          await currentUserNotifier.clearUser();
+        } catch (e) {
+          // Silently handle errors if widget is disposed
+        }
       });
     }
 

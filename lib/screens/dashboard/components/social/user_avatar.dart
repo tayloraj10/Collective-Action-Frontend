@@ -18,6 +18,7 @@ class UserAvatar extends ConsumerWidget {
   final Color? cardColorOverride;
   final bool showTooltip;
   final bool enableHero;
+  final String? heroTagSuffix; // Optional suffix to make hero tag unique
 
   const UserAvatar({
     super.key,
@@ -29,6 +30,7 @@ class UserAvatar extends ConsumerWidget {
     this.cardColorOverride,
     this.showTooltip = false,
     this.enableHero = false,
+    this.heroTagSuffix,
   });
 
   @override
@@ -110,8 +112,9 @@ class UserAvatar extends ConsumerWidget {
             photoUrl: user.photoUrl,
           );
           if (enableHero) {
+            final heroTag = 'user-avatar-$userId${heroTagSuffix != null ? '-$heroTagSuffix' : ''}';
             avatar = Hero(
-              tag: 'user-avatar-$userId',
+              tag: heroTag,
               child: SizedBox(
                 width: avatarRadius * 2,
                 height: avatarRadius * 2,
@@ -136,7 +139,7 @@ class UserAvatar extends ConsumerWidget {
                           ),
                         ),
                         Hero(
-                          tag: 'user-avatar-$userId',
+                          tag: heroTag,
                           child: SizedBox(
                             width: 180,
                             height: 180,
@@ -184,8 +187,9 @@ class UserAvatar extends ConsumerWidget {
             photoUrl: user.photoUrl,
           );
           if (enableHero) {
+            final heroTag = 'user-avatar-$userId${heroTagSuffix != null ? '-$heroTagSuffix' : ''}';
             avatar = Hero(
-              tag: 'user-avatar-$userId',
+              tag: heroTag,
               child: SizedBox(
                 width: avatarRadius * 2,
                 height: avatarRadius * 2,
@@ -210,7 +214,7 @@ class UserAvatar extends ConsumerWidget {
                           ),
                         ),
                         Hero(
-                          tag: 'user-avatar-$userId',
+                          tag: heroTag,
                           child: SizedBox(
                             width: 180,
                             height: 180,
