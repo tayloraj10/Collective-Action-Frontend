@@ -1021,6 +1021,7 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                             onChanged('country', country.name);
                                           },
                                           favorite: const ['US'],
+                                          exclude: const ['IL'],
                                           useSafeArea: true,
                                         );
                                       },
