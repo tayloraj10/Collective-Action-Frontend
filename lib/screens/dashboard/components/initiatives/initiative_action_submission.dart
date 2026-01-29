@@ -1,10 +1,13 @@
 import 'package:collective_action_frontend/app/theme.dart';
+import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/providers/initiative_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class InitiativeActionSubmission extends ConsumerStatefulWidget {
   final InitiativeSchema initiative;
@@ -13,10 +16,10 @@ class InitiativeActionSubmission extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<InitiativeActionSubmission> createState() =>
-      _InitiativeActionSubmissionState();
+      InitiativeActionSubmissionState();
 }
 
-class _InitiativeActionSubmissionState
+class InitiativeActionSubmissionState
     extends ConsumerState<InitiativeActionSubmission> {
   final _formKey = GlobalKey<FormState>();
   bool _loading = false;
@@ -68,11 +71,28 @@ class _InitiativeActionSubmissionState
     try {
       await notifier.createAction(action);
       await featuredInitiatives.refresh();
+      // Play sound on success (web-compatible)
+      // Create a separate AudioPlayer instance so it doesn't get disposed
+      // when the dialog closes, allowing the sound to play fully
+      try {
+        final audioPlayer = AudioPlayer();
+        audioPlayer.setReleaseMode(ReleaseMode.release);
+        if (kIsWeb) {
+          // For web, use UrlSource with the correct asset path
+          audioPlayer.play(UrlSource('/assets/sounds/crab_rave.mp3'));
+        } else {
+          // For mobile/desktop, use AssetSource
+          audioPlayer.play(AssetSource('sounds/crab_rave.mp3'));
+        }
+        // Audio player will auto-dispose when playback completes due to ReleaseMode.release
+      } catch (e) {
+        // Ignore sound errors
+      }
       if (mounted) {
         Navigator.of(context).pop(true);
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Action created!')));
+        ).showSnackBar(CustomSnackBar.success('Action created!'));
       }
     } catch (e) {
       setState(() {
