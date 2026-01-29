@@ -1,10 +1,16 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
+import 'package:collective_action_frontend/providers/initiative_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:collective_action_frontend/providers/user_provider.dart';
+import 'package:collective_action_frontend/providers/action_provider.dart';
+import 'package:collective_action_frontend/components/confirmation_dialog.dart';
+import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 
-class InitiativeActionCard extends StatelessWidget {
+class InitiativeActionCard extends ConsumerWidget {
   final ActionSchema action;
   final InitiativeSchema? initiative;
   const InitiativeActionCard({
@@ -14,7 +20,9 @@ class InitiativeActionCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentUser = ref.watch(currentUserProvider).value;
+    final isOwner = currentUser != null && currentUser.id == action.userId;
     final isMobile = AppConstants.isMobile(context);
     final date = action.date;
     final timeString = _formatTimeAgo(date);
@@ -24,14 +32,12 @@ class InitiativeActionCard extends StatelessWidget {
     // Use AppColors from theme.dart
     final cardColor = isDark ? AppColors.darkSurface : AppColors.white;
     final accentColor = AppColors.lightBlue;
-    final subtleAccent = isDark
-        ? AppColors.lightBlue.withAlpha(130)
-        : AppColors.primaryBlue.withAlpha(130);
+    final subtleAccent = AppColors.lightBlue.withAlpha(isDark ? 150 : 255);
 
     InitiativeSchema? linkedInitiative = initiative;
 
-    return Container(
-      width: isMobile ? double.infinity : 180,
+    Widget card = Container(
+      width: isMobile ? 150 : 180,
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
       decoration: BoxDecoration(
         color: cardColor,
@@ -61,10 +67,13 @@ class InitiativeActionCard extends StatelessWidget {
               child: Row(
                 children: [
                   // User avatar
-                  UserAvatar(
-                    userId: action.userId,
-                    showTooltip: true,
-                    enableHero: true,
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: UserAvatar(
+                      userId: action.userId,
+                      showTooltip: true,
+                      enableHero: true,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   // Title
@@ -192,6 +201,69 @@ class InitiativeActionCard extends StatelessWidget {
         ),
       ),
     );
+
+    if (isOwner) {
+      card = Badge(
+        alignment: Alignment.topLeft,
+        offset: Offset(-5, 1),
+        backgroundColor: Colors.transparent,
+        label: GestureDetector(
+          onTap: () async {
+            // Store ScaffoldMessenger before showing dialog to ensure it's available after
+            final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+            final confirm = await showDialog<bool>(
+              context: context,
+              builder: (context) => ConfirmationDialog(
+                title: 'Delete Action',
+                content: 'Are you sure you want to delete this action?',
+                confirmColor: Colors.redAccent,
+              ),
+            );
+            if (confirm == true) {
+              // Capture references upfront (before async operations) to avoid ref issues
+              final actionNotifier = ref.read(activeActionProvider.notifier);
+              final featuredInitiativesNotifier = ref.read(
+                featuredInitiativeProvider.notifier,
+              );
+
+              try {
+                // Delete the action (this already refreshes activeActionProvider)
+                await actionNotifier.deleteAction(action);
+
+                // Refresh featured initiatives provider to update initiative totals
+                await featuredInitiativesNotifier.refresh();
+
+                // Show success snackbar using stored ScaffoldMessenger
+                scaffoldMessenger.showSnackBar(
+                  CustomSnackBar.info('Action deleted!'),
+                );
+              } catch (e) {
+                // Handle any errors gracefully
+                scaffoldMessenger.showSnackBar(
+                  CustomSnackBar.error('Error deleting action'),
+                );
+              }
+            }
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: Container(
+              width: 18,
+              height: 18,
+              decoration: BoxDecoration(
+                color: Colors.redAccent,
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: Icon(Icons.delete, color: Colors.white, size: 12),
+            ),
+          ),
+        ),
+        child: card,
+      );
+    }
+    return card;
   }
 
   String _titleForAction(ActionSchema action) {
