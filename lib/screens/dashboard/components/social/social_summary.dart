@@ -1,6 +1,7 @@
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/initiative_action_card.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
@@ -201,6 +202,7 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
               ),
             ),
             const SizedBox(height: 8),
+            SummaryCount(count: actions.length, title: 'actions'),
           ],
         );
       },
