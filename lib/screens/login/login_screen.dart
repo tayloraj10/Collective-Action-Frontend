@@ -1,10 +1,13 @@
+import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
+import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -79,7 +82,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final authService = ref.read(authServiceProvider);
 
       if (_isSignUp) {
-        await authService.registerWithEmail(email, password);
+        final userCredential = await authService.registerWithEmail(
+          email,
+          password,
+        );
+        final firebaseUser = userCredential;
+        if (firebaseUser != null) {
+          // Create user in backend
+          final userCreate = UserCreate(
+            email: email,
+            firebaseUserId: firebaseUser.uid,
+          );
+          final createdUser = await ref
+              .read(userProvider(firebaseUser.uid).notifier)
+              .createUser(userCreate);
+          // Set global currentUserProvider
+          if (createdUser != null) {
+            await ref.read(currentUserProvider.notifier).setUser(createdUser);
+          }
+        }
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             CustomSnackBar.success(
@@ -91,7 +112,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           _passwordController.clear();
         }
       } else {
-        await authService.signInWithEmail(email, password);
+        final firebaseUser = await authService.signInWithEmail(email, password);
+        // Fetch app user and set global provider
+        if (firebaseUser != null) {
+          final appUser = await ref
+              .read(userProvider(firebaseUser.uid).notifier)
+              .build();
+          if (appUser != null) {
+            await ref.read(currentUserProvider.notifier).setUser(appUser);
+          }
+        }
+        if (mounted) {
+          context.go('/');
+        }
       }
     } on FirebaseAuthException catch (e) {
       setState(() => _errorMessage = _getFriendlyErrorMessage(e));
@@ -110,7 +143,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     try {
       final authService = ref.read(authServiceProvider);
-      await authService.signInWithGoogle();
+      final userCredential = await authService.signInWithGoogle();
+      final firebaseUser = userCredential;
+      if (firebaseUser != null) {
+        // Try to fetch user from backend
+        UserSchema? appUser;
+        try {
+          appUser = await ref
+              .read(userProvider(firebaseUser.uid).notifier)
+              .build();
+        } catch (e) {
+          appUser = null;
+        }
+        if (appUser == null) {
+          // Only create user if not found
+          final userCreate = UserCreate(
+            email: firebaseUser.email ?? '',
+            name: firebaseUser.displayName ?? '',
+            firebaseUserId: firebaseUser.uid,
+            photoUrl: firebaseUser.photoURL,
+          );
+          appUser = await ref
+              .read(userProvider(firebaseUser.uid).notifier)
+              .createUser(userCreate);
+        }
+        // Set global currentUserProvider
+        if (appUser != null) {
+          await ref.read(currentUserProvider.notifier).setUser(appUser);
+        }
+      }
+      if (mounted) {
+        context.go('/');
+      }
     } on FirebaseAuthException catch (e) {
       setState(() => _errorMessage = _getFriendlyErrorMessage(e));
     } catch (e) {
@@ -205,6 +269,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           const SizedBox(height: 8),
                           TextField(
                             controller: _emailController,
+                            style: TextStyle(color: AppColors.textPrimary),
                             decoration: InputDecoration(
                               hintText: 'Enter your email',
                               filled: true,
@@ -233,6 +298,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           const SizedBox(height: 8),
                           TextField(
                             controller: _passwordController,
+                            style: TextStyle(color: AppColors.textPrimary),
                             obscureText: !_showPassword,
                             decoration: InputDecoration(
                               hintText: 'Enter your password',
@@ -377,8 +443,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                         setState(() {
                                           _isSignUp = !_isSignUp;
                                           _errorMessage = null;
-                                          _emailController.clear();
-                                          _passwordController.clear();
                                         });
                                       },
                                 child: Text(

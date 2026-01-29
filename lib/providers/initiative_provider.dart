@@ -12,6 +12,15 @@ final featuredInitiativeProvider =
       FeaturedInitiativeNotifier.new,
     );
 
+final initiativesByIdsProvider =
+    FutureProvider.family<Map<String, InitiativeSchema>, List<String>>((
+      ref,
+      ids,
+    ) async {
+      final initiatives = await InitiativesService().fetchInitiativesByIds(ids);
+      return {for (final i in initiatives) i.id: i};
+    });
+
 class ActiveInitiativeNotifier extends AsyncNotifier<List<InitiativeSchema>> {
   @override
   Future<List<InitiativeSchema>> build() async {

@@ -68,7 +68,7 @@ Class | Method | HTTP request | Description
 *ActionsApi* | [**deleteActionActionsActionIdDelete**](doc//ActionsApi.md#deleteactionactionsactioniddelete) | **DELETE** /actions/{action_id} | Delete Action
 *ActionsApi* | [**getActionActionsActionIdGet**](doc//ActionsApi.md#getactionactionsactionidget) | **GET** /actions/{action_id} | Get Action
 *ActionsApi* | [**getActionsByLinkedActionsByLinkedLinkedIdGet**](doc//ActionsApi.md#getactionsbylinkedactionsbylinkedlinkedidget) | **GET** /actions/by_linked/{linked_id} | Get Actions By Linked
-*ActionsApi* | [**getLatestActionActionsRecentGet**](doc//ActionsApi.md#getlatestactionactionsrecentget) | **GET** /actions/recent | Get Latest Action
+*ActionsApi* | [**getLatestActionsActionsRecentGet**](doc//ActionsApi.md#getlatestactionsactionsrecentget) | **GET** /actions/recent | Get Latest Actions
 *ActionsApi* | [**listActionsActionsGet**](doc//ActionsApi.md#listactionsactionsget) | **GET** /actions/ | List Actions
 *CategoriesApi* | [**createCategoryCategoriesPost**](doc//CategoriesApi.md#createcategorycategoriespost) | **POST** /categories/ | Create Category
 *CategoriesApi* | [**deleteCategoryCategoriesCategoryIdDelete**](doc//CategoriesApi.md#deletecategorycategoriescategoryiddelete) | **DELETE** /categories/{category_id} | Delete Category
@@ -78,10 +78,16 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**healthHealthGet**](doc//DefaultApi.md#healthhealthget) | **GET** /health | Health
 *InitiativesApi* | [**createInitiativeInitiativesPost**](doc//InitiativesApi.md#createinitiativeinitiativespost) | **POST** /initiatives/ | Create Initiative
 *InitiativesApi* | [**getFeaturedInitiativesInitiativesFeaturedGet**](doc//InitiativesApi.md#getfeaturedinitiativesinitiativesfeaturedget) | **GET** /initiatives/featured | Get Featured Initiatives
-*InitiativesApi* | [**getInitiativeInitiativesInitiativeIdGet**](doc//InitiativesApi.md#getinitiativeinitiativesinitiativeidget) | **GET** /initiatives/{initiative_id} | Get Initiative
+*InitiativesApi* | [**getInitiativesByIdsInitiativesByIdsGet**](doc//InitiativesApi.md#getinitiativesbyidsinitiativesbyidsget) | **GET** /initiatives/by-ids | Get Initiatives By Ids
 *InitiativesApi* | [**listActiveInitiativesInitiativesActiveGet**](doc//InitiativesApi.md#listactiveinitiativesinitiativesactiveget) | **GET** /initiatives/active | List Active Initiatives
 *InitiativesApi* | [**listInitiativesInitiativesGet**](doc//InitiativesApi.md#listinitiativesinitiativesget) | **GET** /initiatives/ | List Initiatives
 *InitiativesApi* | [**listInitiativesSummaryInitiativesSummaryGet**](doc//InitiativesApi.md#listinitiativessummaryinitiativessummaryget) | **GET** /initiatives/summary | List Initiatives Summary
+*QuotesApi* | [**createQuoteQuotesPost**](doc//QuotesApi.md#createquotequotespost) | **POST** /quotes/ | Create Quote
+*QuotesApi* | [**deleteQuoteQuotesQuoteIdDelete**](doc//QuotesApi.md#deletequotequotesquoteiddelete) | **DELETE** /quotes/{quote_id} | Delete Quote
+*QuotesApi* | [**getQuoteQuotesQuoteIdGet**](doc//QuotesApi.md#getquotequotesquoteidget) | **GET** /quotes/{quote_id} | Get Quote
+*QuotesApi* | [**getRandomQuoteQuotesRandomGet**](doc//QuotesApi.md#getrandomquotequotesrandomget) | **GET** /quotes/random | Get Random Quote
+*QuotesApi* | [**listQuotesQuotesGet**](doc//QuotesApi.md#listquotesquotesget) | **GET** /quotes/ | List Quotes
+*QuotesApi* | [**updateQuoteQuotesQuoteIdPatch**](doc//QuotesApi.md#updatequotequotesquoteidpatch) | **PATCH** /quotes/{quote_id} | Update Quote
 *StatusesApi* | [**createStatusStatusesPost**](doc//StatusesApi.md#createstatusstatusespost) | **POST** /statuses/ | Create Status
 *StatusesApi* | [**deleteStatusStatusesStatusIdDelete**](doc//StatusesApi.md#deletestatusstatusesstatusiddelete) | **DELETE** /statuses/{status_id} | Delete Status
 *StatusesApi* | [**getStatusStatusesStatusIdGet**](doc//StatusesApi.md#getstatusstatusesstatusidget) | **GET** /statuses/{status_id} | Get Status
@@ -90,7 +96,8 @@ Class | Method | HTTP request | Description
 *StatusesApi* | [**updateStatusStatusesStatusIdPut**](doc//StatusesApi.md#updatestatusstatusesstatusidput) | **PUT** /statuses/{status_id} | Update Status
 *UsersApi* | [**createUserUsersPost**](doc//UsersApi.md#createuseruserspost) | **POST** /users/ | Create User
 *UsersApi* | [**deleteUserUsersUserIdDelete**](doc//UsersApi.md#deleteuserusersuseriddelete) | **DELETE** /users/{user_id} | Delete User
-*UsersApi* | [**getUserUsersUserIdGet**](doc//UsersApi.md#getuserusersuseridget) | **GET** /users/{user_id} | Get User
+*UsersApi* | [**getUserByFirebaseIdUsersFirebaseIdGet**](doc//UsersApi.md#getuserbyfirebaseidusersfirebaseidget) | **GET** /users/{firebase_id} | Get User By Firebase Id
+*UsersApi* | [**getUserByUserIdUsersDbUserIdGet**](doc//UsersApi.md#getuserbyuseridusersdbuseridget) | **GET** /users/db/{user_id} | Get User By User Id
 *UsersApi* | [**listUsersUsersGet**](doc//UsersApi.md#listusersusersget) | **GET** /users/ | List Users
 *UsersApi* | [**updateUserUsersUserIdPatch**](doc//UsersApi.md#updateuserusersuseridpatch) | **PATCH** /users/{user_id} | Update User
 
@@ -107,6 +114,8 @@ Class | Method | HTTP request | Description
  - [InitiativeCreateSchema](doc//InitiativeCreateSchema.md)
  - [InitiativeSchema](doc//InitiativeSchema.md)
  - [LocationSchema](doc//LocationSchema.md)
+ - [QuoteCreateSchema](doc//QuoteCreateSchema.md)
+ - [QuoteSchema](doc//QuoteSchema.md)
  - [SocialLinksSchema](doc//SocialLinksSchema.md)
  - [StatusCreate](doc//StatusCreate.md)
  - [StatusSchema](doc//StatusSchema.md)

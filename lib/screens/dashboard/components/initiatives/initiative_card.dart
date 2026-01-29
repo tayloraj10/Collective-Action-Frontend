@@ -2,6 +2,7 @@ import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/link.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/initiatives/initiative_submission_button.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
@@ -33,7 +34,10 @@ class InitiativeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = (initiative.complete ?? 0.0) / 100;
+    final goal = (initiative.goal == null || initiative.goal == 0)
+        ? 1
+        : initiative.goal!;
+    final progress = (initiative.complete ?? 0.0) / goal;
 
     return Container(
       decoration: BoxDecoration(
@@ -55,15 +59,15 @@ class InitiativeCard extends StatelessWidget {
       ),
       padding: EdgeInsets.fromLTRB(
         containerPadding,
-        containerPaddingTop + (isMobile ? 2 : 4),
+        containerPaddingTop,
         containerPadding,
-        containerPadding + (isMobile ? 2 : 4),
+        containerPadding,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: Text(
@@ -78,26 +82,11 @@ class InitiativeCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              if (initiative.priority == true) ...[
-                SizedBox(width: 8),
-                Tooltip(
-                  message: 'Priority Initiative',
-                  child: SizedBox(
-                    width: isMobile ? 18 : 20,
-                    height: isMobile ? 18 : 20,
-                    child: Icon(
-                      Icons.flare,
-                      color: AppColors.highlightYelllow,
-                      size: isMobile ? 16 : 18,
-                      semanticLabel: 'Priority',
-                    ),
-                  ),
-                ),
-              ],
+              InitiativeSubmissionButton(initiative: initiative),
             ],
           ),
           if (initiative.link != null && initiative.link!.isNotEmpty) ...[
-            SizedBox(height: isMobile ? 2 : 4),
+            // SizedBox(height: isMobile ? 2 : 4),
             GestureDetector(
               onTap: () async {
                 final url = initiative.link!;

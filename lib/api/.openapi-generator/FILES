@@ -17,6 +17,9 @@ doc/InitiativeCreateSchema.md
 doc/InitiativeSchema.md
 doc/InitiativesApi.md
 doc/LocationSchema.md
+doc/QuoteCreateSchema.md
+doc/QuoteSchema.md
+doc/QuotesApi.md
 doc/SocialLinksSchema.md
 doc/StatusCreate.md
 doc/StatusSchema.md
@@ -34,6 +37,7 @@ lib/api/actions_api.dart
 lib/api/categories_api.dart
 lib/api/default_api.dart
 lib/api/initiatives_api.dart
+lib/api/quotes_api.dart
 lib/api/statuses_api.dart
 lib/api/users_api.dart
 lib/api_client.dart
@@ -54,6 +58,8 @@ lib/model/category_schema.dart
 lib/model/initiative_create_schema.dart
 lib/model/initiative_schema.dart
 lib/model/location_schema.dart
+lib/model/quote_create_schema.dart
+lib/model/quote_schema.dart
 lib/model/social_links_schema.dart
 lib/model/status_create.dart
 lib/model/status_schema.dart
@@ -63,3 +69,6 @@ lib/model/user_create.dart
 lib/model/user_schema.dart
 lib/model/user_type.dart
 pubspec.yaml
+test/quote_create_schema_test.dart
+test/quote_schema_test.dart
+test/quotes_api_test.dart

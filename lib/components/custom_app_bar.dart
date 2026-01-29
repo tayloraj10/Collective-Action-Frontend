@@ -2,9 +2,11 @@ import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/app_bar_icon_button.dart';
 import 'package:collective_action_frontend/components/confirmation_dialog.dart';
-import 'package:collective_action_frontend/components/custom_snack_bar.dart';
+import 'package:collective_action_frontend/components/quote_bar.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:collective_action_frontend/providers/theme_provider.dart';
+import 'package:collective_action_frontend/providers/user_provider.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -27,10 +29,14 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
     final user = authState.value;
 
+    final backendUser = user != null
+        ? ref.watch(userProvider(user.uid)).value
+        : null;
+
     return AppBar(
       elevation: 2,
       centerTitle: isMobile ? false : true,
-      leadingWidth: !isHomeRoute ? 72 : null,
+      leadingWidth: !isHomeRoute ? 66 : null,
       leading: !isHomeRoute
           ? Padding(
               padding: const EdgeInsets.only(left: 12),
@@ -43,18 +49,123 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
             )
           : null,
       title: Padding(
-        padding: EdgeInsets.symmetric(horizontal: isMobile ? 4 : 8),
-        child: Text(
-          isMobile ? 'Collective' : 'Collective Action Network',
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-          style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
-            fontWeight: FontWeight.bold,
-            letterSpacing: isMobile ? 0 : 0.5,
-          ),
+        padding: EdgeInsets.symmetric(horizontal: isMobile ? 0 : 8),
+        child: Column(
+          crossAxisAlignment: isMobile
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              isMobile ? 'Collective' : 'Collective Action Network',
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
+                fontWeight: FontWeight.bold,
+                letterSpacing: isMobile ? 0 : 0.5,
+                fontSize: isMobile ? 18 : null,
+              ),
+            ),
+            // Quote below title
+            if (!isMobile || isHomeRoute) const QuoteBar(),
+          ],
         ),
       ),
       actions: [
+        // Info Button
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2),
+          child: Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.info_outline_rounded),
+              tooltip: 'App Info',
+              onPressed: () async {
+                final RenderBox button =
+                    context.findRenderObject() as RenderBox;
+                final overlay =
+                    Overlay.of(context).context.findRenderObject() as RenderBox;
+                final position = RelativeRect.fromRect(
+                  Rect.fromPoints(
+                    button.localToGlobal(Offset.zero, ancestor: overlay),
+                    button.localToGlobal(
+                      button.size.bottomRight(Offset.zero),
+                      ancestor: overlay,
+                    ),
+                  ),
+                  Offset.zero & overlay.size,
+                );
+                await showMenu(
+                  context: context,
+                  position: position,
+                  items: [
+                    PopupMenuItem(
+                      enabled: false,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Support',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SelectableText(
+                            'support@collectiveaction.app',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Theme.of(context).colorScheme.primary,
+                              // decoration: TextDecoration.underline,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Version',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text('Beta v1.0.0', style: TextStyle(fontSize: 13)),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Recent Features',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.successGreen,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              '- Dashboard\n- Profile Page',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.successGreen.withAlpha(179),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Upcoming Features',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.warningOrange,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              '- Projects\n- Maps\n- Events',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.warningOrange.withAlpha(179),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
         // Dark/Light Mode Toggle
         AppBarIconButton(
           icon: isDarkMode ? Icons.wb_sunny : Icons.nightlight_round,
@@ -67,38 +178,25 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
         // User Profile Button or Login Button
         if (authState.value != null)
-          (user?.photoURL != null
-              ? Padding(
+          Padding(
+            padding: const EdgeInsets.all(4),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  context.go('/settings');
+                },
+                child: Padding(
                   padding: const EdgeInsets.all(4),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          CustomSnackBar.info('Profile feature coming soon!'),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(4),
-                        child: CircleAvatar(
-                          radius: 20,
-                          backgroundImage: NetworkImage(user!.photoURL!),
-                          backgroundColor: Colors.white.withAlpha(38),
-                        ),
-                      ),
-                    ),
+                  child: UserAvatar(
+                    userId: backendUser?.id,
+                    radius: 20,
+                    borderWidth: 1.2,
                   ),
-                )
-              : AppBarIconButton(
-                  icon: Icons.person_outline,
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      CustomSnackBar.info('Profile feature coming soon!'),
-                    );
-                  },
-                  tooltip: 'Profile',
-                  backgroundColor: Colors.white.withAlpha(38),
-                ))
+                ),
+              ),
+            ),
+          )
         else
           AppBarIconButton(
             icon: Icons.login,
@@ -125,6 +223,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
               if (shouldLogout == true) {
                 await authService.signOut();
+                ref.read(currentUserProvider.notifier).clearUser();
               }
             },
             tooltip: 'Logout',

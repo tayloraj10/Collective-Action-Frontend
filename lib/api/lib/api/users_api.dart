@@ -121,7 +121,64 @@ class UsersApi {
     }
   }
 
-  /// Get User
+  /// Get User By Firebase Id
+  ///
+  /// Retrieve a user by their unique ID. Raises 404 if the user is not found.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] firebaseId (required):
+  Future<Response> getUserByFirebaseIdUsersFirebaseIdGetWithHttpInfo(String firebaseId,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/users/{firebase_id}'
+      .replaceAll('{firebase_id}', firebaseId);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get User By Firebase Id
+  ///
+  /// Retrieve a user by their unique ID. Raises 404 if the user is not found.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] firebaseId (required):
+  Future<UserSchema?> getUserByFirebaseIdUsersFirebaseIdGet(String firebaseId,) async {
+    final response = await getUserByFirebaseIdUsersFirebaseIdGetWithHttpInfo(firebaseId,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'UserSchema',) as UserSchema;
+    
+    }
+    return null;
+  }
+
+  /// Get User By User Id
   ///
   /// Retrieve a user by their unique ID. Raises 404 if the user is not found.
   ///
@@ -130,9 +187,9 @@ class UsersApi {
   /// Parameters:
   ///
   /// * [String] userId (required):
-  Future<Response> getUserUsersUserIdGetWithHttpInfo(String userId,) async {
+  Future<Response> getUserByUserIdUsersDbUserIdGetWithHttpInfo(String userId,) async {
     // ignore: prefer_const_declarations
-    final path = r'/users/{user_id}'
+    final path = r'/users/db/{user_id}'
       .replaceAll('{user_id}', userId);
 
     // ignore: prefer_final_locals
@@ -156,15 +213,15 @@ class UsersApi {
     );
   }
 
-  /// Get User
+  /// Get User By User Id
   ///
   /// Retrieve a user by their unique ID. Raises 404 if the user is not found.
   ///
   /// Parameters:
   ///
   /// * [String] userId (required):
-  Future<UserSchema?> getUserUsersUserIdGet(String userId,) async {
-    final response = await getUserUsersUserIdGetWithHttpInfo(userId,);
+  Future<UserSchema?> getUserByUserIdUsersDbUserIdGet(String userId,) async {
+    final response = await getUserByUserIdUsersDbUserIdGetWithHttpInfo(userId,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

@@ -1,5 +1,8 @@
+import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
+import 'package:collective_action_frontend/providers/auth_provider.dart';
+import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/navigation_button.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_pane.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +14,34 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isMobile = MediaQuery.of(context).size.width < 600;
+    final isMobile = AppConstants.isMobile(context);
+    final authUser = ref.watch(authStateProvider).value;
+
+    // Fetch and set user data if logged in
+    // Capture refs before async operations to avoid unmount issues
+    if (authUser != null) {
+      final userNotifier = ref.read(userProvider(authUser.uid).notifier);
+      final currentUserNotifier = ref.read(currentUserProvider.notifier);
+      Future.microtask(() async {
+        try {
+          final appUser = await userNotifier.build();
+          if (appUser != null) {
+            await currentUserNotifier.setUser(appUser);
+          }
+        } catch (e) {
+          // Silently handle errors if widget is disposed
+        }
+      });
+    } else {
+      final currentUserNotifier = ref.read(currentUserProvider.notifier);
+      Future.microtask(() async {
+        try {
+          await currentUserNotifier.clearUser();
+        } catch (e) {
+          // Silently handle errors if widget is disposed
+        }
+      });
+    }
 
     return Scaffold(
       appBar: const CustomAppBar(),
@@ -144,7 +174,7 @@ class PaneLayout extends StatelessWidget {
               Expanded(
                 child: SummaryPane(
                   title: 'Initiatives',
-                  icon: Icons.lightbulb_outline,
+                  icon: Icons.trending_up,
                   color: AppColors.lightBlue,
                 ),
               ),

@@ -150,23 +150,28 @@
                 }
             }
         },
-        "/initiatives/{initiative_id}": {
+        "/initiatives/by-ids": {
             "get": {
                 "tags": [
                     "initiatives"
                 ],
-                "summary": "Get Initiative",
-                "operationId": "get_initiative_initiatives__initiative_id__get",
+                "summary": "Get Initiatives By Ids",
+                "operationId": "get_initiatives_by_ids_initiatives_by_ids_get",
                 "parameters": [
                     {
-                        "name": "initiative_id",
-                        "in": "path",
+                        "name": "initiative_ids",
+                        "in": "query",
                         "required": true,
                         "schema": {
-                            "type": "string",
-                            "format": "uuid",
-                            "title": "Initiative Id"
-                        }
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "description": "List of initiative IDs",
+                            "title": "Initiative Ids"
+                        },
+                        "description": "List of initiative IDs"
                     }
                 ],
                 "responses": {
@@ -175,7 +180,11 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InitiativeSchema"
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/InitiativeSchema"
+                                    },
+                                    "title": "Response Get Initiatives By Ids Initiatives By Ids Get"
                                 }
                             }
                         }
@@ -253,8 +262,8 @@
                 "tags": [
                     "actions"
                 ],
-                "summary": "Get Latest Action",
-                "operationId": "get_latest_action_actions_recent_get",
+                "summary": "Get Latest Actions",
+                "operationId": "get_latest_actions_actions_recent_get",
                 "parameters": [
                     {
                         "name": "days",
@@ -285,7 +294,7 @@
                                     "items": {
                                         "$ref": "#/components/schemas/ActionSchema"
                                     },
-                                    "title": "Response Get Latest Action Actions Recent Get"
+                                    "title": "Response Get Latest Actions Actions Recent Get"
                                 }
                             }
                         }
@@ -892,6 +901,179 @@
                 }
             }
         },
+        "/quotes/": {
+            "get": {
+                "tags": [
+                    "quotes"
+                ],
+                "summary": "List Quotes",
+                "operationId": "list_quotes_quotes__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/QuoteSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Quotes Quotes  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "quotes"
+                ],
+                "summary": "Create Quote",
+                "operationId": "create_quote_quotes__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteCreateSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuoteSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/quotes/random": {
+            "get": {
+                "tags": [
+                    "quotes"
+                ],
+                "summary": "Get Random Quote",
+                "operationId": "get_random_quote_quotes_random_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuoteSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/quotes/{quote_id}": {
+            "get": {
+                "tags": [
+                    "quotes"
+                ],
+                "summary": "Get Quote",
+                "operationId": "get_quote_quotes__quote_id__get",
+                "parameters": [
+                    {
+                        "name": "quote_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Quote Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuoteSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "quotes"
+                ],
+                "summary": "Update Quote",
+                "operationId": "update_quote_quotes__quote_id__patch",
+                "parameters": [
+                    {
+                        "name": "quote_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Quote Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteCreateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuoteSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "quotes"
+                ],
+                "summary": "Delete Quote",
+                "operationId": "delete_quote_quotes__quote_id__delete",
+                "parameters": [
+                    {
+                        "name": "quote_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Quote Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
+                    }
+                }
+            }
+        },
         "/users/": {
             "get": {
                 "tags": [
@@ -948,14 +1130,47 @@
                 }
             }
         },
-        "/users/{user_id}": {
+        "/users/{firebase_id}": {
             "get": {
                 "tags": [
                     "users"
                 ],
-                "summary": "Get User",
+                "summary": "Get User By Firebase Id",
                 "description": "Retrieve a user by their unique ID.\nRaises 404 if the user is not found.",
-                "operationId": "get_user_users__user_id__get",
+                "operationId": "get_user_by_firebase_id_users__firebase_id__get",
+                "parameters": [
+                    {
+                        "name": "firebase_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Firebase Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/db/{user_id}": {
+            "get": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get User By User Id",
+                "description": "Retrieve a user by their unique ID.\nRaises 404 if the user is not found.",
+                "operationId": "get_user_by_user_id_users_db__user_id__get",
                 "parameters": [
                     {
                         "name": "user_id",
@@ -963,7 +1178,6 @@
                         "required": true,
                         "schema": {
                             "type": "string",
-                            "format": "uuid",
                             "title": "User Id"
                         }
                     }
@@ -980,7 +1194,9 @@
                         }
                     }
                 }
-            },
+            }
+        },
+        "/users/{user_id}": {
             "patch": {
                 "tags": [
                     "users"
@@ -1059,14 +1275,7 @@
                         "title": "Action Type"
                     },
                     "amount": {
-                        "anyOf": [
-                            {
-                                "type": "number"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
+                        "type": "number",
                         "title": "Amount"
                     },
                     "image_url": {
@@ -1103,11 +1312,24 @@
                             }
                         ],
                         "title": "User Id"
+                    },
+                    "date": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Date"
                     }
                 },
                 "type": "object",
                 "required": [
-                    "action_type"
+                    "action_type",
+                    "amount"
                 ],
                 "title": "ActionCreateSchema"
             },
@@ -1456,6 +1678,70 @@
                 "type": "object",
                 "title": "LocationSchema"
             },
+            "QuoteCreateSchema": {
+                "properties": {
+                    "text": {
+                        "type": "string",
+                        "title": "Text"
+                    },
+                    "translation": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Translation"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "title": "Active",
+                        "default": true
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "text"
+                ],
+                "title": "QuoteCreateSchema"
+            },
+            "QuoteSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "text": {
+                        "type": "string",
+                        "title": "Text"
+                    },
+                    "translation": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Translation"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "title": "Active"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "text",
+                    "active"
+                ],
+                "title": "QuoteSchema"
+            },
             "SocialLinksSchema": {
                 "properties": {
                     "youtube": {
@@ -1576,7 +1862,14 @@
                         "title": "Email"
                     },
                     "name": {
-                        "type": "string",
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
                         "title": "Name"
                     },
                     "photo_url": {
@@ -1645,8 +1938,7 @@
                 },
                 "type": "object",
                 "required": [
-                    "email",
-                    "name"
+                    "email"
                 ],
                 "title": "UserCreate"
             },

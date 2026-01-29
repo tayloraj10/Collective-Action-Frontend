@@ -14,7 +14,7 @@ class UserCreate {
   /// Returns a new [UserCreate] instance.
   UserCreate({
     required this.email,
-    required this.name,
+    this.name,
     this.photoUrl,
     this.userType,
     this.isActive,
@@ -25,7 +25,7 @@ class UserCreate {
 
   String email;
 
-  String name;
+  String? name;
 
   String? photoUrl;
 
@@ -54,7 +54,7 @@ class UserCreate {
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (email.hashCode) +
-    (name.hashCode) +
+    (name == null ? 0 : name!.hashCode) +
     (photoUrl == null ? 0 : photoUrl!.hashCode) +
     (userType == null ? 0 : userType!.hashCode) +
     (isActive == null ? 0 : isActive!.hashCode) +
@@ -68,7 +68,11 @@ class UserCreate {
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'email'] = this.email;
+    if (this.name != null) {
       json[r'name'] = this.name;
+    } else {
+      json[r'name'] = null;
+    }
     if (this.photoUrl != null) {
       json[r'photo_url'] = this.photoUrl;
     } else {
@@ -122,7 +126,7 @@ class UserCreate {
 
       return UserCreate(
         email: mapValueOfType<String>(json, r'email')!,
-        name: mapValueOfType<String>(json, r'name')!,
+        name: mapValueOfType<String>(json, r'name'),
         photoUrl: mapValueOfType<String>(json, r'photo_url'),
         userType: UserType.fromJson(json[r'user_type']),
         isActive: mapValueOfType<bool>(json, r'is_active'),
@@ -177,7 +181,6 @@ class UserCreate {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'email',
-    'name',
   };
 }
 

@@ -11,7 +11,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**createInitiativeInitiativesPost**](InitiativesApi.md#createinitiativeinitiativespost) | **POST** /initiatives/ | Create Initiative
 [**getFeaturedInitiativesInitiativesFeaturedGet**](InitiativesApi.md#getfeaturedinitiativesinitiativesfeaturedget) | **GET** /initiatives/featured | Get Featured Initiatives
-[**getInitiativeInitiativesInitiativeIdGet**](InitiativesApi.md#getinitiativeinitiativesinitiativeidget) | **GET** /initiatives/{initiative_id} | Get Initiative
+[**getInitiativesByIdsInitiativesByIdsGet**](InitiativesApi.md#getinitiativesbyidsinitiativesbyidsget) | **GET** /initiatives/by-ids | Get Initiatives By Ids
 [**listActiveInitiativesInitiativesActiveGet**](InitiativesApi.md#listactiveinitiativesinitiativesactiveget) | **GET** /initiatives/active | List Active Initiatives
 [**listInitiativesInitiativesGet**](InitiativesApi.md#listinitiativesinitiativesget) | **GET** /initiatives/ | List Initiatives
 [**listInitiativesSummaryInitiativesSummaryGet**](InitiativesApi.md#listinitiativessummaryinitiativessummaryget) | **GET** /initiatives/summary | List Initiatives Summary
@@ -95,23 +95,23 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getInitiativeInitiativesInitiativeIdGet**
-> InitiativeSchema getInitiativeInitiativesInitiativeIdGet(initiativeId)
+# **getInitiativesByIdsInitiativesByIdsGet**
+> List<InitiativeSchema> getInitiativesByIdsInitiativesByIdsGet(initiativeIds)
 
-Get Initiative
+Get Initiatives By Ids
 
 ### Example
 ```dart
 import 'package:collective_action_api/api.dart';
 
 final api_instance = InitiativesApi();
-final initiativeId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final initiativeIds = []; // List<String> | List of initiative IDs
 
 try {
-    final result = api_instance.getInitiativeInitiativesInitiativeIdGet(initiativeId);
+    final result = api_instance.getInitiativesByIdsInitiativesByIdsGet(initiativeIds);
     print(result);
 } catch (e) {
-    print('Exception when calling InitiativesApi->getInitiativeInitiativesInitiativeIdGet: $e\n');
+    print('Exception when calling InitiativesApi->getInitiativesByIdsInitiativesByIdsGet: $e\n');
 }
 ```
 
@@ -119,11 +119,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **initiativeId** | **String**|  | 
+ **initiativeIds** | [**List<String>**](String.md)| List of initiative IDs | [default to const []]
 
 ### Return type
 
-[**InitiativeSchema**](InitiativeSchema.md)
+[**List<InitiativeSchema>**](InitiativeSchema.md)
 
 ### Authorization
 

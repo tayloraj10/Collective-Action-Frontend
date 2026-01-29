@@ -5,15 +5,19 @@ class CustomSnackBar {
   static SnackBar _buildSnackBar({
     required String message,
     Color? backgroundColor,
+    Color? textColor,
     Duration duration = const Duration(seconds: 4),
     SnackBarAction? action,
-    double maxWidth = 200,
+    double maxWidth = 500,
   }) {
     return SnackBar(
       content: Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxWidth),
-          child: Text(message),
+          child: Text(
+            message,
+            style: TextStyle(color: textColor ?? AppColors.white),
+          ),
         ),
       ),
       backgroundColor: backgroundColor,
@@ -29,6 +33,7 @@ class CustomSnackBar {
     return _buildSnackBar(
       message: message,
       backgroundColor: AppColors.lightBlue,
+      textColor: AppColors.white,
       maxWidth: maxWidth,
     );
   }
@@ -37,6 +42,7 @@ class CustomSnackBar {
     return _buildSnackBar(
       message: message,
       backgroundColor: AppColors.successGreen,
+      textColor: AppColors.white,
       maxWidth: maxWidth,
     );
   }
@@ -45,6 +51,7 @@ class CustomSnackBar {
     return _buildSnackBar(
       message: message,
       backgroundColor: AppColors.errorRed,
+      textColor: AppColors.white,
       maxWidth: maxWidth,
     );
   }
@@ -53,6 +60,7 @@ class CustomSnackBar {
     return _buildSnackBar(
       message: message,
       backgroundColor: AppColors.warningOrange,
+      textColor: AppColors.white,
       maxWidth: maxWidth,
     );
   }
