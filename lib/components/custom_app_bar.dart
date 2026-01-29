@@ -117,7 +117,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                             'Version',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          Text('v1.0.0', style: TextStyle(fontSize: 13)),
+                          Text('Beta v1.0.0', style: TextStyle(fontSize: 13)),
                           const SizedBox(height: 8),
                           Text(
                             'Recent Features',
