@@ -37,27 +37,30 @@ class AppConstants {
 
   /// Picks a random success sound and returns the correct `Source` for the
   /// current platform.
-  /// - Web: uses `/assets/<path>` via `UrlSource`
-  /// - Mobile/Desktop: uses `AssetSource(<path>)`
+  /// - Web: uses UrlSource with Uri.base.resolve() for correct URL resolution
+  ///   (works locally and when deployed with any base href)
+  /// - Mobile/Desktop: uses AssetSource
   static ({Source source, Duration maxDuration}) randomSuccessSoundSource({
     Random? random,
     Duration maxDuration = const Duration(seconds: 10),
   }) {
     final rng = random ?? Random();
     const List<String> successSounds = <String>[
-      'sounds/crab_rave.mp3',
-      'sounds/higher.mp3',
+      'assets/sounds/crab_rave.mp3',
+      'assets/sounds/higher.mp3',
     ];
     if (successSounds.isEmpty) {
       return (
-        source: AssetSource('sounds/crab_rave.mp3'),
+        source: kIsWeb
+            ? UrlSource(Uri.base.resolve('assets/sounds/crab_rave.mp3').toString())
+            : AssetSource('assets/sounds/crab_rave.mp3'),
         maxDuration: maxDuration,
       );
     }
     final path = successSounds[rng.nextInt(successSounds.length)];
-    final resultSource = kIsWeb
-        ? UrlSource('/assets/$path')
+    final source = kIsWeb
+        ? UrlSource(Uri.base.resolve(path).toString())
         : AssetSource(path);
-    return (source: resultSource, maxDuration: maxDuration);
+    return (source: source, maxDuration: maxDuration);
   }
 }
