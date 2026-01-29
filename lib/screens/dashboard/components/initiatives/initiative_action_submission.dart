@@ -1,4 +1,5 @@
 import 'package:collective_action_frontend/app/theme.dart';
+import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/providers/initiative_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
@@ -7,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 class InitiativeActionSubmission extends ConsumerStatefulWidget {
   final InitiativeSchema initiative;
@@ -77,13 +77,10 @@ class InitiativeActionSubmissionState
       try {
         final audioPlayer = AudioPlayer();
         audioPlayer.setReleaseMode(ReleaseMode.release);
-        if (kIsWeb) {
-          // For web, use UrlSource with the correct asset path
-          audioPlayer.play(UrlSource('/assets/sounds/crab_rave.mp3'));
-        } else {
-          // For mobile/desktop, use AssetSource
-          audioPlayer.play(AssetSource('sounds/crab_rave.mp3'));
-        }
+        final (:source, :maxDuration) = AppConstants.randomSuccessSoundSource();
+        audioPlayer.play(source);
+        // Stop playback after maxDuration
+        Future.delayed(maxDuration, () => audioPlayer.stop());
         // Audio player will auto-dispose when playback completes due to ReleaseMode.release
       } catch (e) {
         // Ignore sound errors
