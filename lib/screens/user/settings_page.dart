@@ -165,15 +165,15 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
           'website': _website,
         };
         _dirtyFields.value = {};
-        ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar.success('Settings saved!'),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(CustomSnackBar.success('Settings saved!'));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar.error('Failed to save settings'),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(CustomSnackBar.error('Failed to save settings'));
       }
     }
   }
@@ -218,6 +218,167 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
       ),
     );
     return result ?? false;
+  }
+
+  void _showFeaturesDialog(UserType userType) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final features = userType == UserType.person
+        ? [
+            {
+              'icon': Icons.trending_up,
+              'name': '1 Initiative',
+              'color': AppColors.lightBlue,
+            },
+            {
+              'icon': Icons.assignment_outlined,
+              'name': '1 Project',
+              'color': AppColors.errorRed,
+            },
+          ]
+        : [
+            {
+              'icon': Icons.trending_up,
+              'name': '1 Initiative',
+              'color': AppColors.lightBlue,
+            },
+            {
+              'icon': Icons.assignment_outlined,
+              'name': '1 Project',
+              'color': AppColors.errorRed,
+            },
+            {
+              'icon': Icons.map_outlined,
+              'name': 'Map Campaigns',
+              'color': AppColors.successGreen,
+              'comingSoon': true,
+            },
+            {
+              'icon': Icons.event_outlined,
+              'name': 'Scheduling Events',
+              'color': AppColors.warningOrange,
+              'comingSoon': true,
+            },
+          ];
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(
+              userType == UserType.person
+                  ? Icons.person_outline
+                  : Icons.group_outlined,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                userType == UserType.person
+                    ? 'Individual Account Features'
+                    : 'Group Account Features',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isDark
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimary,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Your ${userType == UserType.person ? 'individual' : 'group'} account allows you to create:',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ...features.map(
+                (feature) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: (feature['color'] as Color).withAlpha(26),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          feature['icon'] as IconData,
+                          color: feature['color'] as Color,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          feature['name'] as String,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: isDark
+                                ? AppColors.textPrimaryDark
+                                : AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      if (feature['comingSoon'] == true)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.warningOrange.withAlpha(26),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'Coming Soon',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.warningOrange,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  'More features coming soon!',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontStyle: FontStyle.italic,
+                    color: isDark
+                        ? AppColors.textTertiaryDark
+                        : AppColors.textTertiary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Got it'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -319,6 +480,48 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,
                                         children: [
+                                          // Account Type Header with Info Icon
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              bottom: 12.0,
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  'Account Type',
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Theme.of(
+                                                      context,
+                                                    ).colorScheme.onSurface,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    final currentType =
+                                                        _userType ??
+                                                        UserType.person;
+                                                    _showFeaturesDialog(
+                                                      currentType,
+                                                    );
+                                                  },
+                                                  child: MouseRegion(
+                                                    cursor: SystemMouseCursors
+                                                        .click,
+                                                    child: Icon(
+                                                      Icons.info_outline,
+                                                      size: 26,
+                                                      color: Theme.of(
+                                                        context,
+                                                      ).colorScheme.primary,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                           Container(
                                             decoration: BoxDecoration(
                                               color: Theme.of(context)
