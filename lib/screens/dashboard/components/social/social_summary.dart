@@ -62,44 +62,101 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
             horizontal: isMobile ? 6 : 10,
             vertical: isMobile ? 4 : 6,
           ),
-          child: actionsAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, stack) => Center(
-              child: Text(
-                'Failed to load social activity',
-                style: TextStyle(color: Colors.red),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Always show icon and title
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: cardColor.withAlpha(26),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      widget.icon ?? Icons.people_alt_rounded,
+                      color: cardColor,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Text(
+                          'Social',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(width: isMobile ? 4 : 10),
+                        InkWell(
+                          onTap: () =>
+                              AppConstants.openUrl(AppConstants.discordLink),
+                          borderRadius: BorderRadius.circular(16),
+                          child: Tooltip(
+                            message: 'Join our Discord community',
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Icon(
+                                Icons
+                                    .discord, // If you have a custom Discord icon, use it here
+                                color: Colors.indigo,
+                                size: 22,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ),
-            data: (actions) {
-              if (actions.isEmpty) {
-                return Center(
-                  child: Text(
-                    'No recent social activity.',
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+              const SizedBox(height: 8),
+              // Show loading/error/data below
+              Expanded(
+                child: actionsAsync.when(
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (err, stack) => Center(
+                    child: Text(
+                      'Failed to load social activity',
+                      style: TextStyle(color: Colors.red),
+                    ),
                   ),
-                );
-              }
-              return initiativesMapAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, stack) => Center(
-                  child: Text(
-                    'Failed to load initiatives',
-                    style: TextStyle(color: Colors.red),
-                  ),
+                  data: (actions) {
+                    if (actions.isEmpty) {
+                      return Center(
+                        child: Text(
+                          'No recent social activity.',
+                          style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                        ),
+                      );
+                    }
+                    return initiativesMapAsync.when(
+                      loading: () => const Center(child: CircularProgressIndicator()),
+                      error: (err, stack) => Center(
+                        child: Text(
+                          'Failed to load initiatives',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                      data: (initiativesMap) {
+                        return _buildSocialList(
+                          context,
+                          cardColor,
+                          widget.icon,
+                          isMobile,
+                          actions,
+                          initiativesMap,
+                          _scrollController,
+                        );
+                      },
+                    );
+                  },
                 ),
-                data: (initiativesMap) {
-                  return _buildSocialList(
-                    context,
-                    cardColor,
-                    widget.icon,
-                    isMobile,
-                    actions,
-                    initiativesMap,
-                    _scrollController,
-                  );
-                },
-              );
-            },
+              ),
+            ],
           ),
         ),
       ),
@@ -123,54 +180,6 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: cardColor.withAlpha(26),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    icon ?? Icons.people_alt_rounded,
-                    color: cardColor,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Row(
-                    children: [
-                      Text(
-                        'Social',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(width: isMobile ? 4 : 10),
-                      InkWell(
-                        onTap: () =>
-                            AppConstants.openUrl(AppConstants.discordLink),
-                        borderRadius: BorderRadius.circular(16),
-                        child: Tooltip(
-                          message: 'Join our Discord community',
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Icon(
-                              Icons
-                                  .discord, // If you have a custom Discord icon, use it here
-                              color: Colors.indigo,
-                              size: 22,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
             // Left-to-right, top-to-bottom layout for cards
             Expanded(
               child: Scrollbar(

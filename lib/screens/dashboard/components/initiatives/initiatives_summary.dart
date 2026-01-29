@@ -199,14 +199,17 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
                             ),
                           );
                         }
-                        return const Text(
-                          'Loading...',
-                          style: TextStyle(color: Colors.grey),
+                        return const Expanded(
+                          child: Center(child: CircularProgressIndicator()),
                         );
                       },
-                      error: (err, stack) => Text(
-                        'Error: $err',
-                        style: const TextStyle(color: Colors.red),
+                      error: (err, stack) => const Expanded(
+                        child: Center(
+                          child: Text(
+                            'Failed to load initiatives',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
                       ),
                       data: (initiatives) {
                         final countWidget = SummaryCount(
