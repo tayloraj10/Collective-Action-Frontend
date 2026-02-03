@@ -19,6 +19,9 @@ class UserAvatar extends ConsumerWidget {
   final bool showTooltip;
   final bool enableHero;
   final String? heroTagSuffix; // Optional suffix to make hero tag unique
+  /// When true and [userId] is null, show a loading spinner instead of "?".
+  /// Use for e.g. app bar when logged in but current user data is still loading.
+  final bool showLoadingWhenUserIdNull;
 
   const UserAvatar({
     super.key,
@@ -31,6 +34,7 @@ class UserAvatar extends ConsumerWidget {
     this.showTooltip = false,
     this.enableHero = false,
     this.heroTagSuffix,
+    this.showLoadingWhenUserIdNull = false,
   });
 
   @override
@@ -43,15 +47,26 @@ class UserAvatar extends ConsumerWidget {
     final accentColor = accentColorOverride ?? AppColors.lightBlue;
 
     if (userId == null) {
-      // No userId, show question mark avatar
-      Widget avatar = _questionMarkAvatar(
-        accentColor,
-        radius,
-        isMobile,
-        context,
-      );
+      // No userId: show loading if caller expects user (e.g. logged-in current user), else "?"
+      Widget avatar = showLoadingWhenUserIdNull
+          ? _avatarContainer(
+              cardColor,
+              accentColor,
+              isMobile,
+              radius: radius,
+              isLoading: true,
+            )
+          : _questionMarkAvatar(
+              accentColor,
+              radius,
+              isMobile,
+              context,
+            );
       if (showTooltip) {
-        avatar = Tooltip(message: 'Anonymous', child: avatar);
+        avatar = Tooltip(
+          message: showLoadingWhenUserIdNull ? 'Loading…' : 'Anonymous',
+          child: avatar,
+        );
       }
       return avatar;
     }
@@ -365,6 +380,22 @@ class UserAvatar extends ConsumerWidget {
                     webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
                   ),
                   fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: SizedBox(
+                        width: avatarRadius * 1.2,
+                        height: avatarRadius * 1.2,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  (loadingProgress.expectedTotalBytes ?? 1)
+                              : null,
+                        ),
+                      ),
+                    );
+                  },
                   errorBuilder: (context, error, stackTrace) => Icon(
                     Icons.person_rounded,
                     color: accentColor,
