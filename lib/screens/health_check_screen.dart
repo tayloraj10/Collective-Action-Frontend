@@ -19,9 +19,9 @@ class _HealthCheckScreenState extends State<HealthCheckScreen> {
       _error = null;
     });
     try {
-      final result = await ApiService().getHealth();
+      final result = await HealthService().fetchHealth();
       setState(() {
-        _healthResult = result;
+        _healthResult = result?.toString();
       });
     } catch (e) {
       setState(() {
