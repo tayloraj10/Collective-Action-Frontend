@@ -81,7 +81,12 @@ Class | Method | HTTP request | Description
 *InitiativesApi* | [**getInitiativesByIdsInitiativesByIdsGet**](doc//InitiativesApi.md#getinitiativesbyidsinitiativesbyidsget) | **GET** /initiatives/by-ids | Get Initiatives By Ids
 *InitiativesApi* | [**listActiveInitiativesInitiativesActiveGet**](doc//InitiativesApi.md#listactiveinitiativesinitiativesactiveget) | **GET** /initiatives/active | List Active Initiatives
 *InitiativesApi* | [**listInitiativesInitiativesGet**](doc//InitiativesApi.md#listinitiativesinitiativesget) | **GET** /initiatives/ | List Initiatives
-*InitiativesApi* | [**listInitiativesSummaryInitiativesSummaryGet**](doc//InitiativesApi.md#listinitiativessummaryinitiativessummaryget) | **GET** /initiatives/summary | List Initiatives Summary
+*PhotosApi* | [**deleteAllSubmissionPhotosPhotosSubmissionSubmissionIdDelete**](doc//PhotosApi.md#deleteallsubmissionphotosphotossubmissionsubmissioniddelete) | **DELETE** /photos/submission/{submission_id} | Delete All Submission Photos
+*PhotosApi* | [**deleteProfilePhotoPhotosProfileUserIdDelete**](doc//PhotosApi.md#deleteprofilephotophotosprofileuseriddelete) | **DELETE** /photos/profile/{user_id} | Delete Profile Photo
+*PhotosApi* | [**deleteSubmissionPhotoPhotosSubmissionSubmissionIdPhotoFilenameDelete**](doc//PhotosApi.md#deletesubmissionphotophotossubmissionsubmissionidphotofilenamedelete) | **DELETE** /photos/submission/{submission_id}/{photo_filename} | Delete Submission Photo
+*PhotosApi* | [**listSubmissionPhotosPhotosSubmissionSubmissionIdGet**](doc//PhotosApi.md#listsubmissionphotosphotossubmissionsubmissionidget) | **GET** /photos/submission/{submission_id} | List Submission Photos
+*PhotosApi* | [**uploadProfilePhotoPhotosProfileUserIdPost**](doc//PhotosApi.md#uploadprofilephotophotosprofileuseridpost) | **POST** /photos/profile/{user_id} | Upload Profile Photo
+*PhotosApi* | [**uploadSubmissionPhotoPhotosSubmissionSubmissionIdPost**](doc//PhotosApi.md#uploadsubmissionphotophotossubmissionsubmissionidpost) | **POST** /photos/submission/{submission_id} | Upload Submission Photo
 *QuotesApi* | [**createQuoteQuotesPost**](doc//QuotesApi.md#createquotequotespost) | **POST** /quotes/ | Create Quote
 *QuotesApi* | [**deleteQuoteQuotesQuoteIdDelete**](doc//QuotesApi.md#deletequotequotesquoteiddelete) | **DELETE** /quotes/{quote_id} | Delete Quote
 *QuotesApi* | [**getQuoteQuotesQuoteIdGet**](doc//QuotesApi.md#getquotequotesquoteidget) | **GET** /quotes/{quote_id} | Get Quote

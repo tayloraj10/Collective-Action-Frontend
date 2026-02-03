@@ -33,6 +33,7 @@ part 'api/actions_api.dart';
 part 'api/categories_api.dart';
 part 'api/default_api.dart';
 part 'api/initiatives_api.dart';
+part 'api/photos_api.dart';
 part 'api/quotes_api.dart';
 part 'api/statuses_api.dart';
 part 'api/users_api.dart';
