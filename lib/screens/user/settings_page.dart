@@ -122,7 +122,7 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
         _city = user.location?.city;
         _state = user.location?.state;
         _country = user.location?.country;
-        _locationController.text = _formatLocation();
+        _formatLocation();
         _cityController.text = _city ?? '';
         _stateController.text = _state ?? '';
         _countryController.text = _country ?? '';
@@ -559,8 +559,9 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
               if (user == null) {
                 Future.microtask(() async {
                   if (!mounted) return;
-                  final appUser = await UserService()
-                      .fetchUserByFirebaseID(userId: firebaseUser.uid);
+                  final appUser = await UserService().fetchUserByFirebaseID(
+                    userId: firebaseUser.uid,
+                  );
                   if (!mounted) return;
                   if (appUser != null) {
                     await ref
