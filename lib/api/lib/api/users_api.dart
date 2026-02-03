@@ -349,7 +349,7 @@ class UsersApi {
 
   /// Update User
   ///
-  /// Update an existing user's information. Checks for email uniqueness and applies partial updates. Raises 404 if the user is not found.
+  /// Update an existing user's information (partial update). Cannot update photo_url, firebase_user_id, or is_active; use dedicated endpoints for those. Checks for email uniqueness. Raises 404 if the user is not found.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -357,14 +357,14 @@ class UsersApi {
   ///
   /// * [String] userId (required):
   ///
-  /// * [UserCreate] userCreate (required):
-  Future<Response> updateUserUsersUserIdPatchWithHttpInfo(String userId, UserCreate userCreate,) async {
+  /// * [UserUpdate] userUpdate (required):
+  Future<Response> updateUserUsersUserIdPatchWithHttpInfo(String userId, UserUpdate userUpdate,) async {
     // ignore: prefer_const_declarations
     final path = r'/users/{user_id}'
       .replaceAll('{user_id}', userId);
 
     // ignore: prefer_final_locals
-    Object? postBody = userCreate;
+    Object? postBody = userUpdate;
 
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
@@ -386,15 +386,15 @@ class UsersApi {
 
   /// Update User
   ///
-  /// Update an existing user's information. Checks for email uniqueness and applies partial updates. Raises 404 if the user is not found.
+  /// Update an existing user's information (partial update). Cannot update photo_url, firebase_user_id, or is_active; use dedicated endpoints for those. Checks for email uniqueness. Raises 404 if the user is not found.
   ///
   /// Parameters:
   ///
   /// * [String] userId (required):
   ///
-  /// * [UserCreate] userCreate (required):
-  Future<UserSchema?> updateUserUsersUserIdPatch(String userId, UserCreate userCreate,) async {
-    final response = await updateUserUsersUserIdPatchWithHttpInfo(userId, userCreate,);
+  /// * [UserUpdate] userUpdate (required):
+  Future<UserSchema?> updateUserUsersUserIdPatch(String userId, UserUpdate userUpdate,) async {
+    final response = await updateUserUsersUserIdPatchWithHttpInfo(userId, userUpdate,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

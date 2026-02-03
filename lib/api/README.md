@@ -131,6 +131,7 @@ Class | Method | HTTP request | Description
  - [UserPhotoUpdate](doc//UserPhotoUpdate.md)
  - [UserSchema](doc//UserSchema.md)
  - [UserType](doc//UserType.md)
+ - [UserUpdate](doc//UserUpdate.md)
 
 
 ## Documentation For Authorization

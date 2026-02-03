@@ -59,6 +59,7 @@ part 'model/user_create.dart';
 part 'model/user_photo_update.dart';
 part 'model/user_schema.dart';
 part 'model/user_type.dart';
+part 'model/user_update.dart';
 
 
 /// An [ApiClient] instance that uses the default values obtained from

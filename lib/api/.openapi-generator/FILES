@@ -31,6 +31,7 @@ doc/UserCreate.md
 doc/UserPhotoUpdate.md
 doc/UserSchema.md
 doc/UserType.md
+doc/UserUpdate.md
 doc/UsersApi.md
 git_push.sh
 lib/api.dart
@@ -72,5 +73,6 @@ lib/model/user_create.dart
 lib/model/user_photo_update.dart
 lib/model/user_schema.dart
 lib/model/user_type.dart
+lib/model/user_update.dart
 pubspec.yaml
-test/user_photo_update_test.dart
+test/user_update_test.dart

@@ -1177,7 +1177,7 @@
                     "users"
                 ],
                 "summary": "Update User",
-                "description": "Update an existing user's information.\nChecks for email uniqueness and applies partial updates.\nRaises 404 if the user is not found.",
+                "description": "Update an existing user's information (partial update).\nCannot update photo_url, firebase_user_id, or is_active; use dedicated endpoints for those.\nChecks for email uniqueness. Raises 404 if the user is not found.",
                 "operationId": "update_user_users__user_id__patch",
                 "parameters": [
                     {
@@ -1196,7 +1196,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UserCreate"
+                                "$ref": "#/components/schemas/UserUpdate"
                             }
                         }
                     }
@@ -2343,6 +2343,66 @@
                     "group"
                 ],
                 "title": "UserType"
+            },
+            "UserUpdate": {
+                "properties": {
+                    "email": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "email"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Email"
+                    },
+                    "name": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Name"
+                    },
+                    "user_type": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/UserType"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "location": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/LocationSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "social_links": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/SocialLinksSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "title": "UserUpdate",
+                "description": "Schema for PATCH updates. Excludes photo_url, firebase_user_id, is_active."
             }
         }
     }
