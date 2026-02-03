@@ -33,6 +33,7 @@ dependencies:
   built_collection: ^5.1.1
   country_picker: ^2.0.27
   country_state_city_picker: ^1.2.8
+  flutter_typeahead: ^5.2.0
   crop_image: ^1.0.17
   cupertino_icons: ^1.0.8
   dio: ^5.9.0

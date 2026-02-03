@@ -3,9 +3,11 @@ import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
+import 'package:collective_action_frontend/services/location_search_service.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
@@ -81,8 +83,27 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
 
   String? _currentUserId;
 
+  /// True after we've synced location controllers from loaded user (so we don't
+  /// overwrite when user data arrives after first build).
+  bool _locationSyncedFromUser = false;
+
   /// Bytes from picker; when non-null, show crop dialog.
   Uint8List? _pendingCropBytes;
+
+  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _stateController = TextEditingController();
+  final TextEditingController _countryController = TextEditingController();
+  final LocationSearchService _locationSearchService = LocationSearchService();
+
+  String _formatLocation() {
+    final parts = [
+      _city,
+      _state,
+      _country,
+    ].whereType<String>().where((e) => e.isNotEmpty).toList();
+    return parts.join(', ');
+  }
 
   @override
   void didChangeDependencies() {
@@ -91,6 +112,7 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
     final userId = authUser?.uid;
     if (_currentUserId != userId && userId != null) {
       _currentUserId = userId;
+      _locationSyncedFromUser = false;
       final user = ref.read(userProvider(userId)).value;
       if (user != null) {
         _name = user.name;
@@ -99,6 +121,11 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
         _city = user.location?.city;
         _state = user.location?.state;
         _country = user.location?.country;
+        _locationController.text = _formatLocation();
+        _cityController.text = _city ?? '';
+        _stateController.text = _state ?? '';
+        _countryController.text = _country ?? '';
+        _locationSyncedFromUser = true;
         _youtube = user.socialLinks?.youtube;
         _instagram = user.socialLinks?.instagram;
         _tiktok = user.socialLinks?.tiktok;
@@ -124,6 +151,10 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
 
   @override
   void dispose() {
+    _locationController.dispose();
+    _cityController.dispose();
+    _stateController.dispose();
+    _countryController.dispose();
     _dirtyFields.dispose();
     super.dispose();
   }
@@ -158,11 +189,12 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
     }
     final messenger = ScaffoldMessenger.of(context);
     try {
-      final url = await PhotosService().uploadProfilePhotoFromBytesAndUpdateUserPhotoUrl(
-        user,
-        croppedBytes,
-        filename: 'image.png',
-      );
+      final url = await PhotosService()
+          .uploadProfilePhotoFromBytesAndUpdateUserPhotoUrl(
+            user,
+            croppedBytes,
+            filename: 'image.png',
+          );
       if (!mounted) return;
       if (url != null) {
         ref.read(databaseUserProvider(user.id!).notifier).refresh();
@@ -232,17 +264,28 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
     final user = ref.read(currentUserProvider).value;
     if (user == null || user.id == null) return;
 
+    // Location fields use controllers; read from them so autocomplete/picker
+    // values are saved even if FormFieldState didn't sync.
+    final city = _cityController.text.trim().isEmpty
+        ? null
+        : _cityController.text.trim();
+    final state = _stateController.text.trim().isEmpty
+        ? null
+        : _stateController.text.trim();
+    final country = _countryController.text.trim().isEmpty
+        ? null
+        : _countryController.text.trim();
+
     String? nullIfBlank(String? v) =>
         (v == null || v.trim().isEmpty) ? null : v.trim();
-    final userData = UserCreate(
+    final userData = UserUpdate(
       email: _email!,
       name: nullIfBlank(_name),
-      photoUrl: nullIfBlank(_photoUrl),
       userType: _userType ?? user.userType,
       location: LocationSchema(
-        city: nullIfBlank(_city),
-        state: nullIfBlank(_state),
-        country: nullIfBlank(_country),
+        city: nullIfBlank(city),
+        state: nullIfBlank(state),
+        country: nullIfBlank(country),
       ),
       socialLinks: SocialLinksSchema(
         youtube: nullIfBlank(_youtube),
@@ -250,13 +293,15 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
         tiktok: nullIfBlank(_tiktok),
         website: nullIfBlank(_website),
       ),
-      firebaseUserId: user.firebaseUserId,
-      isActive: user.isActive,
     );
 
     try {
       await ref.read(userProvider(user.id!).notifier).updateUser(userData);
       if (mounted) {
+        // Keep _city, _state, _country in sync with saved location
+        _city = city;
+        _state = state;
+        _country = country;
         // Reset dirty fields after save
         _initialValues = {
           'name': _name,
@@ -526,6 +571,30 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                 return const Scaffold(
                   body: Center(child: CircularProgressIndicator()),
                 );
+              }
+              // Sync location controllers when user data is available (e.g. loaded
+              // after first build); only if we haven't synced yet or location isn't dirty.
+              final locationDirty =
+                  _dirtyFields.value.contains('city') ||
+                  _dirtyFields.value.contains('state') ||
+                  _dirtyFields.value.contains('country');
+              if (!_locationSyncedFromUser && !locationDirty) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (!mounted) return;
+                  if (_locationSyncedFromUser) return;
+                  _city = user.location?.city;
+                  _state = user.location?.state;
+                  _country = user.location?.country;
+                  _formatLocation();
+                  _cityController.text = _city ?? '';
+                  _stateController.text = _state ?? '';
+                  _countryController.text = _country ?? '';
+                  _locationSyncedFromUser = true;
+                  _initialValues['city'] = _city;
+                  _initialValues['state'] = _state;
+                  _initialValues['country'] = _country;
+                  setState(() {});
+                });
               }
               String? displayPhotoUrl = user.photoUrl;
               if ((displayPhotoUrl == null || displayPhotoUrl.isEmpty) &&
@@ -1053,7 +1122,124 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                             fontWeight: FontWeight.bold,
                                           ),
                                     ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Start typing a city to fill in city, state, and country.',
+                                      style: TextStyle(
+                                        color: Colors.grey.shade600,
+                                        fontSize: 13,
+                                      ),
+                                    ),
                                     const SizedBox(height: 12),
+                                    ValueListenableBuilder<Set<String>>(
+                                      valueListenable: _dirtyFields,
+                                      builder: (context, dirtyFields, child) {
+                                        return TypeAheadField<
+                                          LocationSuggestion
+                                        >(
+                                          controller: _locationController,
+                                          builder: (context, controller, focusNode) {
+                                            return TextField(
+                                              controller: controller,
+                                              focusNode: focusNode,
+                                              decoration: InputDecoration(
+                                                labelText: 'City or place',
+                                                hintText:
+                                                    'e.g. New York, Miami, London',
+                                                prefixIcon: const Icon(
+                                                  Icons.location_on_outlined,
+                                                ),
+                                                // enabledBorder: isDirty
+                                                //     ? const OutlineInputBorder(
+                                                //         borderSide: BorderSide(
+                                                //           color: AppColors
+                                                //               .warningOrange,
+                                                //           width: 2,
+                                                //         ),
+                                                //       )
+                                                //     : null,
+                                              ),
+                                              onChanged: (v) {
+                                                if (v.isEmpty) {
+                                                  _city = null;
+                                                  _state = null;
+                                                  _country = null;
+                                                  _cityController.clear();
+                                                  _stateController.clear();
+                                                  _countryController.clear();
+                                                  onChanged('city', null);
+                                                  onChanged('state', null);
+                                                  onChanged('country', null);
+                                                }
+                                              },
+                                            );
+                                          },
+                                          suggestionsCallback: (pattern) =>
+                                              _locationSearchService.search(
+                                                pattern,
+                                              ),
+                                          itemBuilder: (context, suggestion) =>
+                                              ListTile(
+                                                leading: Icon(
+                                                  Icons.place_outlined,
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary,
+                                                ),
+                                                title: Text(
+                                                  suggestion.displayName,
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                          onSelected: (suggestion) {
+                                            _city = suggestion.city;
+                                            _state = suggestion.state;
+                                            _country = suggestion.country;
+                                            _locationController.text =
+                                                suggestion.displayName;
+                                            _cityController.text =
+                                                suggestion.city ?? '';
+                                            _stateController.text =
+                                                suggestion.state ?? '';
+                                            _countryController.text =
+                                                suggestion.country ?? '';
+                                            onChanged('city', suggestion.city);
+                                            onChanged(
+                                              'state',
+                                              suggestion.state,
+                                            );
+                                            onChanged(
+                                              'country',
+                                              suggestion.country,
+                                            );
+                                          },
+                                          emptyBuilder: (context) => const Padding(
+                                            padding: EdgeInsets.all(16),
+                                            child: Text(
+                                              'No places found. Try a different search.',
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                          loadingBuilder: (context) =>
+                                              const Padding(
+                                                padding: EdgeInsets.all(16),
+                                                child: SizedBox(
+                                                  height: 24,
+                                                  width: 24,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                      ),
+                                                ),
+                                              ),
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(height: 16),
                                     Row(
                                       children: [
                                         Expanded(
@@ -1061,8 +1247,7 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                             valueListenable: _dirtyFields,
                                             builder: (context, dirtyFields, child) {
                                               return TextFormField(
-                                                initialValue:
-                                                    user.location?.city,
+                                                controller: _cityController,
                                                 decoration: InputDecoration(
                                                   labelText: 'City',
                                                   enabledBorder:
@@ -1091,8 +1276,7 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                             valueListenable: _dirtyFields,
                                             builder: (context, dirtyFields, child) {
                                               return TextFormField(
-                                                initialValue:
-                                                    user.location?.state,
+                                                controller: _stateController,
                                                 decoration: InputDecoration(
                                                   labelText: 'State',
                                                   enabledBorder:
@@ -1125,10 +1309,11 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                           showPhoneCode: false,
                                           onSelect: (Country country) {
                                             _country = country.name;
+                                            _countryController.text =
+                                                country.name;
                                             onChanged('country', country.name);
                                           },
                                           favorite: const ['US'],
-                                          exclude: const ['IL'],
                                           useSafeArea: true,
                                         );
                                       },
@@ -1137,8 +1322,10 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                           valueListenable: _dirtyFields,
                                           builder: (context, dirtyFields, child) {
                                             return TextFormField(
+                                              controller: _countryController,
                                               decoration: InputDecoration(
                                                 labelText: 'Country',
+                                                hintText: 'Tap to select',
                                                 enabledBorder:
                                                     dirtyFields.contains(
                                                       'country',
@@ -1151,12 +1338,6 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                                         ),
                                                       )
                                                     : null,
-                                              ),
-                                              controller: TextEditingController(
-                                                text:
-                                                    _country ??
-                                                    user.location?.country ??
-                                                    '',
                                               ),
                                               onSaved: (v) => _country = v,
                                             );
