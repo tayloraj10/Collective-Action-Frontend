@@ -286,6 +286,67 @@ class UsersApi {
     return null;
   }
 
+  /// Update User Photo
+  ///
+  /// Update only a user's `photo_url`.  Expected body:   { \"photo_url\": \"https://...\" }
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] userId (required):
+  ///
+  /// * [UserPhotoUpdate] userPhotoUpdate (required):
+  Future<Response> updateUserPhotoUsersUserIdPhotoPatchWithHttpInfo(String userId, UserPhotoUpdate userPhotoUpdate,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/users/{user_id}/photo'
+      .replaceAll('{user_id}', userId);
+
+    // ignore: prefer_final_locals
+    Object? postBody = userPhotoUpdate;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'PATCH',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Update User Photo
+  ///
+  /// Update only a user's `photo_url`.  Expected body:   { \"photo_url\": \"https://...\" }
+  ///
+  /// Parameters:
+  ///
+  /// * [String] userId (required):
+  ///
+  /// * [UserPhotoUpdate] userPhotoUpdate (required):
+  Future<UserSchema?> updateUserPhotoUsersUserIdPhotoPatch(String userId, UserPhotoUpdate userPhotoUpdate,) async {
+    final response = await updateUserPhotoUsersUserIdPhotoPatchWithHttpInfo(userId, userPhotoUpdate,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'UserSchema',) as UserSchema;
+    
+    }
+    return null;
+  }
+
   /// Update User
   ///
   /// Update an existing user's information. Checks for email uniqueness and applies partial updates. Raises 404 if the user is not found.

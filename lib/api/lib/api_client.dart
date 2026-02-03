@@ -218,6 +218,8 @@ class ApiClient {
           return StatusValuesEnumTypeTransformer().decode(value);
         case 'UserCreate':
           return UserCreate.fromJson(value);
+        case 'UserPhotoUpdate':
+          return UserPhotoUpdate.fromJson(value);
         case 'UserSchema':
           return UserSchema.fromJson(value);
         case 'UserType':

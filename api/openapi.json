@@ -1240,6 +1240,50 @@
                 }
             }
         },
+        "/users/{user_id}/photo": {
+            "patch": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update User Photo",
+                "description": "Update only a user's `photo_url`.\n\nExpected body:\n  { \"photo_url\": \"https://...\" }",
+                "operationId": "update_user_photo_users__user_id__photo_patch",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "User Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserPhotoUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/photos/profile/{user_id}": {
             "post": {
                 "tags": [
@@ -2150,6 +2194,19 @@
                     "email"
                 ],
                 "title": "UserCreate"
+            },
+            "UserPhotoUpdate": {
+                "properties": {
+                    "photo_url": {
+                        "type": "string",
+                        "title": "Photo Url"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "photo_url"
+                ],
+                "title": "UserPhotoUpdate"
             },
             "UserSchema": {
                 "properties": {

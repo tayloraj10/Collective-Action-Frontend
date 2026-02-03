@@ -104,6 +104,7 @@ Class | Method | HTTP request | Description
 *UsersApi* | [**getUserByFirebaseIdUsersFirebaseIdGet**](doc//UsersApi.md#getuserbyfirebaseidusersfirebaseidget) | **GET** /users/{firebase_id} | Get User By Firebase Id
 *UsersApi* | [**getUserByUserIdUsersDbUserIdGet**](doc//UsersApi.md#getuserbyuseridusersdbuseridget) | **GET** /users/db/{user_id} | Get User By User Id
 *UsersApi* | [**listUsersUsersGet**](doc//UsersApi.md#listusersusersget) | **GET** /users/ | List Users
+*UsersApi* | [**updateUserPhotoUsersUserIdPhotoPatch**](doc//UsersApi.md#updateuserphotousersuseridphotopatch) | **PATCH** /users/{user_id}/photo | Update User Photo
 *UsersApi* | [**updateUserUsersUserIdPatch**](doc//UsersApi.md#updateuserusersuseridpatch) | **PATCH** /users/{user_id} | Update User
 
 
@@ -127,6 +128,7 @@ Class | Method | HTTP request | Description
  - [StatusTypeEnum](doc//StatusTypeEnum.md)
  - [StatusValuesEnum](doc//StatusValuesEnum.md)
  - [UserCreate](doc//UserCreate.md)
+ - [UserPhotoUpdate](doc//UserPhotoUpdate.md)
  - [UserSchema](doc//UserSchema.md)
  - [UserType](doc//UserType.md)
 

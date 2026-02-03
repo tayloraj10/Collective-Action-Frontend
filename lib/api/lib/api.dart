@@ -56,6 +56,7 @@ part 'model/status_schema.dart';
 part 'model/status_type_enum.dart';
 part 'model/status_values_enum.dart';
 part 'model/user_create.dart';
+part 'model/user_photo_update.dart';
 part 'model/user_schema.dart';
 part 'model/user_type.dart';
 

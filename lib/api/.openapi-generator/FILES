@@ -28,6 +28,7 @@ doc/StatusTypeEnum.md
 doc/StatusValuesEnum.md
 doc/StatusesApi.md
 doc/UserCreate.md
+doc/UserPhotoUpdate.md
 doc/UserSchema.md
 doc/UserType.md
 doc/UsersApi.md
@@ -68,7 +69,8 @@ lib/model/status_schema.dart
 lib/model/status_type_enum.dart
 lib/model/status_values_enum.dart
 lib/model/user_create.dart
+lib/model/user_photo_update.dart
 lib/model/user_schema.dart
 lib/model/user_type.dart
 pubspec.yaml
-test/photos_api_test.dart
+test/user_photo_update_test.dart
