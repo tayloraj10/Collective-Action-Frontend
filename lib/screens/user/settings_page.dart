@@ -3,6 +3,7 @@ import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
+import 'package:collective_action_frontend/services/photos_service.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +11,11 @@ import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'dart:typed_data';
+import 'dart:ui' show ImageByteFormat;
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:crop_image/crop_image.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -76,6 +81,9 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
 
   String? _currentUserId;
 
+  /// Bytes from picker; when non-null, show crop dialog.
+  Uint8List? _pendingCropBytes;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -118,6 +126,104 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
   void dispose() {
     _dirtyFields.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickAndUploadProfilePhoto() async {
+    final user = ref.read(currentUserProvider).value;
+    if (user == null || user.id == null || !mounted) return;
+
+    final xFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1024,
+      imageQuality: 85,
+    );
+    if (xFile == null || !mounted) return;
+
+    final bytes = await xFile.readAsBytes();
+    if (bytes.isEmpty || !mounted) return;
+
+    if (mounted) {
+      setState(() => _pendingCropBytes = bytes);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _pendingCropBytes != null) _showCropDialog();
+      });
+    }
+  }
+
+  Future<void> _uploadCroppedProfilePhoto(Uint8List croppedBytes) async {
+    final user = ref.read(currentUserProvider).value;
+    final firebaseUser = ref.read(authStateProvider).value;
+    if (user == null || user.id == null || firebaseUser == null || !mounted) {
+      return;
+    }
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final url = await PhotosService().uploadProfilePhotoFromBytesAndUpdateUserPhotoUrl(
+        user,
+        croppedBytes,
+        filename: 'image.png',
+      );
+      if (!mounted) return;
+      if (url != null) {
+        ref.read(databaseUserProvider(user.id!).notifier).refresh();
+        await ref.read(userProvider(firebaseUser.uid).notifier).refresh();
+        final updated = ref.read(userProvider(firebaseUser.uid)).value;
+        if (updated != null && mounted) {
+          ref.read(currentUserProvider.notifier).setUser(updated);
+        }
+        messenger.showSnackBar(CustomSnackBar.success('Profile photo updated'));
+      }
+    } catch (e) {
+      messenger.showSnackBar(CustomSnackBar.error('Failed to upload photo'));
+    }
+  }
+
+  void _showCropDialog() {
+    if (_pendingCropBytes == null) return;
+    final bytes = _pendingCropBytes!;
+    final controller = CropController(aspectRatio: 1);
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Crop photo'),
+        content: SizedBox(
+          width: 320,
+          height: 320,
+          child: CropImage(controller: controller, image: Image.memory(bytes)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() => _pendingCropBytes = null);
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final navigator = Navigator.of(context);
+              final messenger = ScaffoldMessenger.of(context);
+              try {
+                final bitmap = await controller.croppedBitmap();
+                final data = await bitmap.toByteData(
+                  format: ImageByteFormat.png,
+                );
+                if (data == null || !mounted) return;
+                final croppedBytes = data.buffer.asUint8List();
+                setState(() => _pendingCropBytes = null);
+                navigator.pop();
+                await _uploadCroppedProfilePhoto(croppedBytes);
+              } catch (e) {
+                messenger.showSnackBar(CustomSnackBar.error('Crop failed'));
+              }
+            },
+            child: const Text('Apply'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _saveSettings() async {
@@ -825,9 +931,10 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                                     color: Colors.white,
                                                     size: 17,
                                                   ),
-                                                  onPressed: () {
-                                                    // Optionally implement photo picker
-                                                  },
+                                                  onPressed: user.id == null
+                                                      ? null
+                                                      : () =>
+                                                            _pickAndUploadProfilePhoto(),
                                                   tooltip: 'Change Photo',
                                                   splashRadius: 18,
                                                   padding: EdgeInsets.zero,

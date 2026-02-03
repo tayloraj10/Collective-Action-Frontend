@@ -112,7 +112,8 @@ class UserAvatar extends ConsumerWidget {
             photoUrl: user.photoUrl,
           );
           if (enableHero) {
-            final heroTag = 'user-avatar-$userId${heroTagSuffix != null ? '-$heroTagSuffix' : ''}';
+            final heroTag =
+                'user-avatar-$userId${heroTagSuffix != null ? '-$heroTagSuffix' : ''}';
             avatar = Hero(
               tag: heroTag,
               child: SizedBox(
@@ -144,8 +145,12 @@ class UserAvatar extends ConsumerWidget {
                             width: 180,
                             height: 180,
                             child: ClipOval(
-                              child: Image.network(
-                                user.photoUrl!,
+                              child: Image(
+                                image: NetworkImage(
+                                  user.photoUrl!,
+                                  webHtmlElementStrategy:
+                                      WebHtmlElementStrategy.prefer,
+                                ),
                                 fit: BoxFit.cover,
                                 width: 180,
                                 height: 180,
@@ -187,7 +192,8 @@ class UserAvatar extends ConsumerWidget {
             photoUrl: user.photoUrl,
           );
           if (enableHero) {
-            final heroTag = 'user-avatar-$userId${heroTagSuffix != null ? '-$heroTagSuffix' : ''}';
+            final heroTag =
+                'user-avatar-$userId${heroTagSuffix != null ? '-$heroTagSuffix' : ''}';
             avatar = Hero(
               tag: heroTag,
               child: SizedBox(
@@ -219,8 +225,12 @@ class UserAvatar extends ConsumerWidget {
                             width: 180,
                             height: 180,
                             child: ClipOval(
-                              child: Image.network(
-                                user.photoUrl!,
+                              child: Image(
+                                image: NetworkImage(
+                                  user.photoUrl!,
+                                  webHtmlElementStrategy:
+                                      WebHtmlElementStrategy.prefer,
+                                ),
                                 fit: BoxFit.cover,
                                 width: 180,
                                 height: 180,
@@ -342,10 +352,26 @@ class UserAvatar extends ConsumerWidget {
               color: accentColor,
               size: avatarRadius * 1.15,
             )
-          : CircleAvatar(
-              radius: avatarRadius,
-              backgroundColor: cardColor,
-              backgroundImage: NetworkImage(photoUrl),
+          : ClipOval(
+              child: SizedBox(
+                width: avatarRadius * 2,
+                height: avatarRadius * 2,
+                child: Image(
+                  image: NetworkImage(
+                    photoUrl,
+                    // On web, prefer using an HTML <img> element when possible to
+                    // avoid `HttpRequest` CORS failures (statusCode 0) for public
+                    // Google Cloud Storage URLs.
+                    webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
+                  ),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Icon(
+                    Icons.person_rounded,
+                    color: accentColor,
+                    size: avatarRadius * 1.15,
+                  ),
+                ),
+              ),
             ),
     );
   }

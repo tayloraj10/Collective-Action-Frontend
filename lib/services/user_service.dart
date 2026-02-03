@@ -40,4 +40,27 @@ class UserService {
       throw Exception('Failed to update user: $e');
     }
   }
+
+  /// Update just the user's profile photo URL while preserving existing fields.
+  ///
+  /// Uses the dedicated endpoint `PATCH /users/{user_id}/photo`.
+  Future<UserSchema?> updateUserPhotoUrl({
+    required UserSchema user,
+    required String photoUrl,
+  }) async {
+    final userId = user.id;
+
+    if (userId == null || userId.isEmpty) {
+      throw Exception('Cannot update photo: user.id is missing');
+    }
+
+    try {
+      return await _api.updateUserPhotoUsersUserIdPhotoPatch(
+        userId,
+        UserPhotoUpdate(photoUrl: photoUrl),
+      );
+    } catch (e) {
+      throw Exception('Failed to update user photo: $e');
+    }
+  }
 }
