@@ -25,55 +25,44 @@ class CurrentUserNotifier extends AsyncNotifier<UserSchema?> {
     state = const AsyncValue.data(null);
   }
 
-  /// Optionally, refresh user from backend
-  Future<void> refreshUser(String firebaseID) async {
+  /// Refresh current user from backend by database user id (users table id).
+  Future<void> refreshUser(String dbUserId) async {
     state = const AsyncLoading();
-    final user = await UserService().fetchUserByFirebaseID(userId: firebaseID);
+    final user = await UserService().fetchUserByUserID(userId: dbUserId);
     state = AsyncValue.data(user);
   }
 }
 
+/// Fetches and holds a user by their database user id (users table primary key).
+/// Use this for refresh/update after you have the user; for initial load when you
+/// only have Firebase UID, use [UserService.fetchUserByFirebaseID] then set [currentUserProvider].
 final userProvider =
     AsyncNotifierProvider.family<UserNotifier, UserSchema?, String>(
-      (firebaseID) => UserNotifier(firebaseID),
+      (dbUserId) => UserNotifier(dbUserId),
     );
 
 class UserNotifier extends AsyncNotifier<UserSchema?> {
-  final String firebaseID;
-  UserNotifier(this.firebaseID);
+  final String dbUserId;
+  UserNotifier(this.dbUserId);
 
   @override
   Future<UserSchema?> build() async {
-    return await UserService().fetchUserByFirebaseID(userId: firebaseID);
+    return await UserService().fetchUserByUserID(userId: dbUserId);
   }
 
   Future<void> refresh() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      return await UserService().fetchUserByFirebaseID(userId: firebaseID);
+      return await UserService().fetchUserByUserID(userId: dbUserId);
     });
   }
 
-  Future<UserSchema?> createUser(UserCreate userData) async {
+  Future<UserSchema?> updateUser(UserUpdate userData) async {
     state = const AsyncLoading();
     try {
-      final created = await UserService().createUser(userData);
+      final updated = await UserService().updateUser(dbUserId, userData);
       state = await AsyncValue.guard(() async {
-        return await UserService().fetchUserByFirebaseID(userId: firebaseID);
-      });
-      return created;
-    } catch (e, st) {
-      state = AsyncError(e, st);
-      rethrow;
-    }
-  }
-
-  Future<UserSchema?> updateUser(UserCreate userData) async {
-    state = const AsyncLoading();
-    try {
-      final updated = await UserService().updateUser(firebaseID, userData);
-      state = await AsyncValue.guard(() async {
-        return await UserService().fetchUserByFirebaseID(userId: firebaseID);
+        return await UserService().fetchUserByUserID(userId: dbUserId);
       });
       return updated;
     } catch (e, st) {

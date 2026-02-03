@@ -27,11 +27,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final currentLocation = GoRouterState.of(context).matchedLocation;
     final isHomeRoute = currentLocation == '/';
 
-    final user = authState.value;
-
-    final backendUser = user != null
-        ? ref.watch(userProvider(user.uid)).value
-        : null;
+    final user = ref.watch(currentUserProvider).value;
 
     return AppBar(
       elevation: 2,
@@ -189,9 +185,10 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(4),
                   child: UserAvatar(
-                    userId: backendUser?.id,
+                    userId: user?.id,
                     radius: 20,
                     borderWidth: 1.2,
+                    showLoadingWhenUserIdNull: true,
                   ),
                 ),
               ),

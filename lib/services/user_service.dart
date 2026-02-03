@@ -33,7 +33,7 @@ class UserService {
     }
   }
 
-  Future<UserSchema?> updateUser(String userId, UserCreate userData) async {
+  Future<UserSchema?> updateUser(String userId, UserUpdate userData) async {
     try {
       return await _api.updateUserUsersUserIdPatch(userId, userData);
     } catch (e) {

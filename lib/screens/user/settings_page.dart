@@ -5,6 +5,7 @@ import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
 import 'package:collective_action_frontend/services/location_search_service.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
+import 'package:collective_action_frontend/services/user_service.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -113,7 +114,7 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
     if (_currentUserId != userId && userId != null) {
       _currentUserId = userId;
       _locationSyncedFromUser = false;
-      final user = ref.read(userProvider(userId)).value;
+      final user = ref.read(currentUserProvider).value;
       if (user != null) {
         _name = user.name;
         _email = user.email;
@@ -198,8 +199,8 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
       if (!mounted) return;
       if (url != null) {
         ref.read(databaseUserProvider(user.id!).notifier).refresh();
-        await ref.read(userProvider(firebaseUser.uid).notifier).refresh();
-        final updated = ref.read(userProvider(firebaseUser.uid)).value;
+        await ref.read(userProvider(user.id!).notifier).refresh();
+        final updated = ref.read(userProvider(user.id!)).value;
         if (updated != null && mounted) {
           ref.read(currentUserProvider.notifier).setUser(updated);
         }
@@ -558,9 +559,8 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
               if (user == null) {
                 Future.microtask(() async {
                   if (!mounted) return;
-                  final appUser = await ref
-                      .read(userProvider(firebaseUser.uid).notifier)
-                      .build();
+                  final appUser = await UserService()
+                      .fetchUserByFirebaseID(userId: firebaseUser.uid);
                   if (!mounted) return;
                   if (appUser != null) {
                     await ref
