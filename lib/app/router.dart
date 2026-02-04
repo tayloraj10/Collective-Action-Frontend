@@ -6,6 +6,7 @@ import 'package:collective_action_frontend/screens/social/social_screen.dart';
 import 'package:collective_action_frontend/screens/login/login_screen.dart';
 import 'package:collective_action_frontend/screens/health_check_screen.dart';
 import 'package:collective_action_frontend/screens/user/settings_page.dart';
+import 'package:collective_action_frontend/screens/user/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -36,6 +37,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsPage(),
+      ),
+      GoRoute(
+        path: '/profile/:userId',
+        builder: (context, state) {
+          final userId = state.pathParameters['userId'] ?? '';
+          if (userId.isEmpty) return const DashboardScreen();
+          return ProfilePage(userId: userId);
+        },
       ),
       // Catch-all route for unknown paths
       GoRoute(path: '/:notFound(.*)', redirect: (_, _) => '/'),

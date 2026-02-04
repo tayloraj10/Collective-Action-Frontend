@@ -74,6 +74,7 @@ class InitiativeActionCard extends ConsumerWidget {
                       showTooltip: true,
                       enableHero: true,
                       heroTagSuffix: action.id, // Use action ID to make hero tag unique
+                      showProfileOnTap: true,
                     ),
                   ),
                   const SizedBox(width: 8),
