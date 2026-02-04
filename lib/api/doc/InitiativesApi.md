@@ -14,7 +14,6 @@ Method | HTTP request | Description
 [**getInitiativesByIdsInitiativesByIdsGet**](InitiativesApi.md#getinitiativesbyidsinitiativesbyidsget) | **GET** /initiatives/by-ids | Get Initiatives By Ids
 [**listActiveInitiativesInitiativesActiveGet**](InitiativesApi.md#listactiveinitiativesinitiativesactiveget) | **GET** /initiatives/active | List Active Initiatives
 [**listInitiativesInitiativesGet**](InitiativesApi.md#listinitiativesinitiativesget) | **GET** /initiatives/ | List Initiatives
-[**listInitiativesSummaryInitiativesSummaryGet**](InitiativesApi.md#listinitiativessummaryinitiativessummaryget) | **GET** /initiatives/summary | List Initiatives Summary
 
 
 # **createInitiativeInitiativesPost**
@@ -189,43 +188,6 @@ try {
     print(result);
 } catch (e) {
     print('Exception when calling InitiativesApi->listInitiativesInitiativesGet: $e\n');
-}
-```
-
-### Parameters
-This endpoint does not need any parameter.
-
-### Return type
-
-[**List<InitiativeSchema>**](InitiativeSchema.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **listInitiativesSummaryInitiativesSummaryGet**
-> List<InitiativeSchema> listInitiativesSummaryInitiativesSummaryGet()
-
-List Initiatives Summary
-
-### Example
-```dart
-import 'package:collective_action_api/api.dart';
-
-final api_instance = InitiativesApi();
-
-try {
-    final result = api_instance.listInitiativesSummaryInitiativesSummaryGet();
-    print(result);
-} catch (e) {
-    print('Exception when calling InitiativesApi->listInitiativesSummaryInitiativesSummaryGet: $e\n');
 }
 ```
 

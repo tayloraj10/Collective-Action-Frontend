@@ -1,3 +1,4 @@
+import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/providers/quote_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,9 +22,9 @@ class QuoteBar extends ConsumerWidget {
       '"${quote.text}"',
       style: TextStyle(
         fontSize: 11,
-        color: Theme.of(context).colorScheme.onSurface.withAlpha(180),
+        color: AppColors.white.withAlpha(220),
         fontStyle: FontStyle.italic,
-        fontWeight: FontWeight.w400,
+        fontWeight: FontWeight.w600,
       ),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,

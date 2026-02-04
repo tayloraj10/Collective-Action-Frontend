@@ -3,14 +3,22 @@ import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
+import 'package:collective_action_frontend/services/location_search_service.dart';
+import 'package:collective_action_frontend/services/photos_service.dart';
+import 'package:collective_action_frontend/services/user_service.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'dart:typed_data';
+import 'dart:ui' show ImageByteFormat;
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:crop_image/crop_image.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -76,6 +84,28 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
 
   String? _currentUserId;
 
+  /// True after we've synced location controllers from loaded user (so we don't
+  /// overwrite when user data arrives after first build).
+  bool _locationSyncedFromUser = false;
+
+  /// Bytes from picker; when non-null, show crop dialog.
+  Uint8List? _pendingCropBytes;
+
+  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _stateController = TextEditingController();
+  final TextEditingController _countryController = TextEditingController();
+  final LocationSearchService _locationSearchService = LocationSearchService();
+
+  String _formatLocation() {
+    final parts = [
+      _city,
+      _state,
+      _country,
+    ].whereType<String>().where((e) => e.isNotEmpty).toList();
+    return parts.join(', ');
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -83,7 +113,8 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
     final userId = authUser?.uid;
     if (_currentUserId != userId && userId != null) {
       _currentUserId = userId;
-      final user = ref.read(userProvider(userId)).value;
+      _locationSyncedFromUser = false;
+      final user = ref.read(currentUserProvider).value;
       if (user != null) {
         _name = user.name;
         _email = user.email;
@@ -91,6 +122,11 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
         _city = user.location?.city;
         _state = user.location?.state;
         _country = user.location?.country;
+        _formatLocation();
+        _cityController.text = _city ?? '';
+        _stateController.text = _state ?? '';
+        _countryController.text = _country ?? '';
+        _locationSyncedFromUser = true;
         _youtube = user.socialLinks?.youtube;
         _instagram = user.socialLinks?.instagram;
         _tiktok = user.socialLinks?.tiktok;
@@ -116,8 +152,111 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
 
   @override
   void dispose() {
+    _locationController.dispose();
+    _cityController.dispose();
+    _stateController.dispose();
+    _countryController.dispose();
     _dirtyFields.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickAndUploadProfilePhoto() async {
+    final user = ref.read(currentUserProvider).value;
+    if (user == null || user.id == null || !mounted) return;
+
+    final xFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1024,
+      imageQuality: 85,
+    );
+    if (xFile == null || !mounted) return;
+
+    final bytes = await xFile.readAsBytes();
+    if (bytes.isEmpty || !mounted) return;
+
+    if (mounted) {
+      setState(() => _pendingCropBytes = bytes);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _pendingCropBytes != null) _showCropDialog();
+      });
+    }
+  }
+
+  Future<void> _uploadCroppedProfilePhoto(Uint8List croppedBytes) async {
+    final user = ref.read(currentUserProvider).value;
+    final firebaseUser = ref.read(authStateProvider).value;
+    if (user == null || user.id == null || firebaseUser == null || !mounted) {
+      return;
+    }
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final url = await PhotosService()
+          .uploadProfilePhotoFromBytesAndUpdateUserPhotoUrl(
+            user,
+            croppedBytes,
+            filename: 'image.png',
+          );
+      if (!mounted) return;
+      if (url != null) {
+        ref.read(databaseUserProvider(user.id!).notifier).refresh();
+        await ref.read(userProvider(user.id!).notifier).refresh();
+        final updated = ref.read(userProvider(user.id!)).value;
+        if (updated != null && mounted) {
+          ref.read(currentUserProvider.notifier).setUser(updated);
+        }
+        messenger.showSnackBar(CustomSnackBar.success('Profile photo updated'));
+      }
+    } catch (e) {
+      messenger.showSnackBar(CustomSnackBar.error('Failed to upload photo'));
+    }
+  }
+
+  void _showCropDialog() {
+    if (_pendingCropBytes == null) return;
+    final bytes = _pendingCropBytes!;
+    final controller = CropController(aspectRatio: 1);
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Crop photo'),
+        content: SizedBox(
+          width: 320,
+          height: 320,
+          child: CropImage(controller: controller, image: Image.memory(bytes)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() => _pendingCropBytes = null);
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final navigator = Navigator.of(context);
+              final messenger = ScaffoldMessenger.of(context);
+              try {
+                final bitmap = await controller.croppedBitmap();
+                final data = await bitmap.toByteData(
+                  format: ImageByteFormat.png,
+                );
+                if (data == null || !mounted) return;
+                final croppedBytes = data.buffer.asUint8List();
+                setState(() => _pendingCropBytes = null);
+                navigator.pop();
+                await _uploadCroppedProfilePhoto(croppedBytes);
+              } catch (e) {
+                messenger.showSnackBar(CustomSnackBar.error('Crop failed'));
+              }
+            },
+            child: const Text('Apply'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _saveSettings() async {
@@ -126,17 +265,28 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
     final user = ref.read(currentUserProvider).value;
     if (user == null || user.id == null) return;
 
+    // Location fields use controllers; read from them so autocomplete/picker
+    // values are saved even if FormFieldState didn't sync.
+    final city = _cityController.text.trim().isEmpty
+        ? null
+        : _cityController.text.trim();
+    final state = _stateController.text.trim().isEmpty
+        ? null
+        : _stateController.text.trim();
+    final country = _countryController.text.trim().isEmpty
+        ? null
+        : _countryController.text.trim();
+
     String? nullIfBlank(String? v) =>
         (v == null || v.trim().isEmpty) ? null : v.trim();
-    final userData = UserCreate(
+    final userData = UserUpdate(
       email: _email!,
       name: nullIfBlank(_name),
-      photoUrl: nullIfBlank(_photoUrl),
       userType: _userType ?? user.userType,
       location: LocationSchema(
-        city: nullIfBlank(_city),
-        state: nullIfBlank(_state),
-        country: nullIfBlank(_country),
+        city: nullIfBlank(city),
+        state: nullIfBlank(state),
+        country: nullIfBlank(country),
       ),
       socialLinks: SocialLinksSchema(
         youtube: nullIfBlank(_youtube),
@@ -144,13 +294,15 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
         tiktok: nullIfBlank(_tiktok),
         website: nullIfBlank(_website),
       ),
-      firebaseUserId: user.firebaseUserId,
-      isActive: user.isActive,
     );
 
     try {
       await ref.read(userProvider(user.id!).notifier).updateUser(userData);
       if (mounted) {
+        // Keep _city, _state, _country in sync with saved location
+        _city = city;
+        _state = state;
+        _country = country;
         // Reset dirty fields after save
         _initialValues = {
           'name': _name,
@@ -407,9 +559,9 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
               if (user == null) {
                 Future.microtask(() async {
                   if (!mounted) return;
-                  final appUser = await ref
-                      .read(userProvider(firebaseUser.uid).notifier)
-                      .build();
+                  final appUser = await UserService().fetchUserByFirebaseID(
+                    userId: firebaseUser.uid,
+                  );
                   if (!mounted) return;
                   if (appUser != null) {
                     await ref
@@ -420,6 +572,30 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                 return const Scaffold(
                   body: Center(child: CircularProgressIndicator()),
                 );
+              }
+              // Sync location controllers when user data is available (e.g. loaded
+              // after first build); only if we haven't synced yet or location isn't dirty.
+              final locationDirty =
+                  _dirtyFields.value.contains('city') ||
+                  _dirtyFields.value.contains('state') ||
+                  _dirtyFields.value.contains('country');
+              if (!_locationSyncedFromUser && !locationDirty) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (!mounted) return;
+                  if (_locationSyncedFromUser) return;
+                  _city = user.location?.city;
+                  _state = user.location?.state;
+                  _country = user.location?.country;
+                  _formatLocation();
+                  _cityController.text = _city ?? '';
+                  _stateController.text = _state ?? '';
+                  _countryController.text = _country ?? '';
+                  _locationSyncedFromUser = true;
+                  _initialValues['city'] = _city;
+                  _initialValues['state'] = _state;
+                  _initialValues['country'] = _country;
+                  setState(() {});
+                });
               }
               String? displayPhotoUrl = user.photoUrl;
               if ((displayPhotoUrl == null || displayPhotoUrl.isEmpty) &&
@@ -825,9 +1001,10 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                                     color: Colors.white,
                                                     size: 17,
                                                   ),
-                                                  onPressed: () {
-                                                    // Optionally implement photo picker
-                                                  },
+                                                  onPressed: user.id == null
+                                                      ? null
+                                                      : () =>
+                                                            _pickAndUploadProfilePhoto(),
                                                   tooltip: 'Change Photo',
                                                   splashRadius: 18,
                                                   padding: EdgeInsets.zero,
@@ -946,7 +1123,124 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                             fontWeight: FontWeight.bold,
                                           ),
                                     ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Start typing a city to fill in city, state, and country.',
+                                      style: TextStyle(
+                                        color: Colors.grey.shade600,
+                                        fontSize: 13,
+                                      ),
+                                    ),
                                     const SizedBox(height: 12),
+                                    ValueListenableBuilder<Set<String>>(
+                                      valueListenable: _dirtyFields,
+                                      builder: (context, dirtyFields, child) {
+                                        return TypeAheadField<
+                                          LocationSuggestion
+                                        >(
+                                          controller: _locationController,
+                                          builder: (context, controller, focusNode) {
+                                            return TextField(
+                                              controller: controller,
+                                              focusNode: focusNode,
+                                              decoration: InputDecoration(
+                                                labelText: 'City or place',
+                                                hintText:
+                                                    'e.g. New York, Miami, London',
+                                                prefixIcon: const Icon(
+                                                  Icons.location_on_outlined,
+                                                ),
+                                                // enabledBorder: isDirty
+                                                //     ? const OutlineInputBorder(
+                                                //         borderSide: BorderSide(
+                                                //           color: AppColors
+                                                //               .warningOrange,
+                                                //           width: 2,
+                                                //         ),
+                                                //       )
+                                                //     : null,
+                                              ),
+                                              onChanged: (v) {
+                                                if (v.isEmpty) {
+                                                  _city = null;
+                                                  _state = null;
+                                                  _country = null;
+                                                  _cityController.clear();
+                                                  _stateController.clear();
+                                                  _countryController.clear();
+                                                  onChanged('city', null);
+                                                  onChanged('state', null);
+                                                  onChanged('country', null);
+                                                }
+                                              },
+                                            );
+                                          },
+                                          suggestionsCallback: (pattern) =>
+                                              _locationSearchService.search(
+                                                pattern,
+                                              ),
+                                          itemBuilder: (context, suggestion) =>
+                                              ListTile(
+                                                leading: Icon(
+                                                  Icons.place_outlined,
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary,
+                                                ),
+                                                title: Text(
+                                                  suggestion.displayName,
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                          onSelected: (suggestion) {
+                                            _city = suggestion.city;
+                                            _state = suggestion.state;
+                                            _country = suggestion.country;
+                                            _locationController.text =
+                                                suggestion.displayName;
+                                            _cityController.text =
+                                                suggestion.city ?? '';
+                                            _stateController.text =
+                                                suggestion.state ?? '';
+                                            _countryController.text =
+                                                suggestion.country ?? '';
+                                            onChanged('city', suggestion.city);
+                                            onChanged(
+                                              'state',
+                                              suggestion.state,
+                                            );
+                                            onChanged(
+                                              'country',
+                                              suggestion.country,
+                                            );
+                                          },
+                                          emptyBuilder: (context) => const Padding(
+                                            padding: EdgeInsets.all(16),
+                                            child: Text(
+                                              'No places found. Try a different search.',
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                          loadingBuilder: (context) =>
+                                              const Padding(
+                                                padding: EdgeInsets.all(16),
+                                                child: SizedBox(
+                                                  height: 24,
+                                                  width: 24,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                      ),
+                                                ),
+                                              ),
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(height: 16),
                                     Row(
                                       children: [
                                         Expanded(
@@ -954,8 +1248,7 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                             valueListenable: _dirtyFields,
                                             builder: (context, dirtyFields, child) {
                                               return TextFormField(
-                                                initialValue:
-                                                    user.location?.city,
+                                                controller: _cityController,
                                                 decoration: InputDecoration(
                                                   labelText: 'City',
                                                   enabledBorder:
@@ -984,8 +1277,7 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                             valueListenable: _dirtyFields,
                                             builder: (context, dirtyFields, child) {
                                               return TextFormField(
-                                                initialValue:
-                                                    user.location?.state,
+                                                controller: _stateController,
                                                 decoration: InputDecoration(
                                                   labelText: 'State',
                                                   enabledBorder:
@@ -1018,10 +1310,11 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                           showPhoneCode: false,
                                           onSelect: (Country country) {
                                             _country = country.name;
+                                            _countryController.text =
+                                                country.name;
                                             onChanged('country', country.name);
                                           },
                                           favorite: const ['US'],
-                                          exclude: const ['IL'],
                                           useSafeArea: true,
                                         );
                                       },
@@ -1030,8 +1323,10 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                           valueListenable: _dirtyFields,
                                           builder: (context, dirtyFields, child) {
                                             return TextFormField(
+                                              controller: _countryController,
                                               decoration: InputDecoration(
                                                 labelText: 'Country',
+                                                hintText: 'Tap to select',
                                                 enabledBorder:
                                                     dirtyFields.contains(
                                                       'country',
@@ -1044,12 +1339,6 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                                         ),
                                                       )
                                                     : null,
-                                              ),
-                                              controller: TextEditingController(
-                                                text:
-                                                    _country ??
-                                                    user.location?.country ??
-                                                    '',
                                               ),
                                               onSaved: (v) => _country = v,
                                             );

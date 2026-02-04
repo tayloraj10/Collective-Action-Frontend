@@ -33,6 +33,7 @@ part 'api/actions_api.dart';
 part 'api/categories_api.dart';
 part 'api/default_api.dart';
 part 'api/initiatives_api.dart';
+part 'api/photos_api.dart';
 part 'api/quotes_api.dart';
 part 'api/statuses_api.dart';
 part 'api/users_api.dart';
@@ -55,8 +56,10 @@ part 'model/status_schema.dart';
 part 'model/status_type_enum.dart';
 part 'model/status_values_enum.dart';
 part 'model/user_create.dart';
+part 'model/user_photo_update.dart';
 part 'model/user_schema.dart';
 part 'model/user_type.dart';
+part 'model/user_update.dart';
 
 
 /// An [ApiClient] instance that uses the default values obtained from

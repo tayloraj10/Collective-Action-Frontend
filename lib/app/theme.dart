@@ -11,6 +11,7 @@ class AppColors {
   static const silver = Color(0xFFF1F5F9);
   static const silverDark = Color(0xFFCBD5E1);
   static const silverLight = Color(0xFFF8FAFC);
+  static const cardBackground = Color(0xFFECECEC);
 
   // Semantic Colors
   static const white = Color(0xFFFFFFFF);
@@ -178,7 +179,7 @@ class AppTheme {
 
     // Card
     cardTheme: CardThemeData(
-      color: AppColors.white,
+      color: AppColors.cardBackground,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: const EdgeInsets.all(0),

@@ -1,22 +1,20 @@
-import 'package:dio/dio.dart';
-import '../app/constants.dart';
+import 'package:collective_action_frontend/api/lib/api.dart';
+import 'package:collective_action_frontend/app/constants.dart';
 
-class ApiService {
-  final Dio _dio = Dio();
+class HealthService {
+  late final DefaultApi _api;
 
-  /// Example: GET /health endpoint
-  Future<String> getHealth() async {
-    final url = '${AppConstants.backendBaseUrl}/health';
+  HealthService({String? baseUrl}) {
+    final client = ApiClient(basePath: baseUrl ?? AppConstants.backendBaseUrl);
+    _api = DefaultApi(client);
+  }
+
+  Future<String?> fetchHealth() async {
     try {
-      final response = await _dio.get(url);
-      if (response.statusCode == 200) {
-        // Assuming the health endpoint returns a simple string or JSON
-        return response.data.toString();
-      } else {
-        throw Exception('Failed to get health: ${response.statusCode}');
-      }
-    } on DioException catch (e) {
-      throw Exception('Dio error: \\${e.message}');
+      final response = await _api.healthHealthGetWithHttpInfo();
+      return response.body;
+    } catch (e) {
+      throw Exception('Failed to fetch health: $e');
     }
   }
 }

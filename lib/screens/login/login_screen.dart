@@ -3,6 +3,7 @@ import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
+import 'package:collective_action_frontend/services/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -93,9 +94,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             email: email,
             firebaseUserId: firebaseUser.uid,
           );
-          final createdUser = await ref
-              .read(userProvider(firebaseUser.uid).notifier)
-              .createUser(userCreate);
+          final createdUser =
+              await UserService().createUser(userCreate);
           // Set global currentUserProvider
           if (createdUser != null) {
             await ref.read(currentUserProvider.notifier).setUser(createdUser);
@@ -113,11 +113,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         }
       } else {
         final firebaseUser = await authService.signInWithEmail(email, password);
-        // Fetch app user and set global provider
+        // Fetch app user from backend (users table) and set global provider
         if (firebaseUser != null) {
-          final appUser = await ref
-              .read(userProvider(firebaseUser.uid).notifier)
-              .build();
+          final appUser = await UserService()
+              .fetchUserByFirebaseID(userId: firebaseUser.uid);
           if (appUser != null) {
             await ref.read(currentUserProvider.notifier).setUser(appUser);
           }
@@ -146,12 +145,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final userCredential = await authService.signInWithGoogle();
       final firebaseUser = userCredential;
       if (firebaseUser != null) {
-        // Try to fetch user from backend
+        // Try to fetch user from backend (users table)
         UserSchema? appUser;
         try {
-          appUser = await ref
-              .read(userProvider(firebaseUser.uid).notifier)
-              .build();
+          appUser = await UserService()
+              .fetchUserByFirebaseID(userId: firebaseUser.uid);
         } catch (e) {
           appUser = null;
         }
@@ -163,9 +161,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             firebaseUserId: firebaseUser.uid,
             photoUrl: firebaseUser.photoURL,
           );
-          appUser = await ref
-              .read(userProvider(firebaseUser.uid).notifier)
-              .createUser(userCreate);
+          appUser = await UserService().createUser(userCreate);
         }
         // Set global currentUserProvider
         if (appUser != null) {

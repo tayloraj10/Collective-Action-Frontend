@@ -3,6 +3,7 @@ import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
+import 'package:collective_action_frontend/services/user_service.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/navigation_button.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_pane.dart';
 import 'package:flutter/material.dart';
@@ -20,11 +21,11 @@ class DashboardScreen extends ConsumerWidget {
     // Fetch and set user data if logged in
     // Capture refs before async operations to avoid unmount issues
     if (authUser != null) {
-      final userNotifier = ref.read(userProvider(authUser.uid).notifier);
       final currentUserNotifier = ref.read(currentUserProvider.notifier);
       Future.microtask(() async {
         try {
-          final appUser = await userNotifier.build();
+          final appUser = await UserService()
+              .fetchUserByFirebaseID(userId: authUser.uid);
           if (appUser != null) {
             await currentUserNotifier.setUser(appUser);
           }

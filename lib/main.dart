@@ -1,10 +1,12 @@
 import 'dart:developer';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/app/router.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:image_picker_for_web/image_picker_for_web.dart';
 import 'firebase_options.dart';
 import 'providers/theme_provider.dart';
 import 'services/health_service.dart';
@@ -12,19 +14,16 @@ import 'services/health_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   usePathUrlStrategy();
+  if (kIsWeb) {
+    ImagePickerPlugin.registerWith(webPluginRegistrar);
+  }
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Call backend health check to spin up backend on app start
-  ApiService()
-      .getHealth()
-      .then((value) {
-        log('Health check result:');
-        log(value.toString());
-      })
-      .catchError((error) {
-        log('Health check error:');
-        log(error.toString());
-      });
+  HealthService().fetchHealth().then((value) {
+    log('Health check result:');
+    log(value?.toString() ?? 'null');
+  });
 
   runApp(const ProviderScope(child: MyApp()));
 }

@@ -14,6 +14,7 @@ Method | HTTP request | Description
 [**getUserByFirebaseIdUsersFirebaseIdGet**](UsersApi.md#getuserbyfirebaseidusersfirebaseidget) | **GET** /users/{firebase_id} | Get User By Firebase Id
 [**getUserByUserIdUsersDbUserIdGet**](UsersApi.md#getuserbyuseridusersdbuseridget) | **GET** /users/db/{user_id} | Get User By User Id
 [**listUsersUsersGet**](UsersApi.md#listusersusersget) | **GET** /users/ | List Users
+[**updateUserPhotoUsersUserIdPhotoPatch**](UsersApi.md#updateuserphotousersuseridphotopatch) | **PATCH** /users/{user_id}/photo | Update User Photo
 [**updateUserUsersUserIdPatch**](UsersApi.md#updateuserusersuseridpatch) | **PATCH** /users/{user_id} | Update User
 
 
@@ -227,12 +228,12 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **updateUserUsersUserIdPatch**
-> UserSchema updateUserUsersUserIdPatch(userId, userCreate)
+# **updateUserPhotoUsersUserIdPhotoPatch**
+> UserSchema updateUserPhotoUsersUserIdPhotoPatch(userId, userPhotoUpdate)
 
-Update User
+Update User Photo
 
-Update an existing user's information. Checks for email uniqueness and applies partial updates. Raises 404 if the user is not found.
+Update only a user's `photo_url`.  Expected body:   { \"photo_url\": \"https://...\" }
 
 ### Example
 ```dart
@@ -240,10 +241,55 @@ import 'package:collective_action_api/api.dart';
 
 final api_instance = UsersApi();
 final userId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final userCreate = UserCreate(); // UserCreate | 
+final userPhotoUpdate = UserPhotoUpdate(); // UserPhotoUpdate | 
 
 try {
-    final result = api_instance.updateUserUsersUserIdPatch(userId, userCreate);
+    final result = api_instance.updateUserPhotoUsersUserIdPhotoPatch(userId, userPhotoUpdate);
+    print(result);
+} catch (e) {
+    print('Exception when calling UsersApi->updateUserPhotoUsersUserIdPhotoPatch: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **userId** | **String**|  | 
+ **userPhotoUpdate** | [**UserPhotoUpdate**](UserPhotoUpdate.md)|  | 
+
+### Return type
+
+[**UserSchema**](UserSchema.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateUserUsersUserIdPatch**
+> UserSchema updateUserUsersUserIdPatch(userId, userUpdate)
+
+Update User
+
+Update an existing user's information (partial update). Cannot update photo_url, firebase_user_id, or is_active; use dedicated endpoints for those. Checks for email uniqueness. Raises 404 if the user is not found.
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = UsersApi();
+final userId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final userUpdate = UserUpdate(); // UserUpdate | 
+
+try {
+    final result = api_instance.updateUserUsersUserIdPatch(userId, userUpdate);
     print(result);
 } catch (e) {
     print('Exception when calling UsersApi->updateUserUsersUserIdPatch: $e\n');
@@ -255,7 +301,7 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **userId** | **String**|  | 
- **userCreate** | [**UserCreate**](UserCreate.md)|  | 
+ **userUpdate** | [**UserUpdate**](UserUpdate.md)|  | 
 
 ### Return type
 
