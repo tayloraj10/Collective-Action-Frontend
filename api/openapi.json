@@ -1357,9 +1357,9 @@
                 "tags": [
                     "photos"
                 ],
-                "summary": "Upload Submission Photo",
-                "description": "Upload a submission photo to cloud storage.\n\nThis endpoint uploads a photo for a specific submission. Multiple photos can be\nuploaded for the same submission - each will get a unique filename.\n\nPath Structure:\n- collective-action-submissions/submissions/{submission_id}/{uuid}.{ext}\n\nArgs:\n    submission_id: The ID of the submission (e.g., \"submission_123\")\n    file: The image file to upload\n\nReturns:\n    str: The public URL of the uploaded photo\n\nRaises:\n    HTTPException: If upload fails or validation fails",
-                "operationId": "upload_submission_photo_photos_submission__submission_id__post",
+                "summary": "Upload Submission Photos",
+                "description": "Upload one or more submission photos to cloud storage.\n\nThis endpoint uploads photos for a specific submission. Each file gets a unique\nfilename under that submission.\n\nPath Structure:\n- collective-action-submissions/submissions/{submission_id}/{uuid}.{ext}\n\nArgs:\n    submission_id: The ID of the submission (e.g., \"submission_123\")\n    files: One or more image files to upload\n\nReturns:\n    list[str]: Public URLs of the uploaded photos (same order as input)\n\nRaises:\n    HTTPException: If no files provided, validation fails, or upload fails",
+                "operationId": "upload_submission_photos_photos_submission__submission_id__post",
                 "parameters": [
                     {
                         "name": "submission_id",
@@ -1376,7 +1376,7 @@
                     "content": {
                         "multipart/form-data": {
                             "schema": {
-                                "$ref": "#/components/schemas/Body_upload_submission_photo_photos_submission__submission_id__post"
+                                "$ref": "#/components/schemas/Body_upload_submission_photos_photos_submission__submission_id__post"
                             }
                         }
                     }
@@ -1387,8 +1387,11 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "string",
-                                    "title": "Response Upload Submission Photo Photos Submission  Submission Id  Post"
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "title": "Response Upload Submission Photos Photos Submission  Submission Id  Post"
                                 }
                             }
                         }
@@ -1503,16 +1506,14 @@
                         "type": "number",
                         "title": "Amount"
                     },
-                    "image_url": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Image Url"
+                    "image_urls": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "minItems": 1,
+                        "title": "Image Urls",
+                        "description": "At least one image URL"
                     },
                     "linked_id": {
                         "anyOf": [
@@ -1554,7 +1555,8 @@
                 "type": "object",
                 "required": [
                     "action_type",
-                    "amount"
+                    "amount",
+                    "image_urls"
                 ],
                 "title": "ActionCreateSchema"
             },
@@ -1585,16 +1587,13 @@
                         "format": "date-time",
                         "title": "Date"
                     },
-                    "image_url": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Image Url"
+                    "image_urls": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Image Urls",
+                        "description": "At least one image URL"
                     },
                     "linked_id": {
                         "anyOf": [
@@ -1687,19 +1686,23 @@
                 ],
                 "title": "Body_upload_profile_photo_photos_profile__user_id__post"
             },
-            "Body_upload_submission_photo_photos_submission__submission_id__post": {
+            "Body_upload_submission_photos_photos_submission__submission_id__post": {
                 "properties": {
-                    "file": {
-                        "type": "string",
-                        "format": "binary",
-                        "title": "File"
+                    "files": {
+                        "items": {
+                            "type": "string",
+                            "format": "binary"
+                        },
+                        "type": "array",
+                        "title": "Files",
+                        "description": "One or more image files"
                     }
                 },
                 "type": "object",
                 "required": [
-                    "file"
+                    "files"
                 ],
-                "title": "Body_upload_submission_photo_photos_submission__submission_id__post"
+                "title": "Body_upload_submission_photos_photos_submission__submission_id__post"
             },
             "CategoryCreate": {
                 "properties": {

@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **actionType** | **String** |  | 
 **amount** | **num** |  | 
-**imageUrl** | **String** |  | [optional] 
+**imageUrls** | **List<String>** | At least one image URL | [default to const []]
 **linkedId** | **String** |  | [optional] 
 **userId** | **String** |  | [optional] 
 **date** | [**DateTime**](DateTime.md) |  | [optional] 

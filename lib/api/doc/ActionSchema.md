@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 **actionType** | **String** |  | 
 **amount** | **num** |  | [optional] 
 **date** | [**DateTime**](DateTime.md) |  | 
-**imageUrl** | **String** |  | [optional] 
+**imageUrls** | **List<String>** | At least one image URL | [optional] [default to const []]
 **linkedId** | **String** |  | [optional] 
 **userId** | **String** |  | [optional] 
 

@@ -299,9 +299,9 @@ class PhotosApi {
     return null;
   }
 
-  /// Upload Submission Photo
+  /// Upload Submission Photos
   ///
-  /// Upload a submission photo to cloud storage.  This endpoint uploads a photo for a specific submission. Multiple photos can be uploaded for the same submission - each will get a unique filename.  Path Structure: - collective-action-submissions/submissions/{submission_id}/{uuid}.{ext}  Args:     submission_id: The ID of the submission (e.g., \"submission_123\")     file: The image file to upload  Returns:     str: The public URL of the uploaded photo  Raises:     HTTPException: If upload fails or validation fails
+  /// Upload one or more submission photos to cloud storage.  This endpoint uploads photos for a specific submission. Each file gets a unique filename under that submission.  Path Structure: - collective-action-submissions/submissions/{submission_id}/{uuid}.{ext}  Args:     submission_id: The ID of the submission (e.g., \"submission_123\")     files: One or more image files to upload  Returns:     list[str]: Public URLs of the uploaded photos (same order as input)  Raises:     HTTPException: If no files provided, validation fails, or upload fails
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -309,8 +309,9 @@ class PhotosApi {
   ///
   /// * [String] submissionId (required):
   ///
-  /// * [MultipartFile] file (required):
-  Future<Response> uploadSubmissionPhotoPhotosSubmissionSubmissionIdPostWithHttpInfo(String submissionId, MultipartFile file,) async {
+  /// * [List<MultipartFile>] files (required):
+  ///   One or more image files
+  Future<Response> uploadSubmissionPhotosPhotosSubmissionSubmissionIdPostWithHttpInfo(String submissionId, List<MultipartFile> files,) async {
     // ignore: prefer_const_declarations
     final path = r'/photos/submission/{submission_id}'
       .replaceAll('{submission_id}', submissionId);
@@ -326,10 +327,10 @@ class PhotosApi {
 
     bool hasFields = false;
     final mp = MultipartRequest('POST', Uri.parse(path));
-    if (file != null) {
+    if (files != null) {
       hasFields = true;
-      mp.fields[r'file'] = file.field;
-      mp.files.add(file);
+      mp.fields[r'files'] = files.field;
+      mp.files.add(files);
     }
     if (hasFields) {
       postBody = mp;
@@ -346,17 +347,18 @@ class PhotosApi {
     );
   }
 
-  /// Upload Submission Photo
+  /// Upload Submission Photos
   ///
-  /// Upload a submission photo to cloud storage.  This endpoint uploads a photo for a specific submission. Multiple photos can be uploaded for the same submission - each will get a unique filename.  Path Structure: - collective-action-submissions/submissions/{submission_id}/{uuid}.{ext}  Args:     submission_id: The ID of the submission (e.g., \"submission_123\")     file: The image file to upload  Returns:     str: The public URL of the uploaded photo  Raises:     HTTPException: If upload fails or validation fails
+  /// Upload one or more submission photos to cloud storage.  This endpoint uploads photos for a specific submission. Each file gets a unique filename under that submission.  Path Structure: - collective-action-submissions/submissions/{submission_id}/{uuid}.{ext}  Args:     submission_id: The ID of the submission (e.g., \"submission_123\")     files: One or more image files to upload  Returns:     list[str]: Public URLs of the uploaded photos (same order as input)  Raises:     HTTPException: If no files provided, validation fails, or upload fails
   ///
   /// Parameters:
   ///
   /// * [String] submissionId (required):
   ///
-  /// * [MultipartFile] file (required):
-  Future<String?> uploadSubmissionPhotoPhotosSubmissionSubmissionIdPost(String submissionId, MultipartFile file,) async {
-    final response = await uploadSubmissionPhotoPhotosSubmissionSubmissionIdPostWithHttpInfo(submissionId, file,);
+  /// * [List<MultipartFile>] files (required):
+  ///   One or more image files
+  Future<List<String>?> uploadSubmissionPhotosPhotosSubmissionSubmissionIdPost(String submissionId, List<MultipartFile> files,) async {
+    final response = await uploadSubmissionPhotosPhotosSubmissionSubmissionIdPostWithHttpInfo(submissionId, files,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -364,8 +366,11 @@ class PhotosApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'String',) as String;
-    
+      final responseBody = await _decodeBodyBytes(response);
+      return (await apiClient.deserializeAsync(responseBody, 'List<String>') as List)
+        .cast<String>()
+        .toList(growable: false);
+
     }
     return null;
   }

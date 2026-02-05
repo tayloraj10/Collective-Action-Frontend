@@ -75,4 +75,3 @@ lib/model/user_schema.dart
 lib/model/user_type.dart
 lib/model/user_update.dart
 pubspec.yaml
-test/user_update_test.dart

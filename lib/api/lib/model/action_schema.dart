@@ -17,7 +17,7 @@ class ActionSchema {
     required this.actionType,
     this.amount,
     required this.date,
-    this.imageUrl,
+    this.imageUrls = const [],
     this.linkedId,
     this.userId,
   });
@@ -30,7 +30,8 @@ class ActionSchema {
 
   DateTime date;
 
-  String? imageUrl;
+  /// At least one image URL
+  List<String> imageUrls;
 
   String? linkedId;
 
@@ -42,7 +43,7 @@ class ActionSchema {
     other.actionType == actionType &&
     other.amount == amount &&
     other.date == date &&
-    other.imageUrl == imageUrl &&
+    _deepEquality.equals(other.imageUrls, imageUrls) &&
     other.linkedId == linkedId &&
     other.userId == userId;
 
@@ -53,12 +54,12 @@ class ActionSchema {
     (actionType.hashCode) +
     (amount == null ? 0 : amount!.hashCode) +
     (date.hashCode) +
-    (imageUrl == null ? 0 : imageUrl!.hashCode) +
+    (imageUrls.hashCode) +
     (linkedId == null ? 0 : linkedId!.hashCode) +
     (userId == null ? 0 : userId!.hashCode);
 
   @override
-  String toString() => 'ActionSchema[id=$id, actionType=$actionType, amount=$amount, date=$date, imageUrl=$imageUrl, linkedId=$linkedId, userId=$userId]';
+  String toString() => 'ActionSchema[id=$id, actionType=$actionType, amount=$amount, date=$date, imageUrls=$imageUrls, linkedId=$linkedId, userId=$userId]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -70,11 +71,7 @@ class ActionSchema {
       json[r'amount'] = null;
     }
       json[r'date'] = this.date.toUtc().toIso8601String();
-    if (this.imageUrl != null) {
-      json[r'image_url'] = this.imageUrl;
-    } else {
-      json[r'image_url'] = null;
-    }
+      json[r'image_urls'] = this.imageUrls;
     if (this.linkedId != null) {
       json[r'linked_id'] = this.linkedId;
     } else {
@@ -113,7 +110,9 @@ class ActionSchema {
             ? null
             : num.parse('${json[r'amount']}'),
         date: mapDateTime(json, r'date', r'')!,
-        imageUrl: mapValueOfType<String>(json, r'image_url'),
+        imageUrls: json[r'image_urls'] is Iterable
+            ? (json[r'image_urls'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
         linkedId: mapValueOfType<String>(json, r'linked_id'),
         userId: mapValueOfType<String>(json, r'user_id'),
       );

@@ -14,7 +14,7 @@ Method | HTTP request | Description
 [**deleteSubmissionPhotoPhotosSubmissionSubmissionIdPhotoFilenameDelete**](PhotosApi.md#deletesubmissionphotophotossubmissionsubmissionidphotofilenamedelete) | **DELETE** /photos/submission/{submission_id}/{photo_filename} | Delete Submission Photo
 [**listSubmissionPhotosPhotosSubmissionSubmissionIdGet**](PhotosApi.md#listsubmissionphotosphotossubmissionsubmissionidget) | **GET** /photos/submission/{submission_id} | List Submission Photos
 [**uploadProfilePhotoPhotosProfileUserIdPost**](PhotosApi.md#uploadprofilephotophotosprofileuseridpost) | **POST** /photos/profile/{user_id} | Upload Profile Photo
-[**uploadSubmissionPhotoPhotosSubmissionSubmissionIdPost**](PhotosApi.md#uploadsubmissionphotophotossubmissionsubmissionidpost) | **POST** /photos/submission/{submission_id} | Upload Submission Photo
+[**uploadSubmissionPhotosPhotosSubmissionSubmissionIdPost**](PhotosApi.md#uploadsubmissionphotosphotossubmissionsubmissionidpost) | **POST** /photos/submission/{submission_id} | Upload Submission Photos
 
 
 # **deleteAllSubmissionPhotosPhotosSubmissionSubmissionIdDelete**
@@ -233,12 +233,12 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **uploadSubmissionPhotoPhotosSubmissionSubmissionIdPost**
-> String uploadSubmissionPhotoPhotosSubmissionSubmissionIdPost(submissionId, file)
+# **uploadSubmissionPhotosPhotosSubmissionSubmissionIdPost**
+> List<String> uploadSubmissionPhotosPhotosSubmissionSubmissionIdPost(submissionId, files)
 
-Upload Submission Photo
+Upload Submission Photos
 
-Upload a submission photo to cloud storage.  This endpoint uploads a photo for a specific submission. Multiple photos can be uploaded for the same submission - each will get a unique filename.  Path Structure: - collective-action-submissions/submissions/{submission_id}/{uuid}.{ext}  Args:     submission_id: The ID of the submission (e.g., \"submission_123\")     file: The image file to upload  Returns:     str: The public URL of the uploaded photo  Raises:     HTTPException: If upload fails or validation fails
+Upload one or more submission photos to cloud storage.  This endpoint uploads photos for a specific submission. Each file gets a unique filename under that submission.  Path Structure: - collective-action-submissions/submissions/{submission_id}/{uuid}.{ext}  Args:     submission_id: The ID of the submission (e.g., \"submission_123\")     files: One or more image files to upload  Returns:     list[str]: Public URLs of the uploaded photos (same order as input)  Raises:     HTTPException: If no files provided, validation fails, or upload fails
 
 ### Example
 ```dart
@@ -246,13 +246,13 @@ import 'package:collective_action_api/api.dart';
 
 final api_instance = PhotosApi();
 final submissionId = submissionId_example; // String | 
-final file = BINARY_DATA_HERE; // MultipartFile | 
+final files = [/path/to/file.txt]; // List<MultipartFile> | One or more image files
 
 try {
-    final result = api_instance.uploadSubmissionPhotoPhotosSubmissionSubmissionIdPost(submissionId, file);
+    final result = api_instance.uploadSubmissionPhotosPhotosSubmissionSubmissionIdPost(submissionId, files);
     print(result);
 } catch (e) {
-    print('Exception when calling PhotosApi->uploadSubmissionPhotoPhotosSubmissionSubmissionIdPost: $e\n');
+    print('Exception when calling PhotosApi->uploadSubmissionPhotosPhotosSubmissionSubmissionIdPost: $e\n');
 }
 ```
 
@@ -261,11 +261,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **submissionId** | **String**|  | 
- **file** | **MultipartFile**|  | 
+ **files** | [**List<MultipartFile>**](MultipartFile.md)| One or more image files | 
 
 ### Return type
 
-**String**
+**List<String>**
 
 ### Authorization
 
