@@ -1507,13 +1507,19 @@
                         "title": "Amount"
                     },
                     "image_urls": {
-                        "items": {
-                            "type": "string"
-                        },
-                        "type": "array",
-                        "minItems": 1,
+                        "anyOf": [
+                            {
+                                "items": {
+                                    "type": "string"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
                         "title": "Image Urls",
-                        "description": "At least one image URL"
+                        "description": "Optional list of image URLs"
                     },
                     "linked_id": {
                         "anyOf": [
@@ -1555,8 +1561,7 @@
                 "type": "object",
                 "required": [
                     "action_type",
-                    "amount",
-                    "image_urls"
+                    "amount"
                 ],
                 "title": "ActionCreateSchema"
             },

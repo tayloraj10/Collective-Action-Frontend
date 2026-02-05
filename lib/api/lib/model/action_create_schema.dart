@@ -25,8 +25,7 @@ class ActionCreateSchema {
 
   num amount;
 
-  /// At least one image URL
-  List<String> imageUrls;
+  List<String>? imageUrls;
 
   String? linkedId;
 
@@ -48,7 +47,7 @@ class ActionCreateSchema {
     // ignore: unnecessary_parenthesis
     (actionType.hashCode) +
     (amount.hashCode) +
-    (imageUrls.hashCode) +
+    (imageUrls == null ? 0 : imageUrls!.hashCode) +
     (linkedId == null ? 0 : linkedId!.hashCode) +
     (userId == null ? 0 : userId!.hashCode) +
     (date == null ? 0 : date!.hashCode);
@@ -60,7 +59,11 @@ class ActionCreateSchema {
     final json = <String, dynamic>{};
       json[r'action_type'] = this.actionType;
       json[r'amount'] = this.amount;
+    if (this.imageUrls != null) {
       json[r'image_urls'] = this.imageUrls;
+    } else {
+      json[r'image_urls'] = null;
+    }
     if (this.linkedId != null) {
       json[r'linked_id'] = this.linkedId;
     } else {
@@ -155,7 +158,6 @@ class ActionCreateSchema {
   static const requiredKeys = <String>{
     'action_type',
     'amount',
-    'image_urls',
   };
 }
 
