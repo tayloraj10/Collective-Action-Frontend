@@ -277,6 +277,50 @@
                 }
             }
         },
+        "/actions/{action_id}/photos": {
+            "patch": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Update Action Photos",
+                "description": "Update the photo URLs for an action.",
+                "operationId": "update_action_photos_actions__action_id__photos_patch",
+                "parameters": [
+                    {
+                        "name": "action_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Action Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ActionPhotosUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/actions/{action_id}": {
             "get": {
                 "tags": [
@@ -1564,6 +1608,20 @@
                     "amount"
                 ],
                 "title": "ActionCreateSchema"
+            },
+            "ActionPhotosUpdate": {
+                "properties": {
+                    "image_urls": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Image Urls",
+                        "description": "List of image URLs"
+                    }
+                },
+                "type": "object",
+                "title": "ActionPhotosUpdate"
             },
             "ActionSchema": {
                 "properties": {

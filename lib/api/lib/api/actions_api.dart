@@ -354,4 +354,65 @@ class ActionsApi {
     }
     return null;
   }
+
+  /// Update Action Photos
+  ///
+  /// Update the photo URLs for an action.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] actionId (required):
+  ///
+  /// * [ActionPhotosUpdate] actionPhotosUpdate (required):
+  Future<Response> updateActionPhotosActionsActionIdPhotosPatchWithHttpInfo(String actionId, ActionPhotosUpdate actionPhotosUpdate,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/actions/{action_id}/photos'
+      .replaceAll('{action_id}', actionId);
+
+    // ignore: prefer_final_locals
+    Object? postBody = actionPhotosUpdate;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'PATCH',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Update Action Photos
+  ///
+  /// Update the photo URLs for an action.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] actionId (required):
+  ///
+  /// * [ActionPhotosUpdate] actionPhotosUpdate (required):
+  Future<ActionSchema?> updateActionPhotosActionsActionIdPhotosPatch(String actionId, ActionPhotosUpdate actionPhotosUpdate,) async {
+    final response = await updateActionPhotosActionsActionIdPhotosPatchWithHttpInfo(actionId, actionPhotosUpdate,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ActionSchema',) as ActionSchema;
+    
+    }
+    return null;
+  }
 }

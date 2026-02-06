@@ -70,6 +70,7 @@ Class | Method | HTTP request | Description
 *ActionsApi* | [**getActionsByLinkedActionsByLinkedLinkedIdGet**](doc//ActionsApi.md#getactionsbylinkedactionsbylinkedlinkedidget) | **GET** /actions/by_linked/{linked_id} | Get Actions By Linked
 *ActionsApi* | [**getLatestActionsActionsRecentGet**](doc//ActionsApi.md#getlatestactionsactionsrecentget) | **GET** /actions/recent | Get Latest Actions
 *ActionsApi* | [**listActionsActionsGet**](doc//ActionsApi.md#listactionsactionsget) | **GET** /actions/ | List Actions
+*ActionsApi* | [**updateActionPhotosActionsActionIdPhotosPatch**](doc//ActionsApi.md#updateactionphotosactionsactionidphotospatch) | **PATCH** /actions/{action_id}/photos | Update Action Photos
 *CategoriesApi* | [**createCategoryCategoriesPost**](doc//CategoriesApi.md#createcategorycategoriespost) | **POST** /categories/ | Create Category
 *CategoriesApi* | [**deleteCategoryCategoriesCategoryIdDelete**](doc//CategoriesApi.md#deletecategorycategoriescategoryiddelete) | **DELETE** /categories/{category_id} | Delete Category
 *CategoriesApi* | [**getCategoryCategoriesCategoryIdGet**](doc//CategoriesApi.md#getcategorycategoriescategoryidget) | **GET** /categories/{category_id} | Get Category
@@ -111,6 +112,7 @@ Class | Method | HTTP request | Description
 ## Documentation For Models
 
  - [ActionCreateSchema](doc//ActionCreateSchema.md)
+ - [ActionPhotosUpdate](doc//ActionPhotosUpdate.md)
  - [ActionSchema](doc//ActionSchema.md)
  - [ActionTypeCreate](doc//ActionTypeCreate.md)
  - [ActionTypeSchema](doc//ActionTypeSchema.md)

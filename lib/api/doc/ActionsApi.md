@@ -15,6 +15,7 @@ Method | HTTP request | Description
 [**getActionsByLinkedActionsByLinkedLinkedIdGet**](ActionsApi.md#getactionsbylinkedactionsbylinkedlinkedidget) | **GET** /actions/by_linked/{linked_id} | Get Actions By Linked
 [**getLatestActionsActionsRecentGet**](ActionsApi.md#getlatestactionsactionsrecentget) | **GET** /actions/recent | Get Latest Actions
 [**listActionsActionsGet**](ActionsApi.md#listactionsactionsget) | **GET** /actions/ | List Actions
+[**updateActionPhotosActionsActionIdPhotosPatch**](ActionsApi.md#updateactionphotosactionsactionidphotospatch) | **PATCH** /actions/{action_id}/photos | Update Action Photos
 
 
 # **createActionActionsPost**
@@ -261,6 +262,51 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateActionPhotosActionsActionIdPhotosPatch**
+> ActionSchema updateActionPhotosActionsActionIdPhotosPatch(actionId, actionPhotosUpdate)
+
+Update Action Photos
+
+Update the photo URLs for an action.
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = ActionsApi();
+final actionId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final actionPhotosUpdate = ActionPhotosUpdate(); // ActionPhotosUpdate | 
+
+try {
+    final result = api_instance.updateActionPhotosActionsActionIdPhotosPatch(actionId, actionPhotosUpdate);
+    print(result);
+} catch (e) {
+    print('Exception when calling ActionsApi->updateActionPhotosActionsActionIdPhotosPatch: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **actionId** | **String**|  | 
+ **actionPhotosUpdate** | [**ActionPhotosUpdate**](ActionPhotosUpdate.md)|  | 
+
+### Return type
+
+[**ActionSchema**](ActionSchema.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

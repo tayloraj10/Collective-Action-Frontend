@@ -184,6 +184,8 @@ class ApiClient {
           return value is DateTime ? value : DateTime.tryParse(value);
         case 'ActionCreateSchema':
           return ActionCreateSchema.fromJson(value);
+        case 'ActionPhotosUpdate':
+          return ActionPhotosUpdate.fromJson(value);
         case 'ActionSchema':
           return ActionSchema.fromJson(value);
         case 'ActionTypeCreate':
