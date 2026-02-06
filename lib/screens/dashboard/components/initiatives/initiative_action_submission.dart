@@ -131,7 +131,6 @@ class InitiativeActionSubmissionState
         ).showSnackBar(CustomSnackBar.success('Action created!'));
       }
     } catch (e) {
-      print(e);
       setState(() {
         _loading = false;
         _error = "An error occurred";
