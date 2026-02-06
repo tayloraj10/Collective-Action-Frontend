@@ -73,10 +73,10 @@ class UserNotifier extends AsyncNotifier<UserSchema?> {
 }
 
 /// Provider for fetching a user by database user ID (not Firebase ID)
-final databaseUserProvider =
-    AsyncNotifierProvider.family<UserByUserIdNotifier, UserSchema?, String>(
-      (userId) => UserByUserIdNotifier(userId),
-    );
+// final databaseUserProvider =
+//     AsyncNotifierProvider.family<UserByUserIdNotifier, UserSchema?, String>(
+//       (userId) => UserByUserIdNotifier(userId),
+//     );
 
 class UserByUserIdNotifier extends AsyncNotifier<UserSchema?> {
   final String userId;
