@@ -7,6 +7,13 @@ final activeActionProvider =
       ActiveActionNotifier.new,
     );
 
+final actionsByLinkedProvider =
+    FutureProvider.family<List<ActionSchema>, String>(
+      (ref, linkedId) async {
+        return await ActionsService().fetchActionsByLinked(linkedId) ?? [];
+      },
+    );
+
 class ActiveActionNotifier extends AsyncNotifier<List<ActionSchema>> {
   int? days;
   ActionTypeValuesEnum? actionType;
