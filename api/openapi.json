@@ -402,6 +402,25 @@
                             "format": "uuid",
                             "title": "Linked Id"
                         }
+                    },
+                    {
+                        "name": "days",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "Only return actions from the last N days",
+                            "title": "Days"
+                        },
+                        "description": "Only return actions from the last N days"
                     }
                 ],
                 "responses": {
