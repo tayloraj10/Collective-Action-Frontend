@@ -144,7 +144,7 @@ class UserProfileView extends ConsumerWidget {
     // }
 
     final userAsync = ref.watch(userProvider(userId));
-    final isMobile = MediaQuery.of(context).size.width < 700;
+    final isMobile = AppConstants.isMobile(context);
     final cardMaxWidth = isMobile ? 520.0 : 900.0;
     final cardPadding = isMobile
         ? const EdgeInsets.symmetric(horizontal: 16, vertical: 20)
