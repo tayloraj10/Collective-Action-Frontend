@@ -349,7 +349,10 @@ class _PhotoCarouselState extends State<_PhotoCarousel> {
   static const double _thumbSize = 36;
   static const double _gap = 12;
   late ScrollController _scrollController;
-  void _onScroll() => setState(() {});
+  void _onScroll() {
+    if (!mounted) return;
+    setState(() {});
+  }
 
   double get _itemWidth => _thumbSize + _gap;
 
