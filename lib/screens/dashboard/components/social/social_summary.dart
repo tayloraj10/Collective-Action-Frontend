@@ -198,7 +198,7 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                                 child: Icon(
                                   Icons.discord,
                                   color: Colors.indigo,
-                                  size: 22,
+                                  size: 24,
                                 ),
                               ),
                             ),
