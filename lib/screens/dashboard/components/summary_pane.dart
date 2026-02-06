@@ -4,6 +4,7 @@ import 'package:collective_action_frontend/screens/dashboard/components/initiati
 import 'package:collective_action_frontend/screens/dashboard/components/social/social_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
+import 'package:go_router/go_router.dart';
 
 class SummaryPane extends StatelessWidget {
   final String title;
@@ -19,6 +20,21 @@ class SummaryPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String? routeForTitle(String title) {
+      switch (title) {
+        case 'Initiatives':
+          return '/initiatives';
+        case 'Projects':
+          return '/projects';
+        case 'Maps':
+          return '/maps';
+        case 'Social':
+          return '/social';
+        default:
+          return null;
+      }
+    }
+
     if (title == 'Initiatives') {
       // Show a different widget for Initiatives with live count
       return InitiativesSummary(icon: icon, color: color);
@@ -30,6 +46,7 @@ class SummaryPane extends StatelessWidget {
 
     if (title == 'Maps') {
       final isMobile = AppConstants.isMobile(context);
+      final route = routeForTitle(title);
       return Card(
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -47,20 +64,114 @@ class SummaryPane extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: color.withAlpha(26),
+                    if (route != null)
+                      InkWell(
                         borderRadius: BorderRadius.circular(8),
+                        onTap: () => context.go(route),
+                        child: Container(
+                          padding: EdgeInsets.all(isMobile ? 10 : 12),
+                          decoration: BoxDecoration(
+                            color: color.withAlpha(26),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            icon,
+                            color: color,
+                            size: isMobile ? 20 : 28,
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
+                        padding: EdgeInsets.all(isMobile ? 10 : 12),
+                        decoration: BoxDecoration(
+                          color: color.withAlpha(26),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          icon,
+                          color: color,
+                          size: isMobile ? 20 : 28,
+                        ),
                       ),
-                      child: Icon(icon, color: color, size: 28),
-                    ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Text(
-                        title,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(6),
+                        onTap: (!isMobile || route == null)
+                            ? null
+                            : () => context.go(route),
+                        splashColor: (!isMobile || route == null)
+                            ? null
+                            : Theme.of(
+                                context,
+                              ).colorScheme.primary.withAlpha(30),
+                        highlightColor: (!isMobile || route == null)
+                            ? null
+                            : Theme.of(
+                                context,
+                              ).colorScheme.primary.withAlpha(20),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: route == null
+                              ? Text(
+                                  title,
+                                  style: Theme.of(context).textTheme.titleLarge
+                                      ?.copyWith(fontWeight: FontWeight.w600),
+                                )
+                              : Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          title,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                      ),
+                                    ),
+                                    if (isMobile) ...[
+                                      const SizedBox(width: 6),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 4),
+                                        child: Container(
+                                          width: 20,
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withAlpha(18),
+                                            border: Border.all(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface
+                                                  .withAlpha(38),
+                                            ),
+                                          ),
+                                          child: Icon(
+                                            Icons.open_in_new,
+                                            size: 14,
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .titleLarge
+                                                ?.color
+                                                ?.withAlpha(210),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
                         ),
                       ),
                     ),
@@ -136,6 +247,7 @@ class SummaryPane extends StatelessWidget {
     final isMobile = AppConstants.isMobile(context);
     final double cardPaddingHeight = isMobile ? 4 : 6;
     final double cardPaddingWidth = isMobile ? 6 : 10;
+    final route = routeForTitle(title);
 
     return Card(
       elevation: 2,
@@ -153,20 +265,115 @@ class SummaryPane extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: color.withAlpha(26),
+                  if (route != null)
+                    InkWell(
                       borderRadius: BorderRadius.circular(8),
+                      onTap: () => context.go(route),
+                      child: Container(
+                        padding: EdgeInsets.all(isMobile ? 10 : 12),
+                        decoration: BoxDecoration(
+                          color: color.withAlpha(26),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.only(top: isMobile ? 2 : 0),
+                          child: Icon(
+                            icon,
+                            color: color,
+                            size: isMobile ? 20 : 28,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 10 : 12),
+                      decoration: BoxDecoration(
+                        color: color.withAlpha(26),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(top: isMobile ? 2 : 0),
+                        child: Icon(
+                          icon,
+                          color: color,
+                          size: isMobile ? 20 : 28,
+                        ),
+                      ),
                     ),
-                    child: Icon(icon, color: color, size: 28),
-                  ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(6),
+                      onTap: (!isMobile || route == null)
+                          ? null
+                          : () => context.go(route),
+                      splashColor: (!isMobile || route == null)
+                          ? null
+                          : Theme.of(context).colorScheme.primary.withAlpha(30),
+                      highlightColor: (!isMobile || route == null)
+                          ? null
+                          : Theme.of(context).colorScheme.primary.withAlpha(20),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2),
+                        child: route == null
+                            ? Text(
+                                title,
+                                style: Theme.of(context).textTheme.titleLarge
+                                    ?.copyWith(fontWeight: FontWeight.w600),
+                              )
+                            : Row(
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Flexible(
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        title,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                      ),
+                                    ),
+                                  ),
+                                  if (isMobile) ...[
+                                    const SizedBox(width: 6),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4),
+                                      child: Container(
+                                        width: 20,
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface.withAlpha(18),
+                                          border: Border.all(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withAlpha(38),
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          Icons.open_in_new,
+                                          size: 14,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge
+                                              ?.color
+                                              ?.withAlpha(210),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
                       ),
                     ),
                   ),

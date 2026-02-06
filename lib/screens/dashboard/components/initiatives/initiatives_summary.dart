@@ -5,6 +5,7 @@ import 'package:collective_action_frontend/screens/dashboard/components/summary_
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/providers/initiative_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class InitiativesSummary extends ConsumerStatefulWidget {
   final IconData icon;
@@ -69,25 +70,93 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
               children: [
                 Row(
                   children: [
-                    Container(
-                      padding: EdgeInsets.all(isMobile ? 7 : 12),
-                      decoration: BoxDecoration(
-                        color: widget.color.withAlpha(26),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        widget.icon,
-                        color: widget.color,
-                        size: isMobile ? 22 : 28,
+                    InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () => context.go('/initiatives'),
+                      child: Container(
+                        padding: EdgeInsets.all(isMobile ? 10 : 12),
+                        decoration: BoxDecoration(
+                          color: widget.color.withAlpha(26),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.only(top: isMobile ? 2 : 0),
+                          child: Icon(
+                            widget.icon,
+                            color: widget.color,
+                            size: isMobile ? 20 : 28,
+                          ),
+                        ),
                       ),
                     ),
-                    SizedBox(width: isMobile ? 7 : 12),
+                    const SizedBox(width: 12),
                     Expanded(
-                      child: Text(
-                        'Initiatives',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: isMobile ? 15 : 20,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(6),
+                        onTap: isMobile
+                            ? () => context.go('/initiatives')
+                            : null,
+                        splashColor: isMobile
+                            ? Theme.of(
+                                context,
+                              ).colorScheme.primary.withAlpha(30)
+                            : null,
+                        highlightColor: isMobile
+                            ? Theme.of(
+                                context,
+                              ).colorScheme.primary.withAlpha(20)
+                            : null,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'Initiatives',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                              ),
+                              if (isMobile) ...[
+                                const SizedBox(width: 6),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: Container(
+                                    width: 20,
+                                    height: 20,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface.withAlpha(18),
+                                      border: Border.all(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface.withAlpha(38),
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      Icons.open_in_new,
+                                      size: 14,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge
+                                          ?.color
+                                          ?.withAlpha(210),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
