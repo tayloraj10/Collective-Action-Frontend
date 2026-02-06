@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/providers/initiative_provider.dart';
+import 'package:go_router/go_router.dart';
 
 // Provider to extract stable, sorted initiative linkedIds from actions
 final _initiativeLinkedIdsProvider = Provider.autoDispose<List<String>>((ref) {
@@ -68,46 +69,141 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
               // Always show icon and title
               Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: cardColor.withAlpha(26),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      widget.icon ?? Icons.people_alt_rounded,
-                      color: cardColor,
-                      size: 28,
+                  InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () => context.go('/social'),
+                    child: Container(
+                      padding: EdgeInsets.all(isMobile ? 10 : 12),
+                      decoration: BoxDecoration(
+                        color: cardColor.withAlpha(26),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(top: isMobile ? 2 : 0),
+                        child: Icon(
+                          widget.icon ?? Icons.people_alt_rounded,
+                          color: cardColor,
+                          size: isMobile ? 20 : 28,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Row(
                       children: [
-                        Text(
-                          'Social',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        SizedBox(width: isMobile ? 4 : 10),
-                        InkWell(
-                          onTap: () =>
-                              AppConstants.openUrl(AppConstants.discordLink),
-                          borderRadius: BorderRadius.circular(16),
-                          child: Tooltip(
-                            message: 'Join our Discord community',
+                        Expanded(
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(6),
+                            onTap: isMobile
+                                ? () => context.go('/social')
+                                : null,
+                            splashColor: isMobile
+                                ? Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withAlpha(30)
+                                : null,
+                            highlightColor: isMobile
+                                ? Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withAlpha(20)
+                                : null,
                             child: Padding(
-                              padding: const EdgeInsets.all(8),
-                              child: Icon(
-                                Icons
-                                    .discord, // If you have a custom Discord icon, use it here
-                                color: Colors.indigo,
-                                size: 22,
+                              padding: const EdgeInsets.symmetric(vertical: 2),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Flexible(
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        'Social',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                      ),
+                                    ),
+                                  ),
+                                  if (!isMobile) ...[
+                                    const SizedBox(width: 8),
+                                    InkWell(
+                                      onTap: () => AppConstants.openUrl(
+                                        AppConstants.discordLink,
+                                      ),
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: Tooltip(
+                                        message: 'Join our Discord community',
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(6),
+                                          child: Icon(
+                                            Icons.discord,
+                                            color: Colors.indigo,
+                                            size: 22,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                  if (isMobile) ...[
+                                    const SizedBox(width: 6),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4),
+                                      child: Container(
+                                        width: 20,
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface.withAlpha(18),
+                                          border: Border.all(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withAlpha(38),
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          Icons.open_in_new,
+                                          size: 14,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge
+                                              ?.color
+                                              ?.withAlpha(210),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               ),
                             ),
                           ),
                         ),
+                        if (isMobile) ...[
+                          const SizedBox(width: 2),
+                          InkWell(
+                            onTap: () =>
+                                AppConstants.openUrl(AppConstants.discordLink),
+                            borderRadius: BorderRadius.circular(16),
+                            child: Tooltip(
+                              message: 'Join our Discord community',
+                              child: Padding(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.discord,
+                                  color: Colors.indigo,
+                                  size: 22,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -117,7 +213,8 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
               // Show loading/error/data below
               Expanded(
                 child: actionsAsync.when(
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                   error: (err, stack) => Center(
                     child: Text(
                       'Failed to load social activity',
@@ -129,12 +226,16 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                       return Center(
                         child: Text(
                           'No recent social activity.',
-                          style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 16,
+                          ),
                         ),
                       );
                     }
                     return initiativesMapAsync.when(
-                      loading: () => const Center(child: CircularProgressIndicator()),
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
                       error: (err, stack) => Center(
                         child: Text(
                           'Failed to load initiatives',

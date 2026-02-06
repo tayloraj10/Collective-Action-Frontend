@@ -24,8 +24,9 @@ class DashboardScreen extends ConsumerWidget {
       final currentUserNotifier = ref.read(currentUserProvider.notifier);
       Future.microtask(() async {
         try {
-          final appUser = await UserService()
-              .fetchUserByFirebaseID(userId: authUser.uid);
+          final appUser = await UserService().fetchUserByFirebaseID(
+            userId: authUser.uid,
+          );
           if (appUser != null) {
             await currentUserNotifier.setUser(appUser);
           }
@@ -51,60 +52,61 @@ class DashboardScreen extends ConsumerWidget {
           Container(
             padding: EdgeInsets.symmetric(
               horizontal: isMobile ? 8 : 16,
-              vertical: 12,
+              vertical: isMobile ? 0 : 12,
             ),
             child: isMobile
-                ? Row(
-                    children: [
-                      Expanded(
-                        child: NavigationButton(
-                          icon: Icons.trending_up,
-                          label: 'Initiatives',
-                          color: AppColors.lightBlue,
-                          onTap: () {
-                            context.go('/initiatives');
-                          },
-                          small: true,
-                        ),
-                      ),
-                      SizedBox(width: 4),
-                      Expanded(
-                        child: NavigationButton(
-                          icon: Icons.assignment_outlined,
-                          label: 'Projects',
-                          color: AppColors.errorRed,
-                          onTap: () {
-                            context.go('/projects');
-                          },
-                          small: true,
-                        ),
-                      ),
-                      SizedBox(width: 4),
-                      Expanded(
-                        child: NavigationButton(
-                          icon: Icons.map_outlined,
-                          label: 'Maps',
-                          color: AppColors.successGreen,
-                          onTap: () {
-                            context.go('/maps');
-                          },
-                          small: true,
-                        ),
-                      ),
-                      SizedBox(width: 4),
-                      Expanded(
-                        child: NavigationButton(
-                          icon: Icons.people_outline,
-                          label: 'Social',
-                          color: AppColors.warningOrange,
-                          onTap: () {
-                            context.go('/social');
-                          },
-                          small: true,
-                        ),
-                      ),
-                    ],
-                  )
+                ? null
+                //  Row(
+                //     children: [
+                //       Expanded(
+                //         child: NavigationButton(
+                //           icon: Icons.trending_up,
+                //           label: 'Initiatives',
+                //           color: AppColors.lightBlue,
+                //           onTap: () {
+                //             context.go('/initiatives');
+                //           },
+                //           small: true,
+                //         ),
+                //       ),
+                //       SizedBox(width: 4),
+                //       Expanded(
+                //         child: NavigationButton(
+                //           icon: Icons.assignment_outlined,
+                //           label: 'Projects',
+                //           color: AppColors.errorRed,
+                //           onTap: () {
+                //             context.go('/projects');
+                //           },
+                //           small: true,
+                //         ),
+                //       ),
+                //       SizedBox(width: 4),
+                //       Expanded(
+                //         child: NavigationButton(
+                //           icon: Icons.map_outlined,
+                //           label: 'Maps',
+                //           color: AppColors.successGreen,
+                //           onTap: () {
+                //             context.go('/maps');
+                //           },
+                //           small: true,
+                //         ),
+                //       ),
+                //       SizedBox(width: 4),
+                //       Expanded(
+                //         child: NavigationButton(
+                //           icon: Icons.people_outline,
+                //           label: 'Social',
+                //           color: AppColors.warningOrange,
+                //           onTap: () {
+                //             context.go('/social');
+                //           },
+                //           small: true,
+                //         ),
+                //       ),
+                //     ],
+                //   )
                 : SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -148,7 +150,7 @@ class DashboardScreen extends ConsumerWidget {
                     ),
                   ),
           ),
-          Divider(height: 1),
+          if (!isMobile) Divider(height: 1),
           // 4-Pane Layout
           Expanded(
             child: Padding(
