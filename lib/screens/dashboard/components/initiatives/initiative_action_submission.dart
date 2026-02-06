@@ -4,6 +4,7 @@ import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/providers/initiative_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
+import 'package:collective_action_frontend/services/actions_service.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -84,35 +85,35 @@ class InitiativeActionSubmissionState
     final int? amount = int.tryParse(_amountController.text);
     final user = ref.read(currentUserProvider).value;
     try {
-      // If photos are selected, upload them first and store the returned URLs
-      // on the action we create.
-      final photosService = PhotosService();
-      final imageUrls = <String>[];
-      if (_selectedPhotos.isNotEmpty) {
-        // The backend uses the path param for storage layout. We generate a
-        // unique grouping id so we can upload before the action exists.
-        final uploadGroupId =
-            'action_${user?.id ?? 'anon'}_${DateTime.now().microsecondsSinceEpoch}';
-        final uploaded = await photosService.uploadSubmissionPhotosBatch(
-          uploadGroupId,
-          _selectedPhotos,
-        );
-        if (uploaded == null || uploaded.isEmpty) {
-          throw Exception('Photo upload returned no URLs');
-        }
-        imageUrls.addAll(uploaded);
-      }
-
+      // Create the action first (no photos yet) so we have an action id to upload under.
       final action = ActionCreateSchema(
         actionType: ActionTypeValuesEnum.initiative.value,
         amount: amount as int,
-        imageUrls: imageUrls,
+        imageUrls: const [],
         linkedId: widget.initiative.id,
         userId: user?.id,
         date: _selectedDate,
       );
 
-      await notifier.createAction(action);
+      final created = await notifier.createAction(action);
+      if (created == null) {
+        throw Exception('Action creation returned no result');
+      }
+
+      // Upload photos under the action's UUID so they stay associated, then update the action with the URLs.
+      if (_selectedPhotos.isNotEmpty) {
+        final photosService = PhotosService();
+        final actionsService = ActionsService();
+        final uploaded = await photosService.uploadSubmissionPhotosBatch(
+          created.id,
+          _selectedPhotos,
+        );
+        if (uploaded == null || uploaded.isEmpty) {
+          throw Exception('Photo upload returned no URLs');
+        }
+        await actionsService.updateActionPhotos(created.id, uploaded);
+        await notifier.refresh();
+      }
       await featuredInitiatives.refresh();
       // Play sound on success (web-compatible)
       try {
@@ -263,7 +264,7 @@ class InitiativeActionSubmissionState
                           horizontal: horizontalPadding,
                         ),
                         itemCount: _selectedPhotos.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: gap),
+                        separatorBuilder: (_, _) => const SizedBox(width: gap),
                         itemBuilder: (context, index) {
                           final xFile = _selectedPhotos[index];
                           return Stack(

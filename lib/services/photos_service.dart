@@ -83,6 +83,17 @@ class PhotosService {
     }
   }
 
+  /// Delete all photos for a submission (e.g. action id). No-op if none exist.
+  Future<void> deleteAllSubmissionPhotos(String submissionId) async {
+    try {
+      await _api.deleteAllSubmissionPhotosPhotosSubmissionSubmissionIdDelete(
+        submissionId,
+      );
+    } catch (e) {
+      throw Exception('Failed to delete submission photos: $e');
+    }
+  }
+
   /// Upload multiple submission photos in one request. All images are sent to
   /// cloud storage; returns the list of public URLs (same order as [xFiles]).
   Future<List<String>?> uploadSubmissionPhotosBatch(

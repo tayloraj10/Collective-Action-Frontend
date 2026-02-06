@@ -9,6 +9,7 @@ import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/components/confirmation_dialog.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
+import 'package:collective_action_frontend/services/photos_service.dart';
 
 class InitiativeActionCard extends ConsumerWidget {
   final ActionSchema action;
@@ -255,6 +256,9 @@ class InitiativeActionCard extends ConsumerWidget {
               );
 
               try {
+                // Wipe photos from storage (action id is the submission id)
+                await PhotosService().deleteAllSubmissionPhotos(action.id);
+
                 // Delete the action (this already refreshes activeActionProvider)
                 await actionNotifier.deleteAction(action);
 
@@ -425,7 +429,7 @@ class _PhotoCarouselState extends State<_PhotoCarousel> {
                           180,
                         ),
                       ),
-                      onPressed: _canGoPrev ? _goToPrev : null,
+                      onPressed: _goToPrev,
                     ),
                   ),
                 ),
@@ -464,7 +468,7 @@ class _PhotoCarouselState extends State<_PhotoCarousel> {
                                       WebHtmlElementStrategy.prefer,
                                 ),
                                 fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Container(
+                                errorBuilder: (_, _, _) => Container(
                                   color: widget
                                       .theme
                                       .colorScheme
@@ -503,7 +507,7 @@ class _PhotoCarouselState extends State<_PhotoCarousel> {
                           180,
                         ),
                       ),
-                      onPressed: _canGoNext ? _goToNext : null,
+                      onPressed: _goToNext,
                     ),
                   ),
                 ),
@@ -686,7 +690,7 @@ class _PhotoViewerDialogState extends State<_PhotoViewerDialog> {
                                       WebHtmlElementStrategy.prefer,
                                 ),
                                 fit: BoxFit.contain,
-                                errorBuilder: (_, __, ___) => Center(
+                                errorBuilder: (_, _, _) => Center(
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [

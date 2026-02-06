@@ -31,6 +31,22 @@ class ActionsService {
     }
   }
 
+  /// Update only the photo URLs for an existing action (e.g. after uploading under action id).
+  Future<ActionSchema?> updateActionPhotos(
+    String actionId,
+    List<String> imageUrls,
+  ) async {
+    try {
+      final body = ActionPhotosUpdate(imageUrls: imageUrls);
+      return await _api.updateActionPhotosActionsActionIdPhotosPatch(
+        actionId,
+        body,
+      );
+    } catch (e) {
+      throw Exception('Failed to update action photos: $e');
+    }
+  }
+
   Future<ActionSchema?> deleteAction(ActionSchema action) async {
     try {
       return await _api.deleteActionActionsActionIdDelete(action.id);
