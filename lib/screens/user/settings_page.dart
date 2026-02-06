@@ -198,7 +198,6 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
           );
       if (!mounted) return;
       if (url != null) {
-        ref.read(databaseUserProvider(user.id!).notifier).refresh();
         await ref.read(userProvider(user.id!).notifier).refresh();
         final updated = ref.read(userProvider(user.id!)).value;
         if (updated != null && mounted) {
@@ -298,6 +297,13 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
 
     try {
       await ref.read(userProvider(user.id!).notifier).updateUser(userData);
+
+      // Refresh and update current user state
+      final updatedUser = ref.read(userProvider(user.id!)).value;
+      if (updatedUser != null) {
+        await ref.read(currentUserProvider.notifier).setUser(updatedUser);
+      }
+
       if (mounted) {
         // Keep _city, _state, _country in sync with saved location
         _city = city;
@@ -420,8 +426,10 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
             Icon(
               userType == UserType.person
                   ? Icons.person_outline
-                  : Icons.group_outlined,
-              color: Theme.of(context).colorScheme.primary,
+                  : Icons.groups_outlined,
+              color: userType == UserType.group
+                  ? Colors.green.shade700
+                  : Theme.of(context).colorScheme.primary,
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -707,10 +715,16 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                               borderRadius:
                                                   BorderRadius.circular(24),
                                               border: Border.all(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary
-                                                    .withAlpha(46),
+                                                color:
+                                                    (_userType ??
+                                                            UserType.person) ==
+                                                        UserType.group
+                                                    ? Colors.green.shade700
+                                                          .withAlpha(46)
+                                                    : Theme.of(context)
+                                                          .colorScheme
+                                                          .primary
+                                                          .withAlpha(46),
                                                 width: 1.2,
                                               ),
                                             ),
@@ -847,9 +861,9 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                                                     UserType
                                                                         .person) ==
                                                                 UserType.group
-                                                            ? Theme.of(context)
-                                                                  .colorScheme
-                                                                  .primary
+                                                            ? Colors
+                                                                  .green
+                                                                  .shade700
                                                                   .withAlpha(33)
                                                             : Colors
                                                                   .transparent,
@@ -877,11 +891,9 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                                                             .person) ==
                                                                     UserType
                                                                         .group
-                                                                ? Theme.of(
-                                                                        context,
-                                                                      )
-                                                                      .colorScheme
-                                                                      .primary
+                                                                ? Colors
+                                                                      .green
+                                                                      .shade700
                                                                 : Theme.of(
                                                                         context,
                                                                       )
@@ -906,11 +918,9 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                                                                               .person) ==
                                                                       UserType
                                                                           .group
-                                                                  ? Theme.of(
-                                                                          context,
-                                                                        )
-                                                                        .colorScheme
-                                                                        .primary
+                                                                  ? Colors
+                                                                        .green
+                                                                        .shade700
                                                                   : Theme.of(
                                                                           context,
                                                                         )

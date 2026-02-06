@@ -39,6 +39,7 @@ part 'api/statuses_api.dart';
 part 'api/users_api.dart';
 
 part 'model/action_create_schema.dart';
+part 'model/action_photos_update.dart';
 part 'model/action_schema.dart';
 part 'model/action_type_create.dart';
 part 'model/action_type_schema.dart';

@@ -15,7 +15,7 @@ class ActionCreateSchema {
   ActionCreateSchema({
     required this.actionType,
     required this.amount,
-    this.imageUrl,
+    this.imageUrls = const [],
     this.linkedId,
     this.userId,
     this.date,
@@ -25,7 +25,7 @@ class ActionCreateSchema {
 
   num amount;
 
-  String? imageUrl;
+  List<String>? imageUrls;
 
   String? linkedId;
 
@@ -37,7 +37,7 @@ class ActionCreateSchema {
   bool operator ==(Object other) => identical(this, other) || other is ActionCreateSchema &&
     other.actionType == actionType &&
     other.amount == amount &&
-    other.imageUrl == imageUrl &&
+    _deepEquality.equals(other.imageUrls, imageUrls) &&
     other.linkedId == linkedId &&
     other.userId == userId &&
     other.date == date;
@@ -47,22 +47,22 @@ class ActionCreateSchema {
     // ignore: unnecessary_parenthesis
     (actionType.hashCode) +
     (amount.hashCode) +
-    (imageUrl == null ? 0 : imageUrl!.hashCode) +
+    (imageUrls == null ? 0 : imageUrls!.hashCode) +
     (linkedId == null ? 0 : linkedId!.hashCode) +
     (userId == null ? 0 : userId!.hashCode) +
     (date == null ? 0 : date!.hashCode);
 
   @override
-  String toString() => 'ActionCreateSchema[actionType=$actionType, amount=$amount, imageUrl=$imageUrl, linkedId=$linkedId, userId=$userId, date=$date]';
+  String toString() => 'ActionCreateSchema[actionType=$actionType, amount=$amount, imageUrls=$imageUrls, linkedId=$linkedId, userId=$userId, date=$date]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'action_type'] = this.actionType;
       json[r'amount'] = this.amount;
-    if (this.imageUrl != null) {
-      json[r'image_url'] = this.imageUrl;
+    if (this.imageUrls != null) {
+      json[r'image_urls'] = this.imageUrls;
     } else {
-      json[r'image_url'] = null;
+      json[r'image_urls'] = null;
     }
     if (this.linkedId != null) {
       json[r'linked_id'] = this.linkedId;
@@ -103,7 +103,9 @@ class ActionCreateSchema {
       return ActionCreateSchema(
         actionType: mapValueOfType<String>(json, r'action_type')!,
         amount: num.parse('${json[r'amount']}'),
-        imageUrl: mapValueOfType<String>(json, r'image_url'),
+        imageUrls: json[r'image_urls'] is Iterable
+            ? (json[r'image_urls'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
         linkedId: mapValueOfType<String>(json, r'linked_id'),
         userId: mapValueOfType<String>(json, r'user_id'),
         date: mapDateTime(json, r'date', r''),

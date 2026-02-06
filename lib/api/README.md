@@ -70,6 +70,7 @@ Class | Method | HTTP request | Description
 *ActionsApi* | [**getActionsByLinkedActionsByLinkedLinkedIdGet**](doc//ActionsApi.md#getactionsbylinkedactionsbylinkedlinkedidget) | **GET** /actions/by_linked/{linked_id} | Get Actions By Linked
 *ActionsApi* | [**getLatestActionsActionsRecentGet**](doc//ActionsApi.md#getlatestactionsactionsrecentget) | **GET** /actions/recent | Get Latest Actions
 *ActionsApi* | [**listActionsActionsGet**](doc//ActionsApi.md#listactionsactionsget) | **GET** /actions/ | List Actions
+*ActionsApi* | [**updateActionPhotosActionsActionIdPhotosPatch**](doc//ActionsApi.md#updateactionphotosactionsactionidphotospatch) | **PATCH** /actions/{action_id}/photos | Update Action Photos
 *CategoriesApi* | [**createCategoryCategoriesPost**](doc//CategoriesApi.md#createcategorycategoriespost) | **POST** /categories/ | Create Category
 *CategoriesApi* | [**deleteCategoryCategoriesCategoryIdDelete**](doc//CategoriesApi.md#deletecategorycategoriescategoryiddelete) | **DELETE** /categories/{category_id} | Delete Category
 *CategoriesApi* | [**getCategoryCategoriesCategoryIdGet**](doc//CategoriesApi.md#getcategorycategoriescategoryidget) | **GET** /categories/{category_id} | Get Category
@@ -86,7 +87,7 @@ Class | Method | HTTP request | Description
 *PhotosApi* | [**deleteSubmissionPhotoPhotosSubmissionSubmissionIdPhotoFilenameDelete**](doc//PhotosApi.md#deletesubmissionphotophotossubmissionsubmissionidphotofilenamedelete) | **DELETE** /photos/submission/{submission_id}/{photo_filename} | Delete Submission Photo
 *PhotosApi* | [**listSubmissionPhotosPhotosSubmissionSubmissionIdGet**](doc//PhotosApi.md#listsubmissionphotosphotossubmissionsubmissionidget) | **GET** /photos/submission/{submission_id} | List Submission Photos
 *PhotosApi* | [**uploadProfilePhotoPhotosProfileUserIdPost**](doc//PhotosApi.md#uploadprofilephotophotosprofileuseridpost) | **POST** /photos/profile/{user_id} | Upload Profile Photo
-*PhotosApi* | [**uploadSubmissionPhotoPhotosSubmissionSubmissionIdPost**](doc//PhotosApi.md#uploadsubmissionphotophotossubmissionsubmissionidpost) | **POST** /photos/submission/{submission_id} | Upload Submission Photo
+*PhotosApi* | [**uploadSubmissionPhotosPhotosSubmissionSubmissionIdPost**](doc//PhotosApi.md#uploadsubmissionphotosphotossubmissionsubmissionidpost) | **POST** /photos/submission/{submission_id} | Upload Submission Photos
 *QuotesApi* | [**createQuoteQuotesPost**](doc//QuotesApi.md#createquotequotespost) | **POST** /quotes/ | Create Quote
 *QuotesApi* | [**deleteQuoteQuotesQuoteIdDelete**](doc//QuotesApi.md#deletequotequotesquoteiddelete) | **DELETE** /quotes/{quote_id} | Delete Quote
 *QuotesApi* | [**getQuoteQuotesQuoteIdGet**](doc//QuotesApi.md#getquotequotesquoteidget) | **GET** /quotes/{quote_id} | Get Quote
@@ -111,6 +112,7 @@ Class | Method | HTTP request | Description
 ## Documentation For Models
 
  - [ActionCreateSchema](doc//ActionCreateSchema.md)
+ - [ActionPhotosUpdate](doc//ActionPhotosUpdate.md)
  - [ActionSchema](doc//ActionSchema.md)
  - [ActionTypeCreate](doc//ActionTypeCreate.md)
  - [ActionTypeSchema](doc//ActionTypeSchema.md)

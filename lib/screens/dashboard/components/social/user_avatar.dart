@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
+import 'package:collective_action_frontend/screens/user/profile_page.dart';
 
 // https://lh3.googleusercontent.com/a/ACg8ocIV2QeitcIYoPelMu0S8akx0uu-xt6UDExyBx38cnc2533VJ5JpQA=s96-c
 // https://i.guim.co.uk/img/media/59c4e3f794184fec5ce5b56d2d856a9808fef52f/0_37_1600_960/master/1600.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=0c09500c89482620a8c98f4cf2ed8eb1
@@ -23,6 +24,10 @@ class UserAvatar extends ConsumerWidget {
   /// Use for e.g. app bar when logged in but current user data is still loading.
   final bool showLoadingWhenUserIdNull;
 
+  /// When true and [userId] is non-null, tapping the avatar opens a profile modal.
+  /// The modal includes a "View full profile" button that navigates to `/profile/:userId`.
+  final bool showProfileOnTap;
+
   const UserAvatar({
     super.key,
     required this.userId,
@@ -35,7 +40,12 @@ class UserAvatar extends ConsumerWidget {
     this.enableHero = false,
     this.heroTagSuffix,
     this.showLoadingWhenUserIdNull = false,
+    this.showProfileOnTap = false,
   });
+
+  void _openProfileModal(BuildContext context, String userId) {
+    ProfilePage.showProfileDialog(context, userId);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -56,12 +66,7 @@ class UserAvatar extends ConsumerWidget {
               radius: radius,
               isLoading: true,
             )
-          : _questionMarkAvatar(
-              accentColor,
-              radius,
-              isMobile,
-              context,
-            );
+          : _questionMarkAvatar(accentColor, radius, isMobile, context);
       if (showTooltip) {
         avatar = Tooltip(
           message: showLoadingWhenUserIdNull ? 'Loading…' : 'Anonymous',
@@ -71,7 +76,7 @@ class UserAvatar extends ConsumerWidget {
       return avatar;
     }
 
-    final userAsync = ref.watch(databaseUserProvider(userId!));
+    final userAsync = ref.watch(userProvider(userId!));
     return userAsync.when(
       loading: () {
         Widget avatar = _avatarContainer(
@@ -117,6 +122,11 @@ class UserAvatar extends ConsumerWidget {
         final hasName = user.name != null && user.name!.trim().isNotEmpty;
         final hasPhoto = user.photoUrl != null && user.photoUrl!.isNotEmpty;
         final firstLetter = hasName ? user.name!.trim()[0].toUpperCase() : null;
+        void handleTap() {
+          if (!showProfileOnTap) return;
+          _openProfileModal(context, userId!);
+        }
+
         // Case 1: user has photo and name
         if (hasPhoto && hasName) {
           Widget avatar = _avatarContainer(
@@ -137,60 +147,12 @@ class UserAvatar extends ConsumerWidget {
                 child: avatar,
               ),
             );
-            avatar = GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  barrierDismissible: true,
-                  builder: (context) => Dialog(
-                    backgroundColor: Colors.transparent,
-                    insetPadding: const EdgeInsets.all(16),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Positioned.fill(
-                          child: GestureDetector(
-                            onTap: () => Navigator.of(context).pop(),
-                            child: Container(color: Colors.transparent),
-                          ),
-                        ),
-                        Hero(
-                          tag: heroTag,
-                          child: SizedBox(
-                            width: 180,
-                            height: 180,
-                            child: ClipOval(
-                              child: Image(
-                                image: NetworkImage(
-                                  user.photoUrl!,
-                                  webHtmlElementStrategy:
-                                      WebHtmlElementStrategy.prefer,
-                                ),
-                                fit: BoxFit.cover,
-                                width: 180,
-                                height: 180,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Container(
-                                      color: cardColor,
-                                      width: 180,
-                                      height: 180,
-                                      child: Icon(
-                                        Icons.error_outline,
-                                        color: accentColor,
-                                        size: 60,
-                                      ),
-                                    ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-              child: avatar,
-            );
+            if (showProfileOnTap) {
+              avatar = GestureDetector(onTap: handleTap, child: avatar);
+            }
+          }
+          if (showProfileOnTap && !enableHero) {
+            avatar = GestureDetector(onTap: handleTap, child: avatar);
           }
           if (showTooltip) {
             avatar = Tooltip(message: user.name!, child: avatar);
@@ -217,60 +179,12 @@ class UserAvatar extends ConsumerWidget {
                 child: avatar,
               ),
             );
-            avatar = GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  barrierDismissible: true,
-                  builder: (context) => Dialog(
-                    backgroundColor: Colors.transparent,
-                    insetPadding: const EdgeInsets.all(16),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Positioned.fill(
-                          child: GestureDetector(
-                            onTap: () => Navigator.of(context).pop(),
-                            child: Container(color: Colors.transparent),
-                          ),
-                        ),
-                        Hero(
-                          tag: heroTag,
-                          child: SizedBox(
-                            width: 180,
-                            height: 180,
-                            child: ClipOval(
-                              child: Image(
-                                image: NetworkImage(
-                                  user.photoUrl!,
-                                  webHtmlElementStrategy:
-                                      WebHtmlElementStrategy.prefer,
-                                ),
-                                fit: BoxFit.cover,
-                                width: 180,
-                                height: 180,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Container(
-                                      color: cardColor,
-                                      width: 180,
-                                      height: 180,
-                                      child: Icon(
-                                        Icons.error_outline,
-                                        color: accentColor,
-                                        size: 60,
-                                      ),
-                                    ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-              child: avatar,
-            );
+            if (showProfileOnTap) {
+              avatar = GestureDetector(onTap: handleTap, child: avatar);
+            }
+          }
+          if (showProfileOnTap && !enableHero) {
+            avatar = GestureDetector(onTap: handleTap, child: avatar);
           }
           if (showTooltip) {
             avatar = Tooltip(message: 'Name Unknown', child: avatar);
@@ -300,6 +214,9 @@ class UserAvatar extends ConsumerWidget {
           if (showTooltip) {
             avatar = Tooltip(message: user.name!, child: avatar);
           }
+          if (showProfileOnTap) {
+            avatar = GestureDetector(onTap: handleTap, child: avatar);
+          }
           return avatar;
         }
         // Case 4: user has no photo and no name
@@ -312,6 +229,9 @@ class UserAvatar extends ConsumerWidget {
           );
           if (showTooltip) {
             avatar = Tooltip(message: 'Name Unknown', child: avatar);
+          }
+          if (showProfileOnTap) {
+            avatar = GestureDetector(onTap: handleTap, child: avatar);
           }
           return avatar;
         }
@@ -390,7 +310,7 @@ class UserAvatar extends ConsumerWidget {
                           strokeWidth: 2,
                           value: loadingProgress.expectedTotalBytes != null
                               ? loadingProgress.cumulativeBytesLoaded /
-                                  (loadingProgress.expectedTotalBytes ?? 1)
+                                    (loadingProgress.expectedTotalBytes ?? 1)
                               : null,
                         ),
                       ),
