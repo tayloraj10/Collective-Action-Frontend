@@ -20,11 +20,17 @@ class InitiativeActionCard extends ConsumerWidget {
   /// horizontally scrolling lists to avoid infinite width constraints).
   final bool expandToFullWidth;
 
+  /// Called after an action is successfully deleted, with the linked initiative id.
+  /// Use this to invalidate linked-action lists (e.g. [actionsByLinkedProvider])
+  /// from a parent that stays mounted (e.g. initiative list screen).
+  final void Function(String initiativeId)? onActionDeleted;
+
   const InitiativeActionCard({
     super.key,
     required this.action,
     this.initiative,
     this.expandToFullWidth = true,
+    this.onActionDeleted,
   });
 
   @override
@@ -248,8 +254,9 @@ class InitiativeActionCard extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         label: GestureDetector(
           onTap: () async {
-            // Store ScaffoldMessenger before showing dialog to ensure it's available after
+            // Capture before any async work so we can safely invalidate after delete
             final scaffoldMessenger = ScaffoldMessenger.of(context);
+            final linkedId = linkedInitiative?.id;
 
             final confirm = await showDialog<bool>(
               context: context,
@@ -279,6 +286,14 @@ class InitiativeActionCard extends ConsumerWidget {
                 // Refresh featured initiatives provider to update initiative totals
                 await featuredInitiativesNotifier.refresh();
                 await activeInitiativesNotifier.refresh();
+
+                // Notify parent so it can invalidate linked-actions (keeps Recent Actions in sync).
+                if (linkedId != null) {
+                  onActionDeleted?.call(linkedId);
+                  ref.invalidate(
+                    actionsByLinkedProvider((linkedId, 7)),
+                  );
+                }
 
                 // Show success snackbar using stored ScaffoldMessenger
                 scaffoldMessenger.showSnackBar(

@@ -473,6 +473,15 @@ class _InitiativeListScreenState extends ConsumerState<InitiativeListScreen> {
                                                                   initiative,
                                                               expandToFullWidth:
                                                                   false,
+                                                              onActionDeleted:
+                                                                  (initiativeId) {
+                                                                ref.invalidate(
+                                                                  actionsByLinkedProvider((
+                                                                    initiativeId,
+                                                                    7,
+                                                                  )),
+                                                                );
+                                                              },
                                                             ),
                                                       );
                                                     },
