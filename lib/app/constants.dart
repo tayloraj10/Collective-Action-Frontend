@@ -1,7 +1,6 @@
 import 'dart:math';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // App-wide constants
@@ -35,32 +34,37 @@ class AppConstants {
     }
   }
 
-  /// Picks a random success sound and returns the correct `Source` for the
-  /// current platform.
-  /// - Web: uses UrlSource with Uri.base.resolve() for correct URL resolution
-  ///   (works locally and when deployed with any base href)
-  /// - Mobile/Desktop: uses AssetSource
-  static ({Source source, Duration maxDuration}) randomSuccessSoundSource({
+  static const List<String> _successSounds = <String>[
+    'assets/sounds/crab_rave.mp3',
+    'assets/sounds/higher.mp3',
+  ];
+
+  /// Picks a random success sound asset path and max duration.
+  static ({String path, Duration maxDuration}) randomSuccessSoundSource({
     Random? random,
     Duration maxDuration = const Duration(seconds: 10),
   }) {
     final rng = random ?? Random();
-    const List<String> successSounds = <String>[
-      'assets/sounds/crab_rave.mp3',
-      'assets/sounds/higher.mp3',
-    ];
-    if (successSounds.isEmpty) {
-      return (
-        source: kIsWeb
-            ? UrlSource(Uri.base.resolve('assets/sounds/crab_rave.mp3').toString())
-            : AssetSource('assets/sounds/crab_rave.mp3'),
-        maxDuration: maxDuration,
-      );
+    final path = _successSounds[rng.nextInt(_successSounds.length)];
+    return (path: path, maxDuration: maxDuration);
+  }
+
+  /// Convenience helper to play a random success sound once.
+  ///
+  /// Swallows any audio errors so it is safe to call from
+  /// anywhere without impacting UX if audio fails.
+  static Future<void> playRandomSuccessSound() async {
+    try {
+      final player = AudioPlayer();
+      final (:path, :maxDuration) = randomSuccessSoundSource();
+      await player.setAsset(path);
+      await player.play();
+      Future.delayed(maxDuration, () async {
+        await player.stop();
+        await player.dispose();
+      });
+    } catch (_) {
+      // Intentionally ignore audio errors
     }
-    final path = successSounds[rng.nextInt(successSounds.length)];
-    final source = kIsWeb
-        ? UrlSource(Uri.base.resolve(path).toString())
-        : AssetSource(path);
-    return (source: source, maxDuration: maxDuration);
   }
 }
