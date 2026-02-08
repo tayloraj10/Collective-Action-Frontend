@@ -1,3 +1,4 @@
+import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
 import 'package:collective_action_frontend/providers/initiative_provider.dart';
@@ -358,84 +359,119 @@ class _InitiativeListScreenState extends ConsumerState<InitiativeListScreen> {
                               ),
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: cardColor.withAlpha(30),
+                                  color: cardColor.withAlpha(25),
                                   borderRadius: BorderRadius.circular(
-                                    isMobile ? 8 : 12,
+                                    isMobile ? 10 : 14,
                                   ),
                                   border: Border.all(
-                                    color: cardColor.withAlpha(80),
-                                    width: 1,
+                                    color: cardColor.withAlpha(100),
+                                    width: 1.5,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: cardColor.withAlpha(40),
-                                      blurRadius: isMobile ? 4 : 6,
+                                      color: cardColor.withAlpha(50),
+                                      blurRadius: isMobile ? 6 : 8,
                                       offset: const Offset(0, 2),
+                                      spreadRadius: 0,
                                     ),
                                   ],
                                 ),
-                                padding: EdgeInsets.all(isMobile ? 8 : 12),
+                                clipBehavior: Clip.antiAlias,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    // Label/header with toggle button
-                                    InkWell(
-                                      onTap: () =>
-                                          _toggleActions(initiative.id),
-                                      borderRadius: BorderRadius.circular(6),
-                                      child: Padding(
-                                        padding: EdgeInsets.only(
-                                          bottom: isMobile ? 6 : 8,
-                                          left: isMobile ? 4 : 6,
-                                          right: isMobile ? 4 : 6,
-                                        ),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.article_outlined,
-                                              size: isMobile ? 14 : 16,
-                                              color: Colors.white.withAlpha(
-                                                200,
+                                    // Header row: label + count badge + expand/collapse
+                                    Material(
+                                      color: cardColor.withAlpha(45),
+                                      child: InkWell(
+                                        onTap: () =>
+                                            _toggleActions(initiative.id),
+                                        borderRadius: BorderRadius.zero,
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: isMobile ? 10 : 14,
+                                            vertical: isMobile ? 8 : 10,
+                                          ),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.history_rounded,
+                                                size: isMobile ? 18 : 20,
+                                                color: Colors.white.withAlpha(
+                                                  230,
+                                                ),
                                               ),
-                                            ),
-                                            SizedBox(width: isMobile ? 6 : 8),
-                                            Expanded(
-                                              child: Text(
-                                                'Recent Actions (${actions.length})',
-                                                style: TextStyle(
+                                              SizedBox(
+                                                width: isMobile ? 8 : 10,
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  'Recent actions',
+                                                  style: TextStyle(
+                                                    color: Colors.white
+                                                        .withAlpha(240),
+                                                    fontSize: isMobile
+                                                        ? 12
+                                                        : 13,
+                                                    fontWeight: FontWeight.w600,
+                                                    letterSpacing: 0.15,
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: isMobile ? 6 : 8,
+                                                  vertical: isMobile ? 2 : 3,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white.withAlpha(
+                                                    35,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                  border: Border.all(
+                                                    color: Colors.white
+                                                        .withAlpha(80),
+                                                    width: 1,
+                                                  ),
+                                                ),
+                                                child: Text(
+                                                  '${actions.length}',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: isMobile
+                                                        ? 11
+                                                        : 12,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(width: isMobile ? 6 : 8),
+                                              AnimatedRotation(
+                                                turns:
+                                                    _isCollapsed(initiative.id)
+                                                    ? 0.5
+                                                    : 0,
+                                                duration: const Duration(
+                                                  milliseconds: 200,
+                                                ),
+                                                child: Icon(
+                                                  Icons.expand_less_rounded,
+                                                  size: isMobile ? 22 : 24,
                                                   color: Colors.white.withAlpha(
                                                     220,
                                                   ),
-                                                  fontSize: isMobile ? 11 : 12,
-                                                  fontWeight: FontWeight.w600,
-                                                  letterSpacing: 0.2,
                                                 ),
                                               ),
-                                            ),
-                                            AnimatedRotation(
-                                              turns: _isCollapsed(initiative.id)
-                                                  ? 0.5
-                                                  : 0,
-                                              duration: const Duration(
-                                                milliseconds: 200,
-                                              ),
-                                              child: Icon(
-                                                Icons.expand_less,
-                                                size: isMobile ? 18 : 20,
-                                                color: Colors.white.withAlpha(
-                                                  200,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
-                                    // Actions scrollable list (collapsible)
+                                    // Actions list (collapsible)
                                     AnimatedSize(
                                       duration: const Duration(
                                         milliseconds: 200,
@@ -444,49 +480,25 @@ class _InitiativeListScreenState extends ConsumerState<InitiativeListScreen> {
                                       clipBehavior: Clip.hardEdge,
                                       child: _isCollapsed(initiative.id)
                                           ? const SizedBox.shrink()
-                                          : SizedBox(
-                                              height: isMobile ? 150 : 150,
-                                              child: SingleChildScrollView(
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: List.generate(
-                                                    actions.length,
-                                                    (actionIdx) {
-                                                      final action =
-                                                          actions[actionIdx];
-                                                      return Padding(
-                                                        padding: EdgeInsets.only(
-                                                          right:
-                                                              actionIdx <
-                                                                  actions.length -
-                                                                      1
-                                                              ? spacing / 2
-                                                              : 0,
+                                          : Padding(
+                                              padding: EdgeInsets.only(
+                                                left: isMobile ? 6 : 8,
+                                                right: isMobile ? 6 : 8,
+                                                bottom: isMobile ? 8 : 10,
+                                                top: 4,
+                                              ),
+                                              child: _RecentActionsScroll(
+                                                actions: actions,
+                                                initiative: initiative,
+                                                isMobile: isMobile,
+                                                onActionDeleted:
+                                                    (initiativeId) {
+                                                      ref.invalidate(
+                                                        actionsByLinkedProvider(
+                                                          (initiativeId, 7),
                                                         ),
-                                                        child:
-                                                            InitiativeActionCard(
-                                                              action: action,
-                                                              initiative:
-                                                                  initiative,
-                                                              expandToFullWidth:
-                                                                  false,
-                                                              onActionDeleted:
-                                                                  (initiativeId) {
-                                                                ref.invalidate(
-                                                                  actionsByLinkedProvider((
-                                                                    initiativeId,
-                                                                    7,
-                                                                  )),
-                                                                );
-                                                              },
-                                                            ),
                                                       );
                                                     },
-                                                  ),
-                                                ),
                                               ),
                                             ),
                                     ),
@@ -504,6 +516,73 @@ class _InitiativeListScreenState extends ConsumerState<InitiativeListScreen> {
             },
           );
         },
+      ),
+    );
+  }
+}
+
+/// Horizontal scrollable list of action cards with a scrollbar.
+/// Owns a [ScrollController] so the scrollbar attaches correctly.
+class _RecentActionsScroll extends StatefulWidget {
+  const _RecentActionsScroll({
+    required this.actions,
+    required this.initiative,
+    required this.isMobile,
+    required this.onActionDeleted,
+  });
+
+  final List<ActionSchema> actions;
+  final InitiativeSchema initiative;
+  final bool isMobile;
+  final void Function(String initiativeId) onActionDeleted;
+
+  @override
+  State<_RecentActionsScroll> createState() => _RecentActionsScrollState();
+}
+
+class _RecentActionsScrollState extends State<_RecentActionsScroll> {
+  late final ScrollController _horizontalController;
+
+  @override
+  void initState() {
+    super.initState();
+    _horizontalController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _horizontalController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final actions = widget.actions;
+    final initiative = widget.initiative;
+    final isMobile = widget.isMobile;
+
+    return SizedBox(
+      height: 150,
+      child: Scrollbar(
+        controller: _horizontalController,
+        thumbVisibility: !isMobile,
+        child: SingleChildScrollView(
+          controller: _horizontalController,
+          scrollDirection: Axis.horizontal,
+          padding: EdgeInsets.only(right: isMobile ? 4 : 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: List.generate(actions.length, (actionIdx) {
+              final action = actions[actionIdx];
+              return InitiativeActionCard(
+                action: action,
+                initiative: initiative,
+                expandToFullWidth: false,
+                onActionDeleted: widget.onActionDeleted,
+              );
+            }),
+          ),
+        ),
       ),
     );
   }
