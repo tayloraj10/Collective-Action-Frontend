@@ -53,9 +53,7 @@ class InitiativeActionCard extends ConsumerWidget {
     // When expandToFullWidth is false (e.g. horizontal list), always use finite width
     // so the card gets bounded width and Row/Expanded inside don't get unbounded constraints.
     Widget card = Container(
-      width: expandToFullWidth
-          ? (isMobile ? double.infinity : 180)
-          : 180,
+      width: expandToFullWidth ? (isMobile ? double.infinity : 180) : 180,
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
       decoration: BoxDecoration(
         color: cardColor,
@@ -290,9 +288,7 @@ class InitiativeActionCard extends ConsumerWidget {
                 // Notify parent so it can invalidate linked-actions (keeps Recent Actions in sync).
                 if (linkedId != null) {
                   onActionDeleted?.call(linkedId);
-                  ref.invalidate(
-                    actionsByLinkedProvider((linkedId, 7)),
-                  );
+                  ref.invalidate(actionsByLinkedProvider((linkedId, 7)));
                 }
 
                 // Show success snackbar using stored ScaffoldMessenger
@@ -662,7 +658,7 @@ class _PhotoViewerDialogState extends State<_PhotoViewerDialog> {
                                   ),
                                   onPressed: () => Navigator.of(context).pop(),
                                 ),
-                                if (hasMultiple) const SizedBox(width: 24),
+                                if (hasMultiple) const SizedBox(width: 4),
                                 hasMultiple
                                     ? Center(
                                         child: Text(
@@ -675,9 +671,6 @@ class _PhotoViewerDialogState extends State<_PhotoViewerDialog> {
                                         ),
                                       )
                                     : const SizedBox.shrink(),
-                                const SizedBox(
-                                  width: 48,
-                                ), // balance close button
                               ],
                             );
                           }
