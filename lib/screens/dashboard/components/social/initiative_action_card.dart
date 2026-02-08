@@ -14,10 +14,23 @@ import 'package:collective_action_frontend/services/photos_service.dart';
 class InitiativeActionCard extends ConsumerWidget {
   final ActionSchema action;
   final InitiativeSchema? initiative;
+
+  /// When true (default), the card expands to full width on mobile.
+  /// When false, the card uses its intrinsic width (important for
+  /// horizontally scrolling lists to avoid infinite width constraints).
+  final bool expandToFullWidth;
+
+  /// Called after an action is successfully deleted, with the linked initiative id.
+  /// Use this to invalidate linked-action lists (e.g. [actionsByLinkedProvider])
+  /// from a parent that stays mounted (e.g. initiative list screen).
+  final void Function(String initiativeId)? onActionDeleted;
+
   const InitiativeActionCard({
     super.key,
     required this.action,
     this.initiative,
+    this.expandToFullWidth = true,
+    this.onActionDeleted,
   });
 
   @override
@@ -37,8 +50,12 @@ class InitiativeActionCard extends ConsumerWidget {
 
     InitiativeSchema? linkedInitiative = initiative;
 
+    // When expandToFullWidth is false (e.g. horizontal list), always use finite width
+    // so the card gets bounded width and Row/Expanded inside don't get unbounded constraints.
     Widget card = Container(
-      width: isMobile ? double.infinity : 180,
+      width: expandToFullWidth
+          ? (isMobile ? double.infinity : 180)
+          : 180,
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
       decoration: BoxDecoration(
         color: cardColor,
@@ -237,8 +254,9 @@ class InitiativeActionCard extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         label: GestureDetector(
           onTap: () async {
-            // Store ScaffoldMessenger before showing dialog to ensure it's available after
+            // Capture before any async work so we can safely invalidate after delete
             final scaffoldMessenger = ScaffoldMessenger.of(context);
+            final linkedId = linkedInitiative?.id;
 
             final confirm = await showDialog<bool>(
               context: context,
@@ -254,6 +272,9 @@ class InitiativeActionCard extends ConsumerWidget {
               final featuredInitiativesNotifier = ref.read(
                 featuredInitiativeProvider.notifier,
               );
+              final activeInitiativesNotifier = ref.read(
+                activeInitiativeProvider.notifier,
+              );
 
               try {
                 // Wipe photos from storage (action id is the submission id)
@@ -264,6 +285,15 @@ class InitiativeActionCard extends ConsumerWidget {
 
                 // Refresh featured initiatives provider to update initiative totals
                 await featuredInitiativesNotifier.refresh();
+                await activeInitiativesNotifier.refresh();
+
+                // Notify parent so it can invalidate linked-actions (keeps Recent Actions in sync).
+                if (linkedId != null) {
+                  onActionDeleted?.call(linkedId);
+                  ref.invalidate(
+                    actionsByLinkedProvider((linkedId, 7)),
+                  );
+                }
 
                 // Show success snackbar using stored ScaffoldMessenger
                 scaffoldMessenger.showSnackBar(
@@ -349,7 +379,10 @@ class _PhotoCarouselState extends State<_PhotoCarousel> {
   static const double _thumbSize = 36;
   static const double _gap = 12;
   late ScrollController _scrollController;
-  void _onScroll() => setState(() {});
+  void _onScroll() {
+    if (!mounted) return;
+    setState(() {});
+  }
 
   double get _itemWidth => _thumbSize + _gap;
 

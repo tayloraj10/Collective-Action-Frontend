@@ -142,7 +142,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getActionsByLinkedActionsByLinkedLinkedIdGet**
-> List<ActionSchema> getActionsByLinkedActionsByLinkedLinkedIdGet(linkedId)
+> List<ActionSchema> getActionsByLinkedActionsByLinkedLinkedIdGet(linkedId, days)
 
 Get Actions By Linked
 
@@ -152,9 +152,10 @@ import 'package:collective_action_api/api.dart';
 
 final api_instance = ActionsApi();
 final linkedId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final days = 56; // int | Only return actions from the last N days
 
 try {
-    final result = api_instance.getActionsByLinkedActionsByLinkedLinkedIdGet(linkedId);
+    final result = api_instance.getActionsByLinkedActionsByLinkedLinkedIdGet(linkedId, days);
     print(result);
 } catch (e) {
     print('Exception when calling ActionsApi->getActionsByLinkedActionsByLinkedLinkedIdGet: $e\n');
@@ -166,6 +167,7 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **linkedId** | **String**|  | 
+ **days** | **int**| Only return actions from the last N days | [optional] 
 
 ### Return type
 

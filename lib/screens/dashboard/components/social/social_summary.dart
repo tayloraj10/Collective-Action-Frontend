@@ -198,7 +198,7 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                                 child: Icon(
                                   Icons.discord,
                                   color: Colors.indigo,
-                                  size: 22,
+                                  size: 24,
                                 ),
                               ),
                             ),
@@ -289,24 +289,29 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                 child: SingleChildScrollView(
                   controller: scrollController,
                   scrollDirection: Axis.vertical,
-                  child: Wrap(
-                    alignment: WrapAlignment.start,
-                    spacing: 0,
-                    runSpacing: 0,
-                    children: List.generate(sortedActions.length, (idx) {
-                      final action = sortedActions[idx];
-                      InitiativeSchema? initiative;
-                      if (action.actionType ==
-                              ActionTypeValuesEnum.initiative.value &&
-                          action.linkedId != null &&
-                          action.linkedId!.isNotEmpty) {
-                        initiative = initiativesMap[action.linkedId!];
-                      }
-                      return InitiativeActionCard(
-                        action: action,
-                        initiative: initiative,
-                      );
-                    }),
+                  child: ConstrainedBox(
+                    // Force the wrapped actions to take at least the full
+                    // available width so the scrollbar sits at the far right.
+                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                    child: Wrap(
+                      alignment: WrapAlignment.start,
+                      spacing: 0,
+                      runSpacing: 0,
+                      children: List.generate(sortedActions.length, (idx) {
+                        final action = sortedActions[idx];
+                        InitiativeSchema? initiative;
+                        if (action.actionType ==
+                                ActionTypeValuesEnum.initiative.value &&
+                            action.linkedId != null &&
+                            action.linkedId!.isNotEmpty) {
+                          initiative = initiativesMap[action.linkedId!];
+                        }
+                        return InitiativeActionCard(
+                          action: action,
+                          initiative: initiative,
+                        );
+                      }),
+                    ),
                   ),
                 ),
               ),

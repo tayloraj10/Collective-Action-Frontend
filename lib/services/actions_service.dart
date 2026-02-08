@@ -54,4 +54,18 @@ class ActionsService {
       throw Exception('Failed to create action: $e');
     }
   }
+
+  Future<List<ActionSchema>?> fetchActionsByLinked(
+    String linkedId, {
+    int? days,
+  }) async {
+    try {
+      return await _api.getActionsByLinkedActionsByLinkedLinkedIdGet(
+        linkedId,
+        days: days,
+      );
+    } catch (e) {
+      throw Exception('Failed to fetch actions by linked: $e');
+    }
+  }
 }

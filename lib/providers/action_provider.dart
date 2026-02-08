@@ -7,6 +7,19 @@ final activeActionProvider =
       ActiveActionNotifier.new,
     );
 
+/// Fetches actions for a linked entity (e.g. initiative).
+/// [params] is (linkedId, days?). Pass null for days to get all actions.
+final actionsByLinkedProvider =
+    FutureProvider.family<List<ActionSchema>, (String, int?)>(
+      (ref, params) async {
+        final (linkedId, days) = params;
+        return await ActionsService().fetchActionsByLinked(
+          linkedId,
+          days: days,
+        ) ?? [];
+      },
+    );
+
 class ActiveActionNotifier extends AsyncNotifier<List<ActionSchema>> {
   int? days;
   ActionTypeValuesEnum? actionType;

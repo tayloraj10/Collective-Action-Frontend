@@ -63,61 +63,93 @@ class InitiativeCard extends StatelessWidget {
         containerPadding,
         containerPadding,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Text(
-                  initiative.title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: titleFontSize,
-                    letterSpacing: 0.1,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final hasBoundedHeight = constraints.maxHeight.isFinite;
+          final reserveHeight = progressHeight + (isMobile ? 12 : 16);
+
+          Widget contentColumn() => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          initiative.title,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: titleFontSize,
+                            letterSpacing: 0.1,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      InitiativeSubmissionButton(initiative: initiative),
+                    ],
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                  if (initiative.link != null &&
+                      initiative.link!.isNotEmpty)
+                    GestureDetector(
+                      onTap: () async {
+                        final url = initiative.link!;
+                        AppConstants.openUrl(url);
+                      },
+                      child: LinkText(
+                        text: initiative.link!,
+                        fontSize: descFontSize,
+                        color: AppColors.blueAccent,
+                      ),
+                    ),
+                  if (!hasBoundedHeight) SizedBox(height: reserveHeight),
+                ],
+              );
+
+          return Stack(
+            children: [
+              if (hasBoundedHeight)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  bottom: progressHeight,
+                  child: SingleChildScrollView(
+                    clipBehavior: Clip.hardEdge,
+                    child: contentColumn(),
+                  ),
+                )
+              else
+                contentColumn(),
+
+              // Pinned bottom progress bar (no flex widgets required).
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: LinearPercentIndicator(
+                  animation: true,
+                  lineHeight: progressHeight,
+                  animationDuration: 1200,
+                  percent: progress.toDouble(),
+                  center: Text(
+                    '${(progress * 100).toStringAsFixed(2)}%',
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w600,
+                      fontSize: progressFontSize,
+                    ),
+                  ),
+                  progressColor: Colors.white,
+                  backgroundColor: Colors.white.withAlpha(46),
+                  barRadius: Radius.circular(24),
                 ),
               ),
-              InitiativeSubmissionButton(initiative: initiative),
             ],
-          ),
-          if (initiative.link != null && initiative.link!.isNotEmpty) ...[
-            // SizedBox(height: isMobile ? 2 : 4),
-            GestureDetector(
-              onTap: () async {
-                final url = initiative.link!;
-                AppConstants.openUrl(url);
-              },
-              child: LinkText(
-                text: initiative.link!,
-                fontSize: descFontSize,
-                color: AppColors.blueAccent,
-              ),
-            ),
-          ],
-          isMobile ? SizedBox(height: isMobile ? 8 : 12) : Spacer(),
-          LinearPercentIndicator(
-            animation: true,
-            lineHeight: progressHeight,
-            animationDuration: 1200,
-            percent: progress.toDouble(),
-            center: Text(
-              '${(progress * 100).toStringAsFixed(2)}%',
-              style: TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.w600,
-                fontSize: progressFontSize,
-              ),
-            ),
-            progressColor: Colors.white,
-            backgroundColor: Colors.white.withAlpha(46),
-            barRadius: Radius.circular(24),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

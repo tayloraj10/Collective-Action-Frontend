@@ -181,7 +181,10 @@ class ActionsApi {
   /// Parameters:
   ///
   /// * [String] linkedId (required):
-  Future<Response> getActionsByLinkedActionsByLinkedLinkedIdGetWithHttpInfo(String linkedId,) async {
+  ///
+  /// * [int] days:
+  ///   Only return actions from the last N days
+  Future<Response> getActionsByLinkedActionsByLinkedLinkedIdGetWithHttpInfo(String linkedId, { int? days, }) async {
     // ignore: prefer_const_declarations
     final path = r'/actions/by_linked/{linked_id}'
       .replaceAll('{linked_id}', linkedId);
@@ -192,6 +195,10 @@ class ActionsApi {
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
     final formParams = <String, String>{};
+
+    if (days != null) {
+      queryParams.addAll(_queryParams('', 'days', days));
+    }
 
     const contentTypes = <String>[];
 
@@ -212,8 +219,11 @@ class ActionsApi {
   /// Parameters:
   ///
   /// * [String] linkedId (required):
-  Future<List<ActionSchema>?> getActionsByLinkedActionsByLinkedLinkedIdGet(String linkedId,) async {
-    final response = await getActionsByLinkedActionsByLinkedLinkedIdGetWithHttpInfo(linkedId,);
+  ///
+  /// * [int] days:
+  ///   Only return actions from the last N days
+  Future<List<ActionSchema>?> getActionsByLinkedActionsByLinkedLinkedIdGet(String linkedId, { int? days, }) async {
+    final response = await getActionsByLinkedActionsByLinkedLinkedIdGetWithHttpInfo(linkedId,  days: days, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:image_picker/image_picker.dart';
 
 class InitiativeActionSubmission extends ConsumerStatefulWidget {
@@ -82,6 +81,7 @@ class InitiativeActionSubmissionState
     _formKey.currentState!.save();
     final notifier = ref.read(activeActionProvider.notifier);
     final featuredInitiatives = ref.read(featuredInitiativeProvider.notifier);
+    final activeInitiatives = ref.read(activeInitiativeProvider.notifier);
     final int? amount = int.tryParse(_amountController.text);
     final user = ref.read(currentUserProvider).value;
     try {
@@ -112,19 +112,19 @@ class InitiativeActionSubmissionState
           throw Exception('Photo upload returned no URLs');
         }
         await actionsService.updateActionPhotos(created.id, uploaded);
+        // Refresh global actions list after photo update
         await notifier.refresh();
       }
+      // Refresh initiative data used across the app:
+      // - featuredInitiativeProvider drives dashboard widgets
+      // - activeInitiativeProvider drives the full initiatives list screen
       await featuredInitiatives.refresh();
+      await activeInitiatives.refresh();
+      // Refresh linked action lists (e.g. recent actions under an initiative)
+      // using the same days window as the initiatives list screen (7 days).
+      ref.invalidate(actionsByLinkedProvider((widget.initiative.id, 7)));
       // Play sound on success (web-compatible)
-      try {
-        final audioPlayer = AudioPlayer();
-        audioPlayer.setReleaseMode(ReleaseMode.release);
-        final (:source, :maxDuration) = AppConstants.randomSuccessSoundSource();
-        audioPlayer.play(source);
-        Future.delayed(maxDuration, () => audioPlayer.stop());
-      } catch (e) {
-        // Ignore sound errors
-      }
+      AppConstants.playRandomSuccessSound();
       if (mounted) {
         Navigator.of(context).pop(true);
         ScaffoldMessenger.of(
