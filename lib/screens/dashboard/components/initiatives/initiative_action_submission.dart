@@ -124,7 +124,7 @@ class InitiativeActionSubmissionState
       // using the same days window as the initiatives list screen (7 days).
       ref.invalidate(actionsByLinkedProvider((widget.initiative.id, 7)));
       // Play sound on success (web-compatible)
-      // AppConstants.playRandomSuccessSound();
+      AppConstants.playRandomSuccessSound();
       if (mounted) {
         Navigator.of(context).pop(true);
         ScaffoldMessenger.of(
