@@ -6,9 +6,28 @@
             "**/.*",
             "**/node_modules/**"
         ],
+        "headers": [
+            {
+                "source": "**/*.mp3",
+                "headers": [
+                    {
+                        "key": "Content-Type",
+                        "value": "audio/mpeg"
+                    },
+                    {
+                        "key": "Cache-Control",
+                        "value": "public, max-age=3600"
+                    },
+                    {
+                        "key": "Content-Encoding",
+                        "value": "identity"
+                    }
+                ]
+            }
+        ],
         "rewrites": [
             {
-                "source": "**",
+                "source": "!/assets/**",
                 "destination": "/index.html"
             }
         ]
