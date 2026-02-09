@@ -25,11 +25,13 @@ class StatusTypeEnum {
 
   static const status = StatusTypeEnum._(r'Status');
   static const projectStatus = StatusTypeEnum._(r'Project Status');
+  static const stepStatus = StatusTypeEnum._(r'Step Status');
 
   /// List of all possible values in this [enum][StatusTypeEnum].
   static const values = <StatusTypeEnum>[
     status,
     projectStatus,
+    stepStatus,
   ];
 
   static StatusTypeEnum? fromJson(dynamic value) => StatusTypeEnumTypeTransformer().decode(value);
@@ -70,6 +72,7 @@ class StatusTypeEnumTypeTransformer {
       switch (data) {
         case r'Status': return StatusTypeEnum.status;
         case r'Project Status': return StatusTypeEnum.projectStatus;
+        case r'Step Status': return StatusTypeEnum.stepStatus;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');

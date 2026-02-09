@@ -204,6 +204,16 @@ class ApiClient {
           return InitiativeSchema.fromJson(value);
         case 'LocationSchema':
           return LocationSchema.fromJson(value);
+        case 'MemberIdsByRole':
+          return MemberIdsByRole.fromJson(value);
+        case 'ProjectCreateSchema':
+          return ProjectCreateSchema.fromJson(value);
+        case 'ProjectSchema':
+          return ProjectSchema.fromJson(value);
+        case 'ProjectStepItem':
+          return ProjectStepItem.fromJson(value);
+        case 'ProjectUpdateSchema':
+          return ProjectUpdateSchema.fromJson(value);
         case 'QuoteCreateSchema':
           return QuoteCreateSchema.fromJson(value);
         case 'QuoteSchema':

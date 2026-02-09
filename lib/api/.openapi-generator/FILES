@@ -18,7 +18,13 @@ doc/InitiativeCreateSchema.md
 doc/InitiativeSchema.md
 doc/InitiativesApi.md
 doc/LocationSchema.md
+doc/MemberIdsByRole.md
 doc/PhotosApi.md
+doc/ProjectCreateSchema.md
+doc/ProjectSchema.md
+doc/ProjectStepItem.md
+doc/ProjectUpdateSchema.md
+doc/ProjectsApi.md
 doc/QuoteCreateSchema.md
 doc/QuoteSchema.md
 doc/QuotesApi.md
@@ -42,6 +48,7 @@ lib/api/categories_api.dart
 lib/api/default_api.dart
 lib/api/initiatives_api.dart
 lib/api/photos_api.dart
+lib/api/projects_api.dart
 lib/api/quotes_api.dart
 lib/api/statuses_api.dart
 lib/api/users_api.dart
@@ -64,6 +71,11 @@ lib/model/category_schema.dart
 lib/model/initiative_create_schema.dart
 lib/model/initiative_schema.dart
 lib/model/location_schema.dart
+lib/model/member_ids_by_role.dart
+lib/model/project_create_schema.dart
+lib/model/project_schema.dart
+lib/model/project_step_item.dart
+lib/model/project_update_schema.dart
 lib/model/quote_create_schema.dart
 lib/model/quote_schema.dart
 lib/model/social_links_schema.dart
@@ -77,3 +89,9 @@ lib/model/user_schema.dart
 lib/model/user_type.dart
 lib/model/user_update.dart
 pubspec.yaml
+test/member_ids_by_role_test.dart
+test/project_create_schema_test.dart
+test/project_schema_test.dart
+test/project_step_item_test.dart
+test/project_update_schema_test.dart
+test/projects_api_test.dart

@@ -88,6 +88,12 @@ Class | Method | HTTP request | Description
 *PhotosApi* | [**listSubmissionPhotosPhotosSubmissionSubmissionIdGet**](doc//PhotosApi.md#listsubmissionphotosphotossubmissionsubmissionidget) | **GET** /photos/submission/{submission_id} | List Submission Photos
 *PhotosApi* | [**uploadProfilePhotoPhotosProfileUserIdPost**](doc//PhotosApi.md#uploadprofilephotophotosprofileuseridpost) | **POST** /photos/profile/{user_id} | Upload Profile Photo
 *PhotosApi* | [**uploadSubmissionPhotosPhotosSubmissionSubmissionIdPost**](doc//PhotosApi.md#uploadsubmissionphotosphotossubmissionsubmissionidpost) | **POST** /photos/submission/{submission_id} | Upload Submission Photos
+*ProjectsApi* | [**createProjectProjectsPost**](doc//ProjectsApi.md#createprojectprojectspost) | **POST** /projects/ | Create Project
+*ProjectsApi* | [**deleteProjectProjectsProjectIdDelete**](doc//ProjectsApi.md#deleteprojectprojectsprojectiddelete) | **DELETE** /projects/{project_id} | Delete Project
+*ProjectsApi* | [**getProjectProjectsProjectIdGet**](doc//ProjectsApi.md#getprojectprojectsprojectidget) | **GET** /projects/{project_id} | Get Project
+*ProjectsApi* | [**listActiveProjectsProjectsActiveGet**](doc//ProjectsApi.md#listactiveprojectsprojectsactiveget) | **GET** /projects/active | List Active Projects
+*ProjectsApi* | [**listProjectsProjectsGet**](doc//ProjectsApi.md#listprojectsprojectsget) | **GET** /projects/ | List Projects
+*ProjectsApi* | [**updateProjectProjectsProjectIdPatch**](doc//ProjectsApi.md#updateprojectprojectsprojectidpatch) | **PATCH** /projects/{project_id} | Update Project
 *QuotesApi* | [**createQuoteQuotesPost**](doc//QuotesApi.md#createquotequotespost) | **POST** /quotes/ | Create Quote
 *QuotesApi* | [**deleteQuoteQuotesQuoteIdDelete**](doc//QuotesApi.md#deletequotequotesquoteiddelete) | **DELETE** /quotes/{quote_id} | Delete Quote
 *QuotesApi* | [**getQuoteQuotesQuoteIdGet**](doc//QuotesApi.md#getquotequotesquoteidget) | **GET** /quotes/{quote_id} | Get Quote
@@ -122,6 +128,11 @@ Class | Method | HTTP request | Description
  - [InitiativeCreateSchema](doc//InitiativeCreateSchema.md)
  - [InitiativeSchema](doc//InitiativeSchema.md)
  - [LocationSchema](doc//LocationSchema.md)
+ - [MemberIdsByRole](doc//MemberIdsByRole.md)
+ - [ProjectCreateSchema](doc//ProjectCreateSchema.md)
+ - [ProjectSchema](doc//ProjectSchema.md)
+ - [ProjectStepItem](doc//ProjectStepItem.md)
+ - [ProjectUpdateSchema](doc//ProjectUpdateSchema.md)
  - [QuoteCreateSchema](doc//QuoteCreateSchema.md)
  - [QuoteSchema](doc//QuoteSchema.md)
  - [SocialLinksSchema](doc//SocialLinksSchema.md)
