@@ -288,18 +288,24 @@ class InitiativeActionCard extends ConsumerWidget {
                 // Notify parent so it can invalidate linked-actions (keeps Recent Actions in sync).
                 if (linkedId != null) {
                   onActionDeleted?.call(linkedId);
-                  ref.invalidate(actionsByLinkedProvider((linkedId, 7)));
+                  if (context.mounted) {
+                    ref.invalidate(actionsByLinkedProvider((linkedId, 7)));
+                  }
                 }
 
-                // Show success snackbar using stored ScaffoldMessenger
-                scaffoldMessenger.showSnackBar(
-                  CustomSnackBar.info('Action deleted!'),
-                );
+                // Show success snackbar using stored ScaffoldMessenger (only if still mounted)
+                if (context.mounted) {
+                  scaffoldMessenger.showSnackBar(
+                    CustomSnackBar.info('Action deleted!'),
+                  );
+                }
               } catch (e) {
-                // Handle any errors gracefully
-                scaffoldMessenger.showSnackBar(
-                  CustomSnackBar.error('Error deleting action'),
-                );
+                // Handle any errors gracefully (only show if still mounted)
+                if (context.mounted) {
+                  scaffoldMessenger.showSnackBar(
+                    CustomSnackBar.error('Error deleting action'),
+                  );
+                }
               }
             }
           },
