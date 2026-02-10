@@ -52,4 +52,33 @@ class ProjectsService {
       throw Exception('Failed to delete project: $e');
     }
   }
+
+  Future<ProjectSchema?> addMemberToProject(
+    String projectId,
+    AddProjectMemberSchema body,
+  ) async {
+    try {
+      return await _api.addMemberToProjectProjectsProjectIdMembersPost(
+        projectId,
+        body,
+      );
+    } catch (e) {
+      throw Exception('Failed to add member to project: $e');
+    }
+  }
+
+  Future<ProjectSchema?> removeMemberFromProject(
+    String projectId,
+    String userId,
+  ) async {
+    try {
+      return await _api
+          .removeMemberFromProjectProjectsProjectIdMembersUserIdDelete(
+            projectId,
+            userId,
+          );
+    } catch (e) {
+      throw Exception('Failed to remove member from project: $e');
+    }
+  }
 }

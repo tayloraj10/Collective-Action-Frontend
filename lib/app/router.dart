@@ -1,6 +1,7 @@
 import 'package:collective_action_frontend/screens/dashboard/dashboard_screen.dart';
 import 'package:collective_action_frontend/screens/initiatives/initiative_list_screen.dart';
 import 'package:collective_action_frontend/screens/projects/project_list_screen.dart';
+import 'package:collective_action_frontend/screens/projects/project_detail_screen.dart';
 import 'package:collective_action_frontend/screens/maps/map_screen.dart';
 import 'package:collective_action_frontend/screens/social/social_screen.dart';
 import 'package:collective_action_frontend/screens/login/login_screen.dart';
@@ -24,6 +25,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/projects',
         builder: (context, state) => const ProjectListScreen(),
+        routes: [
+          GoRoute(
+            path: ':projectId',
+            builder: (context, state) {
+              final id = state.pathParameters['projectId'] ?? '';
+              if (id.isEmpty) return const ProjectListScreen();
+              return ProjectDetailScreen(projectId: id);
+            },
+          ),
+        ],
       ),
       GoRoute(path: '/maps', builder: (context, state) => const MapScreen()),
       GoRoute(
