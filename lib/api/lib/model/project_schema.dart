@@ -22,7 +22,7 @@ class ProjectSchema {
     this.active = true,
     this.members,
     this.steps = const [],
-    this.linkedIds = const [],
+    this.links = const [],
     required this.createdAt,
     required this.updatedAt,
   });
@@ -41,7 +41,6 @@ class ProjectSchema {
 
   bool active;
 
-  /// Only \"members\", \"owners\", \"developers\" keys allowed.
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
@@ -50,9 +49,9 @@ class ProjectSchema {
   ///
   MemberIdsByRole? members;
 
-  List<ProjectStepItem> steps;
+  List<ProjectStepSchema> steps;
 
-  List<String> linkedIds;
+  List<ProjectLinkSchema> links;
 
   DateTime createdAt;
 
@@ -69,7 +68,7 @@ class ProjectSchema {
     other.active == active &&
     other.members == members &&
     _deepEquality.equals(other.steps, steps) &&
-    _deepEquality.equals(other.linkedIds, linkedIds) &&
+    _deepEquality.equals(other.links, links) &&
     other.createdAt == createdAt &&
     other.updatedAt == updatedAt;
 
@@ -85,12 +84,12 @@ class ProjectSchema {
     (active.hashCode) +
     (members == null ? 0 : members!.hashCode) +
     (steps.hashCode) +
-    (linkedIds.hashCode) +
+    (links.hashCode) +
     (createdAt.hashCode) +
     (updatedAt.hashCode);
 
   @override
-  String toString() => 'ProjectSchema[id=$id, name=$name, description=$description, categoryId=$categoryId, statusId=$statusId, creatorId=$creatorId, active=$active, members=$members, steps=$steps, linkedIds=$linkedIds, createdAt=$createdAt, updatedAt=$updatedAt]';
+  String toString() => 'ProjectSchema[id=$id, name=$name, description=$description, categoryId=$categoryId, statusId=$statusId, creatorId=$creatorId, active=$active, members=$members, steps=$steps, links=$links, createdAt=$createdAt, updatedAt=$updatedAt]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -119,7 +118,7 @@ class ProjectSchema {
       json[r'members'] = null;
     }
       json[r'steps'] = this.steps;
-      json[r'linked_ids'] = this.linkedIds;
+      json[r'links'] = this.links;
       json[r'created_at'] = this.createdAt.toUtc().toIso8601String();
       json[r'updated_at'] = this.updatedAt.toUtc().toIso8601String();
     return json;
@@ -152,10 +151,8 @@ class ProjectSchema {
         creatorId: mapValueOfType<String>(json, r'creator_id')!,
         active: mapValueOfType<bool>(json, r'active') ?? true,
         members: MemberIdsByRole.fromJson(json[r'members']),
-        steps: ProjectStepItem.listFromJson(json[r'steps']),
-        linkedIds: json[r'linked_ids'] is Iterable
-            ? (json[r'linked_ids'] as Iterable).cast<String>().toList(growable: false)
-            : const [],
+        steps: ProjectStepSchema.listFromJson(json[r'steps']),
+        links: ProjectLinkSchema.listFromJson(json[r'links']),
         createdAt: mapDateTime(json, r'created_at', r'')!,
         updatedAt: mapDateTime(json, r'updated_at', r'')!,
       );

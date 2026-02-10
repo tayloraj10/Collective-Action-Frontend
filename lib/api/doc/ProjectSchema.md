@@ -15,9 +15,9 @@ Name | Type | Description | Notes
 **statusId** | **String** |  | [optional] 
 **creatorId** | **String** |  | 
 **active** | **bool** |  | [optional] [default to true]
-**members** | [**MemberIdsByRole**](MemberIdsByRole.md) | Only \"members\", \"owners\", \"developers\" keys allowed. | [optional] 
-**steps** | [**List<ProjectStepItem>**](ProjectStepItem.md) |  | [optional] [default to const []]
-**linkedIds** | **List<String>** |  | [optional] [default to const []]
+**members** | [**MemberIdsByRole**](MemberIdsByRole.md) |  | [optional] 
+**steps** | [**List<ProjectStepSchema>**](ProjectStepSchema.md) |  | [optional] [default to const []]
+**links** | [**List<ProjectLinkSchema>**](ProjectLinkSchema.md) |  | [optional] [default to const []]
 **createdAt** | [**DateTime**](DateTime.md) |  | 
 **updatedAt** | [**DateTime**](DateTime.md) |  | 
 

@@ -194,6 +194,8 @@ class ApiClient {
           return ActionTypeSchema.fromJson(value);
         case 'ActionTypeValuesEnum':
           return ActionTypeValuesEnumTypeTransformer().decode(value);
+        case 'AddProjectMemberSchema':
+          return AddProjectMemberSchema.fromJson(value);
         case 'CategoryCreate':
           return CategoryCreate.fromJson(value);
         case 'CategorySchema':
@@ -202,16 +204,34 @@ class ApiClient {
           return InitiativeCreateSchema.fromJson(value);
         case 'InitiativeSchema':
           return InitiativeSchema.fromJson(value);
+        case 'LinkCreateSchema':
+          return LinkCreateSchema.fromJson(value);
+        case 'LinkSchema':
+          return LinkSchema.fromJson(value);
+        case 'LinkUpdateSchema':
+          return LinkUpdateSchema.fromJson(value);
         case 'LocationSchema':
           return LocationSchema.fromJson(value);
         case 'MemberIdsByRole':
           return MemberIdsByRole.fromJson(value);
         case 'ProjectCreateSchema':
           return ProjectCreateSchema.fromJson(value);
+        case 'ProjectLinkSchema':
+          return ProjectLinkSchema.fromJson(value);
+        case 'ProjectRoleCreateSchema':
+          return ProjectRoleCreateSchema.fromJson(value);
+        case 'ProjectRoleSchema':
+          return ProjectRoleSchema.fromJson(value);
+        case 'ProjectRoleUpdateSchema':
+          return ProjectRoleUpdateSchema.fromJson(value);
         case 'ProjectSchema':
           return ProjectSchema.fromJson(value);
-        case 'ProjectStepItem':
-          return ProjectStepItem.fromJson(value);
+        case 'ProjectStepCreateSchema':
+          return ProjectStepCreateSchema.fromJson(value);
+        case 'ProjectStepSchema':
+          return ProjectStepSchema.fromJson(value);
+        case 'ProjectStepUpdateSchema':
+          return ProjectStepUpdateSchema.fromJson(value);
         case 'ProjectUpdateSchema':
           return ProjectUpdateSchema.fromJson(value);
         case 'QuoteCreateSchema':

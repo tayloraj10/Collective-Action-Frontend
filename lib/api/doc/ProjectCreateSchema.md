@@ -15,8 +15,7 @@ Name | Type | Description | Notes
 **creatorId** | **String** |  | 
 **active** | **bool** |  | [optional] [default to true]
 **members** | [**MemberIdsByRole**](MemberIdsByRole.md) |  | [optional] 
-**steps** | [**List<ProjectStepItem>**](ProjectStepItem.md) |  | [optional] [default to const []]
-**linkedIds** | **List<String>** |  | [optional] [default to const []]
+**steps** | [**List<ProjectStepCreateSchema>**](ProjectStepCreateSchema.md) |  | [optional] [default to const []]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

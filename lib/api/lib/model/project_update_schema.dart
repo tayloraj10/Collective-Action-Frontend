@@ -20,7 +20,6 @@ class ProjectUpdateSchema {
     this.active,
     this.members,
     this.steps = const [],
-    this.linkedIds = const [],
   });
 
   String? name;
@@ -35,9 +34,7 @@ class ProjectUpdateSchema {
 
   MemberIdsByRole? members;
 
-  List<ProjectStepItem>? steps;
-
-  List<String>? linkedIds;
+  List<ProjectStepCreateSchema>? steps;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is ProjectUpdateSchema &&
@@ -47,8 +44,7 @@ class ProjectUpdateSchema {
     other.statusId == statusId &&
     other.active == active &&
     other.members == members &&
-    _deepEquality.equals(other.steps, steps) &&
-    _deepEquality.equals(other.linkedIds, linkedIds);
+    _deepEquality.equals(other.steps, steps);
 
   @override
   int get hashCode =>
@@ -59,11 +55,10 @@ class ProjectUpdateSchema {
     (statusId == null ? 0 : statusId!.hashCode) +
     (active == null ? 0 : active!.hashCode) +
     (members == null ? 0 : members!.hashCode) +
-    (steps == null ? 0 : steps!.hashCode) +
-    (linkedIds == null ? 0 : linkedIds!.hashCode);
+    (steps == null ? 0 : steps!.hashCode);
 
   @override
-  String toString() => 'ProjectUpdateSchema[name=$name, description=$description, categoryId=$categoryId, statusId=$statusId, active=$active, members=$members, steps=$steps, linkedIds=$linkedIds]';
+  String toString() => 'ProjectUpdateSchema[name=$name, description=$description, categoryId=$categoryId, statusId=$statusId, active=$active, members=$members, steps=$steps]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -102,11 +97,6 @@ class ProjectUpdateSchema {
     } else {
       json[r'steps'] = null;
     }
-    if (this.linkedIds != null) {
-      json[r'linked_ids'] = this.linkedIds;
-    } else {
-      json[r'linked_ids'] = null;
-    }
     return json;
   }
 
@@ -135,10 +125,7 @@ class ProjectUpdateSchema {
         statusId: mapValueOfType<String>(json, r'status_id'),
         active: mapValueOfType<bool>(json, r'active'),
         members: MemberIdsByRole.fromJson(json[r'members']),
-        steps: ProjectStepItem.listFromJson(json[r'steps']),
-        linkedIds: json[r'linked_ids'] is Iterable
-            ? (json[r'linked_ids'] as Iterable).cast<String>().toList(growable: false)
-            : const [],
+        steps: ProjectStepCreateSchema.listFromJson(json[r'steps']),
       );
     }
     return null;

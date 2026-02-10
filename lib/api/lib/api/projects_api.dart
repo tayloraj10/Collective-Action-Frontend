@@ -16,6 +16,128 @@ class ProjectsApi {
 
   final ApiClient apiClient;
 
+  /// Add Member To Project
+  ///
+  /// Add a user to a project in the given role (members, owners, or developers).
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] projectId (required):
+  ///
+  /// * [AddProjectMemberSchema] addProjectMemberSchema (required):
+  Future<Response> addMemberToProjectProjectsProjectIdMembersPostWithHttpInfo(String projectId, AddProjectMemberSchema addProjectMemberSchema,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/projects/{project_id}/members'
+      .replaceAll('{project_id}', projectId);
+
+    // ignore: prefer_final_locals
+    Object? postBody = addProjectMemberSchema;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Add Member To Project
+  ///
+  /// Add a user to a project in the given role (members, owners, or developers).
+  ///
+  /// Parameters:
+  ///
+  /// * [String] projectId (required):
+  ///
+  /// * [AddProjectMemberSchema] addProjectMemberSchema (required):
+  Future<ProjectSchema?> addMemberToProjectProjectsProjectIdMembersPost(String projectId, AddProjectMemberSchema addProjectMemberSchema,) async {
+    final response = await addMemberToProjectProjectsProjectIdMembersPostWithHttpInfo(projectId, addProjectMemberSchema,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ProjectSchema',) as ProjectSchema;
+    
+    }
+    return null;
+  }
+
+  /// Add Step To Project
+  ///
+  /// Add a step to a project.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] projectId (required):
+  ///
+  /// * [ProjectStepCreateSchema] projectStepCreateSchema (required):
+  Future<Response> addStepToProjectProjectsProjectIdStepsPostWithHttpInfo(String projectId, ProjectStepCreateSchema projectStepCreateSchema,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/projects/{project_id}/steps'
+      .replaceAll('{project_id}', projectId);
+
+    // ignore: prefer_final_locals
+    Object? postBody = projectStepCreateSchema;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Add Step To Project
+  ///
+  /// Add a step to a project.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] projectId (required):
+  ///
+  /// * [ProjectStepCreateSchema] projectStepCreateSchema (required):
+  Future<ProjectSchema?> addStepToProjectProjectsProjectIdStepsPost(String projectId, ProjectStepCreateSchema projectStepCreateSchema,) async {
+    final response = await addStepToProjectProjectsProjectIdStepsPostWithHttpInfo(projectId, projectStepCreateSchema,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ProjectSchema',) as ProjectSchema;
+    
+    }
+    return null;
+  }
+
   /// Create Project
   ///
   /// Note: This method returns the HTTP [Response].
@@ -108,6 +230,68 @@ class ProjectsApi {
   /// * [String] projectId (required):
   Future<ProjectSchema?> deleteProjectProjectsProjectIdDelete(String projectId,) async {
     final response = await deleteProjectProjectsProjectIdDeleteWithHttpInfo(projectId,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ProjectSchema',) as ProjectSchema;
+    
+    }
+    return null;
+  }
+
+  /// Delete Project Step
+  ///
+  /// Delete a specific step from a project.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] projectId (required):
+  ///
+  /// * [String] stepId (required):
+  Future<Response> deleteProjectStepProjectsProjectIdStepsStepIdDeleteWithHttpInfo(String projectId, String stepId,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/projects/{project_id}/steps/{step_id}'
+      .replaceAll('{project_id}', projectId)
+      .replaceAll('{step_id}', stepId);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'DELETE',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Delete Project Step
+  ///
+  /// Delete a specific step from a project.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] projectId (required):
+  ///
+  /// * [String] stepId (required):
+  Future<ProjectSchema?> deleteProjectStepProjectsProjectIdStepsStepIdDelete(String projectId, String stepId,) async {
+    final response = await deleteProjectStepProjectsProjectIdStepsStepIdDeleteWithHttpInfo(projectId, stepId,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -268,6 +452,68 @@ class ProjectsApi {
     return null;
   }
 
+  /// Remove Member From Project
+  ///
+  /// Remove a user from a project.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] projectId (required):
+  ///
+  /// * [String] userId (required):
+  Future<Response> removeMemberFromProjectProjectsProjectIdMembersUserIdDeleteWithHttpInfo(String projectId, String userId,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/projects/{project_id}/members/{user_id}'
+      .replaceAll('{project_id}', projectId)
+      .replaceAll('{user_id}', userId);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'DELETE',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Remove Member From Project
+  ///
+  /// Remove a user from a project.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] projectId (required):
+  ///
+  /// * [String] userId (required):
+  Future<ProjectSchema?> removeMemberFromProjectProjectsProjectIdMembersUserIdDelete(String projectId, String userId,) async {
+    final response = await removeMemberFromProjectProjectsProjectIdMembersUserIdDeleteWithHttpInfo(projectId, userId,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ProjectSchema',) as ProjectSchema;
+    
+    }
+    return null;
+  }
+
   /// Update Project
   ///
   /// Note: This method returns the HTTP [Response].
@@ -312,6 +558,72 @@ class ProjectsApi {
   /// * [ProjectUpdateSchema] projectUpdateSchema (required):
   Future<ProjectSchema?> updateProjectProjectsProjectIdPatch(String projectId, ProjectUpdateSchema projectUpdateSchema,) async {
     final response = await updateProjectProjectsProjectIdPatchWithHttpInfo(projectId, projectUpdateSchema,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ProjectSchema',) as ProjectSchema;
+    
+    }
+    return null;
+  }
+
+  /// Update Project Step
+  ///
+  /// Update a specific step in a project.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] projectId (required):
+  ///
+  /// * [String] stepId (required):
+  ///
+  /// * [ProjectStepUpdateSchema] projectStepUpdateSchema (required):
+  Future<Response> updateProjectStepProjectsProjectIdStepsStepIdPatchWithHttpInfo(String projectId, String stepId, ProjectStepUpdateSchema projectStepUpdateSchema,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/projects/{project_id}/steps/{step_id}'
+      .replaceAll('{project_id}', projectId)
+      .replaceAll('{step_id}', stepId);
+
+    // ignore: prefer_final_locals
+    Object? postBody = projectStepUpdateSchema;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'PATCH',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Update Project Step
+  ///
+  /// Update a specific step in a project.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] projectId (required):
+  ///
+  /// * [String] stepId (required):
+  ///
+  /// * [ProjectStepUpdateSchema] projectStepUpdateSchema (required):
+  Future<ProjectSchema?> updateProjectStepProjectsProjectIdStepsStepIdPatch(String projectId, String stepId, ProjectStepUpdateSchema projectStepUpdateSchema,) async {
+    final response = await updateProjectStepProjectsProjectIdStepsStepIdPatchWithHttpInfo(projectId, stepId, projectStepUpdateSchema,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
