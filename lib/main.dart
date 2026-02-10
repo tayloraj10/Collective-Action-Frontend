@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/app/router.dart';
+import 'package:collective_action_frontend/components/user_data_sync_observer.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,13 +37,15 @@ class MyApp extends ConsumerWidget {
     final themeMode = ref.watch(themeProvider);
     final router = ref.watch(goRouterProvider);
 
-    return MaterialApp.router(
-      title: 'Collective Action Network',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: themeMode,
-      debugShowCheckedModeBanner: false,
-      routerConfig: router,
+    return UserDataSyncObserver(
+      child: MaterialApp.router(
+        title: 'Collective Action Network',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: themeMode,
+        debugShowCheckedModeBanner: false,
+        routerConfig: router,
+      ),
     );
   }
 }
