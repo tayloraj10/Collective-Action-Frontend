@@ -90,6 +90,7 @@ class _ProjectMembershipButtonState
       // Refresh the project data
       ref.invalidate(projectByIdProvider(widget.project.id));
       ref.invalidate(activeProjectsProvider);
+      ref.invalidate(projectsByCreatorProvider);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
