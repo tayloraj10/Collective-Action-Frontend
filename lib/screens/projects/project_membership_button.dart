@@ -111,7 +111,35 @@ class _ProjectMembershipButtonState
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final currentUser = ref.watch(currentUserProvider).value;
+    final isLoggedIn = currentUser != null && currentUser.id != null;
     final isMember = _isUserMember(currentUser?.id);
+
+    // If not logged in, show a disabled button with a tooltip
+    if (!isLoggedIn) {
+      return Tooltip(
+        message: 'You must be logged in to join a project',
+        child: FilledButton.icon(
+          onPressed: null, // Disabled
+          icon: Icon(
+            Icons.group_add_rounded,
+            size: widget.isMobile ? 18 : 20,
+          ),
+          label: Text(
+            'Join Project',
+            style: TextStyle(
+              fontSize: widget.isMobile ? 13 : 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          style: FilledButton.styleFrom(
+            padding: EdgeInsets.symmetric(
+              horizontal: widget.isMobile ? 16 : 20,
+              vertical: widget.isMobile ? 10 : 12,
+            ),
+          ),
+        ),
+      );
+    }
 
     return FilledButton.icon(
       onPressed: _isLoading ? null : _handleToggleMembership,

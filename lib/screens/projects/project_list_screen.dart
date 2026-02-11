@@ -95,6 +95,8 @@ class _ProjectListScreenState extends ConsumerState<ProjectListScreen> {
   ) {
     final theme = Theme.of(context);
     final count = projectsAsync.asData?.value.length ?? 0;
+    final currentUser = ref.watch(currentUserProvider).value;
+    final isLoggedIn = currentUser != null && currentUser.id != null;
 
     return Row(
       children: [
@@ -133,12 +135,17 @@ class _ProjectListScreenState extends ConsumerState<ProjectListScreen> {
         ),
         if (!hasProject) ...[
           const SizedBox(width: 16),
-          FilledButton.icon(
-            onPressed: _showCreateProjectDialog,
-            icon: const Icon(Icons.add_rounded),
-            label: const Text('Create Project'),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primaryBlue,
+          Tooltip(
+            message: isLoggedIn
+                ? 'Create a new project'
+                : 'You must be logged in to create a project',
+            child: FilledButton.icon(
+              onPressed: isLoggedIn ? _showCreateProjectDialog : null,
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Create Project'),
+              style: FilledButton.styleFrom(
+                backgroundColor: theme.colorScheme.primary,
+              ),
             ),
           ),
         ],
