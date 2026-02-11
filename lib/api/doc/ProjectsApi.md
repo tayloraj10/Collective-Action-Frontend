@@ -16,6 +16,7 @@ Method | HTTP request | Description
 [**deleteProjectStepProjectsProjectIdStepsStepIdDelete**](ProjectsApi.md#deleteprojectstepprojectsprojectidstepsstepiddelete) | **DELETE** /projects/{project_id}/steps/{step_id} | Delete Project Step
 [**getProjectProjectsProjectIdGet**](ProjectsApi.md#getprojectprojectsprojectidget) | **GET** /projects/{project_id} | Get Project
 [**listActiveProjectsProjectsActiveGet**](ProjectsApi.md#listactiveprojectsprojectsactiveget) | **GET** /projects/active | List Active Projects
+[**listProjectsByCreatorProjectsCreatorCreatorIdGet**](ProjectsApi.md#listprojectsbycreatorprojectscreatorcreatoridget) | **GET** /projects/creator/{creator_id} | List Projects By Creator
 [**listProjectsProjectsGet**](ProjectsApi.md#listprojectsprojectsget) | **GET** /projects/ | List Projects
 [**removeMemberFromProjectProjectsProjectIdMembersUserIdDelete**](ProjectsApi.md#removememberfromprojectprojectsprojectidmembersuseriddelete) | **DELETE** /projects/{project_id}/members/{user_id} | Remove Member From Project
 [**updateProjectProjectsProjectIdPatch**](ProjectsApi.md#updateprojectprojectsprojectidpatch) | **PATCH** /projects/{project_id} | Update Project
@@ -301,6 +302,49 @@ try {
 
 ### Parameters
 This endpoint does not need any parameter.
+
+### Return type
+
+[**List<ProjectSchema>**](ProjectSchema.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listProjectsByCreatorProjectsCreatorCreatorIdGet**
+> List<ProjectSchema> listProjectsByCreatorProjectsCreatorCreatorIdGet(creatorId)
+
+List Projects By Creator
+
+Get all projects created by a specific user.
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = ProjectsApi();
+final creatorId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+
+try {
+    final result = api_instance.listProjectsByCreatorProjectsCreatorCreatorIdGet(creatorId);
+    print(result);
+} catch (e) {
+    print('Exception when calling ProjectsApi->listProjectsByCreatorProjectsCreatorCreatorIdGet: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **creatorId** | **String**|  | 
 
 ### Return type
 

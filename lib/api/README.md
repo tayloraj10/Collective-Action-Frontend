@@ -107,6 +107,7 @@ Class | Method | HTTP request | Description
 *ProjectsApi* | [**deleteProjectStepProjectsProjectIdStepsStepIdDelete**](doc//ProjectsApi.md#deleteprojectstepprojectsprojectidstepsstepiddelete) | **DELETE** /projects/{project_id}/steps/{step_id} | Delete Project Step
 *ProjectsApi* | [**getProjectProjectsProjectIdGet**](doc//ProjectsApi.md#getprojectprojectsprojectidget) | **GET** /projects/{project_id} | Get Project
 *ProjectsApi* | [**listActiveProjectsProjectsActiveGet**](doc//ProjectsApi.md#listactiveprojectsprojectsactiveget) | **GET** /projects/active | List Active Projects
+*ProjectsApi* | [**listProjectsByCreatorProjectsCreatorCreatorIdGet**](doc//ProjectsApi.md#listprojectsbycreatorprojectscreatorcreatoridget) | **GET** /projects/creator/{creator_id} | List Projects By Creator
 *ProjectsApi* | [**listProjectsProjectsGet**](doc//ProjectsApi.md#listprojectsprojectsget) | **GET** /projects/ | List Projects
 *ProjectsApi* | [**removeMemberFromProjectProjectsProjectIdMembersUserIdDelete**](doc//ProjectsApi.md#removememberfromprojectprojectsprojectidmembersuseriddelete) | **DELETE** /projects/{project_id}/members/{user_id} | Remove Member From Project
 *ProjectsApi* | [**updateProjectProjectsProjectIdPatch**](doc//ProjectsApi.md#updateprojectprojectsprojectidpatch) | **PATCH** /projects/{project_id} | Update Project

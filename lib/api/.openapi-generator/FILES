@@ -113,16 +113,3 @@ lib/model/user_schema.dart
 lib/model/user_type.dart
 lib/model/user_update.dart
 pubspec.yaml
-test/add_project_member_schema_test.dart
-test/link_create_schema_test.dart
-test/link_schema_test.dart
-test/link_update_schema_test.dart
-test/links_api_test.dart
-test/project_link_schema_test.dart
-test/project_role_create_schema_test.dart
-test/project_role_schema_test.dart
-test/project_role_update_schema_test.dart
-test/project_roles_api_test.dart
-test/project_step_create_schema_test.dart
-test/project_step_schema_test.dart
-test/project_step_update_schema_test.dart

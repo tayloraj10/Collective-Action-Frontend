@@ -246,6 +246,44 @@
                 }
             }
         },
+        "/projects/creator/{creator_id}": {
+            "get": {
+                "tags": [
+                    "projects"
+                ],
+                "summary": "List Projects By Creator",
+                "description": "Get all projects created by a specific user.",
+                "operationId": "list_projects_by_creator_projects_creator__creator_id__get",
+                "parameters": [
+                    {
+                        "name": "creator_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Creator Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ProjectSchema"
+                                    },
+                                    "title": "Response List Projects By Creator Projects Creator  Creator Id  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/projects/{project_id}": {
             "get": {
                 "tags": [
