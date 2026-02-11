@@ -223,22 +223,24 @@ class ProjectActionCard extends ConsumerWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              // Members count
-                              _StatBadge(
-                                icon: Icons.people_outline,
-                                count: _getTotalMemberCount(),
-                                label: 'Members',
-                                theme: theme,
-                                isMobile: isMobile,
-                              ),
-                              // Steps count
-                              _StatBadge(
-                                icon: Icons.list_alt,
-                                count: totalSteps,
-                                label: 'Steps',
-                                theme: theme,
-                                isMobile: isMobile,
-                              ),
+                              // Members count - only show if there are members
+                              if (_getTotalMemberCount() > 0)
+                                _StatBadge(
+                                  icon: Icons.people_outline,
+                                  count: _getTotalMemberCount(),
+                                  label: 'Members',
+                                  theme: theme,
+                                  isMobile: isMobile,
+                                ),
+                              // Steps count - only show if there are steps
+                              if (totalSteps > 0)
+                                _StatBadge(
+                                  icon: Icons.list_alt,
+                                  count: totalSteps,
+                                  label: 'Steps',
+                                  theme: theme,
+                                  isMobile: isMobile,
+                                ),
                             ],
                           ),
                         ],

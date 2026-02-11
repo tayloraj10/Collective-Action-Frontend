@@ -1192,6 +1192,17 @@ class _StepDialogState extends ConsumerState<_StepDialog> {
     try {
       final service = ref.read(projectsServiceProvider);
 
+      // Get the selected status to check if it's "Completed"
+      final statusesAsync = ref.read(statusesProvider);
+      final allStatuses = statusesAsync.asData?.value ?? [];
+      final selectedStatus = allStatuses.firstWhere(
+        (s) => s.id == _selectedStatusId,
+        orElse: () => allStatuses.first,
+      );
+
+      // Set completed to true if status is "Completed"
+      final isCompleted = selectedStatus.name == StatusValuesEnum.completed;
+
       if (widget.step == null) {
         // Create new step
         final createBody = ProjectStepCreateSchema(
@@ -1200,7 +1211,7 @@ class _StepDialogState extends ConsumerState<_StepDialog> {
               ? _descriptionController.text.trim()
               : null,
           order: widget.order ?? 0,
-          completed: false,
+          completed: isCompleted,
           statusId: _selectedStatusId,
         );
         await service.addStepToProject(widget.projectId, createBody);
@@ -1212,7 +1223,7 @@ class _StepDialogState extends ConsumerState<_StepDialog> {
               ? _descriptionController.text.trim()
               : null,
           order: widget.step!.order,
-          completed: widget.step!.completed,
+          completed: isCompleted,
           statusId: _selectedStatusId,
         );
         await service.updateProjectStep(
