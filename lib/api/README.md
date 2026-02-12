@@ -79,8 +79,10 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**healthHealthGet**](doc//DefaultApi.md#healthhealthget) | **GET** /health | Health
 *InitiativesApi* | [**createInitiativeInitiativesPost**](doc//InitiativesApi.md#createinitiativeinitiativespost) | **POST** /initiatives/ | Create Initiative
 *InitiativesApi* | [**getFeaturedInitiativesInitiativesFeaturedGet**](doc//InitiativesApi.md#getfeaturedinitiativesinitiativesfeaturedget) | **GET** /initiatives/featured | Get Featured Initiatives
+*InitiativesApi* | [**getInitiativeInitiativesInitiativeIdGet**](doc//InitiativesApi.md#getinitiativeinitiativesinitiativeidget) | **GET** /initiatives/{initiative_id} | Get Initiative
 *InitiativesApi* | [**getInitiativesByIdsInitiativesByIdsGet**](doc//InitiativesApi.md#getinitiativesbyidsinitiativesbyidsget) | **GET** /initiatives/by-ids | Get Initiatives By Ids
 *InitiativesApi* | [**listActiveInitiativesInitiativesActiveGet**](doc//InitiativesApi.md#listactiveinitiativesinitiativesactiveget) | **GET** /initiatives/active | List Active Initiatives
+*InitiativesApi* | [**listInitiativesByCreatorInitiativesCreatorUserIdGet**](doc//InitiativesApi.md#listinitiativesbycreatorinitiativescreatoruseridget) | **GET** /initiatives/creator/{user_id} | List Initiatives By Creator
 *InitiativesApi* | [**listInitiativesInitiativesGet**](doc//InitiativesApi.md#listinitiativesinitiativesget) | **GET** /initiatives/ | List Initiatives
 *LinksApi* | [**createLinkLinksPost**](doc//LinksApi.md#createlinklinkspost) | **POST** /links/ | Create Link
 *LinksApi* | [**deleteLinkLinksLinkIdDelete**](doc//LinksApi.md#deletelinklinkslinkiddelete) | **DELETE** /links/{link_id} | Delete Link
@@ -89,6 +91,12 @@ Class | Method | HTTP request | Description
 *LinksApi* | [**getLinksByProjectLinksProjectProjectIdGet**](doc//LinksApi.md#getlinksbyprojectlinksprojectprojectidget) | **GET** /links/project/{project_id} | Get Links By Project
 *LinksApi* | [**listLinksLinksGet**](doc//LinksApi.md#listlinkslinksget) | **GET** /links/ | List Links
 *LinksApi* | [**updateLinkLinksLinkIdPatch**](doc//LinksApi.md#updatelinklinkslinkidpatch) | **PATCH** /links/{link_id} | Update Link
+*MapCampaignsApi* | [**createMapCampaignMapCampaignsPost**](doc//MapCampaignsApi.md#createmapcampaignmapcampaignspost) | **POST** /map-campaigns/ | Create Map Campaign
+*MapCampaignsApi* | [**getMapCampaignMapCampaignsCampaignIdGet**](doc//MapCampaignsApi.md#getmapcampaignmapcampaignscampaignidget) | **GET** /map-campaigns/{campaign_id} | Get Map Campaign
+*MapCampaignsApi* | [**listActiveMapCampaignsMapCampaignsActiveGet**](doc//MapCampaignsApi.md#listactivemapcampaignsmapcampaignsactiveget) | **GET** /map-campaigns/active | List Active Map Campaigns
+*MapCampaignsApi* | [**listMapCampaignsByCreatorMapCampaignsCreatorUserIdGet**](doc//MapCampaignsApi.md#listmapcampaignsbycreatormapcampaignscreatoruseridget) | **GET** /map-campaigns/creator/{user_id} | List Map Campaigns By Creator
+*MapCampaignsApi* | [**listMapCampaignsByTypeMapCampaignsByTypeCampaignTypeGet**](doc//MapCampaignsApi.md#listmapcampaignsbytypemapcampaignsbytypecampaigntypeget) | **GET** /map-campaigns/by-type/{campaign_type} | List Map Campaigns By Type
+*MapCampaignsApi* | [**listMapCampaignsMapCampaignsGet**](doc//MapCampaignsApi.md#listmapcampaignsmapcampaignsget) | **GET** /map-campaigns/ | List Map Campaigns
 *PhotosApi* | [**deleteAllSubmissionPhotosPhotosSubmissionSubmissionIdDelete**](doc//PhotosApi.md#deleteallsubmissionphotosphotossubmissionsubmissioniddelete) | **DELETE** /photos/submission/{submission_id} | Delete All Submission Photos
 *PhotosApi* | [**deleteProfilePhotoPhotosProfileUserIdDelete**](doc//PhotosApi.md#deleteprofilephotophotosprofileuseriddelete) | **DELETE** /photos/profile/{user_id} | Delete Profile Photo
 *PhotosApi* | [**deleteSubmissionPhotoPhotosSubmissionSubmissionIdPhotoFilenameDelete**](doc//PhotosApi.md#deletesubmissionphotophotossubmissionsubmissionidphotofilenamedelete) | **DELETE** /photos/submission/{submission_id}/{photo_filename} | Delete Submission Photo
@@ -150,6 +158,9 @@ Class | Method | HTTP request | Description
  - [LinkSchema](doc//LinkSchema.md)
  - [LinkUpdateSchema](doc//LinkUpdateSchema.md)
  - [LocationSchema](doc//LocationSchema.md)
+ - [MapCampaignCreateSchema](doc//MapCampaignCreateSchema.md)
+ - [MapCampaignSchema](doc//MapCampaignSchema.md)
+ - [MapCampaignTypeEnum](doc//MapCampaignTypeEnum.md)
  - [MemberIdsByRole](doc//MemberIdsByRole.md)
  - [ProjectCreateSchema](doc//ProjectCreateSchema.md)
  - [ProjectLinkSchema](doc//ProjectLinkSchema.md)

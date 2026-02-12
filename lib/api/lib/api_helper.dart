@@ -58,6 +58,9 @@ String parameterToString(dynamic value) {
   if (value is ActionTypeValuesEnum) {
     return ActionTypeValuesEnumTypeTransformer().encode(value).toString();
   }
+  if (value is MapCampaignTypeEnum) {
+    return MapCampaignTypeEnumTypeTransformer().encode(value).toString();
+  }
   if (value is StatusTypeEnum) {
     return StatusTypeEnumTypeTransformer().encode(value).toString();
   }

@@ -11,24 +11,24 @@
 part of collective_action_api;
 
 
-class InitiativesApi {
-  InitiativesApi([ApiClient? apiClient]) : apiClient = apiClient ?? defaultApiClient;
+class MapCampaignsApi {
+  MapCampaignsApi([ApiClient? apiClient]) : apiClient = apiClient ?? defaultApiClient;
 
   final ApiClient apiClient;
 
-  /// Create Initiative
+  /// Create Map Campaign
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
-  /// * [InitiativeCreateSchema] initiativeCreateSchema (required):
-  Future<Response> createInitiativeInitiativesPostWithHttpInfo(InitiativeCreateSchema initiativeCreateSchema,) async {
+  /// * [MapCampaignCreateSchema] mapCampaignCreateSchema (required):
+  Future<Response> createMapCampaignMapCampaignsPostWithHttpInfo(MapCampaignCreateSchema mapCampaignCreateSchema,) async {
     // ignore: prefer_const_declarations
-    final path = r'/initiatives/';
+    final path = r'/map-campaigns/';
 
     // ignore: prefer_final_locals
-    Object? postBody = initiativeCreateSchema;
+    Object? postBody = mapCampaignCreateSchema;
 
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
@@ -48,13 +48,13 @@ class InitiativesApi {
     );
   }
 
-  /// Create Initiative
+  /// Create Map Campaign
   ///
   /// Parameters:
   ///
-  /// * [InitiativeCreateSchema] initiativeCreateSchema (required):
-  Future<InitiativeSchema?> createInitiativeInitiativesPost(InitiativeCreateSchema initiativeCreateSchema,) async {
-    final response = await createInitiativeInitiativesPostWithHttpInfo(initiativeCreateSchema,);
+  /// * [MapCampaignCreateSchema] mapCampaignCreateSchema (required):
+  Future<MapCampaignSchema?> createMapCampaignMapCampaignsPost(MapCampaignCreateSchema mapCampaignCreateSchema,) async {
+    final response = await createMapCampaignMapCampaignsPostWithHttpInfo(mapCampaignCreateSchema,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -62,18 +62,23 @@ class InitiativesApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'InitiativeSchema',) as InitiativeSchema;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'MapCampaignSchema',) as MapCampaignSchema;
     
     }
     return null;
   }
 
-  /// Get Featured Initiatives
+  /// Get Map Campaign
   ///
   /// Note: This method returns the HTTP [Response].
-  Future<Response> getFeaturedInitiativesInitiativesFeaturedGetWithHttpInfo() async {
+  ///
+  /// Parameters:
+  ///
+  /// * [String] campaignId (required):
+  Future<Response> getMapCampaignMapCampaignsCampaignIdGetWithHttpInfo(String campaignId,) async {
     // ignore: prefer_const_declarations
-    final path = r'/initiatives/featured';
+    final path = r'/map-campaigns/{campaign_id}'
+      .replaceAll('{campaign_id}', campaignId);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -96,9 +101,13 @@ class InitiativesApi {
     );
   }
 
-  /// Get Featured Initiatives
-  Future<List<InitiativeSchema>?> getFeaturedInitiativesInitiativesFeaturedGet() async {
-    final response = await getFeaturedInitiativesInitiativesFeaturedGetWithHttpInfo();
+  /// Get Map Campaign
+  ///
+  /// Parameters:
+  ///
+  /// * [String] campaignId (required):
+  Future<MapCampaignSchema?> getMapCampaignMapCampaignsCampaignIdGet(String campaignId,) async {
+    final response = await getMapCampaignMapCampaignsCampaignIdGetWithHttpInfo(campaignId,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -106,137 +115,18 @@ class InitiativesApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      final responseBody = await _decodeBodyBytes(response);
-      return (await apiClient.deserializeAsync(responseBody, 'List<InitiativeSchema>') as List)
-        .cast<InitiativeSchema>()
-        .toList(growable: false);
-
-    }
-    return null;
-  }
-
-  /// Get Initiative
-  ///
-  /// Get a single initiative by ID (includes created_by).
-  ///
-  /// Note: This method returns the HTTP [Response].
-  ///
-  /// Parameters:
-  ///
-  /// * [String] initiativeId (required):
-  Future<Response> getInitiativeInitiativesInitiativeIdGetWithHttpInfo(String initiativeId,) async {
-    // ignore: prefer_const_declarations
-    final path = r'/initiatives/{initiative_id}'
-      .replaceAll('{initiative_id}', initiativeId);
-
-    // ignore: prefer_final_locals
-    Object? postBody;
-
-    final queryParams = <QueryParam>[];
-    final headerParams = <String, String>{};
-    final formParams = <String, String>{};
-
-    const contentTypes = <String>[];
-
-
-    return apiClient.invokeAPI(
-      path,
-      'GET',
-      queryParams,
-      postBody,
-      headerParams,
-      formParams,
-      contentTypes.isEmpty ? null : contentTypes.first,
-    );
-  }
-
-  /// Get Initiative
-  ///
-  /// Get a single initiative by ID (includes created_by).
-  ///
-  /// Parameters:
-  ///
-  /// * [String] initiativeId (required):
-  Future<InitiativeSchema?> getInitiativeInitiativesInitiativeIdGet(String initiativeId,) async {
-    final response = await getInitiativeInitiativesInitiativeIdGetWithHttpInfo(initiativeId,);
-    if (response.statusCode >= HttpStatus.badRequest) {
-      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
-    }
-    // When a remote server returns no body with a status of 204, we shall not decode it.
-    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
-    // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'InitiativeSchema',) as InitiativeSchema;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'MapCampaignSchema',) as MapCampaignSchema;
     
     }
     return null;
   }
 
-  /// Get Initiatives By Ids
+  /// List Active Map Campaigns
   ///
   /// Note: This method returns the HTTP [Response].
-  ///
-  /// Parameters:
-  ///
-  /// * [List<String>] initiativeIds (required):
-  ///   List of initiative IDs
-  Future<Response> getInitiativesByIdsInitiativesByIdsGetWithHttpInfo(List<String> initiativeIds,) async {
+  Future<Response> listActiveMapCampaignsMapCampaignsActiveGetWithHttpInfo() async {
     // ignore: prefer_const_declarations
-    final path = r'/initiatives/by-ids';
-
-    // ignore: prefer_final_locals
-    Object? postBody;
-
-    final queryParams = <QueryParam>[];
-    final headerParams = <String, String>{};
-    final formParams = <String, String>{};
-
-      queryParams.addAll(_queryParams('multi', 'initiative_ids', initiativeIds));
-
-    const contentTypes = <String>[];
-
-
-    return apiClient.invokeAPI(
-      path,
-      'GET',
-      queryParams,
-      postBody,
-      headerParams,
-      formParams,
-      contentTypes.isEmpty ? null : contentTypes.first,
-    );
-  }
-
-  /// Get Initiatives By Ids
-  ///
-  /// Parameters:
-  ///
-  /// * [List<String>] initiativeIds (required):
-  ///   List of initiative IDs
-  Future<List<InitiativeSchema>?> getInitiativesByIdsInitiativesByIdsGet(List<String> initiativeIds,) async {
-    final response = await getInitiativesByIdsInitiativesByIdsGetWithHttpInfo(initiativeIds,);
-    if (response.statusCode >= HttpStatus.badRequest) {
-      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
-    }
-    // When a remote server returns no body with a status of 204, we shall not decode it.
-    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
-    // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      final responseBody = await _decodeBodyBytes(response);
-      return (await apiClient.deserializeAsync(responseBody, 'List<InitiativeSchema>') as List)
-        .cast<InitiativeSchema>()
-        .toList(growable: false);
-
-    }
-    return null;
-  }
-
-  /// List Active Initiatives
-  ///
-  /// Note: This method returns the HTTP [Response].
-  Future<Response> listActiveInitiativesInitiativesActiveGetWithHttpInfo() async {
-    // ignore: prefer_const_declarations
-    final path = r'/initiatives/active';
+    final path = r'/map-campaigns/active';
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -259,9 +149,9 @@ class InitiativesApi {
     );
   }
 
-  /// List Active Initiatives
-  Future<List<InitiativeSchema>?> listActiveInitiativesInitiativesActiveGet() async {
-    final response = await listActiveInitiativesInitiativesActiveGetWithHttpInfo();
+  /// List Active Map Campaigns
+  Future<List<MapCampaignSchema>?> listActiveMapCampaignsMapCampaignsActiveGet() async {
+    final response = await listActiveMapCampaignsMapCampaignsActiveGetWithHttpInfo();
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -270,26 +160,24 @@ class InitiativesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       final responseBody = await _decodeBodyBytes(response);
-      return (await apiClient.deserializeAsync(responseBody, 'List<InitiativeSchema>') as List)
-        .cast<InitiativeSchema>()
+      return (await apiClient.deserializeAsync(responseBody, 'List<MapCampaignSchema>') as List)
+        .cast<MapCampaignSchema>()
         .toList(growable: false);
 
     }
     return null;
   }
 
-  /// List Initiatives By Creator
-  ///
-  /// Get all initiatives created by a specific user.
+  /// List Map Campaigns By Creator
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] userId (required):
-  Future<Response> listInitiativesByCreatorInitiativesCreatorUserIdGetWithHttpInfo(String userId,) async {
+  Future<Response> listMapCampaignsByCreatorMapCampaignsCreatorUserIdGetWithHttpInfo(String userId,) async {
     // ignore: prefer_const_declarations
-    final path = r'/initiatives/creator/{user_id}'
+    final path = r'/map-campaigns/creator/{user_id}'
       .replaceAll('{user_id}', userId);
 
     // ignore: prefer_final_locals
@@ -313,15 +201,13 @@ class InitiativesApi {
     );
   }
 
-  /// List Initiatives By Creator
-  ///
-  /// Get all initiatives created by a specific user.
+  /// List Map Campaigns By Creator
   ///
   /// Parameters:
   ///
   /// * [String] userId (required):
-  Future<List<InitiativeSchema>?> listInitiativesByCreatorInitiativesCreatorUserIdGet(String userId,) async {
-    final response = await listInitiativesByCreatorInitiativesCreatorUserIdGetWithHttpInfo(userId,);
+  Future<List<MapCampaignSchema>?> listMapCampaignsByCreatorMapCampaignsCreatorUserIdGet(String userId,) async {
+    final response = await listMapCampaignsByCreatorMapCampaignsCreatorUserIdGetWithHttpInfo(userId,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -330,20 +216,25 @@ class InitiativesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       final responseBody = await _decodeBodyBytes(response);
-      return (await apiClient.deserializeAsync(responseBody, 'List<InitiativeSchema>') as List)
-        .cast<InitiativeSchema>()
+      return (await apiClient.deserializeAsync(responseBody, 'List<MapCampaignSchema>') as List)
+        .cast<MapCampaignSchema>()
         .toList(growable: false);
 
     }
     return null;
   }
 
-  /// List Initiatives
+  /// List Map Campaigns By Type
   ///
   /// Note: This method returns the HTTP [Response].
-  Future<Response> listInitiativesInitiativesGetWithHttpInfo() async {
+  ///
+  /// Parameters:
+  ///
+  /// * [MapCampaignTypeEnum] campaignType (required):
+  Future<Response> listMapCampaignsByTypeMapCampaignsByTypeCampaignTypeGetWithHttpInfo(MapCampaignTypeEnum campaignType,) async {
     // ignore: prefer_const_declarations
-    final path = r'/initiatives/';
+    final path = r'/map-campaigns/by-type/{campaign_type}'
+      .replaceAll('{campaign_type}', campaignType.toString());
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -366,9 +257,13 @@ class InitiativesApi {
     );
   }
 
-  /// List Initiatives
-  Future<List<InitiativeSchema>?> listInitiativesInitiativesGet() async {
-    final response = await listInitiativesInitiativesGetWithHttpInfo();
+  /// List Map Campaigns By Type
+  ///
+  /// Parameters:
+  ///
+  /// * [MapCampaignTypeEnum] campaignType (required):
+  Future<List<MapCampaignSchema>?> listMapCampaignsByTypeMapCampaignsByTypeCampaignTypeGet(MapCampaignTypeEnum campaignType,) async {
+    final response = await listMapCampaignsByTypeMapCampaignsByTypeCampaignTypeGetWithHttpInfo(campaignType,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -377,8 +272,55 @@ class InitiativesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       final responseBody = await _decodeBodyBytes(response);
-      return (await apiClient.deserializeAsync(responseBody, 'List<InitiativeSchema>') as List)
-        .cast<InitiativeSchema>()
+      return (await apiClient.deserializeAsync(responseBody, 'List<MapCampaignSchema>') as List)
+        .cast<MapCampaignSchema>()
+        .toList(growable: false);
+
+    }
+    return null;
+  }
+
+  /// List Map Campaigns
+  ///
+  /// Note: This method returns the HTTP [Response].
+  Future<Response> listMapCampaignsMapCampaignsGetWithHttpInfo() async {
+    // ignore: prefer_const_declarations
+    final path = r'/map-campaigns/';
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// List Map Campaigns
+  Future<List<MapCampaignSchema>?> listMapCampaignsMapCampaignsGet() async {
+    final response = await listMapCampaignsMapCampaignsGetWithHttpInfo();
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final responseBody = await _decodeBodyBytes(response);
+      return (await apiClient.deserializeAsync(responseBody, 'List<MapCampaignSchema>') as List)
+        .cast<MapCampaignSchema>()
         .toList(growable: false);
 
     }

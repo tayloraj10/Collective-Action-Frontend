@@ -100,6 +100,44 @@
                 }
             }
         },
+        "/initiatives/creator/{user_id}": {
+            "get": {
+                "tags": [
+                    "initiatives"
+                ],
+                "summary": "List Initiatives By Creator",
+                "description": "Get all initiatives created by a specific user.",
+                "operationId": "list_initiatives_by_creator_initiatives_creator__user_id__get",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "User Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/InitiativeSchema"
+                                    },
+                                    "title": "Response List Initiatives By Creator Initiatives Creator  User Id  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/initiatives/featured": {
             "get": {
                 "tags": [
@@ -160,6 +198,224 @@
                                         "$ref": "#/components/schemas/InitiativeSchema"
                                     },
                                     "title": "Response Get Initiatives By Ids Initiatives By Ids Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/initiatives/{initiative_id}": {
+            "get": {
+                "tags": [
+                    "initiatives"
+                ],
+                "summary": "Get Initiative",
+                "description": "Get a single initiative by ID (includes created_by).",
+                "operationId": "get_initiative_initiatives__initiative_id__get",
+                "parameters": [
+                    {
+                        "name": "initiative_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Initiative Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InitiativeSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map-campaigns/": {
+            "get": {
+                "tags": [
+                    "map-campaigns"
+                ],
+                "summary": "List Map Campaigns",
+                "operationId": "list_map_campaigns_map_campaigns__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/MapCampaignSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Map Campaigns Map Campaigns  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "map-campaigns"
+                ],
+                "summary": "Create Map Campaign",
+                "operationId": "create_map_campaign_map_campaigns__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MapCampaignCreateSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MapCampaignSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map-campaigns/active": {
+            "get": {
+                "tags": [
+                    "map-campaigns"
+                ],
+                "summary": "List Active Map Campaigns",
+                "operationId": "list_active_map_campaigns_map_campaigns_active_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/MapCampaignSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Active Map Campaigns Map Campaigns Active Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map-campaigns/by-type/{campaign_type}": {
+            "get": {
+                "tags": [
+                    "map-campaigns"
+                ],
+                "summary": "List Map Campaigns By Type",
+                "operationId": "list_map_campaigns_by_type_map_campaigns_by_type__campaign_type__get",
+                "parameters": [
+                    {
+                        "name": "campaign_type",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/MapCampaignTypeEnum"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/MapCampaignSchema"
+                                    },
+                                    "title": "Response List Map Campaigns By Type Map Campaigns By Type  Campaign Type  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map-campaigns/creator/{user_id}": {
+            "get": {
+                "tags": [
+                    "map-campaigns"
+                ],
+                "summary": "List Map Campaigns By Creator",
+                "operationId": "list_map_campaigns_by_creator_map_campaigns_creator__user_id__get",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "User Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/MapCampaignSchema"
+                                    },
+                                    "title": "Response List Map Campaigns By Creator Map Campaigns Creator  User Id  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map-campaigns/{campaign_id}": {
+            "get": {
+                "tags": [
+                    "map-campaigns"
+                ],
+                "summary": "Get Map Campaign",
+                "operationId": "get_map_campaign_map_campaigns__campaign_id__get",
+                "parameters": [
+                    {
+                        "name": "campaign_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Campaign Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MapCampaignSchema"
                                 }
                             }
                         }
@@ -2713,6 +2969,11 @@
                         "type": "string",
                         "title": "Action"
                     },
+                    "created_by": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Created By"
+                    },
                     "category_id": {
                         "anyOf": [
                             {
@@ -2766,7 +3027,8 @@
                 "type": "object",
                 "required": [
                     "title",
-                    "action"
+                    "action",
+                    "created_by"
                 ],
                 "title": "InitiativeCreateSchema"
             },
@@ -2846,13 +3108,19 @@
                             }
                         ],
                         "title": "Status Id"
+                    },
+                    "created_by": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Created By"
                     }
                 },
                 "type": "object",
                 "required": [
                     "id",
                     "title",
-                    "action"
+                    "action",
+                    "created_by"
                 ],
                 "title": "InitiativeSchema"
             },
@@ -2973,6 +3241,168 @@
                 },
                 "type": "object",
                 "title": "LocationSchema"
+            },
+            "MapCampaignCreateSchema": {
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "title": "Title"
+                    },
+                    "map_campaign_type": {
+                        "$ref": "#/components/schemas/MapCampaignTypeEnum"
+                    },
+                    "purpose": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Purpose"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description"
+                    },
+                    "link": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Link"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "title": "Active",
+                        "default": true
+                    },
+                    "status_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Status Id"
+                    },
+                    "created_by": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Created By"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "title",
+                    "map_campaign_type",
+                    "created_by"
+                ],
+                "title": "MapCampaignCreateSchema",
+                "description": "Matches MapCampaign model fields (excluding id)."
+            },
+            "MapCampaignSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "title": {
+                        "type": "string",
+                        "title": "Title"
+                    },
+                    "map_campaign_type": {
+                        "type": "string",
+                        "title": "Map Campaign Type"
+                    },
+                    "purpose": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Purpose"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description"
+                    },
+                    "link": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Link"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "title": "Active",
+                        "default": true
+                    },
+                    "status_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Status Id"
+                    },
+                    "created_by": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Created By"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "title",
+                    "map_campaign_type",
+                    "created_by"
+                ],
+                "title": "MapCampaignSchema"
+            },
+            "MapCampaignTypeEnum": {
+                "type": "string",
+                "enum": [
+                    "cleanup_map",
+                    "zip_code_map"
+                ],
+                "title": "MapCampaignTypeEnum"
             },
             "MemberIdsByRole": {
                 "properties": {

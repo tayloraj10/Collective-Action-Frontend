@@ -23,6 +23,10 @@ doc/LinkSchema.md
 doc/LinkUpdateSchema.md
 doc/LinksApi.md
 doc/LocationSchema.md
+doc/MapCampaignCreateSchema.md
+doc/MapCampaignSchema.md
+doc/MapCampaignTypeEnum.md
+doc/MapCampaignsApi.md
 doc/MemberIdsByRole.md
 doc/PhotosApi.md
 doc/ProjectCreateSchema.md
@@ -60,6 +64,7 @@ lib/api/categories_api.dart
 lib/api/default_api.dart
 lib/api/initiatives_api.dart
 lib/api/links_api.dart
+lib/api/map_campaigns_api.dart
 lib/api/photos_api.dart
 lib/api/project_roles_api.dart
 lib/api/projects_api.dart
@@ -89,6 +94,9 @@ lib/model/link_create_schema.dart
 lib/model/link_schema.dart
 lib/model/link_update_schema.dart
 lib/model/location_schema.dart
+lib/model/map_campaign_create_schema.dart
+lib/model/map_campaign_schema.dart
+lib/model/map_campaign_type_enum.dart
 lib/model/member_ids_by_role.dart
 lib/model/project_create_schema.dart
 lib/model/project_link_schema.dart
@@ -113,3 +121,7 @@ lib/model/user_schema.dart
 lib/model/user_type.dart
 lib/model/user_update.dart
 pubspec.yaml
+test/map_campaign_create_schema_test.dart
+test/map_campaign_schema_test.dart
+test/map_campaign_type_enum_test.dart
+test/map_campaigns_api_test.dart

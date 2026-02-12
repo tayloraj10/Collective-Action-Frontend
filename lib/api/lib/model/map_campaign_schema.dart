@@ -10,17 +10,16 @@
 
 part of collective_action_api;
 
-class InitiativeSchema {
-  /// Returns a new [InitiativeSchema] instance.
-  InitiativeSchema({
+class MapCampaignSchema {
+  /// Returns a new [MapCampaignSchema] instance.
+  MapCampaignSchema({
     required this.id,
     required this.title,
-    required this.action,
-    this.categoryId,
-    this.goal,
-    this.complete,
+    required this.mapCampaignType,
+    this.purpose,
+    this.description,
     this.link,
-    this.priority = false,
+    this.active = true,
     this.statusId,
     required this.createdBy,
   });
@@ -29,32 +28,29 @@ class InitiativeSchema {
 
   String title;
 
-  String action;
+  String mapCampaignType;
 
-  String? categoryId;
+  String? purpose;
 
-  int? goal;
-
-  int? complete;
+  String? description;
 
   String? link;
 
-  bool priority;
+  bool active;
 
   String? statusId;
 
   String createdBy;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is InitiativeSchema &&
+  bool operator ==(Object other) => identical(this, other) || other is MapCampaignSchema &&
     other.id == id &&
     other.title == title &&
-    other.action == action &&
-    other.categoryId == categoryId &&
-    other.goal == goal &&
-    other.complete == complete &&
+    other.mapCampaignType == mapCampaignType &&
+    other.purpose == purpose &&
+    other.description == description &&
     other.link == link &&
-    other.priority == priority &&
+    other.active == active &&
     other.statusId == statusId &&
     other.createdBy == createdBy;
 
@@ -63,44 +59,38 @@ class InitiativeSchema {
     // ignore: unnecessary_parenthesis
     (id.hashCode) +
     (title.hashCode) +
-    (action.hashCode) +
-    (categoryId == null ? 0 : categoryId!.hashCode) +
-    (goal == null ? 0 : goal!.hashCode) +
-    (complete == null ? 0 : complete!.hashCode) +
+    (mapCampaignType.hashCode) +
+    (purpose == null ? 0 : purpose!.hashCode) +
+    (description == null ? 0 : description!.hashCode) +
     (link == null ? 0 : link!.hashCode) +
-    (priority.hashCode) +
+    (active.hashCode) +
     (statusId == null ? 0 : statusId!.hashCode) +
     (createdBy.hashCode);
 
   @override
-  String toString() => 'InitiativeSchema[id=$id, title=$title, action=$action, categoryId=$categoryId, goal=$goal, complete=$complete, link=$link, priority=$priority, statusId=$statusId, createdBy=$createdBy]';
+  String toString() => 'MapCampaignSchema[id=$id, title=$title, mapCampaignType=$mapCampaignType, purpose=$purpose, description=$description, link=$link, active=$active, statusId=$statusId, createdBy=$createdBy]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'id'] = this.id;
       json[r'title'] = this.title;
-      json[r'action'] = this.action;
-    if (this.categoryId != null) {
-      json[r'category_id'] = this.categoryId;
+      json[r'map_campaign_type'] = this.mapCampaignType;
+    if (this.purpose != null) {
+      json[r'purpose'] = this.purpose;
     } else {
-      json[r'category_id'] = null;
+      json[r'purpose'] = null;
     }
-    if (this.goal != null) {
-      json[r'goal'] = this.goal;
+    if (this.description != null) {
+      json[r'description'] = this.description;
     } else {
-      json[r'goal'] = null;
-    }
-    if (this.complete != null) {
-      json[r'complete'] = this.complete;
-    } else {
-      json[r'complete'] = null;
+      json[r'description'] = null;
     }
     if (this.link != null) {
       json[r'link'] = this.link;
     } else {
       json[r'link'] = null;
     }
-      json[r'priority'] = this.priority;
+      json[r'active'] = this.active;
     if (this.statusId != null) {
       json[r'status_id'] = this.statusId;
     } else {
@@ -110,10 +100,10 @@ class InitiativeSchema {
     return json;
   }
 
-  /// Returns a new [InitiativeSchema] instance and imports its values from
+  /// Returns a new [MapCampaignSchema] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static InitiativeSchema? fromJson(dynamic value) {
+  static MapCampaignSchema? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -122,21 +112,20 @@ class InitiativeSchema {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "InitiativeSchema[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "InitiativeSchema[$key]" has a null value in JSON.');
+          assert(json.containsKey(key), 'Required key "MapCampaignSchema[$key]" is missing from JSON.');
+          assert(json[key] != null, 'Required key "MapCampaignSchema[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return InitiativeSchema(
+      return MapCampaignSchema(
         id: mapValueOfType<String>(json, r'id')!,
         title: mapValueOfType<String>(json, r'title')!,
-        action: mapValueOfType<String>(json, r'action')!,
-        categoryId: mapValueOfType<String>(json, r'category_id'),
-        goal: mapValueOfType<int>(json, r'goal'),
-        complete: mapValueOfType<int>(json, r'complete'),
+        mapCampaignType: mapValueOfType<String>(json, r'map_campaign_type')!,
+        purpose: mapValueOfType<String>(json, r'purpose'),
+        description: mapValueOfType<String>(json, r'description'),
         link: mapValueOfType<String>(json, r'link'),
-        priority: mapValueOfType<bool>(json, r'priority') ?? false,
+        active: mapValueOfType<bool>(json, r'active') ?? true,
         statusId: mapValueOfType<String>(json, r'status_id'),
         createdBy: mapValueOfType<String>(json, r'created_by')!,
       );
@@ -144,11 +133,11 @@ class InitiativeSchema {
     return null;
   }
 
-  static List<InitiativeSchema> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <InitiativeSchema>[];
+  static List<MapCampaignSchema> listFromJson(dynamic json, {bool growable = false,}) {
+    final result = <MapCampaignSchema>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = InitiativeSchema.fromJson(row);
+        final value = MapCampaignSchema.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -157,12 +146,12 @@ class InitiativeSchema {
     return result.toList(growable: growable);
   }
 
-  static Map<String, InitiativeSchema> mapFromJson(dynamic json) {
-    final map = <String, InitiativeSchema>{};
+  static Map<String, MapCampaignSchema> mapFromJson(dynamic json) {
+    final map = <String, MapCampaignSchema>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = InitiativeSchema.fromJson(entry.value);
+        final value = MapCampaignSchema.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -171,14 +160,14 @@ class InitiativeSchema {
     return map;
   }
 
-  // maps a json object with a list of InitiativeSchema-objects as value to a dart map
-  static Map<String, List<InitiativeSchema>> mapListFromJson(dynamic json, {bool growable = false,}) {
-    final map = <String, List<InitiativeSchema>>{};
+  // maps a json object with a list of MapCampaignSchema-objects as value to a dart map
+  static Map<String, List<MapCampaignSchema>> mapListFromJson(dynamic json, {bool growable = false,}) {
+    final map = <String, List<MapCampaignSchema>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = InitiativeSchema.listFromJson(entry.value, growable: growable,);
+        map[entry.key] = MapCampaignSchema.listFromJson(entry.value, growable: growable,);
       }
     }
     return map;
@@ -188,7 +177,7 @@ class InitiativeSchema {
   static const requiredKeys = <String>{
     'id',
     'title',
-    'action',
+    'map_campaign_type',
     'created_by',
   };
 }

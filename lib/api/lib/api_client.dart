@@ -212,6 +212,12 @@ class ApiClient {
           return LinkUpdateSchema.fromJson(value);
         case 'LocationSchema':
           return LocationSchema.fromJson(value);
+        case 'MapCampaignCreateSchema':
+          return MapCampaignCreateSchema.fromJson(value);
+        case 'MapCampaignSchema':
+          return MapCampaignSchema.fromJson(value);
+        case 'MapCampaignTypeEnum':
+          return MapCampaignTypeEnumTypeTransformer().decode(value);
         case 'MemberIdsByRole':
           return MemberIdsByRole.fromJson(value);
         case 'ProjectCreateSchema':
