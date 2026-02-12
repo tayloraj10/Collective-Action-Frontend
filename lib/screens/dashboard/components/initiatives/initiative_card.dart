@@ -69,44 +69,51 @@ class InitiativeCard extends StatelessWidget {
           final reserveHeight = progressHeight + (isMobile ? 12 : 16);
 
           Widget contentColumn() => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          initiative.title,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            fontSize: titleFontSize,
-                            letterSpacing: 0.1,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                  Expanded(
+                    child: Text(
+                      initiative.title,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: titleFontSize,
+                        letterSpacing: 0.1,
                       ),
-                      InitiativeSubmissionButton(initiative: initiative),
-                    ],
-                  ),
-                  if (initiative.link != null &&
-                      initiative.link!.isNotEmpty)
-                    GestureDetector(
-                      onTap: () async {
-                        final url = initiative.link!;
-                        AppConstants.openUrl(url);
-                      },
-                      child: LinkText(
-                        text: initiative.link!,
-                        fontSize: descFontSize,
-                        color: AppColors.blueAccent,
-                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  if (!hasBoundedHeight) SizedBox(height: reserveHeight),
+                  ),
+                  InitiativeSubmissionButton(initiative: initiative),
                 ],
-              );
+              ),
+              if (initiative.link != null && initiative.link!.isNotEmpty)
+                GestureDetector(
+                  onTap: () async {
+                    final url = initiative.link!;
+                    AppConstants.openUrl(url);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+
+                    decoration: BoxDecoration(
+                      color: AppColors.white.withAlpha(25),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: LinkText(
+                      text: initiative.link!,
+                      fontSize: descFontSize,
+                      color: AppColors.blueAccent,
+                    ),
+                  ),
+                ),
+              if (!hasBoundedHeight) SizedBox(height: reserveHeight),
+            ],
+          );
 
           return Stack(
             children: [

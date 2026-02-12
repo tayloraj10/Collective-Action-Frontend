@@ -3,9 +3,6 @@ import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
 import 'package:collective_action_frontend/providers/initiative_provider.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
-import 'package:collective_action_frontend/providers/auth_provider.dart';
-import 'package:collective_action_frontend/providers/user_provider.dart';
-import 'package:collective_action_frontend/services/user_service.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/initiatives/initiative_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/initiative_action_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
@@ -70,34 +67,6 @@ class _InitiativeListScreenState extends ConsumerState<InitiativeListScreen> {
       Colors.amber,
       Colors.deepPurple,
     ];
-
-    // Ensure logged-in user data is loaded when landing/refeshing on this page,
-    // mirroring the behavior in DashboardScreen.
-    final authUser = ref.watch(authStateProvider).value;
-    if (authUser != null) {
-      final currentUserNotifier = ref.read(currentUserProvider.notifier);
-      Future.microtask(() async {
-        try {
-          final appUser = await UserService().fetchUserByFirebaseID(
-            userId: authUser.uid,
-          );
-          if (appUser != null) {
-            await currentUserNotifier.setUser(appUser);
-          }
-        } catch (_) {
-          // Ignore errors if widget is disposed or request fails.
-        }
-      });
-    } else {
-      final currentUserNotifier = ref.read(currentUserProvider.notifier);
-      Future.microtask(() async {
-        try {
-          await currentUserNotifier.clearUser();
-        } catch (_) {
-          // Ignore errors if widget is disposed.
-        }
-      });
-    }
 
     return Scaffold(
       appBar: const CustomAppBar(),

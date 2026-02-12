@@ -23,6 +23,7 @@ class StatusValuesEnum {
 
   String toJson() => value;
 
+  static const inDevelopment = StatusValuesEnum._(r'In Development');
   static const inProgress = StatusValuesEnum._(r'In Progress');
   static const completed = StatusValuesEnum._(r'Completed');
   static const active = StatusValuesEnum._(r'Active');
@@ -30,6 +31,7 @@ class StatusValuesEnum {
 
   /// List of all possible values in this [enum][StatusValuesEnum].
   static const values = <StatusValuesEnum>[
+    inDevelopment,
     inProgress,
     completed,
     active,
@@ -72,6 +74,7 @@ class StatusValuesEnumTypeTransformer {
   StatusValuesEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
+        case r'In Development': return StatusValuesEnum.inDevelopment;
         case r'In Progress': return StatusValuesEnum.inProgress;
         case r'Completed': return StatusValuesEnum.completed;
         case r'Active': return StatusValuesEnum.active;

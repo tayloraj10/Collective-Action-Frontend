@@ -167,6 +167,860 @@
                 }
             }
         },
+        "/projects/": {
+            "get": {
+                "tags": [
+                    "projects"
+                ],
+                "summary": "List Projects",
+                "operationId": "list_projects_projects__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/ProjectSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Projects Projects  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "projects"
+                ],
+                "summary": "Create Project",
+                "operationId": "create_project_projects__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProjectCreateSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProjectSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/active": {
+            "get": {
+                "tags": [
+                    "projects"
+                ],
+                "summary": "List Active Projects",
+                "operationId": "list_active_projects_projects_active_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/ProjectSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Active Projects Projects Active Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/creator/{creator_id}": {
+            "get": {
+                "tags": [
+                    "projects"
+                ],
+                "summary": "List Projects By Creator",
+                "description": "Get all projects created by a specific user.",
+                "operationId": "list_projects_by_creator_projects_creator__creator_id__get",
+                "parameters": [
+                    {
+                        "name": "creator_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Creator Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ProjectSchema"
+                                    },
+                                    "title": "Response List Projects By Creator Projects Creator  Creator Id  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/{project_id}": {
+            "get": {
+                "tags": [
+                    "projects"
+                ],
+                "summary": "Get Project",
+                "operationId": "get_project_projects__project_id__get",
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Project Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProjectSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "projects"
+                ],
+                "summary": "Update Project",
+                "operationId": "update_project_projects__project_id__patch",
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Project Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProjectUpdateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProjectSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "projects"
+                ],
+                "summary": "Delete Project",
+                "operationId": "delete_project_projects__project_id__delete",
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Project Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProjectSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/{project_id}/members": {
+            "post": {
+                "tags": [
+                    "projects"
+                ],
+                "summary": "Add Member To Project",
+                "description": "Add a user to a project in the given role (members, owners, or developers).",
+                "operationId": "add_member_to_project_projects__project_id__members_post",
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Project Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AddProjectMemberSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProjectSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/{project_id}/members/{user_id}": {
+            "delete": {
+                "tags": [
+                    "projects"
+                ],
+                "summary": "Remove Member From Project",
+                "description": "Remove a user from a project.",
+                "operationId": "remove_member_from_project_projects__project_id__members__user_id__delete",
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Project Id"
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "User Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProjectSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/{project_id}/steps": {
+            "post": {
+                "tags": [
+                    "projects"
+                ],
+                "summary": "Add Step To Project",
+                "description": "Add a step to a project.",
+                "operationId": "add_step_to_project_projects__project_id__steps_post",
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Project Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProjectStepCreateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProjectSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/{project_id}/steps/{step_id}": {
+            "patch": {
+                "tags": [
+                    "projects"
+                ],
+                "summary": "Update Project Step",
+                "description": "Update a specific step in a project.",
+                "operationId": "update_project_step_projects__project_id__steps__step_id__patch",
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Project Id"
+                        }
+                    },
+                    {
+                        "name": "step_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Step Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProjectStepUpdateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProjectSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "projects"
+                ],
+                "summary": "Delete Project Step",
+                "description": "Delete a specific step from a project.",
+                "operationId": "delete_project_step_projects__project_id__steps__step_id__delete",
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Project Id"
+                        }
+                    },
+                    {
+                        "name": "step_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Step Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProjectSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/project-roles/": {
+            "get": {
+                "tags": [
+                    "project-roles"
+                ],
+                "summary": "List Project Roles",
+                "description": "List all project roles.",
+                "operationId": "list_project_roles_project_roles__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/ProjectRoleSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Project Roles Project Roles  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "project-roles"
+                ],
+                "summary": "Create Project Role",
+                "description": "Create a new project role.",
+                "operationId": "create_project_role_project_roles__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProjectRoleCreateSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProjectRoleSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/project-roles/{role_id}": {
+            "get": {
+                "tags": [
+                    "project-roles"
+                ],
+                "summary": "Get Project Role",
+                "description": "Get a specific project role.",
+                "operationId": "get_project_role_project_roles__role_id__get",
+                "parameters": [
+                    {
+                        "name": "role_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Role Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProjectRoleSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "project-roles"
+                ],
+                "summary": "Update Project Role",
+                "description": "Update a project role.",
+                "operationId": "update_project_role_project_roles__role_id__patch",
+                "parameters": [
+                    {
+                        "name": "role_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Role Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProjectRoleUpdateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProjectRoleSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "project-roles"
+                ],
+                "summary": "Delete Project Role",
+                "description": "Delete a project role.",
+                "operationId": "delete_project_role_project_roles__role_id__delete",
+                "parameters": [
+                    {
+                        "name": "role_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Role Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProjectRoleSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/links/": {
+            "get": {
+                "tags": [
+                    "links"
+                ],
+                "summary": "List Links",
+                "description": "Get all links.",
+                "operationId": "list_links_links__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/LinkSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Links Links  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "links"
+                ],
+                "summary": "Create Link",
+                "description": "Create a link between a project and an initiative.",
+                "operationId": "create_link_links__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LinkCreateSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LinkSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/links/{link_id}": {
+            "get": {
+                "tags": [
+                    "links"
+                ],
+                "summary": "Get Link",
+                "description": "Get a specific link by ID.",
+                "operationId": "get_link_links__link_id__get",
+                "parameters": [
+                    {
+                        "name": "link_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Link Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LinkSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "links"
+                ],
+                "summary": "Update Link",
+                "description": "Update a link (change project or initiative).",
+                "operationId": "update_link_links__link_id__patch",
+                "parameters": [
+                    {
+                        "name": "link_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Link Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LinkUpdateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LinkSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "links"
+                ],
+                "summary": "Delete Link",
+                "description": "Delete a link.",
+                "operationId": "delete_link_links__link_id__delete",
+                "parameters": [
+                    {
+                        "name": "link_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Link Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LinkSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/links/project/{project_id}": {
+            "get": {
+                "tags": [
+                    "links"
+                ],
+                "summary": "Get Links By Project",
+                "description": "Get all links for a specific project.",
+                "operationId": "get_links_by_project_links_project__project_id__get",
+                "parameters": [
+                    {
+                        "name": "project_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Project Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/LinkSchema"
+                                    },
+                                    "title": "Response Get Links By Project Links Project  Project Id  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/links/initiative/{initiative_id}": {
+            "get": {
+                "tags": [
+                    "links"
+                ],
+                "summary": "Get Links By Initiative",
+                "description": "Get all links for a specific initiative.",
+                "operationId": "get_links_by_initiative_links_initiative__initiative_id__get",
+                "parameters": [
+                    {
+                        "name": "initiative_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Initiative Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/LinkSchema"
+                                    },
+                                    "title": "Response Get Links By Initiative Links Initiative  Initiative Id  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/actions/": {
             "post": {
                 "tags": [
@@ -1754,6 +2608,31 @@
                 ],
                 "title": "ActionTypeValuesEnum"
             },
+            "AddProjectMemberSchema": {
+                "properties": {
+                    "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "User Id"
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "members",
+                            "owners",
+                            "developers"
+                        ],
+                        "title": "Role"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "user_id",
+                    "role"
+                ],
+                "title": "AddProjectMemberSchema",
+                "description": "Body for adding a user to a project."
+            },
             "Body_upload_profile_photo_photos_profile__user_id__post": {
                 "properties": {
                     "file": {
@@ -1977,6 +2856,85 @@
                 ],
                 "title": "InitiativeSchema"
             },
+            "LinkCreateSchema": {
+                "properties": {
+                    "project_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Project Id"
+                    },
+                    "initiative_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Initiative Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "project_id",
+                    "initiative_id"
+                ],
+                "title": "LinkCreateSchema",
+                "description": "Create a link between a project and an initiative."
+            },
+            "LinkSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "project_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Project Id"
+                    },
+                    "initiative_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Initiative Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "project_id",
+                    "initiative_id"
+                ],
+                "title": "LinkSchema",
+                "description": "Link entity response schema."
+            },
+            "LinkUpdateSchema": {
+                "properties": {
+                    "project_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Project Id"
+                    },
+                    "initiative_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Initiative Id"
+                    }
+                },
+                "type": "object",
+                "title": "LinkUpdateSchema",
+                "description": "Update a link (change project or initiative)."
+            },
             "LocationSchema": {
                 "properties": {
                     "city": {
@@ -2015,6 +2973,531 @@
                 },
                 "type": "object",
                 "title": "LocationSchema"
+            },
+            "MemberIdsByRole": {
+                "properties": {
+                    "members": {
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "type": "array",
+                        "title": "Members"
+                    },
+                    "owners": {
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "type": "array",
+                        "title": "Owners"
+                    },
+                    "developers": {
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "type": "array",
+                        "title": "Developers"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "title": "MemberIdsByRole",
+                "description": "Only 'members', 'owners', and 'developers' are allowed."
+            },
+            "ProjectCreateSchema": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description"
+                    },
+                    "category_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Category Id"
+                    },
+                    "status_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Status Id"
+                    },
+                    "creator_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Creator Id"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "title": "Active",
+                        "default": true
+                    },
+                    "members": {
+                        "$ref": "#/components/schemas/MemberIdsByRole"
+                    },
+                    "steps": {
+                        "items": {
+                            "$ref": "#/components/schemas/ProjectStepCreateSchema"
+                        },
+                        "type": "array",
+                        "title": "Steps"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "creator_id"
+                ],
+                "title": "ProjectCreateSchema"
+            },
+            "ProjectLinkSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "project_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Project Id"
+                    },
+                    "initiative_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Initiative Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "project_id",
+                    "initiative_id"
+                ],
+                "title": "ProjectLinkSchema"
+            },
+            "ProjectRoleCreateSchema": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name"
+                ],
+                "title": "ProjectRoleCreateSchema",
+                "description": "Create a new project role."
+            },
+            "ProjectRoleSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "name"
+                ],
+                "title": "ProjectRoleSchema",
+                "description": "Project role response."
+            },
+            "ProjectRoleUpdateSchema": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name"
+                ],
+                "title": "ProjectRoleUpdateSchema",
+                "description": "Update a project role."
+            },
+            "ProjectSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description"
+                    },
+                    "category_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Category Id"
+                    },
+                    "status_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Status Id"
+                    },
+                    "creator_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Creator Id"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "title": "Active",
+                        "default": true
+                    },
+                    "members": {
+                        "$ref": "#/components/schemas/MemberIdsByRole"
+                    },
+                    "steps": {
+                        "items": {
+                            "$ref": "#/components/schemas/ProjectStepSchema"
+                        },
+                        "type": "array",
+                        "title": "Steps"
+                    },
+                    "links": {
+                        "items": {
+                            "$ref": "#/components/schemas/ProjectLinkSchema"
+                        },
+                        "type": "array",
+                        "title": "Links"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Updated At"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "creator_id",
+                    "created_at",
+                    "updated_at"
+                ],
+                "title": "ProjectSchema",
+                "description": "Project with nested members, steps, and links (for GET responses)."
+            },
+            "ProjectStepCreateSchema": {
+                "properties": {
+                    "order": {
+                        "type": "integer",
+                        "title": "Order",
+                        "default": 0
+                    },
+                    "title": {
+                        "type": "string",
+                        "title": "Title"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description"
+                    },
+                    "completed": {
+                        "type": "boolean",
+                        "title": "Completed",
+                        "default": false
+                    },
+                    "status_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Status Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "title"
+                ],
+                "title": "ProjectStepCreateSchema",
+                "description": "Payload for creating a step (no id)."
+            },
+            "ProjectStepSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "project_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Project Id"
+                    },
+                    "order": {
+                        "type": "integer",
+                        "title": "Order",
+                        "default": 0
+                    },
+                    "title": {
+                        "type": "string",
+                        "title": "Title"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description"
+                    },
+                    "completed": {
+                        "type": "boolean",
+                        "title": "Completed",
+                        "default": false
+                    },
+                    "status_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Status Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "project_id",
+                    "title"
+                ],
+                "title": "ProjectStepSchema"
+            },
+            "ProjectStepUpdateSchema": {
+                "properties": {
+                    "order": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Order"
+                    },
+                    "title": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Title"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description"
+                    },
+                    "completed": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Completed"
+                    },
+                    "status_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Status Id"
+                    }
+                },
+                "type": "object",
+                "title": "ProjectStepUpdateSchema",
+                "description": "Payload for updating a step."
+            },
+            "ProjectUpdateSchema": {
+                "properties": {
+                    "name": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Name"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description"
+                    },
+                    "category_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Category Id"
+                    },
+                    "status_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Status Id"
+                    },
+                    "active": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Active"
+                    },
+                    "members": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/MemberIdsByRole"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "steps": {
+                        "anyOf": [
+                            {
+                                "items": {
+                                    "$ref": "#/components/schemas/ProjectStepCreateSchema"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Steps"
+                    }
+                },
+                "type": "object",
+                "title": "ProjectUpdateSchema"
             },
             "QuoteCreateSchema": {
                 "properties": {
@@ -2178,13 +3661,15 @@
                 "type": "string",
                 "enum": [
                     "Status",
-                    "Project Status"
+                    "Project Status",
+                    "Step Status"
                 ],
                 "title": "StatusTypeEnum"
             },
             "StatusValuesEnum": {
                 "type": "string",
                 "enum": [
+                    "In Development",
                     "In Progress",
                     "Completed",
                     "Active",

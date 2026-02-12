@@ -82,12 +82,36 @@ Class | Method | HTTP request | Description
 *InitiativesApi* | [**getInitiativesByIdsInitiativesByIdsGet**](doc//InitiativesApi.md#getinitiativesbyidsinitiativesbyidsget) | **GET** /initiatives/by-ids | Get Initiatives By Ids
 *InitiativesApi* | [**listActiveInitiativesInitiativesActiveGet**](doc//InitiativesApi.md#listactiveinitiativesinitiativesactiveget) | **GET** /initiatives/active | List Active Initiatives
 *InitiativesApi* | [**listInitiativesInitiativesGet**](doc//InitiativesApi.md#listinitiativesinitiativesget) | **GET** /initiatives/ | List Initiatives
+*LinksApi* | [**createLinkLinksPost**](doc//LinksApi.md#createlinklinkspost) | **POST** /links/ | Create Link
+*LinksApi* | [**deleteLinkLinksLinkIdDelete**](doc//LinksApi.md#deletelinklinkslinkiddelete) | **DELETE** /links/{link_id} | Delete Link
+*LinksApi* | [**getLinkLinksLinkIdGet**](doc//LinksApi.md#getlinklinkslinkidget) | **GET** /links/{link_id} | Get Link
+*LinksApi* | [**getLinksByInitiativeLinksInitiativeInitiativeIdGet**](doc//LinksApi.md#getlinksbyinitiativelinksinitiativeinitiativeidget) | **GET** /links/initiative/{initiative_id} | Get Links By Initiative
+*LinksApi* | [**getLinksByProjectLinksProjectProjectIdGet**](doc//LinksApi.md#getlinksbyprojectlinksprojectprojectidget) | **GET** /links/project/{project_id} | Get Links By Project
+*LinksApi* | [**listLinksLinksGet**](doc//LinksApi.md#listlinkslinksget) | **GET** /links/ | List Links
+*LinksApi* | [**updateLinkLinksLinkIdPatch**](doc//LinksApi.md#updatelinklinkslinkidpatch) | **PATCH** /links/{link_id} | Update Link
 *PhotosApi* | [**deleteAllSubmissionPhotosPhotosSubmissionSubmissionIdDelete**](doc//PhotosApi.md#deleteallsubmissionphotosphotossubmissionsubmissioniddelete) | **DELETE** /photos/submission/{submission_id} | Delete All Submission Photos
 *PhotosApi* | [**deleteProfilePhotoPhotosProfileUserIdDelete**](doc//PhotosApi.md#deleteprofilephotophotosprofileuseriddelete) | **DELETE** /photos/profile/{user_id} | Delete Profile Photo
 *PhotosApi* | [**deleteSubmissionPhotoPhotosSubmissionSubmissionIdPhotoFilenameDelete**](doc//PhotosApi.md#deletesubmissionphotophotossubmissionsubmissionidphotofilenamedelete) | **DELETE** /photos/submission/{submission_id}/{photo_filename} | Delete Submission Photo
 *PhotosApi* | [**listSubmissionPhotosPhotosSubmissionSubmissionIdGet**](doc//PhotosApi.md#listsubmissionphotosphotossubmissionsubmissionidget) | **GET** /photos/submission/{submission_id} | List Submission Photos
 *PhotosApi* | [**uploadProfilePhotoPhotosProfileUserIdPost**](doc//PhotosApi.md#uploadprofilephotophotosprofileuseridpost) | **POST** /photos/profile/{user_id} | Upload Profile Photo
 *PhotosApi* | [**uploadSubmissionPhotosPhotosSubmissionSubmissionIdPost**](doc//PhotosApi.md#uploadsubmissionphotosphotossubmissionsubmissionidpost) | **POST** /photos/submission/{submission_id} | Upload Submission Photos
+*ProjectRolesApi* | [**createProjectRoleProjectRolesPost**](doc//ProjectRolesApi.md#createprojectroleprojectrolespost) | **POST** /project-roles/ | Create Project Role
+*ProjectRolesApi* | [**deleteProjectRoleProjectRolesRoleIdDelete**](doc//ProjectRolesApi.md#deleteprojectroleprojectrolesroleiddelete) | **DELETE** /project-roles/{role_id} | Delete Project Role
+*ProjectRolesApi* | [**getProjectRoleProjectRolesRoleIdGet**](doc//ProjectRolesApi.md#getprojectroleprojectrolesroleidget) | **GET** /project-roles/{role_id} | Get Project Role
+*ProjectRolesApi* | [**listProjectRolesProjectRolesGet**](doc//ProjectRolesApi.md#listprojectrolesprojectrolesget) | **GET** /project-roles/ | List Project Roles
+*ProjectRolesApi* | [**updateProjectRoleProjectRolesRoleIdPatch**](doc//ProjectRolesApi.md#updateprojectroleprojectrolesroleidpatch) | **PATCH** /project-roles/{role_id} | Update Project Role
+*ProjectsApi* | [**addMemberToProjectProjectsProjectIdMembersPost**](doc//ProjectsApi.md#addmembertoprojectprojectsprojectidmemberspost) | **POST** /projects/{project_id}/members | Add Member To Project
+*ProjectsApi* | [**addStepToProjectProjectsProjectIdStepsPost**](doc//ProjectsApi.md#addsteptoprojectprojectsprojectidstepspost) | **POST** /projects/{project_id}/steps | Add Step To Project
+*ProjectsApi* | [**createProjectProjectsPost**](doc//ProjectsApi.md#createprojectprojectspost) | **POST** /projects/ | Create Project
+*ProjectsApi* | [**deleteProjectProjectsProjectIdDelete**](doc//ProjectsApi.md#deleteprojectprojectsprojectiddelete) | **DELETE** /projects/{project_id} | Delete Project
+*ProjectsApi* | [**deleteProjectStepProjectsProjectIdStepsStepIdDelete**](doc//ProjectsApi.md#deleteprojectstepprojectsprojectidstepsstepiddelete) | **DELETE** /projects/{project_id}/steps/{step_id} | Delete Project Step
+*ProjectsApi* | [**getProjectProjectsProjectIdGet**](doc//ProjectsApi.md#getprojectprojectsprojectidget) | **GET** /projects/{project_id} | Get Project
+*ProjectsApi* | [**listActiveProjectsProjectsActiveGet**](doc//ProjectsApi.md#listactiveprojectsprojectsactiveget) | **GET** /projects/active | List Active Projects
+*ProjectsApi* | [**listProjectsByCreatorProjectsCreatorCreatorIdGet**](doc//ProjectsApi.md#listprojectsbycreatorprojectscreatorcreatoridget) | **GET** /projects/creator/{creator_id} | List Projects By Creator
+*ProjectsApi* | [**listProjectsProjectsGet**](doc//ProjectsApi.md#listprojectsprojectsget) | **GET** /projects/ | List Projects
+*ProjectsApi* | [**removeMemberFromProjectProjectsProjectIdMembersUserIdDelete**](doc//ProjectsApi.md#removememberfromprojectprojectsprojectidmembersuseriddelete) | **DELETE** /projects/{project_id}/members/{user_id} | Remove Member From Project
+*ProjectsApi* | [**updateProjectProjectsProjectIdPatch**](doc//ProjectsApi.md#updateprojectprojectsprojectidpatch) | **PATCH** /projects/{project_id} | Update Project
+*ProjectsApi* | [**updateProjectStepProjectsProjectIdStepsStepIdPatch**](doc//ProjectsApi.md#updateprojectstepprojectsprojectidstepsstepidpatch) | **PATCH** /projects/{project_id}/steps/{step_id} | Update Project Step
 *QuotesApi* | [**createQuoteQuotesPost**](doc//QuotesApi.md#createquotequotespost) | **POST** /quotes/ | Create Quote
 *QuotesApi* | [**deleteQuoteQuotesQuoteIdDelete**](doc//QuotesApi.md#deletequotequotesquoteiddelete) | **DELETE** /quotes/{quote_id} | Delete Quote
 *QuotesApi* | [**getQuoteQuotesQuoteIdGet**](doc//QuotesApi.md#getquotequotesquoteidget) | **GET** /quotes/{quote_id} | Get Quote
@@ -117,11 +141,26 @@ Class | Method | HTTP request | Description
  - [ActionTypeCreate](doc//ActionTypeCreate.md)
  - [ActionTypeSchema](doc//ActionTypeSchema.md)
  - [ActionTypeValuesEnum](doc//ActionTypeValuesEnum.md)
+ - [AddProjectMemberSchema](doc//AddProjectMemberSchema.md)
  - [CategoryCreate](doc//CategoryCreate.md)
  - [CategorySchema](doc//CategorySchema.md)
  - [InitiativeCreateSchema](doc//InitiativeCreateSchema.md)
  - [InitiativeSchema](doc//InitiativeSchema.md)
+ - [LinkCreateSchema](doc//LinkCreateSchema.md)
+ - [LinkSchema](doc//LinkSchema.md)
+ - [LinkUpdateSchema](doc//LinkUpdateSchema.md)
  - [LocationSchema](doc//LocationSchema.md)
+ - [MemberIdsByRole](doc//MemberIdsByRole.md)
+ - [ProjectCreateSchema](doc//ProjectCreateSchema.md)
+ - [ProjectLinkSchema](doc//ProjectLinkSchema.md)
+ - [ProjectRoleCreateSchema](doc//ProjectRoleCreateSchema.md)
+ - [ProjectRoleSchema](doc//ProjectRoleSchema.md)
+ - [ProjectRoleUpdateSchema](doc//ProjectRoleUpdateSchema.md)
+ - [ProjectSchema](doc//ProjectSchema.md)
+ - [ProjectStepCreateSchema](doc//ProjectStepCreateSchema.md)
+ - [ProjectStepSchema](doc//ProjectStepSchema.md)
+ - [ProjectStepUpdateSchema](doc//ProjectStepUpdateSchema.md)
+ - [ProjectUpdateSchema](doc//ProjectUpdateSchema.md)
  - [QuoteCreateSchema](doc//QuoteCreateSchema.md)
  - [QuoteSchema](doc//QuoteSchema.md)
  - [SocialLinksSchema](doc//SocialLinksSchema.md)
