@@ -3399,8 +3399,8 @@
             "MapCampaignTypeEnum": {
                 "type": "string",
                 "enum": [
-                    "cleanup_map",
-                    "zip_code_map"
+                    "Cleanup Map",
+                    "Zip Code Map"
                 ],
                 "title": "MapCampaignTypeEnum"
             },

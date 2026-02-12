@@ -23,8 +23,8 @@ class MapCampaignTypeEnum {
 
   String toJson() => value;
 
-  static const cleanupMap = MapCampaignTypeEnum._(r'cleanup_map');
-  static const zipCodeMap = MapCampaignTypeEnum._(r'zip_code_map');
+  static const cleanupMap = MapCampaignTypeEnum._(r'Cleanup Map');
+  static const zipCodeMap = MapCampaignTypeEnum._(r'Zip Code Map');
 
   /// List of all possible values in this [enum][MapCampaignTypeEnum].
   static const values = <MapCampaignTypeEnum>[
@@ -68,8 +68,8 @@ class MapCampaignTypeEnumTypeTransformer {
   MapCampaignTypeEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'cleanup_map': return MapCampaignTypeEnum.cleanupMap;
-        case r'zip_code_map': return MapCampaignTypeEnum.zipCodeMap;
+        case r'Cleanup Map': return MapCampaignTypeEnum.cleanupMap;
+        case r'Zip Code Map': return MapCampaignTypeEnum.zipCodeMap;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
