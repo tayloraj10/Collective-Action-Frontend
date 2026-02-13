@@ -2222,6 +2222,116 @@
                 }
             }
         },
+        "/schemas/event-data/cleanup": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "CleanupEventData schema",
+                "description": "Schema for event_data when action_type is 'cleanup'. Exposed for OpenAPI/codegen.",
+                "operationId": "get_cleanup_event_data_schema_schemas_event_data_cleanup_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CleanupEventData"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/schemas/event-data/trash_report": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "TrashReportEventData schema",
+                "description": "Schema for event_data when action_type is 'trash_report'. Exposed for OpenAPI/codegen.",
+                "operationId": "get_trash_report_event_data_schema_schemas_event_data_trash_report_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TrashReportEventData"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/schemas/event-data/cleanup_route": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "CleanupRouteEventData schema",
+                "description": "Schema for event_data when action_type is 'cleanup_route'. Exposed for OpenAPI/codegen.",
+                "operationId": "get_cleanup_route_event_data_schema_schemas_event_data_cleanup_route_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CleanupRouteEventData"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/schemas/event-data/zip_code_submission": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "ZipCodeSubmissionEventData schema",
+                "description": "Schema for event_data when action_type is 'zip_code_submission'. Exposed for OpenAPI/codegen.",
+                "operationId": "get_zip_code_submission_event_data_schema_schemas_event_data_zip_code_submission_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ZipCodeSubmissionEventData"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/schemas/event-data/base": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "EventDataBase schema",
+                "description": "Shared base fields for all event_data types. Exposed for OpenAPI/codegen.",
+                "operationId": "get_event_data_base_schema_schemas_event_data_base_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventDataBase"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users/": {
             "get": {
                 "tags": [
@@ -3026,6 +3136,255 @@
                     "name"
                 ],
                 "title": "CategorySchema"
+            },
+            "CleanupEventData": {
+                "properties": {
+                    "date": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Date"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "default": ""
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    },
+                    "small_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Small Bags"
+                    },
+                    "large_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Large Bags"
+                    },
+                    "pounds": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Pounds"
+                    },
+                    "location": {
+                        "type": "string",
+                        "title": "Location",
+                        "default": ""
+                    }
+                },
+                "type": "object",
+                "title": "CleanupEventData"
+            },
+            "CleanupRouteEventData": {
+                "properties": {
+                    "date": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Date"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "default": ""
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    },
+                    "small_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Small Bags"
+                    },
+                    "large_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Large Bags"
+                    },
+                    "pounds": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Pounds"
+                    },
+                    "route_name": {
+                        "type": "string",
+                        "title": "Route Name",
+                        "default": ""
+                    },
+                    "waypoints": {
+                        "items": {
+                            "$ref": "#/components/schemas/CleanupWaypoint"
+                        },
+                        "type": "array",
+                        "title": "Waypoints"
+                    },
+                    "bags": {
+                        "type": "number",
+                        "title": "Bags",
+                        "default": 0.0
+                    },
+                    "weight": {
+                        "type": "number",
+                        "title": "Weight",
+                        "default": 0.0
+                    }
+                },
+                "type": "object",
+                "title": "CleanupRouteEventData"
+            },
+            "CleanupWaypoint": {
+                "properties": {
+                    "lat": {
+                        "type": "number",
+                        "title": "Lat",
+                        "default": 0.0
+                    },
+                    "lng": {
+                        "type": "number",
+                        "title": "Lng",
+                        "default": 0.0
+                    },
+                    "number": {
+                        "type": "integer",
+                        "title": "Number",
+                        "default": 0
+                    }
+                },
+                "type": "object",
+                "title": "CleanupWaypoint"
+            },
+            "EventDataBase": {
+                "properties": {
+                    "date": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Date"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "default": ""
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    },
+                    "small_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Small Bags"
+                    },
+                    "large_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Large Bags"
+                    },
+                    "pounds": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Pounds"
+                    }
+                },
+                "type": "object",
+                "title": "EventDataBase"
             },
             "InitiativeCreateSchema": {
                 "properties": {
@@ -4175,6 +4534,78 @@
                 ],
                 "title": "StatusValuesEnum"
             },
+            "TrashReportEventData": {
+                "properties": {
+                    "date": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Date"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "default": ""
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    },
+                    "small_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Small Bags"
+                    },
+                    "large_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Large Bags"
+                    },
+                    "pounds": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Pounds"
+                    },
+                    "location": {
+                        "type": "string",
+                        "title": "Location",
+                        "default": ""
+                    }
+                },
+                "type": "object",
+                "title": "TrashReportEventData"
+            },
             "UserCreate": {
                 "properties": {
                     "email": {
@@ -4471,6 +4902,78 @@
                 "type": "object",
                 "title": "UserUpdate",
                 "description": "Schema for PATCH updates. Excludes photo_url, firebase_user_id, is_active."
+            },
+            "ZipCodeSubmissionEventData": {
+                "properties": {
+                    "date": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Date"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "default": ""
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    },
+                    "small_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Small Bags"
+                    },
+                    "large_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Large Bags"
+                    },
+                    "pounds": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Pounds"
+                    },
+                    "zip_code": {
+                        "type": "string",
+                        "title": "Zip Code",
+                        "default": ""
+                    }
+                },
+                "type": "object",
+                "title": "ZipCodeSubmissionEventData"
             }
         }
     }

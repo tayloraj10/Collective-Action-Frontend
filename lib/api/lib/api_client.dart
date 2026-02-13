@@ -200,6 +200,14 @@ class ApiClient {
           return CategoryCreate.fromJson(value);
         case 'CategorySchema':
           return CategorySchema.fromJson(value);
+        case 'CleanupEventData':
+          return CleanupEventData.fromJson(value);
+        case 'CleanupRouteEventData':
+          return CleanupRouteEventData.fromJson(value);
+        case 'CleanupWaypoint':
+          return CleanupWaypoint.fromJson(value);
+        case 'EventDataBase':
+          return EventDataBase.fromJson(value);
         case 'InitiativeCreateSchema':
           return InitiativeCreateSchema.fromJson(value);
         case 'InitiativeSchema':
@@ -254,6 +262,8 @@ class ApiClient {
           return StatusTypeEnumTypeTransformer().decode(value);
         case 'StatusValuesEnum':
           return StatusValuesEnumTypeTransformer().decode(value);
+        case 'TrashReportEventData':
+          return TrashReportEventData.fromJson(value);
         case 'UserCreate':
           return UserCreate.fromJson(value);
         case 'UserPhotoUpdate':
@@ -264,6 +274,8 @@ class ApiClient {
           return UserTypeTypeTransformer().decode(value);
         case 'UserUpdate':
           return UserUpdate.fromJson(value);
+        case 'ZipCodeSubmissionEventData':
+          return ZipCodeSubmissionEventData.fromJson(value);
         default:
           dynamic match;
           if (value is List && (match = _regList.firstMatch(targetType)?.group(1)) != null) {

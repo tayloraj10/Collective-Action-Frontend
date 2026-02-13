@@ -126,6 +126,11 @@ Class | Method | HTTP request | Description
 *QuotesApi* | [**getRandomQuoteQuotesRandomGet**](doc//QuotesApi.md#getrandomquotequotesrandomget) | **GET** /quotes/random | Get Random Quote
 *QuotesApi* | [**listQuotesQuotesGet**](doc//QuotesApi.md#listquotesquotesget) | **GET** /quotes/ | List Quotes
 *QuotesApi* | [**updateQuoteQuotesQuoteIdPatch**](doc//QuotesApi.md#updatequotequotesquoteidpatch) | **PATCH** /quotes/{quote_id} | Update Quote
+*SchemasApi* | [**getCleanupEventDataSchemaSchemasEventDataCleanupGet**](doc//SchemasApi.md#getcleanupeventdataschemaschemaseventdatacleanupget) | **GET** /schemas/event-data/cleanup | CleanupEventData schema
+*SchemasApi* | [**getCleanupRouteEventDataSchemaSchemasEventDataCleanupRouteGet**](doc//SchemasApi.md#getcleanuprouteeventdataschemaschemaseventdatacleanuprouteget) | **GET** /schemas/event-data/cleanup_route | CleanupRouteEventData schema
+*SchemasApi* | [**getEventDataBaseSchemaSchemasEventDataBaseGet**](doc//SchemasApi.md#geteventdatabaseschemaschemaseventdatabaseget) | **GET** /schemas/event-data/base | EventDataBase schema
+*SchemasApi* | [**getTrashReportEventDataSchemaSchemasEventDataTrashReportGet**](doc//SchemasApi.md#gettrashreporteventdataschemaschemaseventdatatrashreportget) | **GET** /schemas/event-data/trash_report | TrashReportEventData schema
+*SchemasApi* | [**getZipCodeSubmissionEventDataSchemaSchemasEventDataZipCodeSubmissionGet**](doc//SchemasApi.md#getzipcodesubmissioneventdataschemaschemaseventdatazipcodesubmissionget) | **GET** /schemas/event-data/zip_code_submission | ZipCodeSubmissionEventData schema
 *StatusesApi* | [**createStatusStatusesPost**](doc//StatusesApi.md#createstatusstatusespost) | **POST** /statuses/ | Create Status
 *StatusesApi* | [**deleteStatusStatusesStatusIdDelete**](doc//StatusesApi.md#deletestatusstatusesstatusiddelete) | **DELETE** /statuses/{status_id} | Delete Status
 *StatusesApi* | [**getStatusStatusesStatusIdGet**](doc//StatusesApi.md#getstatusstatusesstatusidget) | **GET** /statuses/{status_id} | Get Status
@@ -152,6 +157,10 @@ Class | Method | HTTP request | Description
  - [AddProjectMemberSchema](doc//AddProjectMemberSchema.md)
  - [CategoryCreate](doc//CategoryCreate.md)
  - [CategorySchema](doc//CategorySchema.md)
+ - [CleanupEventData](doc//CleanupEventData.md)
+ - [CleanupRouteEventData](doc//CleanupRouteEventData.md)
+ - [CleanupWaypoint](doc//CleanupWaypoint.md)
+ - [EventDataBase](doc//EventDataBase.md)
  - [InitiativeCreateSchema](doc//InitiativeCreateSchema.md)
  - [InitiativeSchema](doc//InitiativeSchema.md)
  - [LinkCreateSchema](doc//LinkCreateSchema.md)
@@ -179,11 +188,13 @@ Class | Method | HTTP request | Description
  - [StatusSchema](doc//StatusSchema.md)
  - [StatusTypeEnum](doc//StatusTypeEnum.md)
  - [StatusValuesEnum](doc//StatusValuesEnum.md)
+ - [TrashReportEventData](doc//TrashReportEventData.md)
  - [UserCreate](doc//UserCreate.md)
  - [UserPhotoUpdate](doc//UserPhotoUpdate.md)
  - [UserSchema](doc//UserSchema.md)
  - [UserType](doc//UserType.md)
  - [UserUpdate](doc//UserUpdate.md)
+ - [ZipCodeSubmissionEventData](doc//ZipCodeSubmissionEventData.md)
 
 
 ## Documentation For Authorization
