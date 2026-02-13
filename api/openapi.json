@@ -3204,6 +3204,21 @@
                         "type": "string",
                         "title": "Location",
                         "default": ""
+                    },
+                    "group": {
+                        "type": "string",
+                        "title": "Group",
+                        "default": ""
+                    },
+                    "bags": {
+                        "type": "number",
+                        "title": "Bags",
+                        "default": 0.0
+                    },
+                    "weight": {
+                        "type": "number",
+                        "title": "Weight",
+                        "default": 0.0
                     }
                 },
                 "type": "object",
@@ -4536,22 +4551,15 @@
             },
             "TrashReportEventData": {
                 "properties": {
-                    "date": {
-                        "anyOf": [
-                            {
-                                "type": "string",
-                                "format": "date-time"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Date"
-                    },
-                    "name": {
+                    "location": {
                         "type": "string",
-                        "title": "Name",
+                        "title": "Location",
                         "default": ""
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Date"
                     },
                     "image_url": {
                         "anyOf": [
@@ -4563,47 +4571,12 @@
                             }
                         ],
                         "title": "Image Url"
-                    },
-                    "small_bags": {
-                        "anyOf": [
-                            {
-                                "type": "integer"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Small Bags"
-                    },
-                    "large_bags": {
-                        "anyOf": [
-                            {
-                                "type": "integer"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Large Bags"
-                    },
-                    "pounds": {
-                        "anyOf": [
-                            {
-                                "type": "number"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Pounds"
-                    },
-                    "location": {
-                        "type": "string",
-                        "title": "Location",
-                        "default": ""
                     }
                 },
                 "type": "object",
+                "required": [
+                    "date"
+                ],
                 "title": "TrashReportEventData"
             },
             "UserCreate": {

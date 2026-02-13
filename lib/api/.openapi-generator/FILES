@@ -135,10 +135,3 @@ lib/model/user_type.dart
 lib/model/user_update.dart
 lib/model/zip_code_submission_event_data.dart
 pubspec.yaml
-test/cleanup_event_data_test.dart
-test/cleanup_route_event_data_test.dart
-test/cleanup_waypoint_test.dart
-test/event_data_base_test.dart
-test/schemas_api_test.dart
-test/trash_report_event_data_test.dart
-test/zip_code_submission_event_data_test.dart

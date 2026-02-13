@@ -13,82 +13,42 @@ part of collective_action_api;
 class TrashReportEventData {
   /// Returns a new [TrashReportEventData] instance.
   TrashReportEventData({
-    this.date,
-    this.name = '',
-    this.imageUrl,
-    this.smallBags,
-    this.largeBags,
-    this.pounds,
     this.location = '',
+    required this.date,
+    this.imageUrl,
   });
-
-  DateTime? date;
-
-  String name;
-
-  String? imageUrl;
-
-  int? smallBags;
-
-  int? largeBags;
-
-  num? pounds;
 
   String location;
 
+  DateTime date;
+
+  String? imageUrl;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is TrashReportEventData &&
+    other.location == location &&
     other.date == date &&
-    other.name == name &&
-    other.imageUrl == imageUrl &&
-    other.smallBags == smallBags &&
-    other.largeBags == largeBags &&
-    other.pounds == pounds &&
-    other.location == location;
+    other.imageUrl == imageUrl;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (date == null ? 0 : date!.hashCode) +
-    (name.hashCode) +
-    (imageUrl == null ? 0 : imageUrl!.hashCode) +
-    (smallBags == null ? 0 : smallBags!.hashCode) +
-    (largeBags == null ? 0 : largeBags!.hashCode) +
-    (pounds == null ? 0 : pounds!.hashCode) +
-    (location.hashCode);
+    (location.hashCode) +
+    (date.hashCode) +
+    (imageUrl == null ? 0 : imageUrl!.hashCode);
 
   @override
-  String toString() => 'TrashReportEventData[date=$date, name=$name, imageUrl=$imageUrl, smallBags=$smallBags, largeBags=$largeBags, pounds=$pounds, location=$location]';
+  String toString() => 'TrashReportEventData[location=$location, date=$date, imageUrl=$imageUrl]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.date != null) {
-      json[r'date'] = this.date!.toUtc().toIso8601String();
-    } else {
-      json[r'date'] = null;
-    }
-      json[r'name'] = this.name;
+      json[r'location'] = this.location;
+      json[r'date'] = this.date.toUtc().toIso8601String();
     if (this.imageUrl != null) {
       json[r'image_url'] = this.imageUrl;
     } else {
       json[r'image_url'] = null;
     }
-    if (this.smallBags != null) {
-      json[r'small_bags'] = this.smallBags;
-    } else {
-      json[r'small_bags'] = null;
-    }
-    if (this.largeBags != null) {
-      json[r'large_bags'] = this.largeBags;
-    } else {
-      json[r'large_bags'] = null;
-    }
-    if (this.pounds != null) {
-      json[r'pounds'] = this.pounds;
-    } else {
-      json[r'pounds'] = null;
-    }
-      json[r'location'] = this.location;
     return json;
   }
 
@@ -111,15 +71,9 @@ class TrashReportEventData {
       }());
 
       return TrashReportEventData(
-        date: mapDateTime(json, r'date', r''),
-        name: mapValueOfType<String>(json, r'name') ?? '',
-        imageUrl: mapValueOfType<String>(json, r'image_url'),
-        smallBags: mapValueOfType<int>(json, r'small_bags'),
-        largeBags: mapValueOfType<int>(json, r'large_bags'),
-        pounds: json[r'pounds'] == null
-            ? null
-            : num.parse('${json[r'pounds']}'),
         location: mapValueOfType<String>(json, r'location') ?? '',
+        date: mapDateTime(json, r'date', r'')!,
+        imageUrl: mapValueOfType<String>(json, r'image_url'),
       );
     }
     return null;
@@ -167,6 +121,7 @@ class TrashReportEventData {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
+    'date',
   };
 }
 

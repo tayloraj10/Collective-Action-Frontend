@@ -20,6 +20,9 @@ class CleanupEventData {
     this.largeBags,
     this.pounds,
     this.location = '',
+    this.group = '',
+    this.bags = 0.0,
+    this.weight = 0.0,
   });
 
   DateTime? date;
@@ -36,6 +39,12 @@ class CleanupEventData {
 
   String location;
 
+  String group;
+
+  num bags;
+
+  num weight;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is CleanupEventData &&
     other.date == date &&
@@ -44,7 +53,10 @@ class CleanupEventData {
     other.smallBags == smallBags &&
     other.largeBags == largeBags &&
     other.pounds == pounds &&
-    other.location == location;
+    other.location == location &&
+    other.group == group &&
+    other.bags == bags &&
+    other.weight == weight;
 
   @override
   int get hashCode =>
@@ -55,10 +67,13 @@ class CleanupEventData {
     (smallBags == null ? 0 : smallBags!.hashCode) +
     (largeBags == null ? 0 : largeBags!.hashCode) +
     (pounds == null ? 0 : pounds!.hashCode) +
-    (location.hashCode);
+    (location.hashCode) +
+    (group.hashCode) +
+    (bags.hashCode) +
+    (weight.hashCode);
 
   @override
-  String toString() => 'CleanupEventData[date=$date, name=$name, imageUrl=$imageUrl, smallBags=$smallBags, largeBags=$largeBags, pounds=$pounds, location=$location]';
+  String toString() => 'CleanupEventData[date=$date, name=$name, imageUrl=$imageUrl, smallBags=$smallBags, largeBags=$largeBags, pounds=$pounds, location=$location, group=$group, bags=$bags, weight=$weight]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -89,6 +104,9 @@ class CleanupEventData {
       json[r'pounds'] = null;
     }
       json[r'location'] = this.location;
+      json[r'group'] = this.group;
+      json[r'bags'] = this.bags;
+      json[r'weight'] = this.weight;
     return json;
   }
 
@@ -120,6 +138,9 @@ class CleanupEventData {
             ? null
             : num.parse('${json[r'pounds']}'),
         location: mapValueOfType<String>(json, r'location') ?? '',
+        group: mapValueOfType<String>(json, r'group') ?? '',
+        bags: num.parse('${json[r'bags']}'),
+        weight: num.parse('${json[r'weight']}'),
       );
     }
     return null;
