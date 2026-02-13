@@ -13,7 +13,7 @@ part of collective_action_api;
 class EventDataBase {
   /// Returns a new [EventDataBase] instance.
   EventDataBase({
-    this.date,
+    required this.type,
     this.name = '',
     this.imageUrl,
     this.smallBags,
@@ -21,7 +21,7 @@ class EventDataBase {
     this.pounds,
   });
 
-  DateTime? date;
+  EventDataType type;
 
   String name;
 
@@ -35,7 +35,7 @@ class EventDataBase {
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is EventDataBase &&
-    other.date == date &&
+    other.type == type &&
     other.name == name &&
     other.imageUrl == imageUrl &&
     other.smallBags == smallBags &&
@@ -45,7 +45,7 @@ class EventDataBase {
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (date == null ? 0 : date!.hashCode) +
+    (type.hashCode) +
     (name.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
     (smallBags == null ? 0 : smallBags!.hashCode) +
@@ -53,15 +53,11 @@ class EventDataBase {
     (pounds == null ? 0 : pounds!.hashCode);
 
   @override
-  String toString() => 'EventDataBase[date=$date, name=$name, imageUrl=$imageUrl, smallBags=$smallBags, largeBags=$largeBags, pounds=$pounds]';
+  String toString() => 'EventDataBase[type=$type, name=$name, imageUrl=$imageUrl, smallBags=$smallBags, largeBags=$largeBags, pounds=$pounds]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.date != null) {
-      json[r'date'] = this.date!.toUtc().toIso8601String();
-    } else {
-      json[r'date'] = null;
-    }
+      json[r'type'] = this.type;
       json[r'name'] = this.name;
     if (this.imageUrl != null) {
       json[r'image_url'] = this.imageUrl;
@@ -105,7 +101,7 @@ class EventDataBase {
       }());
 
       return EventDataBase(
-        date: mapDateTime(json, r'date', r''),
+        type: EventDataType.fromJson(json[r'type'])!,
         name: mapValueOfType<String>(json, r'name') ?? '',
         imageUrl: mapValueOfType<String>(json, r'image_url'),
         smallBags: mapValueOfType<int>(json, r'small_bags'),
@@ -160,6 +156,7 @@ class EventDataBase {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
+    'type',
   };
 }
 

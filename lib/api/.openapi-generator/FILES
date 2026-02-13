@@ -19,6 +19,7 @@ doc/CleanupRouteEventData.md
 doc/CleanupWaypoint.md
 doc/DefaultApi.md
 doc/EventDataBase.md
+doc/EventDataType.md
 doc/InitiativeCreateSchema.md
 doc/InitiativeSchema.md
 doc/InitiativesApi.md
@@ -100,6 +101,7 @@ lib/model/cleanup_event_data.dart
 lib/model/cleanup_route_event_data.dart
 lib/model/cleanup_waypoint.dart
 lib/model/event_data_base.dart
+lib/model/event_data_type.dart
 lib/model/initiative_create_schema.dart
 lib/model/initiative_schema.dart
 lib/model/link_create_schema.dart
@@ -135,3 +137,4 @@ lib/model/user_type.dart
 lib/model/user_update.dart
 lib/model/zip_code_submission_event_data.dart
 pubspec.yaml
+test/event_data_type_test.dart

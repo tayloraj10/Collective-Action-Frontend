@@ -208,6 +208,8 @@ class ApiClient {
           return CleanupWaypoint.fromJson(value);
         case 'EventDataBase':
           return EventDataBase.fromJson(value);
+        case 'EventDataType':
+          return EventDataTypeTypeTransformer().decode(value);
         case 'InitiativeCreateSchema':
           return InitiativeCreateSchema.fromJson(value);
         case 'InitiativeSchema':

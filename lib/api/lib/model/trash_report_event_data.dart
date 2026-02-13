@@ -13,37 +13,37 @@ part of collective_action_api;
 class TrashReportEventData {
   /// Returns a new [TrashReportEventData] instance.
   TrashReportEventData({
+    this.type = EventDataType.trashReport,
     this.location = '',
-    required this.date,
     this.imageUrl,
   });
 
-  String location;
+  EventDataType type;
 
-  DateTime date;
+  String location;
 
   String? imageUrl;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is TrashReportEventData &&
+    other.type == type &&
     other.location == location &&
-    other.date == date &&
     other.imageUrl == imageUrl;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
+    (type.hashCode) +
     (location.hashCode) +
-    (date.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode);
 
   @override
-  String toString() => 'TrashReportEventData[location=$location, date=$date, imageUrl=$imageUrl]';
+  String toString() => 'TrashReportEventData[type=$type, location=$location, imageUrl=$imageUrl]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
+      json[r'type'] = this.type;
       json[r'location'] = this.location;
-      json[r'date'] = this.date.toUtc().toIso8601String();
     if (this.imageUrl != null) {
       json[r'image_url'] = this.imageUrl;
     } else {
@@ -71,8 +71,8 @@ class TrashReportEventData {
       }());
 
       return TrashReportEventData(
+        type: EventDataType.fromJson(json[r'type']) ?? EventDataType.trashReport,
         location: mapValueOfType<String>(json, r'location') ?? '',
-        date: mapDateTime(json, r'date', r'')!,
         imageUrl: mapValueOfType<String>(json, r'image_url'),
       );
     }
@@ -121,7 +121,6 @@ class TrashReportEventData {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'date',
   };
 }
 

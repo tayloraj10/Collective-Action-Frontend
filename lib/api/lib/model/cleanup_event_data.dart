@@ -13,19 +13,16 @@ part of collective_action_api;
 class CleanupEventData {
   /// Returns a new [CleanupEventData] instance.
   CleanupEventData({
-    this.date,
+    this.type = EventDataType.cleanup,
     this.name = '',
     this.imageUrl,
     this.smallBags,
     this.largeBags,
     this.pounds,
     this.location = '',
-    this.group = '',
-    this.bags = 0.0,
-    this.weight = 0.0,
   });
 
-  DateTime? date;
+  EventDataType type;
 
   String name;
 
@@ -39,49 +36,33 @@ class CleanupEventData {
 
   String location;
 
-  String group;
-
-  num bags;
-
-  num weight;
-
   @override
   bool operator ==(Object other) => identical(this, other) || other is CleanupEventData &&
-    other.date == date &&
+    other.type == type &&
     other.name == name &&
     other.imageUrl == imageUrl &&
     other.smallBags == smallBags &&
     other.largeBags == largeBags &&
     other.pounds == pounds &&
-    other.location == location &&
-    other.group == group &&
-    other.bags == bags &&
-    other.weight == weight;
+    other.location == location;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (date == null ? 0 : date!.hashCode) +
+    (type.hashCode) +
     (name.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
     (smallBags == null ? 0 : smallBags!.hashCode) +
     (largeBags == null ? 0 : largeBags!.hashCode) +
     (pounds == null ? 0 : pounds!.hashCode) +
-    (location.hashCode) +
-    (group.hashCode) +
-    (bags.hashCode) +
-    (weight.hashCode);
+    (location.hashCode);
 
   @override
-  String toString() => 'CleanupEventData[date=$date, name=$name, imageUrl=$imageUrl, smallBags=$smallBags, largeBags=$largeBags, pounds=$pounds, location=$location, group=$group, bags=$bags, weight=$weight]';
+  String toString() => 'CleanupEventData[type=$type, name=$name, imageUrl=$imageUrl, smallBags=$smallBags, largeBags=$largeBags, pounds=$pounds, location=$location]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.date != null) {
-      json[r'date'] = this.date!.toUtc().toIso8601String();
-    } else {
-      json[r'date'] = null;
-    }
+      json[r'type'] = this.type;
       json[r'name'] = this.name;
     if (this.imageUrl != null) {
       json[r'image_url'] = this.imageUrl;
@@ -104,9 +85,6 @@ class CleanupEventData {
       json[r'pounds'] = null;
     }
       json[r'location'] = this.location;
-      json[r'group'] = this.group;
-      json[r'bags'] = this.bags;
-      json[r'weight'] = this.weight;
     return json;
   }
 
@@ -129,7 +107,7 @@ class CleanupEventData {
       }());
 
       return CleanupEventData(
-        date: mapDateTime(json, r'date', r''),
+        type: EventDataType.fromJson(json[r'type']) ?? EventDataType.cleanup,
         name: mapValueOfType<String>(json, r'name') ?? '',
         imageUrl: mapValueOfType<String>(json, r'image_url'),
         smallBags: mapValueOfType<int>(json, r'small_bags'),
@@ -138,9 +116,6 @@ class CleanupEventData {
             ? null
             : num.parse('${json[r'pounds']}'),
         location: mapValueOfType<String>(json, r'location') ?? '',
-        group: mapValueOfType<String>(json, r'group') ?? '',
-        bags: num.parse('${json[r'bags']}'),
-        weight: num.parse('${json[r'weight']}'),
       );
     }
     return null;

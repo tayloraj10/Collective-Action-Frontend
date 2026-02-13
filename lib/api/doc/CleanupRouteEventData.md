@@ -8,7 +8,7 @@ import 'package:collective_action_api/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**date** | [**DateTime**](DateTime.md) |  | [optional] 
+**type** | [**EventDataType**](EventDataType.md) |  | [optional] [default to EventDataType.cleanupRoute]
 **name** | **String** |  | [optional] [default to '']
 **imageUrl** | **String** |  | [optional] 
 **smallBags** | **int** |  | [optional] 
@@ -16,8 +16,6 @@ Name | Type | Description | Notes
 **pounds** | **num** |  | [optional] 
 **routeName** | **String** |  | [optional] [default to '']
 **waypoints** | [**List<CleanupWaypoint>**](CleanupWaypoint.md) |  | [optional] [default to const []]
-**bags** | **num** |  | [optional] [default to 0.0]
-**weight** | **num** |  | [optional] [default to 0.0]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

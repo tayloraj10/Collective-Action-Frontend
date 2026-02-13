@@ -3139,17 +3139,9 @@
             },
             "CleanupEventData": {
                 "properties": {
-                    "date": {
-                        "anyOf": [
-                            {
-                                "type": "string",
-                                "format": "date-time"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Date"
+                    "type": {
+                        "$ref": "#/components/schemas/EventDataType",
+                        "default": "Cleanup"
                     },
                     "name": {
                         "type": "string",
@@ -3204,21 +3196,6 @@
                         "type": "string",
                         "title": "Location",
                         "default": ""
-                    },
-                    "group": {
-                        "type": "string",
-                        "title": "Group",
-                        "default": ""
-                    },
-                    "bags": {
-                        "type": "number",
-                        "title": "Bags",
-                        "default": 0.0
-                    },
-                    "weight": {
-                        "type": "number",
-                        "title": "Weight",
-                        "default": 0.0
                     }
                 },
                 "type": "object",
@@ -3226,17 +3203,9 @@
             },
             "CleanupRouteEventData": {
                 "properties": {
-                    "date": {
-                        "anyOf": [
-                            {
-                                "type": "string",
-                                "format": "date-time"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Date"
+                    "type": {
+                        "$ref": "#/components/schemas/EventDataType",
+                        "default": "Cleanup Route"
                     },
                     "name": {
                         "type": "string",
@@ -3298,16 +3267,6 @@
                         },
                         "type": "array",
                         "title": "Waypoints"
-                    },
-                    "bags": {
-                        "type": "number",
-                        "title": "Bags",
-                        "default": 0.0
-                    },
-                    "weight": {
-                        "type": "number",
-                        "title": "Weight",
-                        "default": 0.0
                     }
                 },
                 "type": "object",
@@ -3336,17 +3295,8 @@
             },
             "EventDataBase": {
                 "properties": {
-                    "date": {
-                        "anyOf": [
-                            {
-                                "type": "string",
-                                "format": "date-time"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Date"
+                    "type": {
+                        "$ref": "#/components/schemas/EventDataType"
                     },
                     "name": {
                         "type": "string",
@@ -3399,7 +3349,21 @@
                     }
                 },
                 "type": "object",
+                "required": [
+                    "type"
+                ],
                 "title": "EventDataBase"
+            },
+            "EventDataType": {
+                "type": "string",
+                "enum": [
+                    "Cleanup",
+                    "Trash Report",
+                    "Cleanup Route",
+                    "Zip Code Submission"
+                ],
+                "title": "EventDataType",
+                "description": "Type discriminator for event_data payloads."
             },
             "InitiativeCreateSchema": {
                 "properties": {
@@ -4551,15 +4515,14 @@
             },
             "TrashReportEventData": {
                 "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/EventDataType",
+                        "default": "Trash Report"
+                    },
                     "location": {
                         "type": "string",
                         "title": "Location",
                         "default": ""
-                    },
-                    "date": {
-                        "type": "string",
-                        "format": "date-time",
-                        "title": "Date"
                     },
                     "image_url": {
                         "anyOf": [
@@ -4574,9 +4537,6 @@
                     }
                 },
                 "type": "object",
-                "required": [
-                    "date"
-                ],
                 "title": "TrashReportEventData"
             },
             "UserCreate": {
@@ -4878,17 +4838,9 @@
             },
             "ZipCodeSubmissionEventData": {
                 "properties": {
-                    "date": {
-                        "anyOf": [
-                            {
-                                "type": "string",
-                                "format": "date-time"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Date"
+                    "type": {
+                        "$ref": "#/components/schemas/EventDataType",
+                        "default": "Zip Code Submission"
                     },
                     "name": {
                         "type": "string",

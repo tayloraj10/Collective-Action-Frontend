@@ -8,7 +8,7 @@ import 'package:collective_action_api/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**date** | [**DateTime**](DateTime.md) |  | [optional] 
+**type** | [**EventDataType**](EventDataType.md) |  | [optional] [default to EventDataType.zipCodeSubmission]
 **name** | **String** |  | [optional] [default to '']
 **imageUrl** | **String** |  | [optional] 
 **smallBags** | **int** |  | [optional] 

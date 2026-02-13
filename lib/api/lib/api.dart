@@ -56,6 +56,7 @@ part 'model/cleanup_event_data.dart';
 part 'model/cleanup_route_event_data.dart';
 part 'model/cleanup_waypoint.dart';
 part 'model/event_data_base.dart';
+part 'model/event_data_type.dart';
 part 'model/initiative_create_schema.dart';
 part 'model/initiative_schema.dart';
 part 'model/link_create_schema.dart';

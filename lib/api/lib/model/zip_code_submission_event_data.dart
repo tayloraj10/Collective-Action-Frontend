@@ -13,7 +13,7 @@ part of collective_action_api;
 class ZipCodeSubmissionEventData {
   /// Returns a new [ZipCodeSubmissionEventData] instance.
   ZipCodeSubmissionEventData({
-    this.date,
+    this.type = EventDataType.zipCodeSubmission,
     this.name = '',
     this.imageUrl,
     this.smallBags,
@@ -22,7 +22,7 @@ class ZipCodeSubmissionEventData {
     this.zipCode = '',
   });
 
-  DateTime? date;
+  EventDataType type;
 
   String name;
 
@@ -38,7 +38,7 @@ class ZipCodeSubmissionEventData {
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is ZipCodeSubmissionEventData &&
-    other.date == date &&
+    other.type == type &&
     other.name == name &&
     other.imageUrl == imageUrl &&
     other.smallBags == smallBags &&
@@ -49,7 +49,7 @@ class ZipCodeSubmissionEventData {
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (date == null ? 0 : date!.hashCode) +
+    (type.hashCode) +
     (name.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
     (smallBags == null ? 0 : smallBags!.hashCode) +
@@ -58,15 +58,11 @@ class ZipCodeSubmissionEventData {
     (zipCode.hashCode);
 
   @override
-  String toString() => 'ZipCodeSubmissionEventData[date=$date, name=$name, imageUrl=$imageUrl, smallBags=$smallBags, largeBags=$largeBags, pounds=$pounds, zipCode=$zipCode]';
+  String toString() => 'ZipCodeSubmissionEventData[type=$type, name=$name, imageUrl=$imageUrl, smallBags=$smallBags, largeBags=$largeBags, pounds=$pounds, zipCode=$zipCode]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.date != null) {
-      json[r'date'] = this.date!.toUtc().toIso8601String();
-    } else {
-      json[r'date'] = null;
-    }
+      json[r'type'] = this.type;
       json[r'name'] = this.name;
     if (this.imageUrl != null) {
       json[r'image_url'] = this.imageUrl;
@@ -111,7 +107,7 @@ class ZipCodeSubmissionEventData {
       }());
 
       return ZipCodeSubmissionEventData(
-        date: mapDateTime(json, r'date', r''),
+        type: EventDataType.fromJson(json[r'type']) ?? EventDataType.zipCodeSubmission,
         name: mapValueOfType<String>(json, r'name') ?? '',
         imageUrl: mapValueOfType<String>(json, r'image_url'),
         smallBags: mapValueOfType<int>(json, r'small_bags'),

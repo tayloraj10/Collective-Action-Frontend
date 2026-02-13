@@ -161,6 +161,7 @@ Class | Method | HTTP request | Description
  - [CleanupRouteEventData](doc//CleanupRouteEventData.md)
  - [CleanupWaypoint](doc//CleanupWaypoint.md)
  - [EventDataBase](doc//EventDataBase.md)
+ - [EventDataType](doc//EventDataType.md)
  - [InitiativeCreateSchema](doc//InitiativeCreateSchema.md)
  - [InitiativeSchema](doc//InitiativeSchema.md)
  - [LinkCreateSchema](doc//LinkCreateSchema.md)
