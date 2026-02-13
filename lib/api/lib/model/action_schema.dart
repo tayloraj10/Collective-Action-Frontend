@@ -20,6 +20,9 @@ class ActionSchema {
     this.imageUrls = const [],
     this.linkedId,
     this.userId,
+    this.latitude,
+    this.longitude,
+    this.eventData = const {},
   });
 
   String id;
@@ -37,6 +40,12 @@ class ActionSchema {
 
   String? userId;
 
+  num? latitude;
+
+  num? longitude;
+
+  Map<String, Object>? eventData;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is ActionSchema &&
     other.id == id &&
@@ -45,7 +54,10 @@ class ActionSchema {
     other.date == date &&
     _deepEquality.equals(other.imageUrls, imageUrls) &&
     other.linkedId == linkedId &&
-    other.userId == userId;
+    other.userId == userId &&
+    other.latitude == latitude &&
+    other.longitude == longitude &&
+    _deepEquality.equals(other.eventData, eventData);
 
   @override
   int get hashCode =>
@@ -56,10 +68,13 @@ class ActionSchema {
     (date.hashCode) +
     (imageUrls.hashCode) +
     (linkedId == null ? 0 : linkedId!.hashCode) +
-    (userId == null ? 0 : userId!.hashCode);
+    (userId == null ? 0 : userId!.hashCode) +
+    (latitude == null ? 0 : latitude!.hashCode) +
+    (longitude == null ? 0 : longitude!.hashCode) +
+    (eventData == null ? 0 : eventData!.hashCode);
 
   @override
-  String toString() => 'ActionSchema[id=$id, actionType=$actionType, amount=$amount, date=$date, imageUrls=$imageUrls, linkedId=$linkedId, userId=$userId]';
+  String toString() => 'ActionSchema[id=$id, actionType=$actionType, amount=$amount, date=$date, imageUrls=$imageUrls, linkedId=$linkedId, userId=$userId, latitude=$latitude, longitude=$longitude, eventData=$eventData]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -81,6 +96,21 @@ class ActionSchema {
       json[r'user_id'] = this.userId;
     } else {
       json[r'user_id'] = null;
+    }
+    if (this.latitude != null) {
+      json[r'latitude'] = this.latitude;
+    } else {
+      json[r'latitude'] = null;
+    }
+    if (this.longitude != null) {
+      json[r'longitude'] = this.longitude;
+    } else {
+      json[r'longitude'] = null;
+    }
+    if (this.eventData != null) {
+      json[r'event_data'] = this.eventData;
+    } else {
+      json[r'event_data'] = null;
     }
     return json;
   }
@@ -115,6 +145,13 @@ class ActionSchema {
             : const [],
         linkedId: mapValueOfType<String>(json, r'linked_id'),
         userId: mapValueOfType<String>(json, r'user_id'),
+        latitude: json[r'latitude'] == null
+            ? null
+            : num.parse('${json[r'latitude']}'),
+        longitude: json[r'longitude'] == null
+            ? null
+            : num.parse('${json[r'longitude']}'),
+        eventData: mapCastOfType<String, Object>(json, r'event_data') ?? const {},
       );
     }
     return null;

@@ -2729,6 +2729,40 @@
                             }
                         ],
                         "title": "Date"
+                    },
+                    "latitude": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Latitude"
+                    },
+                    "longitude": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Longitude"
+                    },
+                    "event_data": {
+                        "anyOf": [
+                            {
+                                "additionalProperties": true,
+                                "type": "object"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Event Data"
                     }
                 },
                 "type": "object",
@@ -2810,6 +2844,40 @@
                             }
                         ],
                         "title": "User Id"
+                    },
+                    "latitude": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Latitude"
+                    },
+                    "longitude": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Longitude"
+                    },
+                    "event_data": {
+                        "anyOf": [
+                            {
+                                "additionalProperties": true,
+                                "type": "object"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Event Data"
                     }
                 },
                 "type": "object",
