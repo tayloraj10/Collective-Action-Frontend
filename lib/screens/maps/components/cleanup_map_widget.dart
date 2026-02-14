@@ -12,6 +12,7 @@ import 'package:collective_action_frontend/screens/maps/components/route_event_d
 import 'package:collective_action_frontend/screens/maps/components/trash_report_event_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/trash_report_event_info_dialog.dart';
 import 'package:collective_action_frontend/services/actions_service.dart';
+import 'package:collective_action_frontend/services/photos_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -63,6 +64,16 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   LatLng? _droppedPosition;
   String? _droppedType;
   bool _confirmingRoute = false;
+
+  /// True while Add Cleanup or Report Trash dialog is open; disables map gestures.
+  bool _isAddEventDialogOpen = false;
+
+  /// True while Cleanup or Trash Report info (view) dialog is open; disables map gestures.
+  bool _isInfoDialogOpen = false;
+
+  /// Positions we dropped pins at; used when building markers so pins stay where the user clicked
+  /// even if the backend (e.g. after photo upload) returns different coordinates.
+  final Map<String, LatLng> _createdActionPositionOverride = {};
 
   BitmapDescriptor? _cleanupMarkerIcon;
   BitmapDescriptor? _trashMarkerIcon;
@@ -295,6 +306,10 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
           zoomControlsEnabled: false,
           myLocationButtonEnabled: true,
           myLocationEnabled: true,
+          scrollGesturesEnabled: !_isAddEventDialogOpen && !_isInfoDialogOpen,
+          zoomGesturesEnabled: !_isAddEventDialogOpen && !_isInfoDialogOpen,
+          tiltGesturesEnabled: !_isAddEventDialogOpen && !_isInfoDialogOpen,
+          rotateGesturesEnabled: !_isAddEventDialogOpen && !_isInfoDialogOpen,
         ),
         // Mode selector (only when logged in), below map type dropdown + info button
         SafeArea(
@@ -514,10 +529,12 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         final isCleanup = eventType == _kActionTypeCleanup.value;
         final isTrash = eventType == _kActionTypeTrashReport.value;
         if (!isCleanup && !isTrash) continue;
+        final position = _createdActionPositionOverride[a.id] ??
+            LatLng(a.latitude!.toDouble(), a.longitude!.toDouble());
         out.add(
           Marker(
             markerId: MarkerId(a.id),
-            position: LatLng(a.latitude!.toDouble(), a.longitude!.toDouble()),
+            position: position,
             icon: isCleanup ? _iconForCleanup() : _iconForTrash(),
             onTap: () => _showEventInfoDialog(context, a, isCleanup),
           ),
@@ -540,13 +557,13 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     return out;
   }
 
-  void _showEventInfoDialog(
+  Future<void> _showEventInfoDialog(
     BuildContext context,
     ActionSchema action,
     bool isCleanup,
-  ) {
+  ) async {
     if (action.eventData == null) return;
-
+    if (mounted) setState(() => _isInfoDialogOpen = true);
     if (isCleanup) {
       // Parse CleanupEventData from eventData map
       final eventDataMap = Map<String, dynamic>.from(action.eventData!);
@@ -563,7 +580,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
             : null,
         imageUrl: eventDataMap['image_url'] as String?,
       );
-      showDialog(
+      await showDialog(
         context: context,
         builder: (c) =>
             CleanupEventInfoDialog(action: action, eventData: eventData),
@@ -578,12 +595,13 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         location: eventDataMap['location'] as String? ?? '',
         imageUrl: eventDataMap['image_url'] as String?,
       );
-      showDialog(
+      await showDialog(
         context: context,
         builder: (c) =>
             TrashReportEventInfoDialog(action: action, eventData: eventData),
       );
     }
+    if (mounted) setState(() => _isInfoDialogOpen = false);
   }
 
   Set<Polyline> _buildPolylines(List<ActionSchema>? events) {
@@ -627,6 +645,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     _resetInactivityTimer();
     if (_mode == null) return;
     if (_confirmingRoute) return;
+    if (_isAddEventDialogOpen || _isInfoDialogOpen) return;
 
     if (_mode == 'route') {
       setState(() {
@@ -691,6 +710,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
 
   Future<void> _onSubmitPin() async {
     if (_droppedPosition == null || _droppedType == null) return;
+    // Capture position once so a tap on the dialog (e.g. Submit) cannot overwrite it.
+    final LatLng droppedPosition = _droppedPosition!;
     final userId = ref.read(currentUserProvider).value?.id;
     if (userId == null) {
       if (mounted) {
@@ -703,35 +724,86 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
 
     if (_droppedType == 'cleanup') {
       final userName = ref.read(currentUserProvider).value?.name;
-      final eventData = await showDialog<CleanupEventData>(
+      if (mounted) setState(() => _isAddEventDialogOpen = true);
+      final result = await showDialog<CleanupEventDialogResult>(
         context: context,
         builder: (c) => CleanupEventDialog(
-          position: _droppedPosition!,
+          position: droppedPosition,
           initialName: userName,
         ),
       );
-      if (eventData == null || !mounted) return;
-      await _createAction(
+      if (mounted) setState(() => _isAddEventDialogOpen = false);
+      if (result == null || !mounted) return;
+      final created = await _createAction(
         actionType: ActionTypeValuesEnum.mapSubmission.value,
-        lat: _droppedPosition!.latitude,
-        lng: _droppedPosition!.longitude,
-        eventData: eventData.toJson(),
+        lat: droppedPosition.latitude,
+        lng: droppedPosition.longitude,
+        eventData: result.eventData.toJson(),
         date: DateTime.now(),
       );
+      if (created != null &&
+          result.photos.isNotEmpty &&
+          mounted) {
+        try {
+          final photosService = PhotosService();
+          final actionsService = ActionsService();
+          final uploaded = await photosService.uploadSubmissionPhotosBatch(
+            created.id,
+            result.photos,
+          );
+          if (uploaded != null && uploaded.isNotEmpty) {
+            await actionsService.updateActionPhotos(created.id, uploaded);
+          }
+        } catch (_) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              CustomSnackBar.error('Photo upload failed'),
+            );
+          }
+        }
+      }
+      if (created != null) {
+        _createdActionPositionOverride[created.id] = droppedPosition;
+      }
     } else {
-      // Same pattern as cleanup: dialog returns typed event_data model, we send its toJson()
-      final eventData = await showDialog<TrashReportEventData>(
+      if (mounted) setState(() => _isAddEventDialogOpen = true);
+      final result = await showDialog<TrashReportEventDialogResult>(
         context: context,
-        builder: (c) => TrashReportEventDialog(position: _droppedPosition!),
+        builder: (c) => TrashReportEventDialog(position: droppedPosition),
       );
-      if (eventData == null || !mounted) return;
-      await _createAction(
+      if (mounted) setState(() => _isAddEventDialogOpen = false);
+      if (result == null || !mounted) return;
+      final created = await _createAction(
         actionType: ActionTypeValuesEnum.mapSubmission.value,
-        lat: _droppedPosition!.latitude,
-        lng: _droppedPosition!.longitude,
-        eventData: eventData.toJson(),
+        lat: droppedPosition.latitude,
+        lng: droppedPosition.longitude,
+        eventData: result.eventData.toJson(),
         date: DateTime.now(),
       );
+      if (created != null &&
+          result.photos.isNotEmpty &&
+          mounted) {
+        try {
+          final photosService = PhotosService();
+          final actionsService = ActionsService();
+          final uploaded = await photosService.uploadSubmissionPhotosBatch(
+            created.id,
+            result.photos,
+          );
+          if (uploaded != null && uploaded.isNotEmpty) {
+            await actionsService.updateActionPhotos(created.id, uploaded);
+          }
+        } catch (_) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              CustomSnackBar.error('Photo upload failed'),
+            );
+          }
+        }
+      }
+      if (created != null) {
+        _createdActionPositionOverride[created.id] = droppedPosition;
+      }
     }
     _cancel();
     ref.invalidate(mapEventsForCampaignProvider(widget.campaign.id));
@@ -781,7 +853,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     return result;
   }
 
-  Future<void> _createAction({
+  Future<ActionSchema?> _createAction({
     required String actionType,
     required double lat,
     required double lng,
@@ -789,9 +861,9 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     required DateTime date,
   }) async {
     final userId = ref.read(currentUserProvider).value?.id;
-    if (userId == null) return;
+    if (userId == null) return null;
     try {
-      await ActionsService().createAction(
+      final created = await ActionsService().createAction(
         ActionCreateSchema(
           actionType: actionType,
           amount: 1,
@@ -808,12 +880,14 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
           context,
         ).showSnackBar(CustomSnackBar.success('Saved'));
       }
+      return created;
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(CustomSnackBar.error('Failed to save: $e'));
       }
+      return null;
     }
   }
 }
