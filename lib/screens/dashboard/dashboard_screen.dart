@@ -134,7 +134,7 @@ class DashboardScreen extends ConsumerWidget {
                           label: 'Maps',
                           color: AppColors.successGreen,
                           onTap: () {
-                            context.go('/maps');
+                            context.go('/maps/cleanup');
                           },
                         ),
                         SizedBox(width: 12),

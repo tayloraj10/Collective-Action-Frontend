@@ -317,7 +317,7 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
               ),
             ),
             const SizedBox(height: 8),
-            SummaryCount(count: actions.length, title: 'actions'),
+            SummaryCount(count: actions.length, title: 'recent actions'),
           ],
         );
       },

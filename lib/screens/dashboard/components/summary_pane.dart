@@ -28,7 +28,7 @@ class SummaryPane extends StatelessWidget {
         case 'Projects':
           return '/projects';
         case 'Maps':
-          return '/maps';
+          return '/maps/cleanup';
         case 'Social':
           return '/social';
         default:

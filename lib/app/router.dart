@@ -36,7 +36,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      GoRoute(path: '/maps', builder: (context, state) => const MapScreen()),
+      GoRoute(
+        path: '/maps',
+        builder: (context, state) => const MapScreen(),
+        routes: [
+          GoRoute(
+            path: 'cleanup',
+            builder: (context, state) => const MapScreen(),
+          ),
+        ],
+      ),
       GoRoute(
         path: '/social',
         builder: (context, state) => const SocialScreen(),
