@@ -1,6 +1,7 @@
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/initiative_action_card.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/social/map_submission_action_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -299,6 +300,10 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                       runSpacing: 0,
                       children: List.generate(sortedActions.length, (idx) {
                         final action = sortedActions[idx];
+                        if (action.actionType ==
+                            ActionTypeValuesEnum.mapSubmission.value) {
+                          return MapSubmissionActionCard(action: action);
+                        }
                         InitiativeSchema? initiative;
                         if (action.actionType ==
                                 ActionTypeValuesEnum.initiative.value &&

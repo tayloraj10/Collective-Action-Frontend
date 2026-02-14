@@ -1,6 +1,4 @@
-import 'dart:ui';
 import 'dart:typed_data';
-
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:flutter/material.dart';
@@ -148,7 +146,7 @@ class _TrashReportEventDialogState extends State<TrashReportEventDialog> {
                             child: ListView.separated(
                               scrollDirection: Axis.horizontal,
                               itemCount: _selectedPhotos.length,
-                              separatorBuilder: (_, __) =>
+                              separatorBuilder: (_, _) =>
                                   const SizedBox(width: 8),
                               itemBuilder: (context, index) {
                                 final xFile = _selectedPhotos[index];

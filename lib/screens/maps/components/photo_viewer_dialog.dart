@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 
 /// Full-screen style dialog to view one or more images (e.g. from map event info).
 class PhotoViewerDialog extends StatefulWidget {
@@ -59,7 +58,11 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 28,
+                    ),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   if (hasMultiple)
@@ -87,25 +90,31 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
                     minScale: 0.5,
                     maxScale: 4,
                     child: Image(
-                        image: NetworkImage(
-                          widget.urls[index],
-                          webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
-                        ),
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.broken_image_outlined, size: 48, color: Colors.white70),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Failed to load image',
-                                style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                      image: NetworkImage(
+                        widget.urls[index],
+                        webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
+                      ),
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, _, _) => Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.broken_image_outlined,
+                              size: 48,
+                              color: Colors.white70,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Failed to load image',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: Colors.white70,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
+                    ),
                   );
                 },
               ),
@@ -116,7 +125,11 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.chevron_left, color: Colors.white, size: 32),
+                    icon: const Icon(
+                      Icons.chevron_left,
+                      color: Colors.white,
+                      size: 32,
+                    ),
                     onPressed: _currentIndex > 0
                         ? () {
                             _pageController.previousPage(
@@ -128,7 +141,11 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
                   ),
                   const SizedBox(width: 24),
                   IconButton(
-                    icon: const Icon(Icons.chevron_right, color: Colors.white, size: 32),
+                    icon: const Icon(
+                      Icons.chevron_right,
+                      color: Colors.white,
+                      size: 32,
+                    ),
                     onPressed: _currentIndex < widget.urls.length - 1
                         ? () {
                             _pageController.nextPage(

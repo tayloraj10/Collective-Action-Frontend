@@ -1,6 +1,3 @@
-import 'dart:ui';
-import 'dart:typed_data';
-
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:flutter/material.dart';
@@ -99,10 +96,12 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
       largeBags: largeBags == 0 ? null : largeBags,
       pounds: pounds,
     );
-    Navigator.of(context).pop(CleanupEventDialogResult(
-      eventData: eventData,
-      photos: List.from(_selectedPhotos),
-    ));
+    Navigator.of(context).pop(
+      CleanupEventDialogResult(
+        eventData: eventData,
+        photos: List.from(_selectedPhotos),
+      ),
+    );
   }
 
   @override
@@ -144,10 +143,11 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
                       children: [
                         Text(
                           'Details',
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
                         ),
                         const SizedBox(height: 8),
                         TextFormField(
@@ -170,10 +170,11 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
                         const SizedBox(height: 16),
                         Text(
                           'Cleanup amounts',
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
                         ),
                         const SizedBox(height: 8),
                         Column(
@@ -187,7 +188,9 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
                                 labelText: 'Small Bags Cleaned Up',
                                 border: OutlineInputBorder(),
                               ),
-                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
                             ),
                             const SizedBox(height: 4),
                             Padding(
@@ -214,7 +217,9 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
                                 labelText: 'Large Bags Cleaned Up',
                                 border: OutlineInputBorder(),
                               ),
-                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
                             ),
                             const SizedBox(height: 4),
                             Padding(
@@ -248,10 +253,11 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
                         const SizedBox(height: 16),
                         Text(
                           'Photos',
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
                         ),
                         const SizedBox(height: 8),
                         if (_selectedPhotos.isNotEmpty) ...[
@@ -261,7 +267,8 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
                             child: ListView.separated(
                               scrollDirection: Axis.horizontal,
                               itemCount: _selectedPhotos.length,
-                              separatorBuilder: (_, __) => const SizedBox(width: 8),
+                              separatorBuilder: (_, _) =>
+                                  const SizedBox(width: 8),
                               itemBuilder: (context, index) {
                                 final xFile = _selectedPhotos[index];
                                 return Stack(
@@ -297,7 +304,10 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
                                         child: GestureDetector(
                                           onTap: () {
                                             setState(
-                                                () => _selectedPhotos.removeAt(index));
+                                              () => _selectedPhotos.removeAt(
+                                                index,
+                                              ),
+                                            );
                                           },
                                           child: const CircleAvatar(
                                             radius: 12,

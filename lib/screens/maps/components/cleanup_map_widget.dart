@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
+import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/providers/map_events_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_dialog.dart';
@@ -807,6 +808,9 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     }
     _cancel();
     ref.invalidate(mapEventsForCampaignProvider(widget.campaign.id));
+    ref.read(activeActionProvider.notifier).refresh();
+    ref.invalidate(actionsByLinkedProvider((widget.campaign.id, null)));
+    ref.invalidate(actionsByLinkedProvider((widget.campaign.id, 7)));
   }
 
   Future<void> _onSubmitRoute() async {
@@ -842,6 +846,9 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     );
     _cancel();
     ref.invalidate(mapEventsForCampaignProvider(widget.campaign.id));
+    ref.read(activeActionProvider.notifier).refresh();
+    ref.invalidate(actionsByLinkedProvider((widget.campaign.id, null)));
+    ref.invalidate(actionsByLinkedProvider((widget.campaign.id, 7)));
   }
 
   /// Removes null values from event_data. Date is only at action level, not in event_data.

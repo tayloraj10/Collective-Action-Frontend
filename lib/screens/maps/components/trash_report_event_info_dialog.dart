@@ -2,8 +2,6 @@ import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-
 import 'photo_viewer_dialog.dart';
 
 /// Dialog to display trash report event information when a trash report pin is clicked.
@@ -38,7 +36,9 @@ class TrashReportEventInfoDialog extends StatelessWidget {
 
   /// Prefer event_data image_url, then action.imageUrls. Normalize so relative or quoted URLs load.
   static List<String> _imageUrls(
-      ActionSchema action, TrashReportEventData? eventData) {
+    ActionSchema action,
+    TrashReportEventData? eventData,
+  ) {
     final urls = <String>[];
     if (eventData?.imageUrl != null && eventData!.imageUrl!.isNotEmpty) {
       final u = PhotosService.normalizePhotoUrl(eventData.imageUrl!);
@@ -61,7 +61,12 @@ class TrashReportEventInfoDialog extends StatelessWidget {
     final maxW = (size.width * 0.95).clamp(280.0, 400.0);
     return Dialog(
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: maxW, maxHeight: maxH, minWidth: 280, minHeight: 200),
+        constraints: BoxConstraints(
+          maxWidth: maxW,
+          maxHeight: maxH,
+          minWidth: 280,
+          minHeight: 200,
+        ),
         child: Material(
           borderRadius: BorderRadius.circular(28),
           child: Column(
@@ -71,7 +76,10 @@ class TrashReportEventInfoDialog extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Trash Report', style: Theme.of(context).textTheme.titleLarge),
+                  child: Text(
+                    'Trash Report',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                 ),
               ),
               Flexible(
@@ -91,15 +99,17 @@ class TrashReportEventInfoDialog extends StatelessWidget {
                           const SizedBox(width: 6),
                           Text(
                             'Details',
-                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: Theme.of(context).textTheme.titleSmall
+                                ?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
-                      if (eventData?.location != null && eventData!.location.isNotEmpty)
+                      if (eventData?.location != null &&
+                          eventData!.location.isNotEmpty)
                         _InfoRow(
                           label: 'Location',
                           value: eventData!.location,
@@ -127,10 +137,13 @@ class TrashReportEventInfoDialog extends StatelessWidget {
                             const SizedBox(width: 6),
                             Text(
                               'Image${_imageUrls(action, eventData).length > 1 ? 's' : ''}',
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                             ),
                           ],
                         ),
@@ -220,7 +233,8 @@ class _InfoDialogPhotoGallery extends StatefulWidget {
   const _InfoDialogPhotoGallery({required this.urls, this.onPhotoTap});
 
   @override
-  State<_InfoDialogPhotoGallery> createState() => _InfoDialogPhotoGalleryState();
+  State<_InfoDialogPhotoGallery> createState() =>
+      _InfoDialogPhotoGalleryState();
 }
 
 class _InfoDialogPhotoGalleryState extends State<_InfoDialogPhotoGallery> {
@@ -299,7 +313,7 @@ class _InfoDialogPhotoGalleryState extends State<_InfoDialogPhotoGallery> {
             webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
           ),
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => Container(
+          errorBuilder: (_, _, _) => Container(
             color: theme.colorScheme.surfaceContainerHighest,
             child: Icon(
               Icons.broken_image_outlined,
@@ -363,7 +377,10 @@ class _InfoDialogPhotoGalleryState extends State<_InfoDialogPhotoGallery> {
                   child: Center(
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                      constraints: const BoxConstraints(
+                        minWidth: 24,
+                        minHeight: 24,
+                      ),
                       iconSize: 20,
                       icon: Icon(
                         Icons.chevron_left,
@@ -393,14 +410,17 @@ class _InfoDialogPhotoGalleryState extends State<_InfoDialogPhotoGallery> {
                           child: Image(
                             image: NetworkImage(
                               url,
-                              webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
+                              webHtmlElementStrategy:
+                                  WebHtmlElementStrategy.prefer,
                             ),
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Container(
+                            errorBuilder: (_, _, _) => Container(
                               color: theme.colorScheme.surfaceContainerHighest,
                               child: Icon(
                                 Icons.broken_image_outlined,
-                                color: theme.colorScheme.onSurface.withAlpha(128),
+                                color: theme.colorScheme.onSurface.withAlpha(
+                                  128,
+                                ),
                                 size: 20,
                               ),
                             ),
@@ -424,7 +444,10 @@ class _InfoDialogPhotoGalleryState extends State<_InfoDialogPhotoGallery> {
                   child: Center(
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                      constraints: const BoxConstraints(
+                        minWidth: 24,
+                        minHeight: 24,
+                      ),
                       iconSize: 20,
                       icon: Icon(
                         Icons.chevron_right,
