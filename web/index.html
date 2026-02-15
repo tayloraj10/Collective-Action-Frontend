@@ -19,7 +19,15 @@
   <!-- PWA / Add to home screen -->
   <link rel="apple-touch-icon" href="icons/Icon-192.png" />
 
-  <script src="https://maps.googleapis.com/maps/api/js?key=__GOOGLE_MAPS_API_KEY__&libraries=visualization"></script>
+  <!-- Google Maps: async loading + callback so API is ready before Flutter uses it. -->
+  <script>
+    window.__googleMapsReady = false;
+    window.__onGoogleMapsReady = function () { window.__googleMapsReady = true; };
+  </script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=__GOOGLE_MAPS_API_KEY__&libraries=visualization&loading=async&callback=__onGoogleMapsReady"
+    async
+    defer></script>
 </head>
 
 <body>
