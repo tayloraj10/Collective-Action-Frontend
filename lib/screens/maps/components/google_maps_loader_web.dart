@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer' as developer;
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:js_interop';
 // ignore: avoid_web_libraries_in_flutter
@@ -37,29 +36,23 @@ void _debugLogState(int elapsedSec) {
       final maps = (google as JSObject).getProperty('maps'.toJS);
       hasMaps = maps != null;
     }
-    developer.log(
-      '[MapsLoader] ${elapsedSec}s: __googleMapsReady=$readyDart, google.maps=$hasMaps',
-      name: 'MapsLoader',
-    );
+    print('[MapsLoader] ${elapsedSec}s: __googleMapsReady=$readyDart, google.maps=$hasMaps');
   } catch (e) {
-    developer.log('[MapsLoader] error reading state: $e', name: 'MapsLoader');
+    print('[MapsLoader] error reading state: $e');
   }
 }
 
 /// Future that completes when the Google Maps JS API is available (callback ran
 /// or google.maps namespace exists), or after [_timeout] so we don't hang.
 Future<void> _waitForGoogleMapsReady() async {
+  print('[MapsLoader] waiting for Google Maps API...');
   final stopwatch = Stopwatch()..start();
   int lastLogSec = -1;
 
   while (!_isGoogleMapsReady()) {
     final elapsedSec = stopwatch.elapsed.inSeconds;
     if (elapsedSec >= _timeout.inSeconds) {
-      developer.log(
-        '[MapsLoader] TIMEOUT after ${_timeout.inSeconds}s – showing map anyway. '
-        'Check __googleMapsReady and google.maps in console above.',
-        name: 'MapsLoader',
-      );
+      print('[MapsLoader] TIMEOUT after ${_timeout.inSeconds}s – showing map anyway.');
       return;
     }
     if (elapsedSec != lastLogSec && elapsedSec % _debugLogInterval.inSeconds == 0) {
@@ -68,7 +61,7 @@ Future<void> _waitForGoogleMapsReady() async {
     }
     await Future<void>.delayed(const Duration(milliseconds: 50));
   }
-  developer.log('[MapsLoader] Ready after ${stopwatch.elapsedMilliseconds}ms', name: 'MapsLoader');
+  print('[MapsLoader] Ready after ${stopwatch.elapsedMilliseconds}ms');
 }
 
 /// On web, waits for the Maps API to be ready before building [child].

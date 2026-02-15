@@ -7,5 +7,7 @@ import 'google_maps_loader_stub.dart'
 /// JS API to be ready (async loading + callback) before building the child.
 /// On non-web platforms this builds the child immediately.
 Widget buildWhenGoogleMapsReady(Widget child) {
+  // Debug: confirms wrapper runs; check browser console (F12).
+  print('[MapsLoader] buildWhenGoogleMapsReady called');
   return impl.buildWhenGoogleMapsReady(child);
 }
