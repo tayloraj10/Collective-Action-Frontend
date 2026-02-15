@@ -1,0 +1,29 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+/// Request the map to zoom to a location. Set to non-null to zoom; map clears after animating.
+class MapZoomToNotifier extends Notifier<LatLng?> {
+  @override
+  LatLng? build() => null;
+
+  void setLocation(LatLng? value) {
+    state = value;
+  }
+}
+
+final mapZoomToLocationProvider =
+    NotifierProvider<MapZoomToNotifier, LatLng?>(MapZoomToNotifier.new);
+
+/// True while the campaign info bottom drawer is open; map disables gestures (like info dialog).
+class CampaignDrawerOpenNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void setOpen(bool value) {
+    state = value;
+  }
+}
+
+final campaignDrawerOpenProvider =
+    NotifierProvider<CampaignDrawerOpenNotifier, bool>(
+        CampaignDrawerOpenNotifier.new);

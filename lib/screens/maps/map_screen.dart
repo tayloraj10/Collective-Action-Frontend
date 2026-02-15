@@ -1,6 +1,10 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
+import 'package:collective_action_frontend/components/leaderboard_dialog.dart';
+import 'package:collective_action_frontend/components/stats_dialog.dart';
 import 'package:collective_action_frontend/providers/map_provider.dart';
+import 'package:collective_action_frontend/providers/map_zoom_provider.dart';
+import 'package:collective_action_frontend/screens/maps/components/campaign_info_sheet.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_map_widget.dart';
 // import 'package:collective_action_frontend/screens/maps/components/zip_code_map_widget.dart'; // restore when re-enabling zip code map
 import 'package:flutter/material.dart';
@@ -20,10 +24,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   MapCampaignTypeEnum _selectedCampaignType = MapCampaignTypeEnum.cleanupMap;
   // String? _selectedPurpose; // For zip code maps - uncomment when re-enabling
 
+  bool _showCampaignDrawer = false;
+  late final ScrollController _campaignDrawerScrollController;
+
   @override
   void initState() {
     super.initState();
-    // Update URL to /maps/cleanup if cleanup is selected and we're on /maps
+    _campaignDrawerScrollController = ScrollController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final currentPath = GoRouterState.of(context).uri.path;
       if (_selectedCampaignType == MapCampaignTypeEnum.cleanupMap &&
@@ -36,98 +43,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   void dispose() {
     _controller?.dispose();
+    _campaignDrawerScrollController.dispose();
     super.dispose();
-  }
-
-  void _showInfoPanel(BuildContext context, List<MapCampaignSchema> campaigns) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.5,
-        minChildSize: 0.3,
-        maxChildSize: 0.9,
-        builder: (context, scrollController) => Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Column(
-            children: [
-              // Handle bar
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 12),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              // Header
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (campaigns.isNotEmpty) ...[
-                            Text(
-                              campaigns.first.title,
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            if (campaigns.first.description != null &&
-                                campaigns.first.description!.isNotEmpty) ...[
-                              Text(
-                                campaigns.first.description!,
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                              const SizedBox(height: 4),
-                            ],
-                          ],
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.of(context).pop(),
-                      tooltip: 'Close',
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(height: 1),
-              // Content
-              Expanded(
-                child: ListView.builder(
-                  controller: scrollController,
-                  padding: const EdgeInsets.all(16),
-                  itemCount: campaigns.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Campaign list items can be added here later
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -250,31 +167,106 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           //       ),
                           //     ),
                           //   ),
-                          // Info button
-                          if (filteredCampaigns.isNotEmpty)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: Material(
-                                elevation: 2,
-                                borderRadius: BorderRadius.circular(8),
-                                color: Theme.of(context).colorScheme.surface,
-                                child: IconButton(
-                                  icon: const Icon(Icons.info_outline),
-                                  onPressed: () => _showInfoPanel(
-                                    context,
-                                    filteredCampaigns,
+                          // Row: Campaign info, Stats, Leaderboard
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (filteredCampaigns.isNotEmpty) ...[
+                                  Material(
+                                    elevation: 2,
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.surface,
+                                    child: IconButton(
+                                      icon: const Icon(Icons.info_outline),
+                                      onPressed: () {
+                                        ref
+                                            .read(
+                                              campaignDrawerOpenProvider
+                                                  .notifier,
+                                            )
+                                            .setOpen(true);
+                                        setState(
+                                          () => _showCampaignDrawer = true,
+                                        );
+                                      },
+                                      tooltip: 'Map Info',
+                                      padding: const EdgeInsets.all(8),
+                                      constraints: const BoxConstraints(),
+                                    ),
                                   ),
-                                  tooltip: 'Campaign info',
-                                  padding: const EdgeInsets.all(8),
-                                  constraints: const BoxConstraints(),
+                                  const SizedBox(width: 6),
+                                ],
+                                Material(
+                                  elevation: 2,
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Theme.of(context).colorScheme.surface,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.bar_chart_rounded),
+                                    onPressed: () => StatsDialog.show(context),
+                                    tooltip: 'Cleanup & trash stats',
+                                    padding: const EdgeInsets.all(8),
+                                    constraints: const BoxConstraints(),
+                                  ),
                                 ),
-                              ),
+                                const SizedBox(width: 6),
+                                Material(
+                                  elevation: 2,
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Theme.of(context).colorScheme.surface,
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.emoji_events_outlined,
+                                    ),
+                                    onPressed: () =>
+                                        LeaderboardDialog.show(context),
+                                    tooltip: 'Leaderboard (bags cleaned)',
+                                    padding: const EdgeInsets.all(8),
+                                    constraints: const BoxConstraints(),
+                                  ),
+                                ),
+                              ],
                             ),
+                          ),
                         ],
                       ),
                     ),
                   ),
                 ),
+                if (_showCampaignDrawer && filteredCampaigns.isNotEmpty)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    child: Listener(
+                      behavior: HitTestBehavior.opaque,
+                      child: Material(
+                        elevation: 16,
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(24),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(24),
+                          ),
+                          child: CampaignInfoSheet(
+                            campaigns: filteredCampaigns,
+                            scrollController: _campaignDrawerScrollController,
+                            onClose: () {
+                              ref
+                                  .read(campaignDrawerOpenProvider.notifier)
+                                  .setOpen(false);
+                              setState(() => _showCampaignDrawer = false);
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             )
           : const Center(child: CircularProgressIndicator()),

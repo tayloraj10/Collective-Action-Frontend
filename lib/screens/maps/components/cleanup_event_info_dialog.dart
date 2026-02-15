@@ -1,19 +1,29 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
+import 'package:collective_action_frontend/components/confirmation_dialog.dart';
+import 'package:collective_action_frontend/components/custom_snack_bar.dart';
+import 'package:collective_action_frontend/providers/action_provider.dart';
+import 'package:collective_action_frontend/providers/map_events_provider.dart';
+import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'photo_viewer_dialog.dart';
 
 /// Dialog to display cleanup event information when a cleanup pin is clicked.
-class CleanupEventInfoDialog extends StatelessWidget {
+/// If the current user owns this submission, shows a Delete button (removes action + photos).
+class CleanupEventInfoDialog extends ConsumerWidget {
   final ActionSchema action;
   final CleanupEventData? eventData;
+  /// Campaign id for invalidating map events after delete (so pin disappears).
+  final String? campaignId;
 
   const CleanupEventInfoDialog({
     super.key,
     required this.action,
     this.eventData,
+    this.campaignId,
   });
 
   static const List<String> _monthNames = [
@@ -56,7 +66,9 @@ class CleanupEventInfoDialog extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentUser = ref.watch(currentUserProvider).value;
+    final isOwner = currentUser != null && currentUser.id == action.userId;
     final size = MediaQuery.sizeOf(context);
     final maxH = (size.height * 0.7).clamp(200.0, 500.0);
     final maxW = (size.width * 0.95).clamp(280.0, 400.0);
@@ -220,12 +232,26 @@ class CleanupEventInfoDialog extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Close'),
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (isOwner) ...[
+                      TextButton.icon(
+                        onPressed: () =>
+                            _confirmAndDelete(context, ref, action, campaignId),
+                        icon: const Icon(Icons.delete_outline, size: 18),
+                        label: const Text('Delete'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Close'),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -233,6 +259,44 @@ class CleanupEventInfoDialog extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  static Future<void> _confirmAndDelete(
+    BuildContext context,
+    WidgetRef ref,
+    ActionSchema action, [
+    String? campaignId,
+  ]) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => ConfirmationDialog(
+        title: 'Delete Map Submission',
+        content:
+            'Are you sure you want to delete this cleanup? This cannot be undone.',
+        confirmColor: Colors.redAccent,
+      ),
+    );
+    if (confirm != true) return;
+    final actionNotifier = ref.read(activeActionProvider.notifier);
+    try {
+      await PhotosService().deleteAllSubmissionPhotos(action.id);
+      await actionNotifier.deleteAction(action);
+      if (context.mounted) {
+        if (campaignId != null) {
+          ref.invalidate(mapEventsForCampaignProvider(campaignId));
+        }
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(CustomSnackBar.info('Map submission deleted!'));
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(CustomSnackBar.error('Error deleting map submission'));
+      }
+    }
   }
 }
 

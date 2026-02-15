@@ -2,6 +2,8 @@ import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
+import 'package:collective_action_frontend/screens/maps/map_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,11 +14,7 @@ class MapsSummary extends ConsumerStatefulWidget {
   final IconData icon;
   final Color color;
 
-  const MapsSummary({
-    super.key,
-    required this.icon,
-    required this.color,
-  });
+  const MapsSummary({super.key, required this.icon, required this.color});
 
   @override
   ConsumerState<MapsSummary> createState() => _MapsSummaryState();
@@ -26,6 +24,9 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
   GoogleMapController? _mapController;
   static const LatLng _defaultCenter = LatLng(39.8283, -98.5795); // US center
   static const double _defaultZoom = 3.5;
+
+  /// User preference for map style only (independent of app theme).
+  bool _mapDarkMode = false;
 
   @override
   void dispose() {
@@ -37,20 +38,24 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
   List<ActionSchema> _mapSubmissionsWithLocation(List<ActionSchema>? actions) {
     if (actions == null) return [];
     return actions
-        .where((a) =>
-            a.actionType == ActionTypeValuesEnum.mapSubmission.value &&
-            a.latitude != null &&
-            a.longitude != null)
+        .where(
+          (a) =>
+              a.actionType == ActionTypeValuesEnum.mapSubmission.value &&
+              a.latitude != null &&
+              a.longitude != null,
+        )
         .toList();
   }
 
   Set<Heatmap> _buildHeatmaps(List<ActionSchema> submissions) {
     if (submissions.isEmpty) return {};
     final points = submissions
-        .map((a) => WeightedLatLng(
-              LatLng(a.latitude!.toDouble(), a.longitude!.toDouble()),
-              weight: 1.0,
-            ))
+        .map(
+          (a) => WeightedLatLng(
+            LatLng(a.latitude!.toDouble(), a.longitude!.toDouble()),
+            weight: 1.0,
+          ),
+        )
         .toList();
     return {
       Heatmap(
@@ -141,14 +146,50 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                       onTap: () => context.go('/maps/cleanup'),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Maps',
-                            style: Theme.of(context).textTheme.titleLarge
-                                ?.copyWith(fontWeight: FontWeight.w600),
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Maps',
+                                style: Theme.of(context).textTheme.titleLarge
+                                    ?.copyWith(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            if (isMobile) ...[
+                              const SizedBox(width: 6),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface.withAlpha(18),
+                                    border: Border.all(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface.withAlpha(38),
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    Icons.open_in_new,
+                                    size: 14,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.color
+                                        ?.withAlpha(210),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                     ),
@@ -161,21 +202,57 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                   borderRadius: BorderRadius.circular(8),
                   child: actionsAsync.when(
                     data: (_) {
-                      return GoogleMap(
-                        initialCameraPosition: const CameraPosition(
-                          target: _defaultCenter,
-                          zoom: _defaultZoom,
-                        ),
-                        onMapCreated: (GoogleMapController c) {
-                          _mapController = c;
-                          _fitBoundsIfNeeded(submissions);
-                        },
-                        heatmaps: heatmaps,
-                        mapType: MapType.normal,
-                        zoomControlsEnabled: false,
-                        myLocationButtonEnabled: false,
-                        myLocationEnabled: false,
-                        liteModeEnabled: false,
+                      return Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          GoogleMap(
+                            initialCameraPosition: const CameraPosition(
+                              target: _defaultCenter,
+                              zoom: _defaultZoom,
+                            ),
+                            style: _mapDarkMode ? kDarkMapStyle : null,
+                            onMapCreated: (GoogleMapController c) async {
+                              _mapController = c;
+                              if (!mounted) return;
+                              _fitBoundsIfNeeded(submissions);
+                            },
+                            heatmaps: heatmaps,
+                            mapType: MapType.normal,
+                            zoomControlsEnabled: false,
+                            myLocationButtonEnabled: false,
+                            myLocationEnabled: false,
+                            liteModeEnabled: false,
+                          ),
+                          Positioned(
+                            top: 6,
+                            right: 6,
+                            child: Material(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.surface.withValues(alpha: 0.9),
+                              borderRadius: BorderRadius.circular(6),
+                              child: IconButton(
+                                iconSize: 20,
+                                icon: Icon(
+                                  _mapDarkMode
+                                      ? Icons.light_mode
+                                      : Icons.dark_mode,
+                                  size: 20,
+                                ),
+                                tooltip: _mapDarkMode
+                                    ? 'Map style: dark (tap for light)'
+                                    : 'Map style: light (tap for dark)',
+                                onPressed: () async {
+                                  setState(() => _mapDarkMode = !_mapDarkMode);
+                                  // ignore: deprecated_member_use
+                                  await _mapController?.setMapStyle(
+                                    _mapDarkMode ? kDarkMapStyle : null,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
                       );
                     },
                     loading: () => Center(
@@ -210,17 +287,11 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                   ),
                 ),
               ),
-              if (!isMobile)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(
-                    'Recent map submissions',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ),
+              const SizedBox(height: 8),
+              SummaryCount(
+                count: submissions.length,
+                title: 'recent map submissions',
+              ),
             ],
           ),
         ),

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:google_maps_flutter_web/google_maps_flutter_web.dart';
 import 'package:image_picker_for_web/image_picker_for_web.dart';
 import 'firebase_options.dart';
 import 'providers/theme_provider.dart';
@@ -17,6 +18,8 @@ void main() async {
   usePathUrlStrategy();
   if (kIsWeb) {
     ImagePickerPlugin.registerWith(webPluginRegistrar);
+    // Use web implementation for Google Maps (avoids "Windows not supported" when running in Chrome)
+    GoogleMapsPlugin.registerWith(webPluginRegistrar);
   }
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 

@@ -5,13 +5,14 @@ import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/providers/map_events_provider.dart';
+import 'package:collective_action_frontend/providers/map_zoom_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_info_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/pin_confirmation_bar.dart';
-import 'package:collective_action_frontend/screens/maps/components/route_event_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/trash_report_event_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/trash_report_event_info_dialog.dart';
+import 'package:collective_action_frontend/screens/maps/map_styles.dart';
 import 'package:collective_action_frontend/services/actions_service.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
 import 'package:flutter/material.dart';
@@ -84,6 +85,9 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   LatLng? _userLocation;
   double? _currentZoom;
 
+  /// User preference for map style only (independent of app theme).
+  bool _mapDarkMode = false;
+
   Timer? _inactivityTimer;
   bool _showInstruction = false;
   final bool _isDisposed = false;
@@ -122,7 +126,6 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     if (!mounted) return;
     final trash = await BitmapDescriptor.asset(config, _kAssetTrash);
     if (!mounted) return;
-    // Smaller size so the location dot doesn't look like it's floating when zoomed out
     const currentLocationConfig = ImageConfiguration(size: Size(30, 30));
     final currentLocation = await BitmapDescriptor.asset(
       currentLocationConfig,
@@ -215,11 +218,13 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     final markers = _buildMarkers(eventsAsync.value, currentUser);
     final polylines = _buildPolylines(eventsAsync.value);
 
-    // Collect all LatLng positions from markers and polylines
+    // Collect all LatLng positions from markers and polylines (exclude user location)
     final List<LatLng> allPoints = [];
 
-    // Add marker positions
+    // Add marker positions (ignore user position icon so extent is data-only)
+    const userLocationMarkerId = MarkerId('current_location');
     for (final marker in markers) {
+      if (marker.markerId == userLocationMarkerId) continue;
       allPoints.add(marker.position);
     }
 
@@ -272,10 +277,23 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     if (_isDisposed) {
       return const SizedBox.shrink();
     }
+    ref.listen<LatLng?>(mapZoomToLocationProvider, (prev, next) {
+      if (next != null && _mapController != null && mounted && !_isDisposed) {
+        // Offset target slightly south so the pin appears in the upper half
+        // (campaign drawer covers bottom half of screen).
+        const offsetDegrees = 0.003;
+        final target = LatLng(next.latitude - offsetDegrees, next.longitude);
+        _mapController!.animateCamera(CameraUpdate.newLatLngZoom(target, 16));
+        ref.read(mapZoomToLocationProvider.notifier).setLocation(null);
+      }
+    });
     final eventsAsync = ref.watch(
       mapEventsForCampaignProvider(widget.campaign.id),
     );
     final currentUser = ref.watch(currentUserProvider).value;
+    final campaignDrawerOpen = ref.watch(campaignDrawerOpenProvider);
+    final gesturesEnabled =
+        !_isAddEventDialogOpen && !_isInfoDialogOpen && !campaignDrawerOpen;
 
     return Stack(
       fit: StackFit.expand,
@@ -285,6 +303,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
             target: LatLng(40.7128, -74.0060),
             zoom: 11.0,
           ),
+          style: _mapDarkMode ? kDarkMapStyle : null,
           onMapCreated: (GoogleMapController c) async {
             if (!mounted || _isDisposed) return;
             _mapController = c;
@@ -307,10 +326,42 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
           zoomControlsEnabled: false,
           myLocationButtonEnabled: true,
           myLocationEnabled: true,
-          scrollGesturesEnabled: !_isAddEventDialogOpen && !_isInfoDialogOpen,
-          zoomGesturesEnabled: !_isAddEventDialogOpen && !_isInfoDialogOpen,
-          tiltGesturesEnabled: !_isAddEventDialogOpen && !_isInfoDialogOpen,
-          rotateGesturesEnabled: !_isAddEventDialogOpen && !_isInfoDialogOpen,
+          scrollGesturesEnabled: gesturesEnabled,
+          zoomGesturesEnabled: gesturesEnabled,
+          tiltGesturesEnabled: gesturesEnabled,
+          rotateGesturesEnabled: gesturesEnabled,
+        ),
+        // Map style toggle (light/dark) – top right
+        SafeArea(
+          child: Align(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 12, right: 12),
+              child: PointerInterceptor(
+                child: Material(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surface.withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(8),
+                  child: IconButton(
+                    icon: Icon(
+                      _mapDarkMode ? Icons.light_mode : Icons.dark_mode,
+                    ),
+                    tooltip: _mapDarkMode
+                        ? 'Map style: dark (tap for light)'
+                        : 'Map style: light (tap for dark)',
+                    onPressed: () async {
+                      setState(() => _mapDarkMode = !_mapDarkMode);
+                      // ignore: deprecated_member_use
+                      await _mapController?.setMapStyle(
+                        _mapDarkMode ? kDarkMapStyle : null,
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
         // Mode selector (only when logged in), below map type dropdown + info button
         SafeArea(
@@ -473,16 +524,16 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
               onCancel: _cancel,
             ),
           ),
-        if (_confirmingRoute && _routePoints.length >= 2)
-          Padding(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).size.width < 600 ? 72 : 0,
-            ),
-            child: PinConfirmationBar(
-              onSubmit: _onSubmitRoute,
-              onCancel: _cancel,
-            ),
-          ),
+        // if (_confirmingRoute && _routePoints.length >= 2)
+        //   Padding(
+        //     padding: EdgeInsets.only(
+        //       top: MediaQuery.of(context).size.width < 600 ? 72 : 0,
+        //     ),
+        //     child: PinConfirmationBar(
+        //       onSubmit: _onSubmitRoute,
+        //       onCancel: _cancel,
+        //     ),
+        //   ),
       ],
     );
   }
@@ -530,7 +581,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         final isCleanup = eventType == _kActionTypeCleanup.value;
         final isTrash = eventType == _kActionTypeTrashReport.value;
         if (!isCleanup && !isTrash) continue;
-        final position = _createdActionPositionOverride[a.id] ??
+        final position =
+            _createdActionPositionOverride[a.id] ??
             LatLng(a.latitude!.toDouble(), a.longitude!.toDouble());
         out.add(
           Marker(
@@ -583,8 +635,11 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       );
       await showDialog(
         context: context,
-        builder: (c) =>
-            CleanupEventInfoDialog(action: action, eventData: eventData),
+        builder: (c) => CleanupEventInfoDialog(
+          action: action,
+          eventData: eventData,
+          campaignId: widget.campaign.id,
+        ),
       );
     } else {
       // Parse TrashReportEventData from eventData map
@@ -598,8 +653,11 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       );
       await showDialog(
         context: context,
-        builder: (c) =>
-            TrashReportEventInfoDialog(action: action, eventData: eventData),
+        builder: (c) => TrashReportEventInfoDialog(
+          action: action,
+          eventData: eventData,
+          campaignId: widget.campaign.id,
+        ),
       );
     }
     if (mounted) setState(() => _isInfoDialogOpen = false);
@@ -742,9 +800,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         eventData: result.eventData.toJson(),
         date: DateTime.now(),
       );
-      if (created != null &&
-          result.photos.isNotEmpty &&
-          mounted) {
+      if (created != null && result.photos.isNotEmpty && mounted) {
         try {
           final photosService = PhotosService();
           final actionsService = ActionsService();
@@ -757,9 +813,9 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
           }
         } catch (_) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              CustomSnackBar.error('Photo upload failed'),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(CustomSnackBar.error('Photo upload failed'));
           }
         }
       }
@@ -781,9 +837,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         eventData: result.eventData.toJson(),
         date: DateTime.now(),
       );
-      if (created != null &&
-          result.photos.isNotEmpty &&
-          mounted) {
+      if (created != null && result.photos.isNotEmpty && mounted) {
         try {
           final photosService = PhotosService();
           final actionsService = ActionsService();
@@ -796,9 +850,9 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
           }
         } catch (_) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              CustomSnackBar.error('Photo upload failed'),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(CustomSnackBar.error('Photo upload failed'));
           }
         }
       }
@@ -813,43 +867,43 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     ref.invalidate(actionsByLinkedProvider((widget.campaign.id, 7)));
   }
 
-  Future<void> _onSubmitRoute() async {
-    if (_routePoints.length < 2) return;
-    final userId = ref.read(currentUserProvider).value?.id;
-    if (userId == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(CustomSnackBar.info('Sign in to save routes'));
-      }
-      return;
-    }
+  // Future<void> _onSubmitRoute() async {
+  //   if (_routePoints.length < 2) return;
+  //   final userId = ref.read(currentUserProvider).value?.id;
+  //   if (userId == null) {
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(
+  //         context,
+  //       ).showSnackBar(CustomSnackBar.info('Sign in to save routes'));
+  //     }
+  //     return;
+  //   }
 
-    final eventData = await showDialog<CleanupRouteEventData>(
-      context: context,
-      builder: (c) => RouteEventDialog(waypoints: List.from(_routePoints)),
-    );
-    if (eventData == null || !mounted) return;
+  //   final eventData = await showDialog<CleanupRouteEventData>(
+  //     context: context,
+  //     builder: (c) => RouteEventDialog(waypoints: List.from(_routePoints)),
+  //   );
+  //   if (eventData == null || !mounted) return;
 
-    final first = _routePoints.first;
-    final eventJson = eventData.toJson();
-    eventJson['waypoints'] = eventData.waypoints
-        .map((w) => w.toJson())
-        .toList();
+  //   final first = _routePoints.first;
+  //   final eventJson = eventData.toJson();
+  //   eventJson['waypoints'] = eventData.waypoints
+  //       .map((w) => w.toJson())
+  //       .toList();
 
-    await _createAction(
-      actionType: ActionTypeValuesEnum.mapSubmission.value,
-      lat: first.latitude,
-      lng: first.longitude,
-      eventData: eventJson,
-      date: DateTime.now(),
-    );
-    _cancel();
-    ref.invalidate(mapEventsForCampaignProvider(widget.campaign.id));
-    ref.read(activeActionProvider.notifier).refresh();
-    ref.invalidate(actionsByLinkedProvider((widget.campaign.id, null)));
-    ref.invalidate(actionsByLinkedProvider((widget.campaign.id, 7)));
-  }
+  //   await _createAction(
+  //     actionType: ActionTypeValuesEnum.mapSubmission.value,
+  //     lat: first.latitude,
+  //     lng: first.longitude,
+  //     eventData: eventJson,
+  //     date: DateTime.now(),
+  //   );
+  //   _cancel();
+  //   ref.invalidate(mapEventsForCampaignProvider(widget.campaign.id));
+  //   ref.read(activeActionProvider.notifier).refresh();
+  //   ref.invalidate(actionsByLinkedProvider((widget.campaign.id, null)));
+  //   ref.invalidate(actionsByLinkedProvider((widget.campaign.id, 7)));
+  // }
 
   /// Removes null values from event_data. Date is only at action level, not in event_data.
   static Map<String, Object> _eventDataWithoutNulls(Map<String, dynamic> data) {
