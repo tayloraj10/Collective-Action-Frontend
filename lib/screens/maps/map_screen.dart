@@ -6,7 +6,6 @@ import 'package:collective_action_frontend/providers/map_provider.dart';
 import 'package:collective_action_frontend/providers/map_zoom_provider.dart';
 import 'package:collective_action_frontend/screens/maps/components/campaign_info_sheet.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_map_widget.dart';
-import 'package:collective_action_frontend/screens/maps/components/google_maps_loader.dart';
 // import 'package:collective_action_frontend/screens/maps/components/zip_code_map_widget.dart'; // restore when re-enabling zip code map
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -80,16 +79,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     return Scaffold(
       appBar: const CustomAppBar(),
       body: selectedCampaign != null
-          ? buildWhenGoogleMapsReady(
-              Stack(
-                fit: StackFit.expand,
-                children: [
-                  // Map widget: zip code branch commented out until we re-enable
-                  if (_selectedCampaignType == MapCampaignTypeEnum.cleanupMap)
-                    CleanupMapWidget(
-                      campaign: selectedCampaign,
-                      mapController: _controller,
-                    ),
+          ? Stack(
+              fit: StackFit.expand,
+              children: [
+                // Map widget: zip code branch commented out until we re-enable
+                if (_selectedCampaignType == MapCampaignTypeEnum.cleanupMap)
+                  CleanupMapWidget(
+                    campaign: selectedCampaign,
+                    mapController: _controller,
+                  ),
                 // else if (_selectedCampaignType == MapCampaignTypeEnum.zipCodeMap)
                 //   ZipCodeMapWidget(
                 //     campaign: selectedCampaign,
@@ -284,8 +282,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     ),
                   ),
                 ],
-              ),
-            )
+              )
           : const Center(child: CircularProgressIndicator()),
     );
   }
