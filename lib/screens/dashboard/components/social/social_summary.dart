@@ -57,14 +57,12 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 6 : 10,
-            vertical: isMobile ? 4 : 6,
-          ),
-          child: Column(
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 6 : 10,
+          vertical: isMobile ? 4 : 6,
+        ),
+        child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Always show icon and title
@@ -261,7 +259,6 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
             ],
           ),
         ),
-      ),
     );
   }
 

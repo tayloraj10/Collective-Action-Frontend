@@ -125,13 +125,7 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                 children: [
                   InkWell(
                     borderRadius: BorderRadius.circular(8),
-                    onTap: isMobile ? () => context.go('/maps/cleanup') : null,
-                    splashColor: isMobile
-                        ? Theme.of(context).colorScheme.primary.withAlpha(30)
-                        : null,
-                    highlightColor: isMobile
-                        ? Theme.of(context).colorScheme.primary.withAlpha(20)
-                        : null,
+                    onTap: () => context.go('/maps/cleanup'),
                     child: Container(
                       padding: EdgeInsets.all(isMobile ? 10 : 12),
                       decoration: BoxDecoration(
@@ -161,16 +155,18 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2),
                         child: Row(
-                          mainAxisSize: MainAxisSize.min,
+                          mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                'Maps',
-                                style: Theme.of(context).textTheme.titleLarge
-                                    ?.copyWith(fontWeight: FontWeight.w600),
+                            Flexible(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'Maps',
+                                  style: Theme.of(context).textTheme.titleLarge
+                                      ?.copyWith(fontWeight: FontWeight.w600),
+                                ),
                               ),
                             ),
                             if (isMobile) ...[
