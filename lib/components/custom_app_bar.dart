@@ -116,7 +116,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                             'Version',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          Text('Beta v1.0.0', style: TextStyle(fontSize: 13)),
+                          Text('Beta v1.1.1', style: TextStyle(fontSize: 13)),
                           const SizedBox(height: 8),
                           Text(
                             'Recent Features',
@@ -128,7 +128,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Text(
-                              '- Dashboard\n- Profile Page',
+                              '- Initial Release!',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.successGreen.withAlpha(179),
@@ -146,7 +146,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Text(
-                              '- Projects\n- Maps\n- Events',
+                              '- Directory of Good\n- Self Improvement Paths\n- Events',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.warningOrange.withAlpha(179),

@@ -115,6 +115,63 @@ class InitiativesApi {
     return null;
   }
 
+  /// Get Initiative
+  ///
+  /// Get a single initiative by ID (includes created_by).
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] initiativeId (required):
+  Future<Response> getInitiativeInitiativesInitiativeIdGetWithHttpInfo(String initiativeId,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/initiatives/{initiative_id}'
+      .replaceAll('{initiative_id}', initiativeId);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get Initiative
+  ///
+  /// Get a single initiative by ID (includes created_by).
+  ///
+  /// Parameters:
+  ///
+  /// * [String] initiativeId (required):
+  Future<InitiativeSchema?> getInitiativeInitiativesInitiativeIdGet(String initiativeId,) async {
+    final response = await getInitiativeInitiativesInitiativeIdGetWithHttpInfo(initiativeId,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'InitiativeSchema',) as InitiativeSchema;
+    
+    }
+    return null;
+  }
+
   /// Get Initiatives By Ids
   ///
   /// Note: This method returns the HTTP [Response].
@@ -205,6 +262,66 @@ class InitiativesApi {
   /// List Active Initiatives
   Future<List<InitiativeSchema>?> listActiveInitiativesInitiativesActiveGet() async {
     final response = await listActiveInitiativesInitiativesActiveGetWithHttpInfo();
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final responseBody = await _decodeBodyBytes(response);
+      return (await apiClient.deserializeAsync(responseBody, 'List<InitiativeSchema>') as List)
+        .cast<InitiativeSchema>()
+        .toList(growable: false);
+
+    }
+    return null;
+  }
+
+  /// List Initiatives By Creator
+  ///
+  /// Get all initiatives created by a specific user.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] userId (required):
+  Future<Response> listInitiativesByCreatorInitiativesCreatorUserIdGetWithHttpInfo(String userId,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/initiatives/creator/{user_id}'
+      .replaceAll('{user_id}', userId);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// List Initiatives By Creator
+  ///
+  /// Get all initiatives created by a specific user.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] userId (required):
+  Future<List<InitiativeSchema>?> listInitiativesByCreatorInitiativesCreatorUserIdGet(String userId,) async {
+    final response = await listInitiativesByCreatorInitiativesCreatorUserIdGetWithHttpInfo(userId,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

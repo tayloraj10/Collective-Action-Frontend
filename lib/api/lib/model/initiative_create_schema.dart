@@ -15,6 +15,7 @@ class InitiativeCreateSchema {
   InitiativeCreateSchema({
     required this.title,
     required this.action,
+    required this.createdBy,
     this.categoryId,
     this.goal,
     this.link,
@@ -25,6 +26,8 @@ class InitiativeCreateSchema {
   String title;
 
   String action;
+
+  String createdBy;
 
   String? categoryId;
 
@@ -40,6 +43,7 @@ class InitiativeCreateSchema {
   bool operator ==(Object other) => identical(this, other) || other is InitiativeCreateSchema &&
     other.title == title &&
     other.action == action &&
+    other.createdBy == createdBy &&
     other.categoryId == categoryId &&
     other.goal == goal &&
     other.link == link &&
@@ -51,6 +55,7 @@ class InitiativeCreateSchema {
     // ignore: unnecessary_parenthesis
     (title.hashCode) +
     (action.hashCode) +
+    (createdBy.hashCode) +
     (categoryId == null ? 0 : categoryId!.hashCode) +
     (goal == null ? 0 : goal!.hashCode) +
     (link == null ? 0 : link!.hashCode) +
@@ -58,12 +63,13 @@ class InitiativeCreateSchema {
     (statusId == null ? 0 : statusId!.hashCode);
 
   @override
-  String toString() => 'InitiativeCreateSchema[title=$title, action=$action, categoryId=$categoryId, goal=$goal, link=$link, priority=$priority, statusId=$statusId]';
+  String toString() => 'InitiativeCreateSchema[title=$title, action=$action, createdBy=$createdBy, categoryId=$categoryId, goal=$goal, link=$link, priority=$priority, statusId=$statusId]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'title'] = this.title;
       json[r'action'] = this.action;
+      json[r'created_by'] = this.createdBy;
     if (this.categoryId != null) {
       json[r'category_id'] = this.categoryId;
     } else {
@@ -109,6 +115,7 @@ class InitiativeCreateSchema {
       return InitiativeCreateSchema(
         title: mapValueOfType<String>(json, r'title')!,
         action: mapValueOfType<String>(json, r'action')!,
+        createdBy: mapValueOfType<String>(json, r'created_by')!,
         categoryId: mapValueOfType<String>(json, r'category_id'),
         goal: mapValueOfType<int>(json, r'goal'),
         link: mapValueOfType<String>(json, r'link'),
@@ -163,6 +170,7 @@ class InitiativeCreateSchema {
   static const requiredKeys = <String>{
     'title',
     'action',
+    'created_by',
   };
 }
 

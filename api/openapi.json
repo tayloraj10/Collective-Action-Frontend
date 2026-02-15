@@ -100,6 +100,44 @@
                 }
             }
         },
+        "/initiatives/creator/{user_id}": {
+            "get": {
+                "tags": [
+                    "initiatives"
+                ],
+                "summary": "List Initiatives By Creator",
+                "description": "Get all initiatives created by a specific user.",
+                "operationId": "list_initiatives_by_creator_initiatives_creator__user_id__get",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "User Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/InitiativeSchema"
+                                    },
+                                    "title": "Response List Initiatives By Creator Initiatives Creator  User Id  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/initiatives/featured": {
             "get": {
                 "tags": [
@@ -160,6 +198,224 @@
                                         "$ref": "#/components/schemas/InitiativeSchema"
                                     },
                                     "title": "Response Get Initiatives By Ids Initiatives By Ids Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/initiatives/{initiative_id}": {
+            "get": {
+                "tags": [
+                    "initiatives"
+                ],
+                "summary": "Get Initiative",
+                "description": "Get a single initiative by ID (includes created_by).",
+                "operationId": "get_initiative_initiatives__initiative_id__get",
+                "parameters": [
+                    {
+                        "name": "initiative_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Initiative Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InitiativeSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map-campaigns/": {
+            "get": {
+                "tags": [
+                    "map-campaigns"
+                ],
+                "summary": "List Map Campaigns",
+                "operationId": "list_map_campaigns_map_campaigns__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/MapCampaignSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Map Campaigns Map Campaigns  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "map-campaigns"
+                ],
+                "summary": "Create Map Campaign",
+                "operationId": "create_map_campaign_map_campaigns__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MapCampaignCreateSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MapCampaignSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map-campaigns/active": {
+            "get": {
+                "tags": [
+                    "map-campaigns"
+                ],
+                "summary": "List Active Map Campaigns",
+                "operationId": "list_active_map_campaigns_map_campaigns_active_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/MapCampaignSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Active Map Campaigns Map Campaigns Active Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map-campaigns/by-type/{campaign_type}": {
+            "get": {
+                "tags": [
+                    "map-campaigns"
+                ],
+                "summary": "List Map Campaigns By Type",
+                "operationId": "list_map_campaigns_by_type_map_campaigns_by_type__campaign_type__get",
+                "parameters": [
+                    {
+                        "name": "campaign_type",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/MapCampaignTypeEnum"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/MapCampaignSchema"
+                                    },
+                                    "title": "Response List Map Campaigns By Type Map Campaigns By Type  Campaign Type  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map-campaigns/creator/{user_id}": {
+            "get": {
+                "tags": [
+                    "map-campaigns"
+                ],
+                "summary": "List Map Campaigns By Creator",
+                "operationId": "list_map_campaigns_by_creator_map_campaigns_creator__user_id__get",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "User Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/MapCampaignSchema"
+                                    },
+                                    "title": "Response List Map Campaigns By Creator Map Campaigns Creator  User Id  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map-campaigns/{campaign_id}": {
+            "get": {
+                "tags": [
+                    "map-campaigns"
+                ],
+                "summary": "Get Map Campaign",
+                "operationId": "get_map_campaign_map_campaigns__campaign_id__get",
+                "parameters": [
+                    {
+                        "name": "campaign_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Campaign Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MapCampaignSchema"
                                 }
                             }
                         }
@@ -1966,6 +2222,116 @@
                 }
             }
         },
+        "/schemas/event-data/cleanup": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "CleanupEventData schema",
+                "description": "Schema for event_data when action_type is 'cleanup'. Exposed for OpenAPI/codegen.",
+                "operationId": "get_cleanup_event_data_schema_schemas_event_data_cleanup_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CleanupEventData"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/schemas/event-data/trash_report": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "TrashReportEventData schema",
+                "description": "Schema for event_data when action_type is 'trash_report'. Exposed for OpenAPI/codegen.",
+                "operationId": "get_trash_report_event_data_schema_schemas_event_data_trash_report_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TrashReportEventData"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/schemas/event-data/cleanup_route": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "CleanupRouteEventData schema",
+                "description": "Schema for event_data when action_type is 'cleanup_route'. Exposed for OpenAPI/codegen.",
+                "operationId": "get_cleanup_route_event_data_schema_schemas_event_data_cleanup_route_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CleanupRouteEventData"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/schemas/event-data/zip_code_submission": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "ZipCodeSubmissionEventData schema",
+                "description": "Schema for event_data when action_type is 'zip_code_submission'. Exposed for OpenAPI/codegen.",
+                "operationId": "get_zip_code_submission_event_data_schema_schemas_event_data_zip_code_submission_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ZipCodeSubmissionEventData"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/schemas/event-data/base": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "EventDataBase schema",
+                "description": "Shared base fields for all event_data types. Exposed for OpenAPI/codegen.",
+                "operationId": "get_event_data_base_schema_schemas_event_data_base_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventDataBase"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users/": {
             "get": {
                 "tags": [
@@ -2473,6 +2839,40 @@
                             }
                         ],
                         "title": "Date"
+                    },
+                    "latitude": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Latitude"
+                    },
+                    "longitude": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Longitude"
+                    },
+                    "event_data": {
+                        "anyOf": [
+                            {
+                                "additionalProperties": true,
+                                "type": "object"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Event Data"
                     }
                 },
                 "type": "object",
@@ -2554,6 +2954,40 @@
                             }
                         ],
                         "title": "User Id"
+                    },
+                    "latitude": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Latitude"
+                    },
+                    "longitude": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Longitude"
+                    },
+                    "event_data": {
+                        "anyOf": [
+                            {
+                                "additionalProperties": true,
+                                "type": "object"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Event Data"
                     }
                 },
                 "type": "object",
@@ -2703,6 +3137,234 @@
                 ],
                 "title": "CategorySchema"
             },
+            "CleanupEventData": {
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/EventDataType",
+                        "default": "Cleanup"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "default": ""
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    },
+                    "small_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Small Bags"
+                    },
+                    "large_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Large Bags"
+                    },
+                    "pounds": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Pounds"
+                    },
+                    "location": {
+                        "type": "string",
+                        "title": "Location",
+                        "default": ""
+                    }
+                },
+                "type": "object",
+                "title": "CleanupEventData"
+            },
+            "CleanupRouteEventData": {
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/EventDataType",
+                        "default": "Cleanup Route"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "default": ""
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    },
+                    "small_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Small Bags"
+                    },
+                    "large_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Large Bags"
+                    },
+                    "pounds": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Pounds"
+                    },
+                    "route_name": {
+                        "type": "string",
+                        "title": "Route Name",
+                        "default": ""
+                    },
+                    "waypoints": {
+                        "items": {
+                            "$ref": "#/components/schemas/CleanupWaypoint"
+                        },
+                        "type": "array",
+                        "title": "Waypoints"
+                    }
+                },
+                "type": "object",
+                "title": "CleanupRouteEventData"
+            },
+            "CleanupWaypoint": {
+                "properties": {
+                    "lat": {
+                        "type": "number",
+                        "title": "Lat",
+                        "default": 0.0
+                    },
+                    "lng": {
+                        "type": "number",
+                        "title": "Lng",
+                        "default": 0.0
+                    },
+                    "number": {
+                        "type": "integer",
+                        "title": "Number",
+                        "default": 0
+                    }
+                },
+                "type": "object",
+                "title": "CleanupWaypoint"
+            },
+            "EventDataBase": {
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/EventDataType"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "default": ""
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    },
+                    "small_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Small Bags"
+                    },
+                    "large_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Large Bags"
+                    },
+                    "pounds": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Pounds"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "type"
+                ],
+                "title": "EventDataBase"
+            },
+            "EventDataType": {
+                "type": "string",
+                "enum": [
+                    "Cleanup",
+                    "Trash Report",
+                    "Cleanup Route",
+                    "Zip Code Submission"
+                ],
+                "title": "EventDataType",
+                "description": "Type discriminator for event_data payloads."
+            },
             "InitiativeCreateSchema": {
                 "properties": {
                     "title": {
@@ -2712,6 +3374,11 @@
                     "action": {
                         "type": "string",
                         "title": "Action"
+                    },
+                    "created_by": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Created By"
                     },
                     "category_id": {
                         "anyOf": [
@@ -2766,7 +3433,8 @@
                 "type": "object",
                 "required": [
                     "title",
-                    "action"
+                    "action",
+                    "created_by"
                 ],
                 "title": "InitiativeCreateSchema"
             },
@@ -2846,13 +3514,19 @@
                             }
                         ],
                         "title": "Status Id"
+                    },
+                    "created_by": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Created By"
                     }
                 },
                 "type": "object",
                 "required": [
                     "id",
                     "title",
-                    "action"
+                    "action",
+                    "created_by"
                 ],
                 "title": "InitiativeSchema"
             },
@@ -2973,6 +3647,168 @@
                 },
                 "type": "object",
                 "title": "LocationSchema"
+            },
+            "MapCampaignCreateSchema": {
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "title": "Title"
+                    },
+                    "map_campaign_type": {
+                        "$ref": "#/components/schemas/MapCampaignTypeEnum"
+                    },
+                    "purpose": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Purpose"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description"
+                    },
+                    "link": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Link"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "title": "Active",
+                        "default": true
+                    },
+                    "status_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Status Id"
+                    },
+                    "created_by": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Created By"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "title",
+                    "map_campaign_type",
+                    "created_by"
+                ],
+                "title": "MapCampaignCreateSchema",
+                "description": "Matches MapCampaign model fields (excluding id)."
+            },
+            "MapCampaignSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "title": {
+                        "type": "string",
+                        "title": "Title"
+                    },
+                    "map_campaign_type": {
+                        "type": "string",
+                        "title": "Map Campaign Type"
+                    },
+                    "purpose": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Purpose"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description"
+                    },
+                    "link": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Link"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "title": "Active",
+                        "default": true
+                    },
+                    "status_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Status Id"
+                    },
+                    "created_by": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Created By"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "title",
+                    "map_campaign_type",
+                    "created_by"
+                ],
+                "title": "MapCampaignSchema"
+            },
+            "MapCampaignTypeEnum": {
+                "type": "string",
+                "enum": [
+                    "Cleanup Map",
+                    "Zip Code Map"
+                ],
+                "title": "MapCampaignTypeEnum"
             },
             "MemberIdsByRole": {
                 "properties": {
@@ -3677,6 +4513,32 @@
                 ],
                 "title": "StatusValuesEnum"
             },
+            "TrashReportEventData": {
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/EventDataType",
+                        "default": "Trash Report"
+                    },
+                    "location": {
+                        "type": "string",
+                        "title": "Location",
+                        "default": ""
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    }
+                },
+                "type": "object",
+                "title": "TrashReportEventData"
+            },
             "UserCreate": {
                 "properties": {
                     "email": {
@@ -3973,6 +4835,70 @@
                 "type": "object",
                 "title": "UserUpdate",
                 "description": "Schema for PATCH updates. Excludes photo_url, firebase_user_id, is_active."
+            },
+            "ZipCodeSubmissionEventData": {
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/EventDataType",
+                        "default": "Zip Code Submission"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "default": ""
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    },
+                    "small_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Small Bags"
+                    },
+                    "large_bags": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Large Bags"
+                    },
+                    "pounds": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Pounds"
+                    },
+                    "zip_code": {
+                        "type": "string",
+                        "title": "Zip Code",
+                        "default": ""
+                    }
+                },
+                "type": "object",
+                "title": "ZipCodeSubmissionEventData"
             }
         }
     }

@@ -34,10 +34,12 @@ part 'api/categories_api.dart';
 part 'api/default_api.dart';
 part 'api/initiatives_api.dart';
 part 'api/links_api.dart';
+part 'api/map_campaigns_api.dart';
 part 'api/photos_api.dart';
 part 'api/project_roles_api.dart';
 part 'api/projects_api.dart';
 part 'api/quotes_api.dart';
+part 'api/schemas_api.dart';
 part 'api/statuses_api.dart';
 part 'api/users_api.dart';
 
@@ -50,12 +52,20 @@ part 'model/action_type_values_enum.dart';
 part 'model/add_project_member_schema.dart';
 part 'model/category_create.dart';
 part 'model/category_schema.dart';
+part 'model/cleanup_event_data.dart';
+part 'model/cleanup_route_event_data.dart';
+part 'model/cleanup_waypoint.dart';
+part 'model/event_data_base.dart';
+part 'model/event_data_type.dart';
 part 'model/initiative_create_schema.dart';
 part 'model/initiative_schema.dart';
 part 'model/link_create_schema.dart';
 part 'model/link_schema.dart';
 part 'model/link_update_schema.dart';
 part 'model/location_schema.dart';
+part 'model/map_campaign_create_schema.dart';
+part 'model/map_campaign_schema.dart';
+part 'model/map_campaign_type_enum.dart';
 part 'model/member_ids_by_role.dart';
 part 'model/project_create_schema.dart';
 part 'model/project_link_schema.dart';
@@ -74,11 +84,13 @@ part 'model/status_create.dart';
 part 'model/status_schema.dart';
 part 'model/status_type_enum.dart';
 part 'model/status_values_enum.dart';
+part 'model/trash_report_event_data.dart';
 part 'model/user_create.dart';
 part 'model/user_photo_update.dart';
 part 'model/user_schema.dart';
 part 'model/user_type.dart';
 part 'model/user_update.dart';
+part 'model/zip_code_submission_event_data.dart';
 
 
 /// An [ApiClient] instance that uses the default values obtained from

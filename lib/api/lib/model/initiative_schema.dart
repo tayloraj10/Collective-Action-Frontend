@@ -22,6 +22,7 @@ class InitiativeSchema {
     this.link,
     this.priority = false,
     this.statusId,
+    required this.createdBy,
   });
 
   String id;
@@ -42,6 +43,8 @@ class InitiativeSchema {
 
   String? statusId;
 
+  String createdBy;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is InitiativeSchema &&
     other.id == id &&
@@ -52,7 +55,8 @@ class InitiativeSchema {
     other.complete == complete &&
     other.link == link &&
     other.priority == priority &&
-    other.statusId == statusId;
+    other.statusId == statusId &&
+    other.createdBy == createdBy;
 
   @override
   int get hashCode =>
@@ -65,10 +69,11 @@ class InitiativeSchema {
     (complete == null ? 0 : complete!.hashCode) +
     (link == null ? 0 : link!.hashCode) +
     (priority.hashCode) +
-    (statusId == null ? 0 : statusId!.hashCode);
+    (statusId == null ? 0 : statusId!.hashCode) +
+    (createdBy.hashCode);
 
   @override
-  String toString() => 'InitiativeSchema[id=$id, title=$title, action=$action, categoryId=$categoryId, goal=$goal, complete=$complete, link=$link, priority=$priority, statusId=$statusId]';
+  String toString() => 'InitiativeSchema[id=$id, title=$title, action=$action, categoryId=$categoryId, goal=$goal, complete=$complete, link=$link, priority=$priority, statusId=$statusId, createdBy=$createdBy]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -101,6 +106,7 @@ class InitiativeSchema {
     } else {
       json[r'status_id'] = null;
     }
+      json[r'created_by'] = this.createdBy;
     return json;
   }
 
@@ -132,6 +138,7 @@ class InitiativeSchema {
         link: mapValueOfType<String>(json, r'link'),
         priority: mapValueOfType<bool>(json, r'priority') ?? false,
         statusId: mapValueOfType<String>(json, r'status_id'),
+        createdBy: mapValueOfType<String>(json, r'created_by')!,
       );
     }
     return null;
@@ -182,6 +189,7 @@ class InitiativeSchema {
     'id',
     'title',
     'action',
+    'created_by',
   };
 }
 

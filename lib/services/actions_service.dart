@@ -68,4 +68,14 @@ class ActionsService {
       throw Exception('Failed to fetch actions by linked: $e');
     }
   }
+
+  /// Map events are actions with latitude/longitude (and optional event_data).
+  /// Use [linkedId] as the map campaign id to get events for that campaign.
+  Future<List<ActionSchema>> fetchMapEvents(String campaignId, {int? days}) async {
+    final list = await fetchActionsByLinked(campaignId, days: days);
+    if (list == null) return [];
+    return list
+        .where((a) => a.latitude != null && a.longitude != null)
+        .toList();
+  }
 }

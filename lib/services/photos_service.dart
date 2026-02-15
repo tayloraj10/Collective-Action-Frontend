@@ -40,6 +40,19 @@ class PhotosService {
     return trimmed;
   }
 
+  /// Normalizes a photo URL (strips quotes/JSON) and converts relative paths to absolute using [backendBaseUrl].
+  /// Use this when displaying action/event image URLs in the UI.
+  static String normalizePhotoUrl(String url) {
+    final cleaned = _normalizePhotoUrl(url);
+    if (cleaned.isEmpty) return cleaned;
+    if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
+      return cleaned;
+    }
+    final base = AppConstants.backendBaseUrl;
+    final path = cleaned.startsWith('/') ? cleaned : '/$cleaned';
+    return base.endsWith('/') ? '$base${path.replaceFirst(RegExp(r'^/'), '')}' : '$base$path';
+  }
+
   Future<String?> uploadSubmissionPhotos(
     String submissionId,
     String filePath,

@@ -11,8 +11,10 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**createInitiativeInitiativesPost**](InitiativesApi.md#createinitiativeinitiativespost) | **POST** /initiatives/ | Create Initiative
 [**getFeaturedInitiativesInitiativesFeaturedGet**](InitiativesApi.md#getfeaturedinitiativesinitiativesfeaturedget) | **GET** /initiatives/featured | Get Featured Initiatives
+[**getInitiativeInitiativesInitiativeIdGet**](InitiativesApi.md#getinitiativeinitiativesinitiativeidget) | **GET** /initiatives/{initiative_id} | Get Initiative
 [**getInitiativesByIdsInitiativesByIdsGet**](InitiativesApi.md#getinitiativesbyidsinitiativesbyidsget) | **GET** /initiatives/by-ids | Get Initiatives By Ids
 [**listActiveInitiativesInitiativesActiveGet**](InitiativesApi.md#listactiveinitiativesinitiativesactiveget) | **GET** /initiatives/active | List Active Initiatives
+[**listInitiativesByCreatorInitiativesCreatorUserIdGet**](InitiativesApi.md#listinitiativesbycreatorinitiativescreatoruseridget) | **GET** /initiatives/creator/{user_id} | List Initiatives By Creator
 [**listInitiativesInitiativesGet**](InitiativesApi.md#listinitiativesinitiativesget) | **GET** /initiatives/ | List Initiatives
 
 
@@ -94,6 +96,49 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getInitiativeInitiativesInitiativeIdGet**
+> InitiativeSchema getInitiativeInitiativesInitiativeIdGet(initiativeId)
+
+Get Initiative
+
+Get a single initiative by ID (includes created_by).
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = InitiativesApi();
+final initiativeId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+
+try {
+    final result = api_instance.getInitiativeInitiativesInitiativeIdGet(initiativeId);
+    print(result);
+} catch (e) {
+    print('Exception when calling InitiativesApi->getInitiativeInitiativesInitiativeIdGet: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **initiativeId** | **String**|  | 
+
+### Return type
+
+[**InitiativeSchema**](InitiativeSchema.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getInitiativesByIdsInitiativesByIdsGet**
 > List<InitiativeSchema> getInitiativesByIdsInitiativesByIdsGet(initiativeIds)
 
@@ -156,6 +201,49 @@ try {
 
 ### Parameters
 This endpoint does not need any parameter.
+
+### Return type
+
+[**List<InitiativeSchema>**](InitiativeSchema.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listInitiativesByCreatorInitiativesCreatorUserIdGet**
+> List<InitiativeSchema> listInitiativesByCreatorInitiativesCreatorUserIdGet(userId)
+
+List Initiatives By Creator
+
+Get all initiatives created by a specific user.
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = InitiativesApi();
+final userId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+
+try {
+    final result = api_instance.listInitiativesByCreatorInitiativesCreatorUserIdGet(userId);
+    print(result);
+} catch (e) {
+    print('Exception when calling InitiativesApi->listInitiativesByCreatorInitiativesCreatorUserIdGet: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **userId** | **String**|  | 
 
 ### Return type
 
