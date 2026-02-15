@@ -4,10 +4,12 @@ import 'dart:js_interop';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:js_interop_unsafe';
 
+import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter/material.dart';
 
 const Duration _debugLogInterval = Duration(seconds: 2);
-const Duration _timeout = Duration(seconds: 15);
+const Duration _timeout = Duration(seconds: 10);
+const Duration _releaseFixedDelay = Duration(seconds: 2);
 
 /// Returns true if the Maps API callback ran (__googleMapsReady) or if
 /// google.maps is already on the window (script loaded but callback may not run
@@ -42,9 +44,15 @@ void _debugLogState(int elapsedSec) {
   }
 }
 
-/// Future that completes when the Google Maps JS API is available (callback ran
-/// or google.maps namespace exists), or after [_timeout] so we don't hang.
+/// Future that completes when the Google Maps JS API is available.
+/// In release/production we use a fixed short delay (avoids minified js_interop
+/// and stripped callback issues). In debug we poll for ready or timeout.
 Future<void> _waitForGoogleMapsReady() async {
+  if (kReleaseMode) {
+    await Future<void>.delayed(_releaseFixedDelay);
+    return;
+  }
+
   print('[MapsLoader] waiting for Google Maps API...');
   final stopwatch = Stopwatch()..start();
   int lastLogSec = -1;
