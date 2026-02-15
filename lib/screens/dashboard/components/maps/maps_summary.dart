@@ -111,7 +111,7 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () => context.go('/maps/cleanup'),
+        onTap: isMobile ? () => context.go('/maps/cleanup') : null,
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: isMobile ? 6 : 10,
@@ -125,7 +125,13 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                 children: [
                   InkWell(
                     borderRadius: BorderRadius.circular(8),
-                    onTap: () => context.go('/maps/cleanup'),
+                    onTap: isMobile ? () => context.go('/maps/cleanup') : null,
+                    splashColor: isMobile
+                        ? Theme.of(context).colorScheme.primary.withAlpha(30)
+                        : null,
+                    highlightColor: isMobile
+                        ? Theme.of(context).colorScheme.primary.withAlpha(20)
+                        : null,
                     child: Container(
                       padding: EdgeInsets.all(isMobile ? 10 : 12),
                       decoration: BoxDecoration(
@@ -143,7 +149,15 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                   Expanded(
                     child: InkWell(
                       borderRadius: BorderRadius.circular(6),
-                      onTap: () => context.go('/maps/cleanup'),
+                      onTap: isMobile
+                          ? () => context.go('/maps/cleanup')
+                          : null,
+                      splashColor: isMobile
+                          ? Theme.of(context).colorScheme.primary.withAlpha(30)
+                          : null,
+                      highlightColor: isMobile
+                          ? Theme.of(context).colorScheme.primary.withAlpha(20)
+                          : null,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2),
                         child: Row(

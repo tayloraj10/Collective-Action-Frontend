@@ -702,6 +702,10 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
 
   void _handleMapTap(LatLng position) {
     _resetInactivityTimer();
+    if (ref.read(campaignDrawerOpenProvider)) {
+      ref.read(campaignDrawerOpenProvider.notifier).setOpen(false);
+      return;
+    }
     if (_mode == null) return;
     if (_confirmingRoute) return;
     if (_isAddEventDialogOpen || _isInfoDialogOpen) return;
