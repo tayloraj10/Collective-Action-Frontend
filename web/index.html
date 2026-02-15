@@ -19,19 +19,21 @@
   <!-- PWA / Add to home screen -->
   <link rel="apple-touch-icon" href="icons/Icon-192.png" />
 
-  <!-- Google Maps: async loading + callback so API is ready before Flutter uses it. -->
-  <script>
-    window.__googleMapsReady = false;
-    window.__onGoogleMapsReady = function () { window.__googleMapsReady = true; };
-  </script>
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=__GOOGLE_MAPS_API_KEY__&libraries=visualization&loading=async&callback=__onGoogleMapsReady"
-    async
-    defer></script>
+  <!-- Google Maps: sync load in head (like TrashMap). Must finish before body. -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=__GOOGLE_MAPS_API_KEY__&libraries=visualization"></script>
 </head>
 
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+  <!-- Start Flutter only after window load so Maps script has definitely run (matches TrashMap). -->
+  <script>
+    window.addEventListener('load', function () {
+      var s = document.createElement('script');
+      s.src = 'flutter_bootstrap.js';
+      s.type = 'application/javascript';
+      s.async = true;
+      document.body.appendChild(s);
+    });
+  </script>
 </body>
 
 </html>
