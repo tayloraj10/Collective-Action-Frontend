@@ -6,13 +6,26 @@ import 'dart:js_interop_unsafe';
 
 import 'package:flutter/material.dart';
 
-/// Future that completes when the Google Maps JS API has loaded (callback ran).
+/// Returns true if the Maps API callback ran (__googleMapsReady) or if
+/// google.maps is already on the window (script loaded but callback may not run
+/// if e.g. gen_204 is blocked).
+bool _isGoogleMapsReady() {
+  try {
+    final ready = globalContext.getProperty('__googleMapsReady'.toJS);
+    if (ready != null && ready.dartify() == true) return true;
+    final google = globalContext.getProperty('google'.toJS);
+    if (google != null) {
+      final maps = (google as JSObject).getProperty('maps'.toJS);
+      if (maps != null) return true;
+    }
+  } catch (_) {}
+  return false;
+}
+
+/// Future that completes when the Google Maps JS API is available (callback ran
+/// or google.maps namespace exists, so we don't hang if the callback never runs).
 Future<void> _waitForGoogleMapsReady() async {
-  while (true) {
-    try {
-      final value = globalContext.getProperty('__googleMapsReady'.toJS);
-      if (value != null && value.dartify() == true) return;
-    } catch (_) {}
+  while (!_isGoogleMapsReady()) {
     await Future<void>.delayed(const Duration(milliseconds: 50));
   }
 }

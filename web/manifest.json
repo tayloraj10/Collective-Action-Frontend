@@ -1,11 +1,11 @@
 {
-    "name": "collective_action_frontend",
-    "short_name": "collective_action_frontend",
+    "name": "Collective Action",
+    "short_name": "Collective Action",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Collective Action",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
