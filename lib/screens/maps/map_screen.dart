@@ -55,6 +55,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     });
     // Watch active campaigns and filter by selected type
     final activeCampaignsAsync = ref.watch(activeMapCampaignsProvider);
+    final isLoading = activeCampaignsAsync is AsyncLoading;
+    final hasError = activeCampaignsAsync is AsyncError;
+    final errorMessage = activeCampaignsAsync.whenOrNull(
+      error: (e, _) => e.toString(),
+    );
     final filteredCampaigns = activeCampaignsAsync.when(
       data: (campaigns) => campaigns.where((campaign) {
         // Compare campaign type string with enum value
@@ -76,10 +81,62 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     //     .toSet()
     //     .toList();
 
+    // Show loading, error, or empty state when no campaign is available
+    if (selectedCampaign == null) {
+      return Scaffold(
+        appBar: const CustomAppBar(),
+        body: Center(
+          child: isLoading
+              ? const CircularProgressIndicator()
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      hasError ? Icons.error_outline : Icons.map_outlined,
+                      size: 64,
+                      color: Theme.of(context).colorScheme.onSurface.withAlpha(100),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      hasError
+                          ? 'Could not load map campaigns'
+                          : 'No active map campaigns',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface.withAlpha(180),
+                          ),
+                    ),
+                    if (hasError && errorMessage != null) ...[
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Text(
+                          errorMessage,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(context).colorScheme.error,
+                              ),
+                          textAlign: TextAlign.center,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    FilledButton.icon(
+                      onPressed: () {
+                        ref.invalidate(activeMapCampaignsProvider);
+                      },
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Retry'),
+                    ),
+                  ],
+                ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: const CustomAppBar(),
-      body: selectedCampaign != null
-          ? Stack(
+      body: Stack(
               fit: StackFit.expand,
               children: [
                 // Map widget: zip code branch commented out until we re-enable
@@ -282,8 +339,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     ),
                   ),
                 ],
-              )
-          : const Center(child: CircularProgressIndicator()),
+              ),
     );
   }
 }
