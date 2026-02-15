@@ -513,11 +513,11 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
             ),
           ),
         ),
-        // Submit / Cancel bar (extra top padding on narrow screens to clear dropdown)
+        // Submit / Cancel bar (extra top padding on mobile to clear dropdown + Map info/Stats/Leaderboard row)
         if (_pinDropped)
           Padding(
             padding: EdgeInsets.only(
-              top: MediaQuery.of(context).size.width < 600 ? 36 : 0,
+              top: MediaQuery.of(context).size.width < 600 ? 86 : 0,
             ),
             child: PinConfirmationBar(
               onSubmit: _onSubmitPin,
