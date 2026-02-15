@@ -19,6 +19,12 @@ jobs:
       - run: flutter --version
       - run: flutter pub get
       - run: flutter build web --release
+      # Inject Google Maps API key from repo secret (key never committed)
+      - name: Inject Google Maps API key
+        run: |
+          if [ -n "${{ secrets.GOOGLE_MAPS_API_KEY }}" ]; then
+            sed -i 's|__GOOGLE_MAPS_API_KEY__|${{ secrets.GOOGLE_MAPS_API_KEY }}|g' build/web/index.html
+          fi
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
