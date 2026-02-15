@@ -313,26 +313,28 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     right: 0,
                     bottom: 0,
                     height: MediaQuery.of(context).size.height * 0.5,
-                    child: Listener(
-                      behavior: HitTestBehavior.opaque,
-                      child: Material(
-                        elevation: 16,
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(24),
-                        ),
-                        child: ClipRRect(
+                    child: PointerInterceptor(
+                      child: Listener(
+                        behavior: HitTestBehavior.opaque,
+                        child: Material(
+                          elevation: 16,
                           borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(24),
                           ),
-                          child: CampaignInfoSheet(
-                            campaigns: filteredCampaigns,
-                            scrollController: _campaignDrawerScrollController,
-                            onClose: () {
-                              ref
-                                  .read(campaignDrawerOpenProvider.notifier)
-                                  .setOpen(false);
-                              setState(() => _showCampaignDrawer = false);
-                            },
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(24),
+                            ),
+                            child: CampaignInfoSheet(
+                              campaigns: filteredCampaigns,
+                              scrollController: _campaignDrawerScrollController,
+                              onClose: () {
+                                ref
+                                    .read(campaignDrawerOpenProvider.notifier)
+                                    .setOpen(false);
+                                setState(() => _showCampaignDrawer = false);
+                              },
+                            ),
                           ),
                         ),
                       ),
