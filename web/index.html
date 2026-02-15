@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!--
+  Deployment: Before deploying to production, replace __GOOGLE_MAPS_API_KEY__ with your real key
+  (e.g. run scripts/inject_maps_key.ps1 before build, or replace in CI).
+  After 'flutter build web', verify build/web/index.html contains the Maps script and your key.
+-->
 <html>
 
 <head>
@@ -24,16 +29,7 @@
 </head>
 
 <body>
-  <!-- Start Flutter only after window load so Maps script has definitely run (matches TrashMap). -->
-  <script>
-    window.addEventListener('load', function () {
-      var s = document.createElement('script');
-      s.src = 'flutter_bootstrap.js';
-      s.type = 'application/javascript';
-      s.async = true;
-      document.body.appendChild(s);
-    });
-  </script>
+  <script src="flutter_bootstrap.js" async></script>
 </body>
 
 </html>
