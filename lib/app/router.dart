@@ -15,6 +15,15 @@ import 'package:go_router/go_router.dart';
 final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
+    redirect: (BuildContext context, GoRouterState state) {
+      // Redirect /maps to /maps/cleanup so we never build then navigate (avoids
+      // mobile Chrome crashes from context.go in postFrameCallback).
+      final path = state.uri.path;
+      if (path == '/maps' || path == '/maps/') {
+        return '/maps/cleanup';
+      }
+      return null;
+    },
     routes: [
       GoRoute(path: '/', builder: (context, state) => const DashboardScreen()),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
