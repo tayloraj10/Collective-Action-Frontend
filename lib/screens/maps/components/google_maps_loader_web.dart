@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 
 const Duration _debugLogInterval = Duration(seconds: 2);
 const Duration _timeout = Duration(seconds: 10);
-const Duration _releaseFixedDelay = Duration(seconds: 2);
+const Duration _releaseFixedDelay = Duration(seconds: 4);
 
 /// Returns true if the Maps API callback ran (__googleMapsReady) or if
 /// google.maps is already on the window (script loaded but callback may not run
@@ -73,29 +73,48 @@ Future<void> _waitForGoogleMapsReady() async {
 }
 
 /// On web, waits for the Maps API to be ready before building [child].
+/// Uses a StatefulWidget so the future is created once and not reset on parent rebuilds.
 Widget buildWhenGoogleMapsReady(Widget child) {
-  return FutureBuilder<void>(
-    future: _waitForGoogleMapsReady(),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.done) {
-        return child;
-      }
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Loading map…'),
-            SizedBox(height: 8),
-            Text(
-              'If this hangs, open DevTools (F12) → Console and look for [MapsLoader] logs.',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      );
-    },
-  );
+  return _GoogleMapsLoaderWidget(child: child);
+}
+
+class _GoogleMapsLoaderWidget extends StatefulWidget {
+  const _GoogleMapsLoaderWidget({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_GoogleMapsLoaderWidget> createState() => _GoogleMapsLoaderWidgetState();
+}
+
+class _GoogleMapsLoaderWidgetState extends State<_GoogleMapsLoaderWidget> {
+  late final Future<void> _mapsReadyFuture = _waitForGoogleMapsReady();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _mapsReadyFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return widget.child;
+        }
+        return const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Loading map…'),
+              SizedBox(height: 8),
+              Text(
+                'Map may take a few seconds to appear.',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
