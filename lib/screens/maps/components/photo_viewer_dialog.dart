@@ -63,7 +63,15 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
                       color: Colors.white,
                       size: 28,
                     ),
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed: () {
+                      // Defer pop to avoid mobile Chrome crash when closing
+                      // during gesture/layout.
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (context.mounted) {
+                          Navigator.of(context, rootNavigator: true).pop();
+                        }
+                      });
+                    },
                   ),
                   if (hasMultiple)
                     Text(
@@ -84,7 +92,9 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
               child: PageView.builder(
                 controller: _pageController,
                 itemCount: widget.urls.length,
-                onPageChanged: (i) => setState(() => _currentIndex = i),
+                onPageChanged: (i) {
+                  if (mounted) setState(() => _currentIndex = i);
+                },
                 itemBuilder: (context, index) {
                   return InteractiveViewer(
                     minScale: 0.5,

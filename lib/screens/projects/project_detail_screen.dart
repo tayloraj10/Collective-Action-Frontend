@@ -576,8 +576,13 @@ class ProjectDetailDialog extends ConsumerWidget {
                   FilledButton.icon(
                     onPressed: () {
                       final router = GoRouter.of(context);
-                      Navigator.of(context).pop();
-                      router.go('/projects/$projectId');
+                      final id = projectId;
+                      Navigator.of(context, rootNavigator: true).pop();
+                      // Defer navigation to avoid mobile Chrome crash when
+                      // pop and go run in the same frame.
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        router.go('/projects/$id');
+                      });
                     },
                     icon: const Icon(Icons.open_in_full_rounded, size: 18),
                     label: const Text('Project Page'),
@@ -592,7 +597,13 @@ class ProjectDetailDialog extends ConsumerWidget {
                   const SizedBox(width: 4),
                   IconButton.filled(
                     icon: const Icon(Icons.close_rounded, size: 20),
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed: () {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (context.mounted) {
+                          Navigator.of(context, rootNavigator: true).pop();
+                        }
+                      });
+                    },
                     tooltip: 'Close',
                     style: IconButton.styleFrom(
                       backgroundColor: theme.colorScheme.onSurface.withAlpha(

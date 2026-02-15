@@ -581,6 +581,14 @@ class _PhotoViewerDialogState extends State<_PhotoViewerDialog> {
     super.dispose();
   }
 
+  void _close() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -602,7 +610,7 @@ class _PhotoViewerDialogState extends State<_PhotoViewerDialog> {
           Positioned.fill(
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () => Navigator.of(context).pop(),
+              onTap: _close,
             ),
           ),
           // Content (tap here does not close)
@@ -634,8 +642,7 @@ class _PhotoViewerDialogState extends State<_PhotoViewerDialog> {
                                       color: Colors.white,
                                       size: 28,
                                     ),
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(),
+                                    onPressed: _close,
                                   ),
                                 ),
                                 if (hasMultiple)
@@ -662,7 +669,7 @@ class _PhotoViewerDialogState extends State<_PhotoViewerDialog> {
                                     color: Colors.white,
                                     size: 28,
                                   ),
-                                  onPressed: () => Navigator.of(context).pop(),
+                                  onPressed: _close,
                                 ),
                                 if (hasMultiple) const SizedBox(width: 4),
                                 hasMultiple
@@ -709,8 +716,11 @@ class _PhotoViewerDialogState extends State<_PhotoViewerDialog> {
                           controller: _pageController,
                           physics: const PageScrollPhysics(),
                           itemCount: widget.urls.length,
-                          onPageChanged: (i) =>
-                              setState(() => _currentIndex = i),
+                          onPageChanged: (i) {
+                            if (mounted) {
+                              setState(() => _currentIndex = i);
+                            }
+                          },
                           itemBuilder: (context, index) {
                             return InteractiveViewer(
                               minScale: 0.5,

@@ -32,13 +32,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   void initState() {
     super.initState();
     _campaignDrawerScrollController = ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final currentPath = GoRouterState.of(context).uri.path;
-      if (_selectedCampaignType == MapCampaignTypeEnum.cleanupMap &&
-          currentPath == '/maps') {
-        context.go('/maps/cleanup');
-      }
-    });
   }
 
   @override
@@ -94,7 +87,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     Icon(
                       hasError ? Icons.error_outline : Icons.map_outlined,
                       size: 64,
-                      color: Theme.of(context).colorScheme.onSurface.withAlpha(100),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withAlpha(100),
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -102,8 +97,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           ? 'Could not load map campaigns'
                           : 'No active map campaigns',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface.withAlpha(180),
-                          ),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withAlpha(180),
+                      ),
                     ),
                     if (hasError && errorMessage != null) ...[
                       const SizedBox(height: 8),
@@ -111,7 +108,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 32),
                         child: Text(
                           errorMessage,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
                                 color: Theme.of(context).colorScheme.error,
                               ),
                           textAlign: TextAlign.center,
@@ -137,211 +135,197 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     return Scaffold(
       appBar: const CustomAppBar(),
       body: Stack(
-              fit: StackFit.expand,
-              children: [
-                // Map widget: zip code branch commented out until we re-enable
-                if (_selectedCampaignType == MapCampaignTypeEnum.cleanupMap)
-                  CleanupMapWidget(
-                    campaign: selectedCampaign,
-                    mapController: _controller,
-                  ),
-                // else if (_selectedCampaignType == MapCampaignTypeEnum.zipCodeMap)
-                //   ZipCodeMapWidget(
-                //     campaign: selectedCampaign,
-                //     mapController: _controller,
-                //     selectedPurpose: _selectedPurpose,
-                //   ),
-                // Controls overlay (PointerInterceptor so first tap hits buttons, not map, on web)
-                SafeArea(
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: PointerInterceptor(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 8, left: 12),
-                        child: Column(
+        fit: StackFit.expand,
+        children: [
+          // Map widget: zip code branch commented out until we re-enable
+          if (_selectedCampaignType == MapCampaignTypeEnum.cleanupMap)
+            CleanupMapWidget(
+              campaign: selectedCampaign,
+              mapController: _controller,
+            ),
+          // else if (_selectedCampaignType == MapCampaignTypeEnum.zipCodeMap)
+          //   ZipCodeMapWidget(
+          //     campaign: selectedCampaign,
+          //     mapController: _controller,
+          //     selectedPurpose: _selectedPurpose,
+          //   ),
+          // Controls overlay (PointerInterceptor so first tap hits buttons, not map, on web)
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: PointerInterceptor(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8, left: 12),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Map type selector
+                      Material(
+                        elevation: 2,
+                        borderRadius: BorderRadius.circular(8),
+                        color: Theme.of(context).colorScheme.surface,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 4,
+                          ),
+                          child: DropdownButton<MapCampaignTypeEnum>(
+                            value: _selectedCampaignType,
+                            underline: const SizedBox.shrink(),
+                            isDense: true,
+                            // Hide zip code map for now; remove .where to show all types
+                            items: MapCampaignTypeEnum.values
+                                .where(
+                                  (type) =>
+                                      type != MapCampaignTypeEnum.zipCodeMap,
+                                )
+                                .map(
+                                  (type) => DropdownMenuItem(
+                                    value: type,
+                                    child: Text(type.value),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (MapCampaignTypeEnum? value) {
+                              if (value != null) {
+                                setState(() {
+                                  _selectedCampaignType = value;
+                                  // _selectedPurpose = null; // uncomment when re-enabling zip code map
+                                });
+                                // Update URL when cleanup is selected
+                                if (value == MapCampaignTypeEnum.cleanupMap) {
+                                  context.go('/maps/cleanup');
+                                } else {
+                                  // For other types, go back to /maps
+                                  context.go('/maps');
+                                }
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                      // Purpose selector for zip code maps (restore when re-enabling)
+                      // if (_selectedCampaignType == MapCampaignTypeEnum.zipCodeMap && zipCodePurposes.length > 1)
+                      //   Padding(
+                      //     padding: const EdgeInsets.only(top: 8),
+                      //     child: Material(
+                      //       elevation: 2,
+                      //       borderRadius: BorderRadius.circular(8),
+                      //       color: Theme.of(context).colorScheme.surface,
+                      //       child: Padding(
+                      //         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      //         child: DropdownButton<String>(
+                      //           value: _selectedPurpose ?? zipCodePurposes.first,
+                      //           underline: const SizedBox.shrink(),
+                      //           isDense: true,
+                      //           items: zipCodePurposes.map((purpose) => DropdownMenuItem(value: purpose, child: Text(purpose))).toList(),
+                      //           onChanged: (String? value) { if (value != null) setState(() => _selectedPurpose = value); },
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // Row: Campaign info, Stats, Leaderboard
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Map type selector
+                            if (filteredCampaigns.isNotEmpty) ...[
+                              Material(
+                                elevation: 2,
+                                borderRadius: BorderRadius.circular(8),
+                                color: Theme.of(context).colorScheme.surface,
+                                child: IconButton(
+                                  icon: const Icon(Icons.info_outline),
+                                  onPressed: () {
+                                    final open = !_showCampaignDrawer;
+                                    ref
+                                        .read(
+                                          campaignDrawerOpenProvider.notifier,
+                                        )
+                                        .setOpen(open);
+                                    setState(() => _showCampaignDrawer = open);
+                                  },
+                                  tooltip: _showCampaignDrawer
+                                      ? 'Close map info'
+                                      : 'Map Info',
+                                  padding: const EdgeInsets.all(8),
+                                  constraints: const BoxConstraints(),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                            ],
                             Material(
                               elevation: 2,
                               borderRadius: BorderRadius.circular(8),
                               color: Theme.of(context).colorScheme.surface,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 4,
-                                ),
-                                child: DropdownButton<MapCampaignTypeEnum>(
-                                  value: _selectedCampaignType,
-                                  underline: const SizedBox.shrink(),
-                                  isDense: true,
-                                  // Hide zip code map for now; remove .where to show all types
-                                  items: MapCampaignTypeEnum.values
-                                      .where(
-                                        (type) =>
-                                            type !=
-                                            MapCampaignTypeEnum.zipCodeMap,
-                                      )
-                                      .map(
-                                        (type) => DropdownMenuItem(
-                                          value: type,
-                                          child: Text(type.value),
-                                        ),
-                                      )
-                                      .toList(),
-                                  onChanged: (MapCampaignTypeEnum? value) {
-                                    if (value != null) {
-                                      setState(() {
-                                        _selectedCampaignType = value;
-                                        // _selectedPurpose = null; // uncomment when re-enabling zip code map
-                                      });
-                                      // Update URL when cleanup is selected
-                                      if (value ==
-                                          MapCampaignTypeEnum.cleanupMap) {
-                                        context.go('/maps/cleanup');
-                                      } else {
-                                        // For other types, go back to /maps
-                                        context.go('/maps');
-                                      }
-                                    }
-                                  },
-                                ),
+                              child: IconButton(
+                                icon: const Icon(Icons.bar_chart_rounded),
+                                onPressed: () => StatsDialog.show(context),
+                                tooltip: 'Cleanup & trash stats',
+                                padding: const EdgeInsets.all(8),
+                                constraints: const BoxConstraints(),
                               ),
                             ),
-                            // Purpose selector for zip code maps (restore when re-enabling)
-                            // if (_selectedCampaignType == MapCampaignTypeEnum.zipCodeMap && zipCodePurposes.length > 1)
-                            //   Padding(
-                            //     padding: const EdgeInsets.only(top: 8),
-                            //     child: Material(
-                            //       elevation: 2,
-                            //       borderRadius: BorderRadius.circular(8),
-                            //       color: Theme.of(context).colorScheme.surface,
-                            //       child: Padding(
-                            //         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                            //         child: DropdownButton<String>(
-                            //           value: _selectedPurpose ?? zipCodePurposes.first,
-                            //           underline: const SizedBox.shrink(),
-                            //           isDense: true,
-                            //           items: zipCodePurposes.map((purpose) => DropdownMenuItem(value: purpose, child: Text(purpose))).toList(),
-                            //           onChanged: (String? value) { if (value != null) setState(() => _selectedPurpose = value); },
-                            //         ),
-                            //       ),
-                            //     ),
-                            //   ),
-                            // Row: Campaign info, Stats, Leaderboard
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (filteredCampaigns.isNotEmpty) ...[
-                                    Material(
-                                      elevation: 2,
-                                      borderRadius: BorderRadius.circular(8),
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.surface,
-                                      child: IconButton(
-                                        icon: const Icon(Icons.info_outline),
-                                        onPressed: () {
-                                          final open = !_showCampaignDrawer;
-                                          ref
-                                              .read(
-                                                campaignDrawerOpenProvider
-                                                    .notifier,
-                                              )
-                                              .setOpen(open);
-                                          setState(
-                                            () => _showCampaignDrawer = open,
-                                          );
-                                        },
-                                        tooltip: _showCampaignDrawer
-                                            ? 'Close map info'
-                                            : 'Map Info',
-                                        padding: const EdgeInsets.all(8),
-                                        constraints: const BoxConstraints(),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                  ],
-                                  Material(
-                                    elevation: 2,
-                                    borderRadius: BorderRadius.circular(8),
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.surface,
-                                    child: IconButton(
-                                      icon: const Icon(Icons.bar_chart_rounded),
-                                      onPressed: () =>
-                                          StatsDialog.show(context),
-                                      tooltip: 'Cleanup & trash stats',
-                                      padding: const EdgeInsets.all(8),
-                                      constraints: const BoxConstraints(),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Material(
-                                    elevation: 2,
-                                    borderRadius: BorderRadius.circular(8),
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.surface,
-                                    child: IconButton(
-                                      icon: const Icon(
-                                        Icons.emoji_events_outlined,
-                                      ),
-                                      onPressed: () =>
-                                          LeaderboardDialog.show(context),
-                                      tooltip: 'Leaderboard (bags cleaned)',
-                                      padding: const EdgeInsets.all(8),
-                                      constraints: const BoxConstraints(),
-                                    ),
-                                  ),
-                                ],
+                            const SizedBox(width: 6),
+                            Material(
+                              elevation: 2,
+                              borderRadius: BorderRadius.circular(8),
+                              color: Theme.of(context).colorScheme.surface,
+                              child: IconButton(
+                                icon: const Icon(Icons.emoji_events_outlined),
+                                onPressed: () =>
+                                    LeaderboardDialog.show(context),
+                                tooltip: 'Leaderboard (bags cleaned)',
+                                padding: const EdgeInsets.all(8),
+                                constraints: const BoxConstraints(),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
-                if (_showCampaignDrawer && filteredCampaigns.isNotEmpty)
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    height: MediaQuery.of(context).size.height * 0.5,
-                    child: PointerInterceptor(
-                      child: Listener(
-                        behavior: HitTestBehavior.opaque,
-                        child: Material(
-                          elevation: 16,
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(24),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(24),
-                            ),
-                            child: CampaignInfoSheet(
-                              campaigns: filteredCampaigns,
-                              scrollController: _campaignDrawerScrollController,
-                              onClose: () {
-                                ref
-                                    .read(campaignDrawerOpenProvider.notifier)
-                                    .setOpen(false);
-                                setState(() => _showCampaignDrawer = false);
-                              },
-                            ),
-                          ),
-                        ),
+              ),
+            ),
+          ),
+          if (_showCampaignDrawer && filteredCampaigns.isNotEmpty)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: PointerInterceptor(
+                child: Listener(
+                  behavior: HitTestBehavior.opaque,
+                  child: Material(
+                    elevation: 16,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(24),
+                      ),
+                      child: CampaignInfoSheet(
+                        campaigns: filteredCampaigns,
+                        scrollController: _campaignDrawerScrollController,
+                        onClose: () {
+                          ref
+                              .read(campaignDrawerOpenProvider.notifier)
+                              .setOpen(false);
+                          setState(() => _showCampaignDrawer = false);
+                        },
                       ),
                     ),
                   ),
-                ],
+                ),
               ),
+            ),
+        ],
+      ),
     );
   }
 }
