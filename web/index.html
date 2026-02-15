@@ -1,9 +1,4 @@
 <!DOCTYPE html>
-<!--
-  Deployment: Before deploying to production, replace __GOOGLE_MAPS_API_KEY__ with your real key
-  (e.g. run scripts/inject_maps_key.ps1 before build, or replace in CI).
-  After 'flutter build web', verify build/web/index.html contains the Maps script and your key.
--->
 <html>
 
 <head>
@@ -24,8 +19,12 @@
   <!-- PWA / Add to home screen -->
   <link rel="apple-touch-icon" href="icons/Icon-192.png" />
 
-  <!-- Google Maps: sync load in head (like TrashMap). Must finish before body. -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=__GOOGLE_MAPS_API_KEY__&libraries=visualization"></script>
+  <script>
+    window.__onGoogleMapsReady = function () { };
+  </script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=__GOOGLE_MAPS_API_KEY__&libraries=visualization&loading=async&callback=__onGoogleMapsReady"
+    async defer></script>
 </head>
 
 <body>
