@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter Web (with Maps key)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": ["-d", "chrome"],
+      "preLaunchTask": "inject-maps-key",
+      "postDebugTask": "restore-maps-key"
+    }
+  ]
+}
