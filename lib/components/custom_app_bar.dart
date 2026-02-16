@@ -38,7 +38,12 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
               padding: const EdgeInsets.only(left: 12),
               child: AppBarIconButton(
                 icon: Icons.home,
-                onPressed: () => context.go('/'),
+                onPressed: () {
+                  // Defer to avoid mobile Chrome crash when navigating during tap.
+                  Future.microtask(() {
+                    if (context.mounted) context.go('/');
+                  });
+                },
                 tooltip: 'Home',
                 backgroundColor: Colors.white.withAlpha(38),
               ),
@@ -180,7 +185,9 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  context.go('/settings');
+                  Future.microtask(() {
+                    if (context.mounted) context.go('/settings');
+                  });
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(4),
@@ -198,7 +205,9 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
           AppBarIconButton(
             icon: Icons.login,
             onPressed: () {
-              context.go('/login');
+              Future.microtask(() {
+                if (context.mounted) context.go('/login');
+              });
             },
             tooltip: 'Login',
             backgroundColor: Colors.white.withAlpha(38),
