@@ -580,7 +580,7 @@ class ProjectDetailDialog extends ConsumerWidget {
                       Navigator.of(context, rootNavigator: true).pop();
                       // Defer navigation to avoid mobile Chrome crash when
                       // pop and go run in the same frame.
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                      Future.microtask(() {
                         router.go('/projects/$id');
                       });
                     },
@@ -598,7 +598,7 @@ class ProjectDetailDialog extends ConsumerWidget {
                   IconButton.filled(
                     icon: const Icon(Icons.close_rounded, size: 20),
                     onPressed: () {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                      Future.microtask(() {
                         if (context.mounted) {
                           Navigator.of(context, rootNavigator: true).pop();
                         }
@@ -1090,20 +1090,19 @@ class _StepDialogState extends ConsumerState<_StepDialog> {
     );
     _selectedStatusId = widget.step?.statusId;
 
-    // Set default status after build if none is selected
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_selectedStatusId == null) {
-        final statusesAsync = ref.read(statusesProvider);
-        final allStatuses = statusesAsync.asData?.value ?? [];
-        final stepStatuses = allStatuses
-            .where((status) => status.statusType == StatusTypeEnum.stepStatus)
-            .toList();
+    // Set default status after this initState completes (avoid setState during build)
+    Future.microtask(() {
+      if (!mounted || _selectedStatusId != null) return;
+      final statusesAsync = ref.read(statusesProvider);
+      final allStatuses = statusesAsync.asData?.value ?? [];
+      final stepStatuses = allStatuses
+          .where((status) => status.statusType == StatusTypeEnum.stepStatus)
+          .toList();
 
-        if (stepStatuses.isNotEmpty) {
-          setState(() {
-            _selectedStatusId = stepStatuses.first.id;
-          });
-        }
+      if (stepStatuses.isNotEmpty) {
+        setState(() {
+          _selectedStatusId = stepStatuses.first.id;
+        });
       }
     });
   }

@@ -474,7 +474,10 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
               ),
             ],
           ),
-          if (isCleanup) ...[
+          if (isCleanup &&
+              (eventData['small_bags'] != null ||
+                  eventData['large_bags'] != null ||
+                  eventData['pounds'] != null)) ...[
             const SizedBox(height: 20),
             _DetailSection(
               title: 'Cleanup amounts',
