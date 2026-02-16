@@ -27,3 +27,19 @@ class CampaignDrawerOpenNotifier extends Notifier<bool> {
 final campaignDrawerOpenProvider =
     NotifierProvider<CampaignDrawerOpenNotifier, bool>(
         CampaignDrawerOpenNotifier.new);
+
+/// Set when a full-screen overlay (e.g. PhotoViewerDialog) was just closed.
+/// The map ignores "tap to close drawer" for a short window so the same tap
+/// doesn't close the campaign info sheet.
+class PhotoViewerClosedAtNotifier extends Notifier<DateTime?> {
+  @override
+  DateTime? build() => null;
+
+  void setClosed() {
+    state = DateTime.now();
+  }
+}
+
+final photoViewerClosedAtProvider =
+    NotifierProvider<PhotoViewerClosedAtNotifier, DateTime?>(
+        PhotoViewerClosedAtNotifier.new);

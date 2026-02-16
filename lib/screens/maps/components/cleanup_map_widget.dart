@@ -703,6 +703,13 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   void _handleMapTap(LatLng position) {
     _resetInactivityTimer();
     if (ref.read(campaignDrawerOpenProvider)) {
+      // Don't close the drawer if a full-screen overlay (e.g. photo viewer) was
+      // just closed—the same tap can hit the map and would wrongly close the sheet.
+      final closedAt = ref.read(photoViewerClosedAtProvider);
+      if (closedAt != null &&
+          DateTime.now().difference(closedAt) < const Duration(milliseconds: 400)) {
+        return;
+      }
       ref.read(campaignDrawerOpenProvider.notifier).setOpen(false);
       return;
     }

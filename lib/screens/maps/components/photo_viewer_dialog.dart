@@ -1,6 +1,11 @@
+import 'package:collective_action_frontend/app/constants.dart';
+import 'package:collective_action_frontend/providers/map_zoom_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Full-screen style dialog to view one or more images (e.g. from map event info).
+/// Use [PhotoViewerDialog.show] to open with deferred show. Tap outside (dark area)
+/// or the close button dismiss via a deferred pop to avoid mobile Chrome crashes.
 class PhotoViewerDialog extends StatefulWidget {
   final List<String> urls;
   final int initialIndex;
@@ -10,6 +15,28 @@ class PhotoViewerDialog extends StatefulWidget {
     required this.urls,
     this.initialIndex = 0,
   });
+
+  /// Opens the photo viewer after the current turn (microtask) to avoid mobile web
+  /// crashes when opening during tap.
+  static void show(
+    BuildContext context, {
+    required List<String> urls,
+    int initialIndex = 0,
+  }) {
+    if (urls.isEmpty) return;
+    Future.microtask(() {
+      if (!context.mounted) return;
+      showDialog<void>(
+        context: context,
+        barrierColor: Colors.black87,
+        barrierDismissible: false,
+        builder: (c) => PhotoViewerDialog(
+          urls: urls,
+          initialIndex: initialIndex,
+        ),
+      );
+    });
+  }
 
   @override
   State<PhotoViewerDialog> createState() => _PhotoViewerDialogState();
@@ -32,145 +59,236 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
     super.dispose();
   }
 
+  void _close() {
+    // Mark that we're closing so the map doesn't treat the same tap as a
+    // "tap on map" and close the campaign info sheet.
+    try {
+      final container = ProviderScope.containerOf(context);
+      container.read(photoViewerClosedAtProvider.notifier).setClosed();
+    } catch (_) {}
+    // Defer pop to the next frame so the tap is fully finished and only the
+    // dialog is removed (using this route's context).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final navigator = Navigator.of(context);
+      if (navigator.mounted) {
+        navigator.pop();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final hasMultiple = widget.urls.length > 1;
     final size = MediaQuery.sizeOf(context);
-    final imageHeight = size.height * 0.6;
+    final contentConstraints = BoxConstraints(
+      maxWidth: size.width - 32,
+      maxHeight: size.height * 0.85,
+    );
+    final imageHeight = size.height * 0.55;
 
     return Dialog(
-      backgroundColor: Colors.black87,
+      backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: size.width - 32,
-          maxHeight: size.height * 0.85,
-          minWidth: 200,
-          minHeight: 200,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 28,
-                    ),
-                    onPressed: () {
-                      // Defer pop to avoid mobile Chrome crash when closing
-                      // during gesture/layout.
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (context.mounted) {
-                          Navigator.of(context, rootNavigator: true).pop();
-                        }
-                      });
-                    },
-                  ),
-                  if (hasMultiple)
-                    Text(
-                      '${_currentIndex + 1} / ${widget.urls.length}',
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    )
-                  else
-                    const SizedBox(width: 48),
-                  const SizedBox(width: 48),
-                ],
-              ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Tap outside content to close (deferred pop; barrier shows through)
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: _close,
             ),
-            SizedBox(
-              height: imageHeight,
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: widget.urls.length,
-                onPageChanged: (i) {
-                  if (mounted) setState(() => _currentIndex = i);
-                },
-                itemBuilder: (context, index) {
-                  return InteractiveViewer(
-                    minScale: 0.5,
-                    maxScale: 4,
-                    child: Image(
-                      image: NetworkImage(
-                        widget.urls[index],
-                        webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
+          ),
+          // Content: tap here does not close
+          Center(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {},
+              child: ConstrainedBox(
+                constraints: contentConstraints,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Close + page index: match initiative card (mobile = close left, index center)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final isMobile = AppConstants.isMobile(context);
+                          if (isMobile) {
+                            return Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.close,
+                                      color: Colors.white,
+                                      size: 28,
+                                    ),
+                                    onPressed: _close,
+                                  ),
+                                ),
+                                if (hasMultiple)
+                                  Center(
+                                    child: Text(
+                                      '${_currentIndex + 1} / ${widget.urls.length}',
+                                      style: theme.textTheme.titleSmall
+                                          ?.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                  ),
+                              ],
+                            );
+                          } else {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.close,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
+                                  onPressed: _close,
+                                ),
+                                if (hasMultiple) const SizedBox(width: 4),
+                                hasMultiple
+                                    ? Center(
+                                        child: Text(
+                                          '${_currentIndex + 1} / ${widget.urls.length}',
+                                          style: theme.textTheme.titleSmall
+                                              ?.copyWith(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                      )
+                                    : const SizedBox.shrink(),
+                              ],
+                            );
+                          }
+                        },
                       ),
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, _, _) => Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.broken_image_outlined,
-                              size: 48,
-                              color: Colors.white70,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Failed to load image',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: Colors.white70,
+                    ),
+                    // Image (swipeable via horizontal drag on desktop)
+                    SizedBox(
+                      height: imageHeight,
+                      child: GestureDetector(
+                        onHorizontalDragEnd: hasMultiple
+                            ? (DragEndDetails d) {
+                                final v = d.velocity.pixelsPerSecond.dx;
+                                if (v < -100 &&
+                                    _currentIndex < widget.urls.length - 1) {
+                                  _pageController.nextPage(
+                                    duration: const Duration(milliseconds: 200),
+                                    curve: Curves.easeInOut,
+                                  );
+                                } else if (v > 100 && _currentIndex > 0) {
+                                  _pageController.previousPage(
+                                    duration: const Duration(milliseconds: 200),
+                                    curve: Curves.easeInOut,
+                                  );
+                                }
+                              }
+                            : null,
+                        behavior: HitTestBehavior.translucent,
+                        child: PageView.builder(
+                          physics: const PageScrollPhysics(),
+                          controller: _pageController,
+                          itemCount: widget.urls.length,
+                          onPageChanged: (i) {
+                            if (mounted) setState(() => _currentIndex = i);
+                          },
+                          itemBuilder: (context, index) {
+                            return InteractiveViewer(
+                              minScale: 0.5,
+                              maxScale: 4,
+                              child: Image(
+                                image: NetworkImage(
+                                  widget.urls[index],
+                                  webHtmlElementStrategy:
+                                      WebHtmlElementStrategy.prefer,
+                                ),
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, _, _) => Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.broken_image_outlined,
+                                        size: 48,
+                                        color: Colors.white70,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Failed to load image',
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(color: Colors.white70),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
+                            );
+                          },
                         ),
                       ),
                     ),
-                  );
-                },
+                    if (hasMultiple) ...[
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.chevron_left,
+                              color: Colors.white,
+                              size: 32,
+                            ),
+                            onPressed: _currentIndex > 0
+                                ? () {
+                                    _pageController.previousPage(
+                                      duration: const Duration(
+                                        milliseconds: 200,
+                                      ),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  }
+                                : null,
+                          ),
+                          const SizedBox(width: 24),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.chevron_right,
+                              color: Colors.white,
+                              size: 32,
+                            ),
+                            onPressed: _currentIndex < widget.urls.length - 1
+                                ? () {
+                                    _pageController.nextPage(
+                                      duration: const Duration(
+                                        milliseconds: 200,
+                                      ),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  }
+                                : null,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
               ),
             ),
-            if (hasMultiple) ...[
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.chevron_left,
-                      color: Colors.white,
-                      size: 32,
-                    ),
-                    onPressed: _currentIndex > 0
-                        ? () {
-                            _pageController.previousPage(
-                              duration: const Duration(milliseconds: 200),
-                              curve: Curves.easeInOut,
-                            );
-                          }
-                        : null,
-                  ),
-                  const SizedBox(width: 24),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.chevron_right,
-                      color: Colors.white,
-                      size: 32,
-                    ),
-                    onPressed: _currentIndex < widget.urls.length - 1
-                        ? () {
-                            _pageController.nextPage(
-                              duration: const Duration(milliseconds: 200),
-                              curve: Curves.easeInOut,
-                            );
-                          }
-                        : null,
-                  ),
-                ],
-              ),
-            ],
-            const SizedBox(height: 8),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import 'package:collective_action_frontend/components/photo_thumbnail_strip.dart';
 import 'photo_viewer_dialog.dart';
 
 /// Filter for the submissions list.
@@ -507,80 +508,16 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
               icon: Icons.image_outlined,
               children: [
                 const SizedBox(height: 8),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      for (var i = 0; i < _imageUrls(action).length; i++)
-                        Padding(
-                          padding: const EdgeInsets.only(right: 12),
-                          child: GestureDetector(
-                            onTap: () => showDialog(
-                              context: context,
-                              builder: (c) => PhotoViewerDialog(
-                                urls: _imageUrls(action),
-                                initialIndex: i,
-                              ),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: SizedBox(
-                                width: 120,
-                                height: 120,
-                                child: Image(
-                                  image: NetworkImage(
-                                    _imageUrls(action)[i],
-                                    webHtmlElementStrategy:
-                                        WebHtmlElementStrategy.prefer,
-                                  ),
-                                  fit: BoxFit.cover,
-                                  loadingBuilder: (_, child, progress) {
-                                    if (progress == null) return child;
-                                    return Container(
-                                      width: 120,
-                                      height: 120,
-                                      color: theme
-                                          .colorScheme
-                                          .surfaceContainerHighest,
-                                      child: progress.expectedTotalBytes != null
-                                          ? Center(
-                                              child: CircularProgressIndicator(
-                                                value:
-                                                    progress
-                                                        .cumulativeBytesLoaded /
-                                                    progress
-                                                        .expectedTotalBytes!,
-                                              ),
-                                            )
-                                          : const Center(
-                                              child: SizedBox(
-                                                width: 24,
-                                                height: 24,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                      strokeWidth: 2,
-                                                    ),
-                                              ),
-                                            ),
-                                    );
-                                  },
-                                  errorBuilder: (_, _, _) => Container(
-                                    width: 120,
-                                    height: 120,
-                                    color: theme
-                                        .colorScheme
-                                        .surfaceContainerHighest,
-                                    child: const Icon(
-                                      Icons.broken_image_outlined,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
+                PhotoThumbnailStrip(
+                  urls: _imageUrls(action),
+                  thumbSize: 48,
+                  showArrows: false,
+                  onTap: (i) => PhotoViewerDialog.show(
+                    context,
+                    urls: _imageUrls(action),
+                    initialIndex: i,
                   ),
+                  theme: theme,
                 ),
               ],
             ),

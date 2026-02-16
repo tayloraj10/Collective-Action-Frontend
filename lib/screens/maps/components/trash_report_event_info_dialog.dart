@@ -1,11 +1,11 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
-import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/components/confirmation_dialog.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/providers/map_events_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
+import 'package:collective_action_frontend/components/photo_thumbnail_strip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -161,15 +161,15 @@ class TrashReportEventInfoDialog extends ConsumerWidget {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        _InfoDialogPhotoGallery(
+                        PhotoThumbnailStrip(
                           urls: _imageUrls(action, eventData),
-                          onPhotoTap: (index) {
-                            showDialog(
-                              context: context,
-                              builder: (c) => PhotoViewerDialog(
-                                urls: _imageUrls(action, eventData),
-                                initialIndex: index,
-                              ),
+                          thumbSize: 48,
+                          showArrows: false,
+                          onTap: (index) {
+                            PhotoViewerDialog.show(
+                              context,
+                              urls: _imageUrls(action, eventData),
+                              initialIndex: index,
                             );
                           },
                         ),
@@ -285,246 +285,6 @@ class _InfoRow extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// Horizontal scrollable photo gallery with optional prev/next buttons (like initiative action card).
-class _InfoDialogPhotoGallery extends StatefulWidget {
-  final List<String> urls;
-  final void Function(int index)? onPhotoTap;
-
-  const _InfoDialogPhotoGallery({required this.urls, this.onPhotoTap});
-
-  @override
-  State<_InfoDialogPhotoGallery> createState() =>
-      _InfoDialogPhotoGalleryState();
-}
-
-class _InfoDialogPhotoGalleryState extends State<_InfoDialogPhotoGallery> {
-  static const double _thumbSize = 48;
-  static const double _gap = 12;
-  late ScrollController _scrollController;
-
-  void _onScroll() {
-    if (mounted) setState(() {});
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-    _scrollController.addListener(_onScroll);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && _scrollController.hasClients) setState(() {});
-    });
-  }
-
-  @override
-  void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  double get _itemWidth => _thumbSize + _gap;
-
-  bool get _canGoPrev =>
-      _scrollController.hasClients && _scrollController.offset > 0.5;
-
-  bool get _canGoNext =>
-      _scrollController.hasClients &&
-      _scrollController.offset <
-          _scrollController.position.maxScrollExtent - 0.5;
-
-  void _goToPrev() {
-    if (!_scrollController.hasClients) return;
-    final pos = _scrollController.position;
-    final target = (pos.pixels - _itemWidth).clamp(0.0, pos.maxScrollExtent);
-    _scrollController.animateTo(
-      target,
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeOut,
-    );
-  }
-
-  void _goToNext() {
-    if (!_scrollController.hasClients) return;
-    final pos = _scrollController.position;
-    final target = (pos.pixels + _itemWidth).clamp(0.0, pos.maxScrollExtent);
-    _scrollController.animateTo(
-      target,
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeOut,
-    );
-  }
-
-  Widget _buildThumb(
-    BuildContext context,
-    ThemeData theme,
-    String url,
-    int index,
-    double size,
-  ) {
-    final thumb = ClipRRect(
-      borderRadius: BorderRadius.circular(6),
-      child: SizedBox(
-        width: size,
-        height: size,
-        child: Image(
-          image: NetworkImage(
-            url,
-            webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
-          ),
-          fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => Container(
-            color: theme.colorScheme.surfaceContainerHighest,
-            child: Icon(
-              Icons.broken_image_outlined,
-              color: theme.colorScheme.onSurface.withAlpha(128),
-              size: 20,
-            ),
-          ),
-        ),
-      ),
-    );
-    if (widget.onPhotoTap != null) {
-      return GestureDetector(
-        onTap: () => widget.onPhotoTap!(index),
-        child: thumb,
-      );
-    }
-    return thumb;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final hasMultiple = widget.urls.length > 1;
-    final isMobile = AppConstants.isMobile(context);
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        if (!isMobile && widget.urls.isNotEmpty) {
-          final count = widget.urls.length;
-          const gap = 12.0;
-          final totalGaps = (count - 1) * gap;
-          final itemSize = ((width - totalGaps) / count).clamp(24.0, 120.0);
-          return SizedBox(
-            height: itemSize,
-            child: Row(
-              children: [
-                for (int i = 0; i < count; i++)
-                  Padding(
-                    padding: EdgeInsets.only(right: i < count - 1 ? gap : 0),
-                    child: _buildThumb(
-                      context,
-                      theme,
-                      widget.urls[i],
-                      i,
-                      itemSize,
-                    ),
-                  ),
-              ],
-            ),
-          );
-        }
-
-        return SizedBox(
-          height: _thumbSize + 4,
-          child: Row(
-            children: [
-              if (hasMultiple)
-                SizedBox(
-                  width: 28,
-                  child: Center(
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(
-                        minWidth: 24,
-                        minHeight: 24,
-                      ),
-                      iconSize: 20,
-                      icon: Icon(
-                        Icons.chevron_left,
-                        color: theme.colorScheme.onSurface.withAlpha(180),
-                      ),
-                      onPressed: _canGoPrev ? _goToPrev : null,
-                    ),
-                  ),
-                ),
-              Expanded(
-                child: ListView.builder(
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  itemExtent: _itemWidth,
-                  itemCount: widget.urls.length,
-                  itemBuilder: (context, index) {
-                    final url = widget.urls[index];
-                    final thumb = Padding(
-                      padding: EdgeInsets.only(
-                        right: index < widget.urls.length - 1 ? _gap : 0,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(6),
-                        child: SizedBox(
-                          width: _thumbSize,
-                          height: _thumbSize,
-                          child: Image(
-                            image: NetworkImage(
-                              url,
-                              webHtmlElementStrategy:
-                                  WebHtmlElementStrategy.prefer,
-                            ),
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => Container(
-                              color: theme.colorScheme.surfaceContainerHighest,
-                              child: Icon(
-                                Icons.broken_image_outlined,
-                                color: theme.colorScheme.onSurface.withAlpha(
-                                  128,
-                                ),
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                    if (widget.onPhotoTap != null) {
-                      return GestureDetector(
-                        onTap: () => widget.onPhotoTap!(index),
-                        child: thumb,
-                      );
-                    }
-                    return thumb;
-                  },
-                ),
-              ),
-              if (hasMultiple)
-                SizedBox(
-                  width: 28,
-                  child: Center(
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(
-                        minWidth: 24,
-                        minHeight: 24,
-                      ),
-                      iconSize: 20,
-                      icon: Icon(
-                        Icons.chevron_right,
-                        color: theme.colorScheme.onSurface.withAlpha(180),
-                      ),
-                      onPressed: _canGoNext ? _goToNext : null,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        );
-      },
     );
   }
 }

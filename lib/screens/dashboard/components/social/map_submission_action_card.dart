@@ -7,6 +7,7 @@ import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_info_dialog.dart';
+import 'package:collective_action_frontend/components/photo_thumbnail_strip.dart';
 import 'package:collective_action_frontend/screens/maps/components/photo_viewer_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/trash_report_event_info_dialog.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
@@ -255,52 +256,14 @@ class MapSubmissionActionCard extends ConsumerWidget {
                       ),
                       if (imageUrls.isNotEmpty) ...[
                         const SizedBox(height: 6),
-                        SizedBox(
-                          height: 36,
-                          child: ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: imageUrls.length,
-                            separatorBuilder: (_, _) =>
-                                const SizedBox(width: 8),
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onTap: () => showDialog<void>(
-                                  context: context,
-                                  barrierColor: Colors.black87,
-                                  builder: (ctx) => PhotoViewerDialog(
-                                    urls: imageUrls,
-                                    initialIndex: index,
-                                  ),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(6),
-                                  child: SizedBox(
-                                    width: 36,
-                                    height: 36,
-                                    child: Image(
-                                      image: NetworkImage(
-                                        imageUrls[index],
-                                        webHtmlElementStrategy:
-                                            WebHtmlElementStrategy.prefer,
-                                      ),
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, _, _) => Container(
-                                        color: theme
-                                            .colorScheme
-                                            .surfaceContainerHighest,
-                                        child: Icon(
-                                          Icons.broken_image_outlined,
-                                          color: theme.colorScheme.onSurface
-                                              .withAlpha(128),
-                                          size: 20,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
+                        PhotoThumbnailStrip(
+                          urls: imageUrls,
+                          onTap: (index) => PhotoViewerDialog.show(
+                            context,
+                            urls: imageUrls,
+                            initialIndex: index,
                           ),
+                          theme: theme,
                         ),
                       ],
                     ],
