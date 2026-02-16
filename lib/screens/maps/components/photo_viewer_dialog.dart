@@ -45,6 +45,7 @@ class PhotoViewerDialog extends StatefulWidget {
 class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
   late PageController _pageController;
   late int _currentIndex;
+  bool _isClosing = false;
 
   @override
   void initState() {
@@ -60,15 +61,23 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
   }
 
   void _close() {
+    // Prevent multiple taps (e.g. tap-outside) from scheduling multiple pops,
+    // which causes a crash when deployed (first pop closes dialog, second pops
+    // underlying route).
+    if (_isClosing) return;
+    _isClosing = true;
+
     // Mark that we're closing so the map doesn't treat the same tap as a
     // "tap on map" and close the campaign info sheet.
     try {
       final container = ProviderScope.containerOf(context);
       container.read(photoViewerClosedAtProvider.notifier).setClosed();
     } catch (_) {}
-    // Defer pop to the next frame so the tap is fully finished and only the
-    // dialog is removed (using this route's context).
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Defer pop so we don't pop during the gesture (avoids crashes). Microtask
+    // runs after this handler returns but before the next frame—snappier than
+    // addPostFrameCallback. Map cooldown (photoViewerClosedAtProvider) backs
+    // us up if the tap were to hit the map.
+    Future.microtask(() {
       if (!mounted) return;
       final navigator = Navigator.of(context);
       if (navigator.mounted) {

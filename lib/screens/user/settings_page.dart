@@ -59,7 +59,7 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
   void _redirectIfNotLoggedIn() {
     if (_isRedirecting) return;
     _isRedirecting = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    Future.microtask(() {
       if (mounted) {
         context.go('/');
       }
@@ -588,7 +588,7 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
                   _dirtyFields.value.contains('state') ||
                   _dirtyFields.value.contains('country');
               if (!_locationSyncedFromUser && !locationDirty) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
+                Future.microtask(() {
                   if (!mounted) return;
                   if (_locationSyncedFromUser) return;
                   _city = user.location?.city;
