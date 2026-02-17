@@ -4,6 +4,7 @@ import 'package:collective_action_frontend/components/app_bar_icon_button.dart';
 import 'package:collective_action_frontend/components/confirmation_dialog.dart';
 import 'package:collective_action_frontend/components/quote_bar.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
+import 'package:collective_action_frontend/providers/sound_provider.dart';
 import 'package:collective_action_frontend/providers/theme_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
@@ -21,8 +22,6 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authService = ref.watch(authServiceProvider);
     final authState = ref.watch(authStateProvider);
-    final themeMode = ref.watch(themeProvider);
-    final isDarkMode = themeMode == ThemeMode.dark;
     final isMobile = AppConstants.isMobile(context);
     final currentLocation = GoRouterState.of(context).matchedLocation;
     final isHomeRoute = currentLocation == '/';
@@ -167,35 +166,267 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
             ),
           ),
         ),
-        // Dark/Light Mode Toggle
-        AppBarIconButton(
-          icon: isDarkMode ? Icons.wb_sunny : Icons.nightlight_round,
-          onPressed: () {
-            ref.read(themeProvider.notifier).toggleTheme();
-          },
-          tooltip: isDarkMode ? 'Light Mode' : 'Dark Mode',
-          backgroundColor: Colors.white.withAlpha(38),
+        // Settings menu (theme + sound) — opens next to button like app info
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2),
+          child: Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.settings_rounded),
+              tooltip: 'Settings',
+              onPressed: () async {
+                final RenderBox? button =
+                    context.findRenderObject() as RenderBox?;
+                if (button == null || !button.hasSize) return;
+                final overlayState = Overlay.of(context);
+                final RenderBox? overlayBox =
+                    overlayState.context.findRenderObject() as RenderBox?;
+                if (overlayBox == null || !overlayBox.hasSize) return;
+                // Button position in global coordinates
+                final buttonBottomRight = button.localToGlobal(
+                  button.size.bottomRight(Offset.zero),
+                );
+                // Overlay position in global coordinates (usually 0,0)
+                final overlayTopLeft = overlayBox.localToGlobal(Offset.zero);
+                // Align menu's right edge with button's right edge
+                final buttonRightInOverlay =
+                    buttonBottomRight.dx - overlayTopLeft.dx;
+                final menuRight = overlayBox.size.width - buttonRightInOverlay;
+                final menuTop = buttonBottomRight.dy - overlayTopLeft.dy + 4;
+                late OverlayEntry entry;
+                entry = OverlayEntry(
+                  builder: (overlayContext) => SizedBox.expand(
+                    child: Stack(
+                      children: [
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => entry.remove(),
+                        ),
+                        Positioned(
+                          right: menuRight,
+                          top: menuTop,
+                          child: Material(
+                            elevation: 8,
+                            borderRadius: BorderRadius.circular(8),
+                            child: GestureDetector(
+                              onTap:
+                                  () {}, // absorb tap so barrier doesn't close
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                child: IntrinsicWidth(
+                                  child: Consumer(
+                                    builder: (context, ref, _) {
+                                      final theme = Theme.of(context);
+                                      final isDarkMode =
+                                          ref.watch(themeProvider) ==
+                                          ThemeMode.dark;
+                                      final soundEnabled = ref.watch(
+                                        soundEnabledProvider,
+                                      );
+                                      final menuTextStyle = theme
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            color: theme.colorScheme.onSurface,
+                                            fontWeight: FontWeight.w500,
+                                          );
+                                      return Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              SizedBox(
+                                                width: 85,
+                                                child: Text(
+                                                  isDarkMode
+                                                      ? 'Dark Mode'
+                                                      : 'Light Mode',
+                                                  style: menuTextStyle,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Material(
+                                                color:
+                                                    (isDarkMode
+                                                            ? Colors.indigo
+                                                            : Colors.amber)
+                                                        .withAlpha(102),
+                                                shape: const CircleBorder(),
+                                                child: IconButton(
+                                                  icon: Icon(
+                                                    isDarkMode
+                                                        ? Icons.nightlight_round
+                                                        : Icons.wb_sunny,
+                                                    size: 20,
+                                                    color: isDarkMode
+                                                        ? Colors.indigo.shade400
+                                                        : Colors.amber.shade800,
+                                                  ),
+                                                  onPressed: () {
+                                                    ref
+                                                        .read(
+                                                          themeProvider
+                                                              .notifier,
+                                                        )
+                                                        .toggleTheme();
+                                                  },
+                                                  padding: const EdgeInsets.all(
+                                                    6,
+                                                  ),
+                                                  constraints:
+                                                      const BoxConstraints(
+                                                        minWidth: 32,
+                                                        minHeight: 32,
+                                                      ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              SizedBox(
+                                                width: 85,
+                                                child: Text(
+                                                  soundEnabled
+                                                      ? 'Sound On'
+                                                      : 'Sound Off',
+                                                  style: menuTextStyle,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Material(
+                                                color:
+                                                    (soundEnabled
+                                                            ? theme
+                                                                  .colorScheme
+                                                                  .primary
+                                                            : AppColors
+                                                                  .errorRed)
+                                                        .withAlpha(102),
+                                                shape: const CircleBorder(),
+                                                child: IconButton(
+                                                  icon: Icon(
+                                                    soundEnabled
+                                                        ? Icons.volume_up
+                                                        : Icons.volume_off,
+                                                    size: 20,
+                                                    color: soundEnabled
+                                                        ? theme
+                                                              .colorScheme
+                                                              .primary
+                                                        : AppColors.errorRed,
+                                                  ),
+                                                  onPressed: () {
+                                                    ref
+                                                        .read(
+                                                          soundEnabledProvider
+                                                              .notifier,
+                                                        )
+                                                        .toggle();
+                                                  },
+                                                  padding: const EdgeInsets.all(
+                                                    6,
+                                                  ),
+                                                  constraints:
+                                                      const BoxConstraints(
+                                                        minWidth: 32,
+                                                        minHeight: 32,
+                                                      ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              SizedBox(
+                                                width: 85,
+                                                child: Text(
+                                                  'Your Profile',
+                                                  style: menuTextStyle,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Material(
+                                                color: theme.colorScheme.primary
+                                                    .withAlpha(102),
+                                                shape: const CircleBorder(),
+                                                child: IconButton(
+                                                  icon: Icon(
+                                                    Icons.person_rounded,
+                                                    size: 20,
+                                                    color: theme
+                                                        .colorScheme
+                                                        .primary,
+                                                  ),
+                                                  onPressed: () {
+                                                    entry.remove();
+                                                    if (context.mounted) {
+                                                      context.go('/settings');
+                                                    }
+                                                  },
+                                                  padding: const EdgeInsets.all(
+                                                    6,
+                                                  ),
+                                                  constraints:
+                                                      const BoxConstraints(
+                                                        minWidth: 32,
+                                                        minHeight: 32,
+                                                      ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+                overlayState.insert(entry);
+              },
+            ),
+          ),
         ),
 
-        // User Profile Button or Login Button
+        // User avatar → Settings (profile) page
         if (authState.value != null)
           Padding(
             padding: const EdgeInsets.all(4),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  Future.microtask(() {
-                    if (context.mounted) context.go('/settings');
-                  });
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: UserAvatar(
-                    userId: user?.id,
-                    radius: 20,
-                    borderWidth: 1.2,
-                    showLoadingWhenUserIdNull: true,
+            child: Tooltip(
+              message: 'Settings',
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Future.microtask(() {
+                      if (context.mounted) context.go('/settings');
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(24),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: UserAvatar(
+                      userId: user?.id,
+                      radius: 20,
+                      borderWidth: 1.2,
+                      showLoadingWhenUserIdNull: true,
+                    ),
                   ),
                 ),
               ),

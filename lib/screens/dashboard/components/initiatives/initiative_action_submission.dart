@@ -123,9 +123,9 @@ class InitiativeActionSubmissionState
       // Refresh linked action lists (e.g. recent actions under an initiative)
       // using the same days window as the initiatives list screen (7 days).
       ref.invalidate(actionsByLinkedProvider((widget.initiative.id, 7)));
-      // Play sound on success (web-compatible)
-      // AppConstants.playRandomSuccessSound();
+      // Play sound and full-screen confetti together on success
       if (mounted) {
+        AppConstants.playSuccessCelebration(context);
         Navigator.of(context).pop(true);
         ScaffoldMessenger.of(
           context,

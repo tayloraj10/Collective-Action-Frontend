@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:collective_action_frontend/api/lib/api.dart';
+import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
@@ -707,7 +708,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       // just closed—the same tap can hit the map and would wrongly close the sheet.
       final closedAt = ref.read(photoViewerClosedAtProvider);
       if (closedAt != null &&
-          DateTime.now().difference(closedAt) < const Duration(milliseconds: 400)) {
+          DateTime.now().difference(closedAt) <
+              const Duration(milliseconds: 400)) {
         return;
       }
       ref.read(campaignDrawerOpenProvider.notifier).setOpen(false);
@@ -948,6 +950,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         ),
       );
       if (mounted) {
+        AppConstants.playSuccessCelebration(context);
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(CustomSnackBar.success('Saved'));

@@ -536,6 +536,7 @@ class _CreateProjectDialogState extends ConsumerState<_CreateProjectDialog> {
 
       if (!mounted) return;
 
+      AppConstants.playSuccessCelebration(context);
       navigator.pop();
       messenger.showSnackBar(
         CustomSnackBar.success('Project created successfully'),
