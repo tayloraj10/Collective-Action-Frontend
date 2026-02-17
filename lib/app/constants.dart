@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/providers/sound_provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_confetti/flutter_confetti.dart';
 import 'package:just_audio/just_audio.dart';
@@ -99,6 +100,34 @@ class AppConstants {
     }
   }
 
+  // Web: preloaded player used to unlock AudioContext on first user gesture (mobile browsers).
+  static AudioPlayer? _webUnlockPlayer;
+  static bool _webAudioUnlocked = false;
+
+  /// Call from main() when kIsWeb so a player is ready to play on first tap.
+  static void preloadAudioForWeb() {
+    if (!kIsWeb || _webUnlockPlayer != null) return;
+    _webUnlockPlayer = AudioPlayer();
+    _webUnlockPlayer!
+        .setAsset(_successSounds.first)
+        .then((_) {})
+        .catchError((_) {});
+  }
+
+  /// Call from a user gesture handler on web so later sounds can play. Muted so user hears nothing.
+  static void unlockAudioForWeb() {
+    if (!kIsWeb || _webAudioUnlocked) return;
+    if (_webUnlockPlayer == null) return;
+    _webAudioUnlocked = true;
+    try {
+      _webUnlockPlayer!.setVolume(0);
+      _webUnlockPlayer!.play();
+      Future.delayed(const Duration(milliseconds: 150), () {
+        _webUnlockPlayer?.stop();
+      });
+    } catch (_) {}
+  }
+
   static const List<String> _successSounds = <String>[
     'assets/sounds/around-the-world.mp3',
     'assets/sounds/billie-jean.mp3',
@@ -115,31 +144,44 @@ class AppConstants {
   /// Picks a random success sound asset path and max duration.
   static ({String path, Duration maxDuration}) randomSuccessSoundSource({
     Random? random,
-    Duration maxDuration = const Duration(seconds: 8),
+    Duration maxDuration = const Duration(seconds: 13),
   }) {
     final rng = random ?? Random();
     final path = _successSounds[rng.nextInt(_successSounds.length)];
     return (path: path, maxDuration: maxDuration);
   }
 
+  static AudioPlayer? _currentSuccessPlayer;
+
   /// Convenience helper to play a random success sound once.
-  ///
-  /// Swallows any audio errors so it is safe to call from
-  /// anywhere without impacting UX if audio fails.
+  /// Stops any currently playing success sound first. Stops after [maxDuration] (default 10s).
   static Future<void> playRandomSuccessSound() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       if (prefs.getBool(soundEnabledPrefsKey) == false) return;
+      // Stop previous success sound if still playing
+      if (_currentSuccessPlayer != null) {
+        try {
+          await _currentSuccessPlayer!.stop();
+          await _currentSuccessPlayer!.dispose();
+        } catch (_) {}
+        _currentSuccessPlayer = null;
+      }
       final player = AudioPlayer();
+      _currentSuccessPlayer = player;
       final (:path, :maxDuration) = randomSuccessSoundSource();
       await player.setAsset(path);
-      await player.play();
+      player.play();
       Future.delayed(maxDuration, () async {
-        await player.stop();
-        await player.dispose();
+        if (_currentSuccessPlayer != player) return;
+        try {
+          await player.stop();
+          await player.dispose();
+        } catch (_) {}
+        if (_currentSuccessPlayer == player) _currentSuccessPlayer = null;
       });
     } catch (_) {
-      // Intentionally ignore audio errors
+      _currentSuccessPlayer = null;
     }
   }
 

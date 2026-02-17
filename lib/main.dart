@@ -1,6 +1,7 @@
 import 'dart:developer';
-import 'package:collective_action_frontend/app/theme.dart';
+import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/router.dart';
+import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/user_data_sync_observer.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -20,6 +21,8 @@ void main() async {
     ImagePickerPlugin.registerWith(webPluginRegistrar);
     // Use web implementation for Google Maps (avoids "Windows not supported" when running in Chrome)
     GoogleMapsPlugin.registerWith(webPluginRegistrar);
+    // Preload audio so first user gesture can unlock playback on mobile browsers
+    AppConstants.preloadAudioForWeb();
   }
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
@@ -41,14 +44,32 @@ class MyApp extends ConsumerWidget {
     final router = ref.watch(goRouterProvider);
 
     return UserDataSyncObserver(
-      child: MaterialApp.router(
-        title: 'Collective Action Network',
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: themeMode,
-        debugShowCheckedModeBanner: false,
-        routerConfig: router,
+      child: _WebAudioUnlock(
+        child: MaterialApp.router(
+          title: 'Collective Action Network',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeMode,
+          debugShowCheckedModeBanner: false,
+          routerConfig: router,
+        ),
       ),
+    );
+  }
+}
+
+/// On web, unlocks audio on first user tap anywhere so success sounds can play on mobile browsers.
+class _WebAudioUnlock extends StatelessWidget {
+  const _WebAudioUnlock({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!kIsWeb) return child;
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      onPointerDown: (_) => AppConstants.unlockAudioForWeb(),
+      child: child,
     );
   }
 }
