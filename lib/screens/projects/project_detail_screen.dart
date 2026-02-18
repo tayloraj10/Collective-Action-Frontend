@@ -1,6 +1,7 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
+import 'package:collective_action_frontend/utils/step_status_utils.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/providers/config_provider.dart';
@@ -994,20 +995,8 @@ class _EditableStepTile extends ConsumerWidget {
     );
   }
 
-  static Color _statusColor(StatusValuesEnum statusName, ThemeData theme) {
-    switch (statusName.value) {
-      case 'Completed':
-        return AppColors.successGreen;
-      case 'In Progress':
-        return AppColors.lightBlue;
-      case 'Active':
-        return AppColors.lightBlue;
-      case 'Inactive':
-        return theme.colorScheme.onSurface.withAlpha(140);
-      default:
-        return AppColors.lightBlue;
-    }
-  }
+  static Color _statusColor(StatusValuesEnum statusName, ThemeData theme) =>
+      stepStatusColor(statusName.value, theme);
 
   void _editStep(BuildContext context) {
     showDialog(
@@ -1095,9 +1084,11 @@ class _StepDialogState extends ConsumerState<_StepDialog> {
       if (!mounted || _selectedStatusId != null) return;
       final statusesAsync = ref.read(statusesProvider);
       final allStatuses = statusesAsync.asData?.value ?? [];
-      final stepStatuses = allStatuses
-          .where((status) => status.statusType == StatusTypeEnum.stepStatus)
-          .toList();
+      final stepStatuses = sortStepStatusesByOrder(
+        allStatuses
+            .where((status) => status.statusType == StatusTypeEnum.stepStatus)
+            .toList(),
+      );
 
       if (stepStatuses.isNotEmpty) {
         setState(() {
@@ -1119,10 +1110,13 @@ class _StepDialogState extends ConsumerState<_StepDialog> {
     final statusesAsync = ref.watch(statusesProvider);
     final allStatuses = statusesAsync.asData?.value ?? [];
 
-    // Filter to only show "Step Status" type statuses
-    final stepStatuses = allStatuses
-        .where((status) => status.statusType == StatusTypeEnum.stepStatus)
-        .toList();
+    // Filter to only show "Step Status" type statuses, then sort in logical order
+    final stepStatuses = sortStepStatusesByOrder(
+      allStatuses
+          .where((status) => status.statusType == StatusTypeEnum.stepStatus)
+          .toList(),
+    );
+    final theme = Theme.of(context);
 
     return AlertDialog(
       title: Text(widget.step == null ? 'Add Step' : 'Edit Step'),
@@ -1155,9 +1149,23 @@ class _StepDialogState extends ConsumerState<_StepDialog> {
                 border: OutlineInputBorder(),
               ),
               items: stepStatuses.map((status) {
+                final color = stepStatusColor(status.name.value, theme);
                 return DropdownMenuItem<String>(
                   value: status.id,
-                  child: Text(status.name.value),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(status.name.value),
+                    ],
+                  ),
                 );
               }).toList(),
               onChanged: (value) {

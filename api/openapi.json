@@ -4505,8 +4505,11 @@
             "StatusValuesEnum": {
                 "type": "string",
                 "enum": [
+                    "Not Started",
                     "In Development",
                     "In Progress",
+                    "In Review",
+                    "Blocked",
                     "Completed",
                     "Active",
                     "Inactive"

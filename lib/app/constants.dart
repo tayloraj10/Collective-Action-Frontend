@@ -110,6 +110,7 @@ class AppConstants {
   // Web: preloaded player used to unlock AudioContext on first user gesture (mobile browsers).
   static AudioPlayer? _webUnlockPlayer;
   static bool _webAudioUnlocked = false;
+  static bool _webUnlockReady = false;
 
   /// Call from main() when kIsWeb so a player is ready to play on first tap.
   static void preloadAudioForWeb() {
@@ -117,14 +118,17 @@ class AppConstants {
     _webUnlockPlayer = AudioPlayer();
     _webUnlockPlayer!
         .setAsset(_successSounds.first)
-        .then((_) {})
+        .then((_) {
+          _webUnlockReady = true;
+        })
         .catchError((_) {});
   }
 
   /// Call from a user gesture handler on web so later sounds can play. Muted so user hears nothing.
+  /// Only plays when the preloaded asset is ready so the gesture actually unlocks playback on mobile Chrome.
   static void unlockAudioForWeb() {
     if (!kIsWeb || _webAudioUnlocked) return;
-    if (_webUnlockPlayer == null) return;
+    if (_webUnlockPlayer == null || !_webUnlockReady) return;
     _webAudioUnlocked = true;
     try {
       _webUnlockPlayer!.setVolume(0);

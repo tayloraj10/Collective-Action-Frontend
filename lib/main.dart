@@ -59,6 +59,7 @@ class MyApp extends ConsumerWidget {
 }
 
 /// On web, unlocks audio on first user tap anywhere so success sounds can play on mobile browsers.
+/// Listener catches pointer (and touch) events; GestureDetector ensures tap is also handled on all platforms.
 class _WebAudioUnlock extends StatelessWidget {
   const _WebAudioUnlock({required this.child});
   final Widget child;
@@ -69,7 +70,11 @@ class _WebAudioUnlock extends StatelessWidget {
     return Listener(
       behavior: HitTestBehavior.translucent,
       onPointerDown: (_) => AppConstants.unlockAudioForWeb(),
-      child: child,
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => AppConstants.unlockAudioForWeb(),
+        child: child,
+      ),
     );
   }
 }

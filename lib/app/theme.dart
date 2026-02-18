@@ -20,6 +20,15 @@ class AppColors {
   static const successGreen = Color(0xFF16A34A);
   static const warningOrange = Color(0xFFEA580C);
   static const highlightYelllow = Color(0xFFFFE082);
+  // Step status colors (each status has a distinct color)
+  static const statusNotStarted = Color(0xFF64748B); // slate
+  static const statusInDevelopment = Color(0xFF0D9488); // teal
+  static const statusInProgress = Color(0xFF3B82F6); // lightBlue
+  static const statusInReview = Color(0xFF7C3AED); // violet
+  static const statusBlocked = Color(0xFFEA580C); // warningOrange
+  static const statusCompleted = Color(0xFF16A34A); // successGreen
+  static const statusActive = Color(0xFF1E40AF); // primaryBlue
+  static const statusInactive = Color(0xFF94A3B8); // muted grey
 
   // Text Colors
   static const textPrimary = Color(0xFF1E293B);
@@ -385,4 +394,31 @@ class AppTheme {
       elevation: 8,
     ),
   );
+}
+
+// --- Step status colors ---
+
+/// Returns a distinct color for each step status. Used for badges and dropdowns.
+/// [statusValue] is the status display string (e.g. 'In Progress', 'Completed').
+Color stepStatusColor(String statusValue, ThemeData theme) {
+  switch (statusValue) {
+    case 'Not Started':
+      return AppColors.statusNotStarted;
+    case 'In Development':
+      return AppColors.statusInDevelopment;
+    case 'In Progress':
+      return AppColors.statusInProgress;
+    case 'In Review':
+      return AppColors.statusInReview;
+    case 'Blocked':
+      return AppColors.statusBlocked;
+    case 'Completed':
+      return AppColors.statusCompleted;
+    case 'Active':
+      return AppColors.statusActive;
+    case 'Inactive':
+      return AppColors.statusInactive;
+    default:
+      return AppColors.statusInProgress;
+  }
 }
