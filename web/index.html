@@ -28,6 +28,31 @@
 </head>
 
 <body>
+  <!-- Unlock audio on first user gesture (required for mobile Chrome/Firefox). Must run before Flutter. -->
+  <script>
+    (function () {
+      var unlocked = false;
+      function unlock() {
+        if (unlocked) return;
+        unlocked = true;
+        try {
+          var C = window.AudioContext || window.webkitAudioContext;
+          if (C) {
+            var ctx = new C();
+            if (ctx.resume) ctx.resume();
+          }
+        } catch (e) { }
+        document.removeEventListener('touchstart', unlock, true);
+        document.removeEventListener('touchend', unlock, true);
+        document.removeEventListener('click', unlock, true);
+        document.removeEventListener('keydown', unlock, true);
+      }
+      document.addEventListener('touchstart', unlock, true);
+      document.addEventListener('touchend', unlock, true);
+      document.addEventListener('click', unlock, true);
+      document.addEventListener('keydown', unlock, true);
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 
