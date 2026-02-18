@@ -110,25 +110,25 @@ class AppConstants {
   // Web: preloaded player used to unlock AudioContext on first user gesture (mobile browsers).
   static AudioPlayer? _webUnlockPlayer;
   static bool _webAudioUnlocked = false;
-  static bool _webUnlockReady = false;
 
   /// Call from main() when kIsWeb so a player is ready to play on first tap.
   static void preloadAudioForWeb() {
     if (!kIsWeb || _webUnlockPlayer != null) return;
     _webUnlockPlayer = AudioPlayer();
-    _webUnlockPlayer!
-        .setAsset(_successSounds.first)
-        .then((_) {
-          _webUnlockReady = true;
-        })
-        .catchError((_) {});
+    // On web use setUrl so asset path resolves reliably and is ready for unlock on first tap.
+    final path = _successSounds.first;
+    final future = kIsWeb
+        ? _webUnlockPlayer!.setUrl(Uri.base.resolve(path).toString())
+        : _webUnlockPlayer!.setAsset(path);
+    future.catchError((_) => null);
   }
 
   /// Call from a user gesture handler on web so later sounds can play. Muted so user hears nothing.
-  /// Only plays when the preloaded asset is ready so the gesture actually unlocks playback on mobile Chrome.
+  /// Attempts play on first tap even if preload is not ready yet (removes _webUnlockReady guard)
+  /// so the gesture can unlock AudioContext on mobile; playing with volume 0 is inaudible.
   static void unlockAudioForWeb() {
     if (!kIsWeb || _webAudioUnlocked) return;
-    if (_webUnlockPlayer == null || !_webUnlockReady) return;
+    if (_webUnlockPlayer == null) return;
     _webAudioUnlocked = true;
     try {
       _webUnlockPlayer!.setVolume(0);
@@ -166,6 +166,7 @@ class AppConstants {
 
   /// Convenience helper to play a random success sound once.
   /// Stops any currently playing success sound first. Stops after [maxDuration] (default 10s).
+  /// On web: uses setUrl and await play() for mobile browser compatibility (iOS Safari, Chrome).
   static Future<void> playRandomSuccessSound() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -181,8 +182,13 @@ class AppConstants {
       final player = AudioPlayer();
       _currentSuccessPlayer = player;
       final (:path, :maxDuration) = randomSuccessSoundSource();
-      await player.setAsset(path);
-      player.play();
+      if (kIsWeb) {
+        await player.setUrl(Uri.base.resolve(path).toString());
+      } else {
+        await player.setAsset(path);
+      }
+      player.setVolume(1.0);
+      await player.play();
       Future.delayed(maxDuration, () async {
         if (_currentSuccessPlayer != player) return;
         try {
@@ -198,6 +204,10 @@ class AppConstants {
 
   /// Plays the success sound and shows the confetti overlay together.
   /// Call this for any success celebration so both always run at the same time.
+  ///
+  /// On mobile web, audio requires a user gesture to unlock. The app unlocks on first tap
+  /// anywhere (see [unlockAudioForWeb]). If this is called after an async gap (e.g. after an
+  /// API call), sound may still be blocked; having the user tap once in the session first helps.
   static void playSuccessCelebration(BuildContext context) {
     playRandomSuccessSound();
     showCelebrationOverlay(context);
