@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:collective_action_frontend/app/version.g.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/providers/sound_provider.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -11,6 +12,12 @@ import 'package:url_launcher/url_launcher.dart';
 // App-wide constants
 
 class AppConstants {
+  /// Label shown before version (e.g. 'Beta', '' for production).
+  static const String appReleaseLabel = 'Beta';
+
+  /// App version shown in UI (from pubspec.yaml via version.g.dart).
+  static String get appVersionFallback => appVersion;
+
   // Backend API base URL
   static String get backendBaseUrl {
     const bool inDebugMode = bool.fromEnvironment('dart.vm.product') == false;
