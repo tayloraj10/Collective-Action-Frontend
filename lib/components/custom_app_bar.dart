@@ -221,6 +221,9 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                                       final soundEnabled = ref.watch(
                                         soundEnabledProvider,
                                       );
+                                      final isLoggedIn =
+                                          ref.watch(authStateProvider).value !=
+                                          null;
                                       final menuTextStyle = theme
                                           .textTheme
                                           .bodyMedium
@@ -339,46 +342,52 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                                               ),
                                             ],
                                           ),
-                                          const SizedBox(height: 10),
-                                          Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              SizedBox(
-                                                width: 85,
-                                                child: Text(
-                                                  'Your Profile',
-                                                  style: menuTextStyle,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 12),
-                                              Material(
-                                                color: theme.colorScheme.primary
-                                                    .withAlpha(102),
-                                                shape: const CircleBorder(),
-                                                child: IconButton(
-                                                  icon: Icon(
-                                                    Icons.person_rounded,
-                                                    size: 20,
-                                                    color: theme
-                                                        .colorScheme
-                                                        .primary,
+                                          if (isLoggedIn) ...[
+                                            const SizedBox(height: 10),
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                SizedBox(
+                                                  width: 85,
+                                                  child: Text(
+                                                    'Your Profile',
+                                                    style: menuTextStyle,
                                                   ),
-                                                  onPressed: () {
-                                                    entry.remove();
-                                                    safeGo(context, '/settings');
-                                                  },
-                                                  padding: const EdgeInsets.all(
-                                                    6,
-                                                  ),
-                                                  constraints:
-                                                      const BoxConstraints(
-                                                        minWidth: 32,
-                                                        minHeight: 32,
-                                                      ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
+                                                const SizedBox(width: 12),
+                                                Material(
+                                                  color: theme
+                                                      .colorScheme
+                                                      .primary
+                                                      .withAlpha(102),
+                                                  shape: const CircleBorder(),
+                                                  child: IconButton(
+                                                    icon: Icon(
+                                                      Icons.person_rounded,
+                                                      size: 20,
+                                                      color: theme
+                                                          .colorScheme
+                                                          .primary,
+                                                    ),
+                                                    onPressed: () {
+                                                      entry.remove();
+                                                      safeGo(
+                                                        context,
+                                                        '/settings',
+                                                      );
+                                                    },
+                                                    padding:
+                                                        const EdgeInsets.all(6),
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                          minWidth: 32,
+                                                          minHeight: 32,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
                                         ],
                                       );
                                     },
