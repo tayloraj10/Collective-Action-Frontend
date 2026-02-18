@@ -16,7 +16,6 @@ import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:typed_data';
 import 'dart:ui' show ImageByteFormat;
-import 'package:go_router/go_router.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:crop_image/crop_image.dart';

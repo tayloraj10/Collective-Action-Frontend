@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/providers/initiative_provider.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class InitiativesSummary extends ConsumerStatefulWidget {
   final IconData icon;
