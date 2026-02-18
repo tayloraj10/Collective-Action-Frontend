@@ -8,7 +8,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
-import 'package:go_router/go_router.dart';
+
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -122,7 +123,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           }
         }
         if (mounted) {
-          context.go('/');
+          safeGo(context, '/');
         }
       }
     } on FirebaseAuthException catch (e) {
@@ -169,7 +170,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         }
       }
       if (mounted) {
-        context.go('/');
+        safeGo(context, '/');
       }
     } on FirebaseAuthException catch (e) {
       setState(() => _errorMessage = _getFriendlyErrorMessage(e));

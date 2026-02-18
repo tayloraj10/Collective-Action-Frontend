@@ -1,5 +1,6 @@
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/initiatives/initiatives_summary.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/maps/maps_summary.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/projects/projects_summary.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/social_summary.dart';
@@ -78,7 +79,7 @@ class SummaryPane extends StatelessWidget {
                   if (route != null)
                     InkWell(
                       borderRadius: BorderRadius.circular(8),
-                      onTap: () => context.go(route),
+                      onTap: () => safeGo(context, route!),
                       child: Container(
                         padding: EdgeInsets.all(isMobile ? 10 : 12),
                         decoration: BoxDecoration(
@@ -117,7 +118,7 @@ class SummaryPane extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                       onTap: (!isMobile || route == null)
                           ? null
-                          : () => context.go(route),
+                          : () => safeGo(context, route!),
                       splashColor: (!isMobile || route == null)
                           ? null
                           : Theme.of(context).colorScheme.primary.withAlpha(30),

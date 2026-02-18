@@ -5,6 +5,7 @@ import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/services/user_service.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/navigation_button.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_pane.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -115,36 +116,28 @@ class DashboardScreen extends ConsumerWidget {
                           icon: Icons.trending_up,
                           label: 'Initiatives',
                           color: AppColors.lightBlue,
-                          onTap: () {
-                            context.go('/initiatives');
-                          },
+                          onTap: () => safeGo(context, '/initiatives'),
                         ),
                         SizedBox(width: 12),
                         NavigationButton(
                           icon: Icons.assignment_outlined,
                           label: 'Projects',
                           color: AppColors.errorRed,
-                          onTap: () {
-                            context.go('/projects');
-                          },
+                          onTap: () => safeGo(context, '/projects'),
                         ),
                         SizedBox(width: 12),
                         NavigationButton(
                           icon: Icons.map_outlined,
                           label: 'Maps',
                           color: AppColors.successGreen,
-                          onTap: () {
-                            context.go('/maps/cleanup');
-                          },
+                          onTap: () => safeGo(context, '/maps/cleanup'),
                         ),
                         SizedBox(width: 12),
                         NavigationButton(
                           icon: Icons.people_outline,
                           label: 'Social',
                           color: AppColors.warningOrange,
-                          onTap: () {
-                            context.go('/social');
-                          },
+                          onTap: () => safeGo(context, '/social'),
                         ),
                       ],
                     ),

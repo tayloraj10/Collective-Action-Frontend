@@ -4,6 +4,7 @@ import 'package:collective_action_frontend/screens/dashboard/components/initiati
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/providers/initiative_provider.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -72,7 +73,7 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
                   children: [
                     InkWell(
                       borderRadius: BorderRadius.circular(8),
-                      onTap: () => context.go('/initiatives'),
+                      onTap: () => safeGo(context, '/initiatives'),
                       child: Container(
                         padding: EdgeInsets.all(isMobile ? 10 : 12),
                         decoration: BoxDecoration(
@@ -94,7 +95,7 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(6),
                         onTap: isMobile
-                            ? () => context.go('/initiatives')
+                            ? () => safeGo(context, '/initiatives')
                             : null,
                         splashColor: isMobile
                             ? Theme.of(

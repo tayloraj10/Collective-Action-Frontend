@@ -3,6 +3,7 @@ import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/initiative_action_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/map_submission_action_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
@@ -70,7 +71,7 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                 children: [
                   InkWell(
                     borderRadius: BorderRadius.circular(8),
-                    onTap: () => context.go('/social'),
+                    onTap: () => safeGo(context, '/social'),
                     child: Container(
                       padding: EdgeInsets.all(isMobile ? 10 : 12),
                       decoration: BoxDecoration(
@@ -95,7 +96,7 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(6),
                             onTap: isMobile
-                                ? () => context.go('/social')
+                                ? () => safeGo(context, '/social')
                                 : null,
                             splashColor: isMobile
                                 ? Theme.of(

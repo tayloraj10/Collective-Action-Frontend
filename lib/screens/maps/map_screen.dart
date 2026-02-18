@@ -9,7 +9,8 @@ import 'package:collective_action_frontend/screens/maps/components/cleanup_map_w
 // import 'package:collective_action_frontend/screens/maps/components/zip_code_map_widget.dart'; // restore when re-enabling zip code map
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
@@ -195,10 +196,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 });
                                 // Update URL when cleanup is selected
                                 if (value == MapCampaignTypeEnum.cleanupMap) {
-                                  context.go('/maps/cleanup');
+                                  safeGo(context, '/maps/cleanup');
                                 } else {
-                                  // For other types, go back to /maps
-                                  context.go('/maps');
+                                  safeGo(context, '/maps');
                                 }
                               }
                             },
@@ -262,7 +262,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                               color: Theme.of(context).colorScheme.surface,
                               child: IconButton(
                                 icon: const Icon(Icons.bar_chart_rounded),
-                                onPressed: () => StatsDialog.show(context),
+                                onPressed: () => scheduleAfterTap(context, () => StatsDialog.show(context)),
                                 tooltip: 'Cleanup & trash stats',
                                 padding: const EdgeInsets.all(8),
                                 constraints: const BoxConstraints(),
@@ -275,8 +275,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                               color: Theme.of(context).colorScheme.surface,
                               child: IconButton(
                                 icon: const Icon(Icons.emoji_events_outlined),
-                                onPressed: () =>
-                                    LeaderboardDialog.show(context),
+                                onPressed: () => scheduleAfterTap(
+                                    context,
+                                    () => LeaderboardDialog.show(context)),
                                 tooltip: 'Leaderboard (bags cleaned)',
                                 padding: const EdgeInsets.all(8),
                                 constraints: const BoxConstraints(),

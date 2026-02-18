@@ -15,6 +15,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
+
 class ProjectDetailScreen extends ConsumerStatefulWidget {
   final String projectId;
 
@@ -114,7 +116,7 @@ class _ProjectDetailScreenState extends ConsumerState<ProjectDetailScreen> {
                   children: [
                     // Back button
                     TextButton.icon(
-                      onPressed: () => context.go('/projects'),
+                      onPressed: () => safeGo(context, '/projects'),
                       icon: const Icon(Icons.arrow_back, size: 18),
                       label: const Text('Back to Projects'),
                       style: TextButton.styleFrom(

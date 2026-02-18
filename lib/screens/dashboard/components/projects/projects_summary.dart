@@ -3,6 +3,7 @@ import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/providers/project_provider.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/projects/project_action_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -37,7 +38,7 @@ class ProjectsSummary extends ConsumerWidget {
               children: [
                 InkWell(
                   borderRadius: BorderRadius.circular(8),
-                  onTap: () => context.go('/projects'),
+                  onTap: () => safeGo(context, '/projects'),
                   child: Container(
                     padding: EdgeInsets.all(isMobile ? 10 : 12),
                     decoration: BoxDecoration(
@@ -54,7 +55,7 @@ class ProjectsSummary extends ConsumerWidget {
                 Expanded(
                   child: InkWell(
                     borderRadius: BorderRadius.circular(6),
-                    onTap: isMobile ? () => context.go('/projects') : null,
+                    onTap: isMobile ? () => safeGo(context, '/projects') : null,
                     splashColor: isMobile
                         ? theme.colorScheme.primary.withAlpha(30)
                         : null,
@@ -159,7 +160,7 @@ class ProjectsSummary extends ConsumerWidget {
                           ),
                           const SizedBox(height: 8),
                           TextButton.icon(
-                            onPressed: () => context.go('/projects'),
+                            onPressed: () => safeGo(context, '/projects'),
                             icon: const Icon(Icons.add_rounded),
                             label: const Text('Create a project'),
                           ),
