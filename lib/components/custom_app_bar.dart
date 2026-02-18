@@ -120,7 +120,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                             'Version',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          Text('Beta v1.1.1', style: TextStyle(fontSize: 13)),
+                          _VersionText(),
                           const SizedBox(height: 8),
                           Text(
                             'Recent Features',
@@ -470,5 +470,17 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
         SizedBox(width: isMobile ? 4 : 8),
       ],
     );
+  }
+}
+
+class _VersionText extends StatelessWidget {
+  const _VersionText();
+
+  @override
+  Widget build(BuildContext context) {
+    final label = AppConstants.appReleaseLabel.isEmpty
+        ? 'v${AppConstants.appVersionFallback}'
+        : '${AppConstants.appReleaseLabel} v${AppConstants.appVersionFallback}';
+    return Text(label, style: const TextStyle(fontSize: 13));
   }
 }
