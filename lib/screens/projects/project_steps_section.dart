@@ -323,17 +323,6 @@ class _StepTile extends StatelessWidget {
     );
   }
 
-  static Color _statusColor(StatusValuesEnum statusName, ThemeData theme) {
-    switch (statusName.value) {
-      case 'Completed':
-        return AppColors.successGreen;
-      case 'In Progress':
-      case 'Active':
-        return AppColors.lightBlue;
-      case 'Inactive':
-        return theme.colorScheme.onSurface.withAlpha(140);
-      default:
-        return AppColors.lightBlue;
-    }
-  }
+  static Color _statusColor(StatusValuesEnum statusName, ThemeData theme) =>
+      stepStatusColor(statusName.value, theme);
 }
