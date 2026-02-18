@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 /// Delay used on mobile web so the browser finishes the tap/gesture before we
 /// navigate or pop. Reduces crashes and jank on mobile Chrome.
-const Duration _kMobileWebNavDelay = Duration(milliseconds: 80);
+const Duration _kMobileWebNavDelay = Duration(milliseconds: 120);
 
 /// True when running on web and the viewport is mobile-sized. Navigation and
 /// dialog open/close are more fragile on mobile Chrome; we defer with a short

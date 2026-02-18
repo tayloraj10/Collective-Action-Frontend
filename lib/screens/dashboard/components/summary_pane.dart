@@ -6,7 +6,6 @@ import 'package:collective_action_frontend/screens/dashboard/components/projects
 import 'package:collective_action_frontend/screens/dashboard/components/social/social_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
-import 'package:go_router/go_router.dart';
 
 class SummaryPane extends StatelessWidget {
   final String title;
@@ -79,7 +78,7 @@ class SummaryPane extends StatelessWidget {
                   if (route != null)
                     InkWell(
                       borderRadius: BorderRadius.circular(8),
-                      onTap: () => safeGo(context, route!),
+                      onTap: () => safeGo(context, route),
                       child: Container(
                         padding: EdgeInsets.all(isMobile ? 10 : 12),
                         decoration: BoxDecoration(
@@ -118,7 +117,7 @@ class SummaryPane extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                       onTap: (!isMobile || route == null)
                           ? null
-                          : () => safeGo(context, route!),
+                          : () => safeGo(context, route),
                       splashColor: (!isMobile || route == null)
                           ? null
                           : Theme.of(context).colorScheme.primary.withAlpha(30),

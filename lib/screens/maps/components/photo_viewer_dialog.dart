@@ -1,6 +1,7 @@
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/providers/map_zoom_provider.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -62,20 +63,33 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
   }
 
   void _close() {
-    // Prevent multiple taps (e.g. tap-outside) from scheduling multiple pops,
-    // which causes a crash when deployed (first pop closes dialog, second pops
-    // underlying route).
+    // Prevent multiple taps from scheduling multiple pops (crashes on mobile Chrome).
     if (_isClosing) return;
     _isClosing = true;
 
-    // Mark that we're closing so the map doesn't treat the same tap as a
-    // "tap on map" and close the campaign info sheet.
+    // Capture navigator and set provider synchronously—do not use context in the
+    // delayed callback to avoid using disposed context or triggering rebuilds
+    // during route removal. Also avoids races with image disposal on web.
+    final navigator = Navigator.of(context);
     try {
       final container = ProviderScope.containerOf(context);
       container.read(photoViewerClosedAtProvider.notifier).setClosed();
     } catch (_) {}
-    // Use safePop so on mobile web we defer pop and reduce crashes/jank.
-    safePop(context);
+
+    // On mobile web use a longer delay so (1) the tap is fully done and (2) any
+    // in-flight image decode/network work can settle before we dispose the route.
+    final isMobileWeb = kIsWeb && AppConstants.isMobile(context);
+    final delay = isMobileWeb ? const Duration(milliseconds: 200) : null;
+
+    if (delay != null) {
+      Future.delayed(delay, () {
+        if (navigator.mounted) navigator.pop();
+      });
+    } else {
+      Future.microtask(() {
+        if (navigator.mounted) navigator.pop();
+      });
+    }
   }
 
   @override

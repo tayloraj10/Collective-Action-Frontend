@@ -9,7 +9,6 @@ import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_pane.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
