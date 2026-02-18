@@ -1,6 +1,7 @@
 import 'package:collective_action_frontend/components/stat.dart';
 import 'package:collective_action_frontend/providers/stats_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -84,7 +85,7 @@ class StatsDialog extends ConsumerWidget {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => safePop(context),
           child: const Text('Close'),
         ),
       ],

@@ -1,5 +1,6 @@
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/providers/map_zoom_provider.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,15 +17,15 @@ class PhotoViewerDialog extends StatefulWidget {
     this.initialIndex = 0,
   });
 
-  /// Opens the photo viewer after the current turn (microtask) to avoid mobile web
-  /// crashes when opening during tap.
+  /// Opens the photo viewer after the current tap; on mobile web uses a short
+  /// delay to reduce crashes and jank when opening during tap.
   static void show(
     BuildContext context, {
     required List<String> urls,
     int initialIndex = 0,
   }) {
     if (urls.isEmpty) return;
-    Future.microtask(() {
+    scheduleAfterTap(context, () {
       if (!context.mounted) return;
       showDialog<void>(
         context: context,
@@ -73,17 +74,8 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
       final container = ProviderScope.containerOf(context);
       container.read(photoViewerClosedAtProvider.notifier).setClosed();
     } catch (_) {}
-    // Defer pop so we don't pop during the gesture (avoids crashes). Microtask
-    // runs after this handler returns but before the next frame—snappier than
-    // addPostFrameCallback. Map cooldown (photoViewerClosedAtProvider) backs
-    // us up if the tap were to hit the map.
-    Future.microtask(() {
-      if (!mounted) return;
-      final navigator = Navigator.of(context);
-      if (navigator.mounted) {
-        navigator.pop();
-      }
-    });
+    // Use safePop so on mobile web we defer pop and reduce crashes/jank.
+    safePop(context);
   }
 
   @override

@@ -17,6 +17,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:typed_data';
 import 'dart:ui' show ImageByteFormat;
 import 'package:go_router/go_router.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:crop_image/crop_image.dart';
 
@@ -59,11 +60,7 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
   void _redirectIfNotLoggedIn() {
     if (_isRedirecting) return;
     _isRedirecting = true;
-    Future.microtask(() {
-      if (mounted) {
-        context.go('/');
-      }
-    });
+    safeGo(context, '/');
   }
 
   final _formKey = GlobalKey<FormState>();

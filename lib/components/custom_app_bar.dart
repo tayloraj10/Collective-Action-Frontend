@@ -1,5 +1,6 @@
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:collective_action_frontend/components/app_bar_icon_button.dart';
 import 'package:collective_action_frontend/components/confirmation_dialog.dart';
 import 'package:collective_action_frontend/components/quote_bar.dart';
@@ -37,12 +38,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
               padding: const EdgeInsets.only(left: 12),
               child: AppBarIconButton(
                 icon: Icons.home,
-                onPressed: () {
-                  // Defer to avoid mobile Chrome crash when navigating during tap.
-                  Future.microtask(() {
-                    if (context.mounted) context.go('/');
-                  });
-                },
+                onPressed: () => safeGo(context, '/'),
                 tooltip: 'Home',
                 backgroundColor: Colors.white.withAlpha(38),
               ),
@@ -369,9 +365,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                                                   ),
                                                   onPressed: () {
                                                     entry.remove();
-                                                    if (context.mounted) {
-                                                      context.go('/settings');
-                                                    }
+                                                    safeGo(context, '/settings');
                                                   },
                                                   padding: const EdgeInsets.all(
                                                     6,
@@ -413,11 +407,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: () {
-                    Future.microtask(() {
-                      if (context.mounted) context.go('/settings');
-                    });
-                  },
+                  onTap: () => safeGo(context, '/settings'),
                   borderRadius: BorderRadius.circular(24),
                   child: Padding(
                     padding: const EdgeInsets.all(4),
@@ -435,11 +425,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
         else
           AppBarIconButton(
             icon: Icons.login,
-            onPressed: () {
-              Future.microtask(() {
-                if (context.mounted) context.go('/login');
-              });
-            },
+            onPressed: () => safeGo(context, '/login'),
             tooltip: 'Login',
             backgroundColor: Colors.white.withAlpha(38),
           ),

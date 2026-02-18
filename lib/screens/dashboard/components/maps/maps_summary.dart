@@ -7,6 +7,8 @@ import 'package:collective_action_frontend/screens/maps/map_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 /// Dashboard Maps pane: Google Maps heatmap of recent Map Submission actions.
@@ -111,7 +113,7 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: isMobile ? () => context.go('/maps/cleanup') : null,
+        onTap: isMobile ? () => safeGo(context, '/maps/cleanup') : null,
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: isMobile ? 6 : 10,
@@ -125,7 +127,7 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                 children: [
                   InkWell(
                     borderRadius: BorderRadius.circular(8),
-                    onTap: () => context.go('/maps/cleanup'),
+                    onTap: () => safeGo(context, '/maps/cleanup'),
                     child: Container(
                       padding: EdgeInsets.all(isMobile ? 10 : 12),
                       decoration: BoxDecoration(
@@ -144,7 +146,7 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(6),
                       onTap: isMobile
-                          ? () => context.go('/maps/cleanup')
+                          ? () => safeGo(context, '/maps/cleanup')
                           : null,
                       splashColor: isMobile
                           ? Theme.of(context).colorScheme.primary.withAlpha(30)
