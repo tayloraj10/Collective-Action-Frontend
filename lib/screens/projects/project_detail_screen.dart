@@ -485,11 +485,23 @@ class ProjectDetailDialog extends ConsumerWidget {
 
   const ProjectDetailDialog({super.key, required this.projectId});
 
+  /// Same opening style as initiative submission: showDialog with Dialog(child: content).
+  /// Opens after the current tap to reduce mobile Chrome crashes.
   static void show(BuildContext context, String projectId) {
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => ProjectDetailDialog(projectId: projectId),
-    );
+    scheduleAfterTap(context, () {
+      if (!context.mounted) return;
+      showDialog<void>(
+        context: context,
+        builder: (ctx) => Dialog(
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 48,
+          ),
+          backgroundColor: Colors.transparent,
+          child: ProjectDetailDialog(projectId: projectId),
+        ),
+      );
+    });
   }
 
   @override
@@ -500,221 +512,208 @@ class ProjectDetailDialog extends ConsumerWidget {
 
     final isDark = theme.brightness == Brightness.dark;
 
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
-      backgroundColor: Colors.transparent,
-      child: Container(
-        constraints: BoxConstraints(
-          maxWidth: 520,
-          maxHeight: MediaQuery.of(context).size.height * 0.82,
+    return Container(
+      constraints: BoxConstraints(
+        maxWidth: 520,
+        maxHeight: MediaQuery.of(context).size.height * 0.82,
+      ),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : AppColors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDark
+              ? AppColors.darkSurfaceVariant.withAlpha(120)
+              : AppColors.silverDark.withAlpha(180),
+          width: 1,
         ),
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.darkSurface : AppColors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isDark
-                ? AppColors.darkSurfaceVariant.withAlpha(120)
-                : AppColors.silverDark.withAlpha(180),
-            width: 1,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(isDark ? 80 : 40),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(isDark ? 80 : 40),
-              blurRadius: 24,
-              offset: const Offset(0, 8),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Header: icon, title (no duplicate in body), actions
+          Container(
+            padding: const EdgeInsets.fromLTRB(20, 20, 12, 16),
+            decoration: BoxDecoration(
+              color: (isDark ? AppColors.darkSurfaceVariant : AppColors.silver)
+                  .withAlpha(isDark ? 80 : 120),
             ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Header: icon, title (no duplicate in body), actions
-            Container(
-              padding: const EdgeInsets.fromLTRB(20, 20, 12, 16),
-              decoration: BoxDecoration(
-                color:
-                    (isDark ? AppColors.darkSurfaceVariant : AppColors.silver)
-                        .withAlpha(isDark ? 80 : 120),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.lightBlue.withAlpha(isDark ? 60 : 40),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      Icons.folder_rounded,
-                      color: AppColors.lightBlue,
-                      size: 24,
-                    ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.lightBlue.withAlpha(isDark ? 60 : 40),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: projectAsync.when(
-                      loading: () => Text(
-                        'Project',
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      error: (_, _) => Text(
-                        'Project',
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      data: (p) => Text(
-                        p?.name ?? 'Project',
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                        overflow: TextOverflow.visible,
-                        maxLines: null,
-                      ),
-                    ),
+                  child: Icon(
+                    Icons.folder_rounded,
+                    color: AppColors.lightBlue,
+                    size: 24,
                   ),
-                  FilledButton.icon(
-                    onPressed: () {
-                      final router = GoRouter.of(context);
-                      final id = projectId;
-                      Navigator.of(context, rootNavigator: true).pop();
-                      // Defer navigation to avoid mobile Chrome crash when
-                      // pop and go run in the same frame.
-                      Future.microtask(() {
-                        router.go('/projects/$id');
-                      });
-                    },
-                    icon: const Icon(Icons.open_in_full_rounded, size: 18),
-                    label: const Text('Project Page'),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.lightBlue,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  IconButton.filled(
-                    icon: const Icon(Icons.close_rounded, size: 20),
-                    onPressed: () {
-                      Future.microtask(() {
-                        if (context.mounted) {
-                          Navigator.of(context, rootNavigator: true).pop();
-                        }
-                      });
-                    },
-                    tooltip: 'Close',
-                    style: IconButton.styleFrom(
-                      backgroundColor: theme.colorScheme.onSurface.withAlpha(
-                        25,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Flexible(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(
-                  isMobile ? 20 : 24,
-                  20,
-                  isMobile ? 20 : 24,
-                  24,
                 ),
-                child: projectAsync.when(
-                  loading: () => const Padding(
-                    padding: EdgeInsets.all(40),
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                  error: (err, _) => Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.error_outline_rounded,
-                          size: 48,
-                          color: AppColors.errorRed.withAlpha(200),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Failed to load project',
-                          style: theme.textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          err.toString(),
-                          style: theme.textTheme.bodySmall,
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        FilledButton.icon(
-                          onPressed: () =>
-                              ref.refresh(projectByIdProvider(projectId)),
-                          icon: const Icon(Icons.refresh),
-                          label: const Text('Retry'),
-                        ),
-                      ],
+                const SizedBox(width: 14),
+                Expanded(
+                  child: projectAsync.when(
+                    loading: () => Text(
+                      'Project',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    error: (_, _) => Text(
+                      'Project',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    data: (p) => Text(
+                      p?.name ?? 'Project',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                      overflow: TextOverflow.visible,
+                      maxLines: null,
                     ),
                   ),
-                  data: (project) {
-                    if (project == null) {
-                      return Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Text(
-                          'Project not found',
-                          style: theme.textTheme.titleMedium,
+                ),
+                FilledButton.icon(
+                  onPressed: () {
+                    final router = GoRouter.of(context);
+                    final route = '/projects/$projectId';
+                    // Pop then go in separate ticks to avoid mobile Chrome crash.
+                    scheduleAfterTap(context, () {
+                      if (!context.mounted) return;
+                      Navigator.of(context, rootNavigator: true).pop();
+                      Future.microtask(() => router.go(route));
+                    });
+                  },
+                  icon: const Icon(Icons.open_in_full_rounded, size: 18),
+                  label: const Text('Project Page'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.lightBlue,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                IconButton.filled(
+                  icon: const Icon(Icons.close_rounded, size: 20),
+                  onPressed: () => safePop(context, rootNavigator: true),
+                  tooltip: 'Close',
+                  style: IconButton.styleFrom(
+                    backgroundColor: theme.colorScheme.onSurface.withAlpha(25),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Flexible(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                isMobile ? 20 : 24,
+                20,
+                isMobile ? 20 : 24,
+                24,
+              ),
+              child: projectAsync.when(
+                loading: () => const Padding(
+                  padding: EdgeInsets.all(40),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+                error: (err, _) => Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.error_outline_rounded,
+                        size: 48,
+                        color: AppColors.errorRed.withAlpha(200),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Failed to load project',
+                        style: theme.textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        err.toString(),
+                        style: theme.textTheme.bodySmall,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      FilledButton.icon(
+                        onPressed: () =>
+                            ref.refresh(projectByIdProvider(projectId)),
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                ),
+                data: (project) {
+                  if (project == null) {
+                    return Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        'Project not found',
+                        style: theme.textTheme.titleMedium,
+                      ),
+                    );
+                  }
+                  // No duplicate name – it's in the header
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _ProjectCreator(
+                        creatorId: project.creatorId,
+                        isMobile: isMobile,
+                      ),
+                      if (project.description != null &&
+                          project.description!.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          project.description!,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            height: 1.5,
+                            color: theme.colorScheme.onSurface.withAlpha(220),
+                          ),
                         ),
-                      );
-                    }
-                    // No duplicate name – it's in the header
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _ProjectCreator(
-                          creatorId: project.creatorId,
+                        const SizedBox(height: 24),
+                      ],
+                      if (project.steps.isNotEmpty) ...[
+                        ProjectStepsSection(
+                          steps: project.steps,
                           isMobile: isMobile,
                         ),
-                        if (project.description != null &&
-                            project.description!.isNotEmpty) ...[
-                          const SizedBox(height: 12),
-                          Text(
-                            project.description!,
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              height: 1.5,
-                              color: theme.colorScheme.onSurface.withAlpha(220),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                        ],
-                        if (project.steps.isNotEmpty) ...[
-                          ProjectStepsSection(
-                            steps: project.steps,
-                            isMobile: isMobile,
-                          ),
-                          const SizedBox(height: 24),
-                        ],
-                        ProjectMembersByRole(
-                          members: project.members,
-                          avatarSize: isMobile ? 36 : 40,
-                          trailing: ProjectMembershipButton(
-                            project: project,
-                            isMobile: isMobile,
-                          ),
-                        ),
+                        const SizedBox(height: 24),
                       ],
-                    );
-                  },
-                ),
+                      ProjectMembersByRole(
+                        members: project.members,
+                        avatarSize: isMobile ? 36 : 40,
+                        trailing: ProjectMembershipButton(
+                          project: project,
+                          isMobile: isMobile,
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -115,12 +115,9 @@ class AppConstants {
   static void preloadAudioForWeb() {
     if (!kIsWeb || _webUnlockPlayer != null) return;
     _webUnlockPlayer = AudioPlayer();
-    // On web use setUrl so asset path resolves reliably and is ready for unlock on first tap.
-    final path = _successSounds.first;
-    final future = kIsWeb
-        ? _webUnlockPlayer!.setUrl(Uri.base.resolve(path).toString())
-        : _webUnlockPlayer!.setAsset(path);
-    future.catchError((_) => null);
+    _webUnlockPlayer!
+        .setAsset(_successSounds.first)
+        .catchError((_) => null);
   }
 
   /// Call from a user gesture handler on web so later sounds can play. Muted so user hears nothing.
@@ -166,7 +163,7 @@ class AppConstants {
 
   /// Convenience helper to play a random success sound once.
   /// Stops any currently playing success sound first. Stops after [maxDuration] (default 10s).
-  /// On web: uses setUrl and await play() for mobile browser compatibility (iOS Safari, Chrome).
+  /// Uses await play() and setVolume(1.0) for mobile web (iOS Safari). Unlock via [unlockAudioForWeb] on first tap.
   static Future<void> playRandomSuccessSound() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -182,11 +179,7 @@ class AppConstants {
       final player = AudioPlayer();
       _currentSuccessPlayer = player;
       final (:path, :maxDuration) = randomSuccessSoundSource();
-      if (kIsWeb) {
-        await player.setUrl(Uri.base.resolve(path).toString());
-      } else {
-        await player.setAsset(path);
-      }
+      await player.setAsset(path);
       player.setVolume(1.0);
       await player.play();
       Future.delayed(maxDuration, () async {
