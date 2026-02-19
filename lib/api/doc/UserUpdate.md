@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **email** | **String** |  | [optional] 
 **name** | **String** |  | [optional] 
 **userType** | [**UserType**](UserType.md) |  | [optional] 
+**admin** | **bool** |  | [optional] 
 **location** | [**LocationSchema**](LocationSchema.md) |  | [optional] 
 **socialLinks** | [**SocialLinksSchema**](SocialLinksSchema.md) |  | [optional] 
 

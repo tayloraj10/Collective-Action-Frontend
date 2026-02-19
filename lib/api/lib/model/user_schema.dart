@@ -19,6 +19,7 @@ class UserSchema {
     this.photoUrl,
     this.userType,
     this.isActive,
+    this.admin,
     this.location,
     this.socialLinks,
     this.firebaseUserId,
@@ -38,6 +39,8 @@ class UserSchema {
 
   bool? isActive;
 
+  bool? admin;
+
   LocationSchema? location;
 
   SocialLinksSchema? socialLinks;
@@ -56,6 +59,7 @@ class UserSchema {
     other.photoUrl == photoUrl &&
     other.userType == userType &&
     other.isActive == isActive &&
+    other.admin == admin &&
     other.location == location &&
     other.socialLinks == socialLinks &&
     other.firebaseUserId == firebaseUserId &&
@@ -71,6 +75,7 @@ class UserSchema {
     (photoUrl == null ? 0 : photoUrl!.hashCode) +
     (userType == null ? 0 : userType!.hashCode) +
     (isActive == null ? 0 : isActive!.hashCode) +
+    (admin == null ? 0 : admin!.hashCode) +
     (location == null ? 0 : location!.hashCode) +
     (socialLinks == null ? 0 : socialLinks!.hashCode) +
     (firebaseUserId == null ? 0 : firebaseUserId!.hashCode) +
@@ -78,7 +83,7 @@ class UserSchema {
     (updatedAt == null ? 0 : updatedAt!.hashCode);
 
   @override
-  String toString() => 'UserSchema[id=$id, email=$email, name=$name, photoUrl=$photoUrl, userType=$userType, isActive=$isActive, location=$location, socialLinks=$socialLinks, firebaseUserId=$firebaseUserId, createdAt=$createdAt, updatedAt=$updatedAt]';
+  String toString() => 'UserSchema[id=$id, email=$email, name=$name, photoUrl=$photoUrl, userType=$userType, isActive=$isActive, admin=$admin, location=$location, socialLinks=$socialLinks, firebaseUserId=$firebaseUserId, createdAt=$createdAt, updatedAt=$updatedAt]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -111,6 +116,11 @@ class UserSchema {
       json[r'is_active'] = this.isActive;
     } else {
       json[r'is_active'] = null;
+    }
+    if (this.admin != null) {
+      json[r'admin'] = this.admin;
+    } else {
+      json[r'admin'] = null;
     }
     if (this.location != null) {
       json[r'location'] = this.location;
@@ -165,6 +175,7 @@ class UserSchema {
         photoUrl: mapValueOfType<String>(json, r'photo_url'),
         userType: UserType.fromJson(json[r'user_type']),
         isActive: mapValueOfType<bool>(json, r'is_active'),
+        admin: mapValueOfType<bool>(json, r'admin'),
         location: LocationSchema.fromJson(json[r'location']),
         socialLinks: SocialLinksSchema.fromJson(json[r'social_links']),
         firebaseUserId: mapValueOfType<String>(json, r'firebase_user_id'),

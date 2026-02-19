@@ -5041,6 +5041,17 @@
                         ],
                         "title": "Is Active"
                     },
+                    "admin": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Admin"
+                    },
                     "location": {
                         "anyOf": [
                             {
@@ -5161,6 +5172,17 @@
                         ],
                         "title": "Is Active"
                     },
+                    "admin": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Admin"
+                    },
                     "location": {
                         "anyOf": [
                             {
@@ -5262,6 +5284,17 @@
                                 "type": "null"
                             }
                         ]
+                    },
+                    "admin": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Admin"
                     },
                     "location": {
                         "anyOf": [

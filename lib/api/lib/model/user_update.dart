@@ -16,6 +16,7 @@ class UserUpdate {
     this.email,
     this.name,
     this.userType,
+    this.admin,
     this.location,
     this.socialLinks,
   });
@@ -26,6 +27,8 @@ class UserUpdate {
 
   UserType? userType;
 
+  bool? admin;
+
   LocationSchema? location;
 
   SocialLinksSchema? socialLinks;
@@ -35,6 +38,7 @@ class UserUpdate {
     other.email == email &&
     other.name == name &&
     other.userType == userType &&
+    other.admin == admin &&
     other.location == location &&
     other.socialLinks == socialLinks;
 
@@ -44,11 +48,12 @@ class UserUpdate {
     (email == null ? 0 : email!.hashCode) +
     (name == null ? 0 : name!.hashCode) +
     (userType == null ? 0 : userType!.hashCode) +
+    (admin == null ? 0 : admin!.hashCode) +
     (location == null ? 0 : location!.hashCode) +
     (socialLinks == null ? 0 : socialLinks!.hashCode);
 
   @override
-  String toString() => 'UserUpdate[email=$email, name=$name, userType=$userType, location=$location, socialLinks=$socialLinks]';
+  String toString() => 'UserUpdate[email=$email, name=$name, userType=$userType, admin=$admin, location=$location, socialLinks=$socialLinks]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -66,6 +71,11 @@ class UserUpdate {
       json[r'user_type'] = this.userType;
     } else {
       json[r'user_type'] = null;
+    }
+    if (this.admin != null) {
+      json[r'admin'] = this.admin;
+    } else {
+      json[r'admin'] = null;
     }
     if (this.location != null) {
       json[r'location'] = this.location;
@@ -102,6 +112,7 @@ class UserUpdate {
         email: mapValueOfType<String>(json, r'email'),
         name: mapValueOfType<String>(json, r'name'),
         userType: UserType.fromJson(json[r'user_type']),
+        admin: mapValueOfType<bool>(json, r'admin'),
         location: LocationSchema.fromJson(json[r'location']),
         socialLinks: SocialLinksSchema.fromJson(json[r'social_links']),
       );
