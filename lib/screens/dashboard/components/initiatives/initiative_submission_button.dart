@@ -1,5 +1,6 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/initiatives/initiative_action_submission.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
 
 class InitiativeSubmissionButton extends StatelessWidget {
@@ -14,11 +15,14 @@ class InitiativeSubmissionButton extends StatelessWidget {
       // constraints: BoxConstraints(),
       tooltip: 'Add Submission',
       onPressed: () {
-        showDialog(
-          context: context,
-          builder: (ctx) =>
-              Dialog(child: InitiativeActionSubmission(initiative: initiative)),
-        );
+        scheduleAfterTap(context, () {
+          if (!context.mounted) return;
+          showDialog(
+            context: context,
+            builder: (ctx) =>
+                Dialog(child: InitiativeActionSubmission(initiative: initiative)),
+          );
+        });
       },
     );
   }

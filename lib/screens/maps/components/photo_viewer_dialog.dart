@@ -18,8 +18,8 @@ class PhotoViewerDialog extends StatefulWidget {
     this.initialIndex = 0,
   });
 
-  /// Opens the photo viewer after the current tap; on mobile web uses a short
-  /// delay to reduce crashes and jank when opening during tap.
+  /// Same opening style as initiative submission: showDialog with Dialog(child: content).
+  /// Opens after the current tap to reduce mobile Chrome crashes.
   static void show(
     BuildContext context, {
     required List<String> urls,
@@ -32,9 +32,13 @@ class PhotoViewerDialog extends StatefulWidget {
         context: context,
         barrierColor: Colors.black87,
         barrierDismissible: false,
-        builder: (c) => PhotoViewerDialog(
-          urls: urls,
-          initialIndex: initialIndex,
+        builder: (ctx) => Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: PhotoViewerDialog(
+            urls: urls,
+            initialIndex: initialIndex,
+          ),
         ),
       );
     });
@@ -103,11 +107,8 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
     );
     final imageHeight = size.height * 0.55;
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      child: Stack(
-        fit: StackFit.expand,
+    return Stack(
+      fit: StackFit.expand,
         children: [
           // Tap outside content to close (deferred pop; barrier shows through)
           Positioned.fill(
@@ -304,7 +305,6 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
             ),
           ),
         ],
-      ),
-    );
+      );
   }
 }
