@@ -206,6 +206,12 @@ class ApiClient {
           return CleanupRouteEventData.fromJson(value);
         case 'CleanupWaypoint':
           return CleanupWaypoint.fromJson(value);
+        case 'DirectoryOfGoodCreate':
+          return DirectoryOfGoodCreate.fromJson(value);
+        case 'DirectoryOfGoodSchema':
+          return DirectoryOfGoodSchema.fromJson(value);
+        case 'DirectoryOfGoodUpdate':
+          return DirectoryOfGoodUpdate.fromJson(value);
         case 'EventDataBase':
           return EventDataBase.fromJson(value);
         case 'EventDataType':

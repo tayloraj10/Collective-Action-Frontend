@@ -77,6 +77,12 @@ Class | Method | HTTP request | Description
 *CategoriesApi* | [**listCategoriesCategoriesGet**](doc//CategoriesApi.md#listcategoriescategoriesget) | **GET** /categories/ | List Categories
 *CategoriesApi* | [**updateCategoryCategoriesCategoryIdPut**](doc//CategoriesApi.md#updatecategorycategoriescategoryidput) | **PUT** /categories/{category_id} | Update Category
 *DefaultApi* | [**healthHealthGet**](doc//DefaultApi.md#healthhealthget) | **GET** /health | Health
+*DirectoryOfGoodApi* | [**createEntryDirectoryOfGoodPost**](doc//DirectoryOfGoodApi.md#createentrydirectoryofgoodpost) | **POST** /directory-of-good/ | Create Entry
+*DirectoryOfGoodApi* | [**deleteEntryDirectoryOfGoodEntryIdDelete**](doc//DirectoryOfGoodApi.md#deleteentrydirectoryofgoodentryiddelete) | **DELETE** /directory-of-good/{entry_id} | Delete Entry
+*DirectoryOfGoodApi* | [**getEntryDirectoryOfGoodEntryIdGet**](doc//DirectoryOfGoodApi.md#getentrydirectoryofgoodentryidget) | **GET** /directory-of-good/{entry_id} | Get Entry
+*DirectoryOfGoodApi* | [**listEntriesByUserDirectoryOfGoodByUserUserIdGet**](doc//DirectoryOfGoodApi.md#listentriesbyuserdirectoryofgoodbyuseruseridget) | **GET** /directory-of-good/by-user/{user_id} | List Entries By User
+*DirectoryOfGoodApi* | [**listEntriesDirectoryOfGoodGet**](doc//DirectoryOfGoodApi.md#listentriesdirectoryofgoodget) | **GET** /directory-of-good/ | List Entries
+*DirectoryOfGoodApi* | [**updateEntryDirectoryOfGoodEntryIdPatch**](doc//DirectoryOfGoodApi.md#updateentrydirectoryofgoodentryidpatch) | **PATCH** /directory-of-good/{entry_id} | Update Entry
 *InitiativesApi* | [**createInitiativeInitiativesPost**](doc//InitiativesApi.md#createinitiativeinitiativespost) | **POST** /initiatives/ | Create Initiative
 *InitiativesApi* | [**getFeaturedInitiativesInitiativesFeaturedGet**](doc//InitiativesApi.md#getfeaturedinitiativesinitiativesfeaturedget) | **GET** /initiatives/featured | Get Featured Initiatives
 *InitiativesApi* | [**getInitiativeInitiativesInitiativeIdGet**](doc//InitiativesApi.md#getinitiativeinitiativesinitiativeidget) | **GET** /initiatives/{initiative_id} | Get Initiative
@@ -160,6 +166,9 @@ Class | Method | HTTP request | Description
  - [CleanupEventData](doc//CleanupEventData.md)
  - [CleanupRouteEventData](doc//CleanupRouteEventData.md)
  - [CleanupWaypoint](doc//CleanupWaypoint.md)
+ - [DirectoryOfGoodCreate](doc//DirectoryOfGoodCreate.md)
+ - [DirectoryOfGoodSchema](doc//DirectoryOfGoodSchema.md)
+ - [DirectoryOfGoodUpdate](doc//DirectoryOfGoodUpdate.md)
  - [EventDataBase](doc//EventDataBase.md)
  - [EventDataType](doc//EventDataType.md)
  - [InitiativeCreateSchema](doc//InitiativeCreateSchema.md)
