@@ -10,59 +10,51 @@
 
 part of collective_action_api;
 
-class UserSchema {
-  /// Returns a new [UserSchema] instance.
-  UserSchema({
+class DirectoryOfGoodSchema {
+  /// Returns a new [DirectoryOfGoodSchema] instance.
+  DirectoryOfGoodSchema({
     this.id,
-    this.email,
-    this.name,
-    this.photoUrl,
-    this.userType,
-    this.isActive,
-    this.admin,
+    required this.name,
+    this.focus,
+    this.categoryId,
+    this.imageUrl,
     this.location,
     this.socialLinks,
-    this.firebaseUserId,
+    this.userId,
     this.createdAt,
     this.updatedAt,
   });
 
   String? id;
 
-  String? email;
+  String name;
 
-  String? name;
+  String? focus;
 
-  String? photoUrl;
+  String? categoryId;
 
-  UserType? userType;
-
-  bool? isActive;
-
-  bool? admin;
+  String? imageUrl;
 
   LocationSchema? location;
 
   SocialLinksSchema? socialLinks;
 
-  String? firebaseUserId;
+  String? userId;
 
   DateTime? createdAt;
 
   DateTime? updatedAt;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is UserSchema &&
+  bool operator ==(Object other) => identical(this, other) || other is DirectoryOfGoodSchema &&
     other.id == id &&
-    other.email == email &&
     other.name == name &&
-    other.photoUrl == photoUrl &&
-    other.userType == userType &&
-    other.isActive == isActive &&
-    other.admin == admin &&
+    other.focus == focus &&
+    other.categoryId == categoryId &&
+    other.imageUrl == imageUrl &&
     other.location == location &&
     other.socialLinks == socialLinks &&
-    other.firebaseUserId == firebaseUserId &&
+    other.userId == userId &&
     other.createdAt == createdAt &&
     other.updatedAt == updatedAt;
 
@@ -70,20 +62,18 @@ class UserSchema {
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (id == null ? 0 : id!.hashCode) +
-    (email == null ? 0 : email!.hashCode) +
-    (name == null ? 0 : name!.hashCode) +
-    (photoUrl == null ? 0 : photoUrl!.hashCode) +
-    (userType == null ? 0 : userType!.hashCode) +
-    (isActive == null ? 0 : isActive!.hashCode) +
-    (admin == null ? 0 : admin!.hashCode) +
+    (name.hashCode) +
+    (focus == null ? 0 : focus!.hashCode) +
+    (categoryId == null ? 0 : categoryId!.hashCode) +
+    (imageUrl == null ? 0 : imageUrl!.hashCode) +
     (location == null ? 0 : location!.hashCode) +
     (socialLinks == null ? 0 : socialLinks!.hashCode) +
-    (firebaseUserId == null ? 0 : firebaseUserId!.hashCode) +
+    (userId == null ? 0 : userId!.hashCode) +
     (createdAt == null ? 0 : createdAt!.hashCode) +
     (updatedAt == null ? 0 : updatedAt!.hashCode);
 
   @override
-  String toString() => 'UserSchema[id=$id, email=$email, name=$name, photoUrl=$photoUrl, userType=$userType, isActive=$isActive, admin=$admin, location=$location, socialLinks=$socialLinks, firebaseUserId=$firebaseUserId, createdAt=$createdAt, updatedAt=$updatedAt]';
+  String toString() => 'DirectoryOfGoodSchema[id=$id, name=$name, focus=$focus, categoryId=$categoryId, imageUrl=$imageUrl, location=$location, socialLinks=$socialLinks, userId=$userId, createdAt=$createdAt, updatedAt=$updatedAt]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -92,35 +82,21 @@ class UserSchema {
     } else {
       json[r'id'] = null;
     }
-    if (this.email != null) {
-      json[r'email'] = this.email;
-    } else {
-      json[r'email'] = null;
-    }
-    if (this.name != null) {
       json[r'name'] = this.name;
+    if (this.focus != null) {
+      json[r'focus'] = this.focus;
     } else {
-      json[r'name'] = null;
+      json[r'focus'] = null;
     }
-    if (this.photoUrl != null) {
-      json[r'photo_url'] = this.photoUrl;
+    if (this.categoryId != null) {
+      json[r'category_id'] = this.categoryId;
     } else {
-      json[r'photo_url'] = null;
+      json[r'category_id'] = null;
     }
-    if (this.userType != null) {
-      json[r'user_type'] = this.userType;
+    if (this.imageUrl != null) {
+      json[r'image_url'] = this.imageUrl;
     } else {
-      json[r'user_type'] = null;
-    }
-    if (this.isActive != null) {
-      json[r'is_active'] = this.isActive;
-    } else {
-      json[r'is_active'] = null;
-    }
-    if (this.admin != null) {
-      json[r'admin'] = this.admin;
-    } else {
-      json[r'admin'] = null;
+      json[r'image_url'] = null;
     }
     if (this.location != null) {
       json[r'location'] = this.location;
@@ -132,10 +108,10 @@ class UserSchema {
     } else {
       json[r'social_links'] = null;
     }
-    if (this.firebaseUserId != null) {
-      json[r'firebase_user_id'] = this.firebaseUserId;
+    if (this.userId != null) {
+      json[r'user_id'] = this.userId;
     } else {
-      json[r'firebase_user_id'] = null;
+      json[r'user_id'] = null;
     }
     if (this.createdAt != null) {
       json[r'created_at'] = this.createdAt!.toUtc().toIso8601String();
@@ -150,10 +126,10 @@ class UserSchema {
     return json;
   }
 
-  /// Returns a new [UserSchema] instance and imports its values from
+  /// Returns a new [DirectoryOfGoodSchema] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static UserSchema? fromJson(dynamic value) {
+  static DirectoryOfGoodSchema? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -162,23 +138,21 @@ class UserSchema {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "UserSchema[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "UserSchema[$key]" has a null value in JSON.');
+          assert(json.containsKey(key), 'Required key "DirectoryOfGoodSchema[$key]" is missing from JSON.');
+          assert(json[key] != null, 'Required key "DirectoryOfGoodSchema[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return UserSchema(
+      return DirectoryOfGoodSchema(
         id: mapValueOfType<String>(json, r'id'),
-        email: mapValueOfType<String>(json, r'email'),
-        name: mapValueOfType<String>(json, r'name'),
-        photoUrl: mapValueOfType<String>(json, r'photo_url'),
-        userType: UserType.fromJson(json[r'user_type']),
-        isActive: mapValueOfType<bool>(json, r'is_active'),
-        admin: mapValueOfType<bool>(json, r'admin'),
+        name: mapValueOfType<String>(json, r'name')!,
+        focus: mapValueOfType<String>(json, r'focus'),
+        categoryId: mapValueOfType<String>(json, r'category_id'),
+        imageUrl: mapValueOfType<String>(json, r'image_url'),
         location: LocationSchema.fromJson(json[r'location']),
         socialLinks: SocialLinksSchema.fromJson(json[r'social_links']),
-        firebaseUserId: mapValueOfType<String>(json, r'firebase_user_id'),
+        userId: mapValueOfType<String>(json, r'user_id'),
         createdAt: mapDateTime(json, r'created_at', r''),
         updatedAt: mapDateTime(json, r'updated_at', r''),
       );
@@ -186,11 +160,11 @@ class UserSchema {
     return null;
   }
 
-  static List<UserSchema> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <UserSchema>[];
+  static List<DirectoryOfGoodSchema> listFromJson(dynamic json, {bool growable = false,}) {
+    final result = <DirectoryOfGoodSchema>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = UserSchema.fromJson(row);
+        final value = DirectoryOfGoodSchema.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -199,12 +173,12 @@ class UserSchema {
     return result.toList(growable: growable);
   }
 
-  static Map<String, UserSchema> mapFromJson(dynamic json) {
-    final map = <String, UserSchema>{};
+  static Map<String, DirectoryOfGoodSchema> mapFromJson(dynamic json) {
+    final map = <String, DirectoryOfGoodSchema>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = UserSchema.fromJson(entry.value);
+        final value = DirectoryOfGoodSchema.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -213,14 +187,14 @@ class UserSchema {
     return map;
   }
 
-  // maps a json object with a list of UserSchema-objects as value to a dart map
-  static Map<String, List<UserSchema>> mapListFromJson(dynamic json, {bool growable = false,}) {
-    final map = <String, List<UserSchema>>{};
+  // maps a json object with a list of DirectoryOfGoodSchema-objects as value to a dart map
+  static Map<String, List<DirectoryOfGoodSchema>> mapListFromJson(dynamic json, {bool growable = false,}) {
+    final map = <String, List<DirectoryOfGoodSchema>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = UserSchema.listFromJson(entry.value, growable: growable,);
+        map[entry.key] = DirectoryOfGoodSchema.listFromJson(entry.value, growable: growable,);
       }
     }
     return map;
@@ -228,6 +202,7 @@ class UserSchema {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
+    'name',
   };
 }
 

@@ -41,6 +41,9 @@ class UserService {
     }
   }
 
+  /// Returns true if [user] is non-null and has [UserSchema.admin] == true.
+  static bool isAdmin(UserSchema? user) => user?.admin == true;
+
   /// Update just the user's profile photo URL while preserving existing fields.
   ///
   /// Uses the dedicated endpoint `PATCH /users/{user_id}/photo`.

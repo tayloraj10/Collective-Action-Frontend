@@ -14,6 +14,7 @@ Name | Type | Description | Notes
 **photoUrl** | **String** |  | [optional] 
 **userType** | [**UserType**](UserType.md) |  | [optional] 
 **isActive** | **bool** |  | [optional] 
+**admin** | **bool** |  | [optional] 
 **location** | [**LocationSchema**](LocationSchema.md) |  | [optional] 
 **socialLinks** | [**SocialLinksSchema**](SocialLinksSchema.md) |  | [optional] 
 **firebaseUserId** | **String** |  | [optional] 

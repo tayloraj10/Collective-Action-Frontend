@@ -18,6 +18,10 @@ doc/CleanupEventData.md
 doc/CleanupRouteEventData.md
 doc/CleanupWaypoint.md
 doc/DefaultApi.md
+doc/DirectoryOfGoodApi.md
+doc/DirectoryOfGoodCreate.md
+doc/DirectoryOfGoodSchema.md
+doc/DirectoryOfGoodUpdate.md
 doc/EventDataBase.md
 doc/EventDataType.md
 doc/InitiativeCreateSchema.md
@@ -70,6 +74,7 @@ lib/api/action_types_api.dart
 lib/api/actions_api.dart
 lib/api/categories_api.dart
 lib/api/default_api.dart
+lib/api/directory_of_good_api.dart
 lib/api/initiatives_api.dart
 lib/api/links_api.dart
 lib/api/map_campaigns_api.dart
@@ -100,6 +105,9 @@ lib/model/category_schema.dart
 lib/model/cleanup_event_data.dart
 lib/model/cleanup_route_event_data.dart
 lib/model/cleanup_waypoint.dart
+lib/model/directory_of_good_create.dart
+lib/model/directory_of_good_schema.dart
+lib/model/directory_of_good_update.dart
 lib/model/event_data_base.dart
 lib/model/event_data_type.dart
 lib/model/initiative_create_schema.dart

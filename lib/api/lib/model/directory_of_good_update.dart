@@ -10,72 +10,72 @@
 
 part of collective_action_api;
 
-class UserUpdate {
-  /// Returns a new [UserUpdate] instance.
-  UserUpdate({
-    this.email,
+class DirectoryOfGoodUpdate {
+  /// Returns a new [DirectoryOfGoodUpdate] instance.
+  DirectoryOfGoodUpdate({
     this.name,
-    this.userType,
-    this.admin,
+    this.focus,
+    this.categoryId,
+    this.imageUrl,
     this.location,
     this.socialLinks,
   });
 
-  String? email;
-
   String? name;
 
-  UserType? userType;
+  String? focus;
 
-  bool? admin;
+  String? categoryId;
+
+  String? imageUrl;
 
   LocationSchema? location;
 
   SocialLinksSchema? socialLinks;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is UserUpdate &&
-    other.email == email &&
+  bool operator ==(Object other) => identical(this, other) || other is DirectoryOfGoodUpdate &&
     other.name == name &&
-    other.userType == userType &&
-    other.admin == admin &&
+    other.focus == focus &&
+    other.categoryId == categoryId &&
+    other.imageUrl == imageUrl &&
     other.location == location &&
     other.socialLinks == socialLinks;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (email == null ? 0 : email!.hashCode) +
     (name == null ? 0 : name!.hashCode) +
-    (userType == null ? 0 : userType!.hashCode) +
-    (admin == null ? 0 : admin!.hashCode) +
+    (focus == null ? 0 : focus!.hashCode) +
+    (categoryId == null ? 0 : categoryId!.hashCode) +
+    (imageUrl == null ? 0 : imageUrl!.hashCode) +
     (location == null ? 0 : location!.hashCode) +
     (socialLinks == null ? 0 : socialLinks!.hashCode);
 
   @override
-  String toString() => 'UserUpdate[email=$email, name=$name, userType=$userType, admin=$admin, location=$location, socialLinks=$socialLinks]';
+  String toString() => 'DirectoryOfGoodUpdate[name=$name, focus=$focus, categoryId=$categoryId, imageUrl=$imageUrl, location=$location, socialLinks=$socialLinks]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.email != null) {
-      json[r'email'] = this.email;
-    } else {
-      json[r'email'] = null;
-    }
     if (this.name != null) {
       json[r'name'] = this.name;
     } else {
       json[r'name'] = null;
     }
-    if (this.userType != null) {
-      json[r'user_type'] = this.userType;
+    if (this.focus != null) {
+      json[r'focus'] = this.focus;
     } else {
-      json[r'user_type'] = null;
+      json[r'focus'] = null;
     }
-    if (this.admin != null) {
-      json[r'admin'] = this.admin;
+    if (this.categoryId != null) {
+      json[r'category_id'] = this.categoryId;
     } else {
-      json[r'admin'] = null;
+      json[r'category_id'] = null;
+    }
+    if (this.imageUrl != null) {
+      json[r'image_url'] = this.imageUrl;
+    } else {
+      json[r'image_url'] = null;
     }
     if (this.location != null) {
       json[r'location'] = this.location;
@@ -90,10 +90,10 @@ class UserUpdate {
     return json;
   }
 
-  /// Returns a new [UserUpdate] instance and imports its values from
+  /// Returns a new [DirectoryOfGoodUpdate] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static UserUpdate? fromJson(dynamic value) {
+  static DirectoryOfGoodUpdate? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -102,17 +102,17 @@ class UserUpdate {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "UserUpdate[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "UserUpdate[$key]" has a null value in JSON.');
+          assert(json.containsKey(key), 'Required key "DirectoryOfGoodUpdate[$key]" is missing from JSON.');
+          assert(json[key] != null, 'Required key "DirectoryOfGoodUpdate[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return UserUpdate(
-        email: mapValueOfType<String>(json, r'email'),
+      return DirectoryOfGoodUpdate(
         name: mapValueOfType<String>(json, r'name'),
-        userType: UserType.fromJson(json[r'user_type']),
-        admin: mapValueOfType<bool>(json, r'admin'),
+        focus: mapValueOfType<String>(json, r'focus'),
+        categoryId: mapValueOfType<String>(json, r'category_id'),
+        imageUrl: mapValueOfType<String>(json, r'image_url'),
         location: LocationSchema.fromJson(json[r'location']),
         socialLinks: SocialLinksSchema.fromJson(json[r'social_links']),
       );
@@ -120,11 +120,11 @@ class UserUpdate {
     return null;
   }
 
-  static List<UserUpdate> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <UserUpdate>[];
+  static List<DirectoryOfGoodUpdate> listFromJson(dynamic json, {bool growable = false,}) {
+    final result = <DirectoryOfGoodUpdate>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = UserUpdate.fromJson(row);
+        final value = DirectoryOfGoodUpdate.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -133,12 +133,12 @@ class UserUpdate {
     return result.toList(growable: growable);
   }
 
-  static Map<String, UserUpdate> mapFromJson(dynamic json) {
-    final map = <String, UserUpdate>{};
+  static Map<String, DirectoryOfGoodUpdate> mapFromJson(dynamic json) {
+    final map = <String, DirectoryOfGoodUpdate>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = UserUpdate.fromJson(entry.value);
+        final value = DirectoryOfGoodUpdate.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -147,14 +147,14 @@ class UserUpdate {
     return map;
   }
 
-  // maps a json object with a list of UserUpdate-objects as value to a dart map
-  static Map<String, List<UserUpdate>> mapListFromJson(dynamic json, {bool growable = false,}) {
-    final map = <String, List<UserUpdate>>{};
+  // maps a json object with a list of DirectoryOfGoodUpdate-objects as value to a dart map
+  static Map<String, List<DirectoryOfGoodUpdate>> mapListFromJson(dynamic json, {bool growable = false,}) {
+    final map = <String, List<DirectoryOfGoodUpdate>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = UserUpdate.listFromJson(entry.value, growable: growable,);
+        map[entry.key] = DirectoryOfGoodUpdate.listFromJson(entry.value, growable: growable,);
       }
     }
     return map;

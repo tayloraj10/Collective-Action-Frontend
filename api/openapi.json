@@ -21,6 +21,201 @@
                 }
             }
         },
+        "/directory-of-good/": {
+            "get": {
+                "tags": [
+                    "directory-of-good"
+                ],
+                "summary": "List Entries",
+                "description": "List all directory of good entries.",
+                "operationId": "list_entries_directory_of_good__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/DirectoryOfGoodSchema"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Entries Directory Of Good  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "directory-of-good"
+                ],
+                "summary": "Create Entry",
+                "description": "Create a new directory of good entry.",
+                "operationId": "create_entry_directory_of_good__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DirectoryOfGoodCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DirectoryOfGoodSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/directory-of-good/{entry_id}": {
+            "get": {
+                "tags": [
+                    "directory-of-good"
+                ],
+                "summary": "Get Entry",
+                "description": "Get a single directory of good entry by ID.",
+                "operationId": "get_entry_directory_of_good__entry_id__get",
+                "parameters": [
+                    {
+                        "name": "entry_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Entry Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DirectoryOfGoodSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "directory-of-good"
+                ],
+                "summary": "Update Entry",
+                "description": "Update a directory of good entry (partial update).",
+                "operationId": "update_entry_directory_of_good__entry_id__patch",
+                "parameters": [
+                    {
+                        "name": "entry_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Entry Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DirectoryOfGoodUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DirectoryOfGoodSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "directory-of-good"
+                ],
+                "summary": "Delete Entry",
+                "description": "Delete a directory of good entry.",
+                "operationId": "delete_entry_directory_of_good__entry_id__delete",
+                "parameters": [
+                    {
+                        "name": "entry_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Entry Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
+                    }
+                }
+            }
+        },
+        "/directory-of-good/by-user/{user_id}": {
+            "get": {
+                "tags": [
+                    "directory-of-good"
+                ],
+                "summary": "List Entries By User",
+                "description": "List directory entries linked to a specific user.",
+                "operationId": "list_entries_by_user_directory_of_good_by_user__user_id__get",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "User Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/DirectoryOfGoodSchema"
+                                    },
+                                    "title": "Response List Entries By User Directory Of Good By User  User Id  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/initiatives/": {
             "get": {
                 "tags": [
@@ -3038,7 +3233,8 @@
                 "type": "string",
                 "enum": [
                     "Initiative",
-                    "Map Submission"
+                    "Map Submission",
+                    "Directory of Good Addition"
                 ],
                 "title": "ActionTypeValuesEnum"
             },
@@ -3292,6 +3488,259 @@
                 },
                 "type": "object",
                 "title": "CleanupWaypoint"
+            },
+            "DirectoryOfGoodCreate": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "focus": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Focus"
+                    },
+                    "category_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Category Id"
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    },
+                    "location": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/LocationSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "social_links": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/SocialLinksSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name"
+                ],
+                "title": "DirectoryOfGoodCreate"
+            },
+            "DirectoryOfGoodSchema": {
+                "properties": {
+                    "id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Id"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "focus": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Focus"
+                    },
+                    "category_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Category Id"
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    },
+                    "location": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/LocationSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "social_links": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/SocialLinksSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "user_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "User Id"
+                    },
+                    "created_at": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Created At"
+                    },
+                    "updated_at": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Updated At"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name"
+                ],
+                "title": "DirectoryOfGoodSchema"
+            },
+            "DirectoryOfGoodUpdate": {
+                "properties": {
+                    "name": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Name"
+                    },
+                    "focus": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Focus"
+                    },
+                    "category_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Category Id"
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    },
+                    "location": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/LocationSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "social_links": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/SocialLinksSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "title": "DirectoryOfGoodUpdate"
             },
             "EventDataBase": {
                 "properties": {
@@ -4592,6 +5041,17 @@
                         ],
                         "title": "Is Active"
                     },
+                    "admin": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Admin"
+                    },
                     "location": {
                         "anyOf": [
                             {
@@ -4712,6 +5172,17 @@
                         ],
                         "title": "Is Active"
                     },
+                    "admin": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Admin"
+                    },
                     "location": {
                         "anyOf": [
                             {
@@ -4813,6 +5284,17 @@
                                 "type": "null"
                             }
                         ]
+                    },
+                    "admin": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Admin"
                     },
                     "location": {
                         "anyOf": [

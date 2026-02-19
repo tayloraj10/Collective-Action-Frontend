@@ -8,6 +8,14 @@ final currentUserProvider =
       CurrentUserNotifier.new,
     );
 
+/// True when the current user is loaded and is an admin. Easy to use with
+/// `ref.watch(isCurrentUserAdminProvider)` or `ref.read(isCurrentUserAdminProvider)`.
+final isCurrentUserAdminProvider = Provider<bool>((ref) {
+  final userAsync = ref.watch(currentUserProvider);
+  final user = userAsync.value;
+  return UserService.isAdmin(user);
+});
+
 class CurrentUserNotifier extends AsyncNotifier<UserSchema?> {
   @override
   Future<UserSchema?> build() async {

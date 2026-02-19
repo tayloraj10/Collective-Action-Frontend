@@ -25,11 +25,13 @@ class ActionTypeValuesEnum {
 
   static const initiative = ActionTypeValuesEnum._(r'Initiative');
   static const mapSubmission = ActionTypeValuesEnum._(r'Map Submission');
+  static const directoryOfGoodAddition = ActionTypeValuesEnum._(r'Directory of Good Addition');
 
   /// List of all possible values in this [enum][ActionTypeValuesEnum].
   static const values = <ActionTypeValuesEnum>[
     initiative,
     mapSubmission,
+    directoryOfGoodAddition,
   ];
 
   static ActionTypeValuesEnum? fromJson(dynamic value) => ActionTypeValuesEnumTypeTransformer().decode(value);
@@ -70,6 +72,7 @@ class ActionTypeValuesEnumTypeTransformer {
       switch (data) {
         case r'Initiative': return ActionTypeValuesEnum.initiative;
         case r'Map Submission': return ActionTypeValuesEnum.mapSubmission;
+        case r'Directory of Good Addition': return ActionTypeValuesEnum.directoryOfGoodAddition;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
