@@ -3233,7 +3233,8 @@
                 "type": "string",
                 "enum": [
                     "Initiative",
-                    "Map Submission"
+                    "Map Submission",
+                    "Directory of Good Addition"
                 ],
                 "title": "ActionTypeValuesEnum"
             },
@@ -3505,17 +3506,6 @@
                         ],
                         "title": "Focus"
                     },
-                    "website": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Website"
-                    },
                     "category_id": {
                         "anyOf": [
                             {
@@ -3594,17 +3584,6 @@
                             }
                         ],
                         "title": "Focus"
-                    },
-                    "website": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Website"
                     },
                     "category_id": {
                         "anyOf": [
@@ -3715,17 +3694,6 @@
                             }
                         ],
                         "title": "Focus"
-                    },
-                    "website": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Website"
                     },
                     "category_id": {
                         "anyOf": [

@@ -16,7 +16,6 @@ class DirectoryOfGoodSchema {
     this.id,
     required this.name,
     this.focus,
-    this.website,
     this.categoryId,
     this.imageUrl,
     this.location,
@@ -31,8 +30,6 @@ class DirectoryOfGoodSchema {
   String name;
 
   String? focus;
-
-  String? website;
 
   String? categoryId;
 
@@ -53,7 +50,6 @@ class DirectoryOfGoodSchema {
     other.id == id &&
     other.name == name &&
     other.focus == focus &&
-    other.website == website &&
     other.categoryId == categoryId &&
     other.imageUrl == imageUrl &&
     other.location == location &&
@@ -68,7 +64,6 @@ class DirectoryOfGoodSchema {
     (id == null ? 0 : id!.hashCode) +
     (name.hashCode) +
     (focus == null ? 0 : focus!.hashCode) +
-    (website == null ? 0 : website!.hashCode) +
     (categoryId == null ? 0 : categoryId!.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
     (location == null ? 0 : location!.hashCode) +
@@ -78,7 +73,7 @@ class DirectoryOfGoodSchema {
     (updatedAt == null ? 0 : updatedAt!.hashCode);
 
   @override
-  String toString() => 'DirectoryOfGoodSchema[id=$id, name=$name, focus=$focus, website=$website, categoryId=$categoryId, imageUrl=$imageUrl, location=$location, socialLinks=$socialLinks, userId=$userId, createdAt=$createdAt, updatedAt=$updatedAt]';
+  String toString() => 'DirectoryOfGoodSchema[id=$id, name=$name, focus=$focus, categoryId=$categoryId, imageUrl=$imageUrl, location=$location, socialLinks=$socialLinks, userId=$userId, createdAt=$createdAt, updatedAt=$updatedAt]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -92,11 +87,6 @@ class DirectoryOfGoodSchema {
       json[r'focus'] = this.focus;
     } else {
       json[r'focus'] = null;
-    }
-    if (this.website != null) {
-      json[r'website'] = this.website;
-    } else {
-      json[r'website'] = null;
     }
     if (this.categoryId != null) {
       json[r'category_id'] = this.categoryId;
@@ -158,7 +148,6 @@ class DirectoryOfGoodSchema {
         id: mapValueOfType<String>(json, r'id'),
         name: mapValueOfType<String>(json, r'name')!,
         focus: mapValueOfType<String>(json, r'focus'),
-        website: mapValueOfType<String>(json, r'website'),
         categoryId: mapValueOfType<String>(json, r'category_id'),
         imageUrl: mapValueOfType<String>(json, r'image_url'),
         location: LocationSchema.fromJson(json[r'location']),

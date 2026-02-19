@@ -15,7 +15,6 @@ class DirectoryOfGoodCreate {
   DirectoryOfGoodCreate({
     required this.name,
     this.focus,
-    this.website,
     this.categoryId,
     this.imageUrl,
     this.location,
@@ -25,8 +24,6 @@ class DirectoryOfGoodCreate {
   String name;
 
   String? focus;
-
-  String? website;
 
   String? categoryId;
 
@@ -40,7 +37,6 @@ class DirectoryOfGoodCreate {
   bool operator ==(Object other) => identical(this, other) || other is DirectoryOfGoodCreate &&
     other.name == name &&
     other.focus == focus &&
-    other.website == website &&
     other.categoryId == categoryId &&
     other.imageUrl == imageUrl &&
     other.location == location &&
@@ -51,14 +47,13 @@ class DirectoryOfGoodCreate {
     // ignore: unnecessary_parenthesis
     (name.hashCode) +
     (focus == null ? 0 : focus!.hashCode) +
-    (website == null ? 0 : website!.hashCode) +
     (categoryId == null ? 0 : categoryId!.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
     (location == null ? 0 : location!.hashCode) +
     (socialLinks == null ? 0 : socialLinks!.hashCode);
 
   @override
-  String toString() => 'DirectoryOfGoodCreate[name=$name, focus=$focus, website=$website, categoryId=$categoryId, imageUrl=$imageUrl, location=$location, socialLinks=$socialLinks]';
+  String toString() => 'DirectoryOfGoodCreate[name=$name, focus=$focus, categoryId=$categoryId, imageUrl=$imageUrl, location=$location, socialLinks=$socialLinks]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -67,11 +62,6 @@ class DirectoryOfGoodCreate {
       json[r'focus'] = this.focus;
     } else {
       json[r'focus'] = null;
-    }
-    if (this.website != null) {
-      json[r'website'] = this.website;
-    } else {
-      json[r'website'] = null;
     }
     if (this.categoryId != null) {
       json[r'category_id'] = this.categoryId;
@@ -117,7 +107,6 @@ class DirectoryOfGoodCreate {
       return DirectoryOfGoodCreate(
         name: mapValueOfType<String>(json, r'name')!,
         focus: mapValueOfType<String>(json, r'focus'),
-        website: mapValueOfType<String>(json, r'website'),
         categoryId: mapValueOfType<String>(json, r'category_id'),
         imageUrl: mapValueOfType<String>(json, r'image_url'),
         location: LocationSchema.fromJson(json[r'location']),

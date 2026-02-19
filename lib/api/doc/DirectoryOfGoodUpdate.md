@@ -10,7 +10,6 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **name** | **String** |  | [optional] 
 **focus** | **String** |  | [optional] 
-**website** | **String** |  | [optional] 
 **categoryId** | **String** |  | [optional] 
 **imageUrl** | **String** |  | [optional] 
 **location** | [**LocationSchema**](LocationSchema.md) |  | [optional] 

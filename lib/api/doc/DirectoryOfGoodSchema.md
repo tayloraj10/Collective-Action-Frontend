@@ -11,7 +11,6 @@ Name | Type | Description | Notes
 **id** | **String** |  | [optional] 
 **name** | **String** |  | 
 **focus** | **String** |  | [optional] 
-**website** | **String** |  | [optional] 
 **categoryId** | **String** |  | [optional] 
 **imageUrl** | **String** |  | [optional] 
 **location** | [**LocationSchema**](LocationSchema.md) |  | [optional] 
