@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:collective_action_frontend/components/photo_thumbnail_strip.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'photo_viewer_dialog.dart';
 
 /// Dialog to display cleanup event information when a cleanup pin is clicked.
@@ -248,7 +249,7 @@ class CleanupEventInfoDialog extends ConsumerWidget {
                       const SizedBox(width: 8),
                     ],
                     TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () => safePop(context),
                       child: const Text('Close'),
                     ),
                   ],

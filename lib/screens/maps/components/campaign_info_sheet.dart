@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:collective_action_frontend/components/photo_thumbnail_strip.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'photo_viewer_dialog.dart';
 
 /// Filter for the submissions list.
@@ -210,7 +211,7 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
                     if (widget.onClose != null) {
                       widget.onClose!();
                     } else {
-                      Navigator.of(context).pop();
+                      safePop(context);
                     }
                   },
                   tooltip: 'Close',

@@ -127,26 +127,33 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Close + page index: match initiative card (mobile = close left, index center)
+                    // Close + page index: match initiative card (mobile = close left, index center).
+                    // Use GestureDetector (not IconButton) so close path matches tap-outside and
+                    // avoids IconButton splash/focus behavior that can trigger crashes on mobile Chrome.
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: LayoutBuilder(
                         builder: (context, constraints) {
                           final isMobile = AppConstants.isMobile(context);
+                          final closeControl = GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: _close,
+                            child: const Padding(
+                              padding: EdgeInsets.all(12),
+                              child: Icon(
+                                Icons.close,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                            ),
+                          );
                           if (isMobile) {
                             return Stack(
                               alignment: Alignment.center,
                               children: [
                                 Align(
                                   alignment: Alignment.centerLeft,
-                                  child: IconButton(
-                                    icon: const Icon(
-                                      Icons.close,
-                                      color: Colors.white,
-                                      size: 28,
-                                    ),
-                                    onPressed: _close,
-                                  ),
+                                  child: closeControl,
                                 ),
                                 if (hasMultiple)
                                   Center(
@@ -165,14 +172,7 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.close,
-                                    color: Colors.white,
-                                    size: 28,
-                                  ),
-                                  onPressed: _close,
-                                ),
+                                closeControl,
                                 if (hasMultiple) const SizedBox(width: 4),
                                 hasMultiple
                                     ? Center(
