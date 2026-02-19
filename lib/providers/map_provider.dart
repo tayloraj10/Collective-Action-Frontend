@@ -7,6 +7,20 @@ final mapServiceProvider = Provider<MapService>((ref) {
   return MapService();
 });
 
+/// When true, the map shows only the current user's submissions (cleanups, trash reports, routes).
+class MapFilterMySubmissionsOnlyNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void setFilter(bool value) {
+    state = value;
+  }
+}
+
+final mapFilterMySubmissionsOnlyProvider =
+    NotifierProvider<MapFilterMySubmissionsOnlyNotifier, bool>(
+        MapFilterMySubmissionsOnlyNotifier.new);
+
 final activeMapCampaignsProvider =
     AsyncNotifierProvider<ActiveMapCampaignsNotifier, List<MapCampaignSchema>>(
       ActiveMapCampaignsNotifier.new,

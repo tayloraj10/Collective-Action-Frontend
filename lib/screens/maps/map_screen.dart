@@ -4,6 +4,7 @@ import 'package:collective_action_frontend/components/leaderboard_dialog.dart';
 import 'package:collective_action_frontend/components/stats_dialog.dart';
 import 'package:collective_action_frontend/providers/map_provider.dart';
 import 'package:collective_action_frontend/providers/map_zoom_provider.dart';
+import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/screens/maps/components/campaign_info_sheet.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_map_widget.dart';
 // import 'package:collective_action_frontend/screens/maps/components/zip_code_map_widget.dart'; // restore when re-enabling zip code map
@@ -224,7 +225,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       //         ),
                       //       ),
                       //     ),
-                      //   ),
+                      //                         ),
                       // Row: Campaign info, Stats, Leaderboard
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
@@ -286,6 +287,70 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           ],
                         ),
                       ),
+                      // My pins only filter (below icon row, when logged in)
+                      if (ref.watch(currentUserProvider).value != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Tooltip(
+                            message: ref.watch(mapFilterMySubmissionsOnlyProvider)
+                                ? 'Show all pins on the map'
+                                : 'Show only my cleanup & trash report pins',
+                            child: Material(
+                              elevation: 2,
+                              borderRadius: BorderRadius.circular(8),
+                              color: Theme.of(context).colorScheme.surface,
+                              child: InkWell(
+                                onTap: () {
+                                  final notifier = ref.read(
+                                      mapFilterMySubmissionsOnlyProvider.notifier);
+                                  notifier.setFilter(
+                                      !ref.read(mapFilterMySubmissionsOnlyProvider));
+                                },
+                                borderRadius: BorderRadius.circular(8),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 8,
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        ref.watch(mapFilterMySubmissionsOnlyProvider)
+                                            ? Icons.filter_alt
+                                            : Icons.filter_alt_outlined,
+                                        size: 22,
+                                        color: ref.watch(
+                                                mapFilterMySubmissionsOnlyProvider)
+                                            ? Theme.of(context).colorScheme.primary
+                                            : null,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        'My pins only',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelMedium
+                                            ?.copyWith(
+                                              fontWeight: ref.watch(
+                                                      mapFilterMySubmissionsOnlyProvider)
+                                                  ? FontWeight.w600
+                                                  : null,
+                                              color: ref.watch(
+                                                      mapFilterMySubmissionsOnlyProvider)
+                                                  ? Theme.of(context)
+                                                      .colorScheme
+                                                      .primary
+                                                  : null,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
