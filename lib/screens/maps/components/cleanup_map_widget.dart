@@ -6,6 +6,7 @@ import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/providers/map_events_provider.dart';
+import 'package:collective_action_frontend/providers/map_provider.dart';
 import 'package:collective_action_frontend/providers/map_zoom_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_dialog.dart';
@@ -216,8 +217,17 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       mapEventsForCampaignProvider(widget.campaign.id),
     );
     final currentUser = ref.read(currentUserProvider).value;
-    final markers = _buildMarkers(eventsAsync.value, currentUser);
-    final polylines = _buildPolylines(eventsAsync.value);
+    final filterMySubmissionsOnly = ref.read(
+      mapFilterMySubmissionsOnlyProvider,
+    );
+    final rawEvents = eventsAsync.value;
+    final eventsToShow = rawEvents == null
+        ? null
+        : (filterMySubmissionsOnly && currentUser != null)
+        ? rawEvents.where((a) => a.userId == currentUser.id).toList()
+        : rawEvents;
+    final markers = _buildMarkers(eventsToShow, currentUser);
+    final polylines = _buildPolylines(eventsToShow);
 
     // Collect all LatLng positions from markers and polylines (exclude user location)
     final List<LatLng> allPoints = [];
@@ -292,6 +302,15 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       mapEventsForCampaignProvider(widget.campaign.id),
     );
     final currentUser = ref.watch(currentUserProvider).value;
+    final filterMySubmissionsOnly = ref.watch(
+      mapFilterMySubmissionsOnlyProvider,
+    );
+    final rawEvents = eventsAsync.value;
+    final eventsToShow = rawEvents == null
+        ? null
+        : (filterMySubmissionsOnly && currentUser != null)
+        ? rawEvents.where((a) => a.userId == currentUser.id).toList()
+        : rawEvents;
     final campaignDrawerOpen = ref.watch(campaignDrawerOpenProvider);
     final gesturesEnabled =
         !_isAddEventDialogOpen && !_isInfoDialogOpen && !campaignDrawerOpen;
@@ -320,8 +339,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
               setState(() => _currentZoom = position.zoom);
             }
           },
-          markers: _buildMarkers(eventsAsync.value, currentUser),
-          polylines: _buildPolylines(eventsAsync.value),
+          markers: _buildMarkers(eventsToShow, currentUser),
+          polylines: _buildPolylines(eventsToShow),
           onTap: _handleMapTap,
           mapType: MapType.normal,
           zoomControlsEnabled: false,
@@ -364,12 +383,12 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
             ),
           ),
         ),
-        // Mode selector (only when logged in), below map type dropdown + info button
+        // Mode selector: Cleanup / Report (below map type dropdown, icon row, and My pins only row)
         SafeArea(
           child: Align(
             alignment: Alignment.topLeft,
             child: Padding(
-              padding: const EdgeInsets.only(top: 100, left: 12),
+              padding: const EdgeInsets.only(top: 150, left: 12),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -784,15 +803,6 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     if (_droppedPosition == null || _droppedType == null) return;
     // Capture position once so a tap on the dialog (e.g. Submit) cannot overwrite it.
     final LatLng droppedPosition = _droppedPosition!;
-    final userId = ref.read(currentUserProvider).value?.id;
-    if (userId == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(CustomSnackBar.info('Sign in to add pins'));
-      }
-      return;
-    }
 
     if (_droppedType == 'cleanup') {
       final userName = ref.read(currentUserProvider).value?.name;
@@ -935,7 +945,6 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     required DateTime date,
   }) async {
     final userId = ref.read(currentUserProvider).value?.id;
-    if (userId == null) return null;
     try {
       final created = await ActionsService().createAction(
         ActionCreateSchema(
