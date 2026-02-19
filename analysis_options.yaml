@@ -25,9 +25,10 @@ linter:
     # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
 
 
-# Exclude generated models from analysis
+# Exclude generated models and old_code from analysis
 analyzer:
   exclude:
     - lib/api/**
+    - old_code/**
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
