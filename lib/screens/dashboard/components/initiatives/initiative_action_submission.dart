@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:image_picker/image_picker.dart';
 
 class InitiativeActionSubmission extends ConsumerStatefulWidget {
@@ -123,13 +124,17 @@ class InitiativeActionSubmissionState
       // Refresh linked action lists (e.g. recent actions under an initiative)
       // using the same days window as the initiatives list screen (7 days).
       ref.invalidate(actionsByLinkedProvider((widget.initiative.id, 7)));
-      // Play sound and full-screen confetti together on success
+      // Defer success UI so we don't run celebration + pop + snackbar in the same
+      // frame as provider invalidation (reduces mobile Chrome crashes after submit).
       if (mounted) {
-        AppConstants.playSuccessCelebration(context);
-        Navigator.of(context).pop(true);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(CustomSnackBar.success('Action created!'));
+        scheduleAfterTap(context, () {
+          if (!context.mounted) return;
+          AppConstants.playSuccessCelebration(context);
+          Navigator.of(context).pop(true);
+          ScaffoldMessenger.of(context).showSnackBar(
+            CustomSnackBar.success('Action created!'),
+          );
+        });
       }
     } catch (e) {
       setState(() {

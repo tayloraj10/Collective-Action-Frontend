@@ -287,27 +287,27 @@ class InitiativeActionCard extends ConsumerWidget {
                 await featuredInitiativesNotifier.refresh();
                 await activeInitiativesNotifier.refresh();
 
-                // Notify parent so it can invalidate linked-actions (keeps Recent Actions in sync).
-                if (linkedId != null) {
-                  onActionDeleted?.call(linkedId);
-                  if (context.mounted) {
+                // Defer invalidation and snackbar to next tick so we don't run state
+                // updates in the same frame as async delete completion (reduces crashes
+                // on mobile, especially after the app has been used for a while).
+                Future.microtask(() {
+                  if (!context.mounted) return;
+                  if (linkedId != null) {
+                    onActionDeleted?.call(linkedId);
                     ref.invalidate(actionsByLinkedProvider((linkedId, 7)));
                   }
-                }
-
-                // Show success snackbar using stored ScaffoldMessenger (only if still mounted)
-                if (context.mounted) {
                   scaffoldMessenger.showSnackBar(
                     CustomSnackBar.info('Action deleted!'),
                   );
-                }
+                });
               } catch (e) {
-                // Handle any errors gracefully (only show if still mounted)
-                if (context.mounted) {
-                  scaffoldMessenger.showSnackBar(
-                    CustomSnackBar.error('Error deleting action'),
-                  );
-                }
+                Future.microtask(() {
+                  if (context.mounted) {
+                    scaffoldMessenger.showSnackBar(
+                      CustomSnackBar.error('Error deleting action'),
+                    );
+                  }
+                });
               }
             }
           },
