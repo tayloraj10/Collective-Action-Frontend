@@ -27,3 +27,39 @@
 - Figure out why can't turn on raised exceptions in backend
 - Sounds not playing in prod
 - Refactor sound player to be more reusable
+
+
+AIzaSyC8xmeEp_dbRnu5D_fkwbKEHtFJtp0EdRU
+
+
+
+Pictures for trash sumbissions
+Link trash submissions to trash initiative
+Cleanup Stats
+Manage Submissions
+Give Map Submissions different style in social dash
+Show Map submission heat map in map dash
+
+
+Cleanup Routes
+Zip Code Map
+Social Action Likes
+Play sounds and show animations on events throughout app like map and initiative submissions
+work on apps setting menu in app bar
+    - control whether sounds will play, retain this info like we do for light/dark mode
+    - put light/dark mode toggle here
+Link trash submissions to trash initiative
+Edit Map Submissions
+More Comprehensive App Info Panel with Development Plan
+
+
+Finish Maps
+Cleanup Routes
+Zip Code Map - also set up to allow for other zip code campaigns besides trash
+Full Social Page
+Friends
+
+
+Events
+Directory of Good - List of categorized people and groups doing good in the world, if they sign up they can claim the directory entry for themselves
+Improvement Pathways - Tracks of actions you can take to improve yourself, your community, and the world. These will tie in to existing initiatives

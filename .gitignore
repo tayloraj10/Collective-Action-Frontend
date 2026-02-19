@@ -1,3 +1,6 @@
+old_code/
+zipcode_data_simple.json
+
 # Miscellaneous
 *.class
 *.log
@@ -46,3 +49,6 @@ app.*.map.json
 # Firebase configuration files (contains sensitive credentials)
 google-services.json
 GoogleService-Info.plist
+
+# Local env (API keys for local dev – never commit)
+.env
