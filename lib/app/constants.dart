@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:collective_action_frontend/app/success_sounds.g.dart';
 import 'package:collective_action_frontend/app/version.g.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/providers/sound_provider.dart';
@@ -116,7 +117,7 @@ class AppConstants {
     if (!kIsWeb || _webUnlockPlayer != null) return;
     _webUnlockPlayer = AudioPlayer();
     _webUnlockPlayer!
-        .setAsset(_successSounds.first)
+        .setAsset(successSoundPaths.first)
         .catchError((_) => null);
   }
 
@@ -136,26 +137,16 @@ class AppConstants {
     } catch (_) {}
   }
 
-  static const List<String> _successSounds = <String>[
-    'assets/sounds/around-the-world.mp3',
-    'assets/sounds/billie-jean.mp3',
-    'assets/sounds/cowboy-bebop.mp3',
-    'assets/sounds/crab_rave.mp3',
-    'assets/sounds/earth song.mp3',
-    'assets/sounds/hero-nickleback.mp3',
-    'assets/sounds/higher.mp3',
-    'assets/sounds/pirates.mp3',
-    'assets/sounds/sweet_victory.mp3',
-    'assets/sounds/what_is_love.mp3',
-  ];
-
   /// Picks a random success sound asset path and max duration.
+  /// Success sounds list is generated from assets/sounds/*.mp3 — run:
+  ///   dart run scripts/generate_success_sounds.dart
+  /// after adding new sound files.
   static ({String path, Duration maxDuration}) randomSuccessSoundSource({
     Random? random,
     Duration maxDuration = const Duration(seconds: 13),
   }) {
     final rng = random ?? Random();
-    final path = _successSounds[rng.nextInt(_successSounds.length)];
+    final path = successSoundPaths[rng.nextInt(successSoundPaths.length)];
     return (path: path, maxDuration: maxDuration);
   }
 
