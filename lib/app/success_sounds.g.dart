@@ -2,6 +2,7 @@
 // Run: dart run scripts/generate_success_sounds.dart (after adding sounds to assets/sounds/)
 
 const List<String> successSoundPaths = <String>[
+  'assets/sounds/Tame Impala - Dracula.mp3',
   'assets/sounds/around-the-world.mp3',
   'assets/sounds/billie-jean.mp3',
   'assets/sounds/cowboy-bebop.mp3',
