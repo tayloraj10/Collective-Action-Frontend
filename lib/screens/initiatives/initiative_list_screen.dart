@@ -313,7 +313,7 @@ class _InitiativeListScreenState extends ConsumerState<InitiativeListScreen> {
                     Builder(
                       builder: (context) {
                         final actionsAsync = ref.watch(
-                          actionsByLinkedProvider((initiative.id, 7)),
+                          actionsByLinkedProvider((initiative.id, 30)),
                         );
                         return actionsAsync.when(
                           loading: () => const SizedBox.shrink(),
