@@ -146,7 +146,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Text(
-                              '- Directory of Good\n- Self Improvement Paths\n- Events',
+                              '• Self Improvement Paths\n• Events\n• More Maps',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.warningOrange.withAlpha(179),
