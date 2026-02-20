@@ -10,6 +10,7 @@ const List<String> successSoundPaths = <String>[
   'assets/sounds/hero-nickleback.mp3',
   'assets/sounds/higher.mp3',
   'assets/sounds/lights.mp3',
+  'assets/sounds/modjo-lady.mp3',
   'assets/sounds/pirates.mp3',
   'assets/sounds/sweet_victory.mp3',
   'assets/sounds/tame-impala.mp3',
