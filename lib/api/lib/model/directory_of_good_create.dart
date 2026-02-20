@@ -19,6 +19,7 @@ class DirectoryOfGoodCreate {
     this.imageUrl,
     this.location,
     this.socialLinks,
+    this.featured = false,
   });
 
   String name;
@@ -33,6 +34,8 @@ class DirectoryOfGoodCreate {
 
   SocialLinksSchema? socialLinks;
 
+  bool featured;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is DirectoryOfGoodCreate &&
     other.name == name &&
@@ -40,7 +43,8 @@ class DirectoryOfGoodCreate {
     other.categoryId == categoryId &&
     other.imageUrl == imageUrl &&
     other.location == location &&
-    other.socialLinks == socialLinks;
+    other.socialLinks == socialLinks &&
+    other.featured == featured;
 
   @override
   int get hashCode =>
@@ -50,10 +54,11 @@ class DirectoryOfGoodCreate {
     (categoryId == null ? 0 : categoryId!.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
     (location == null ? 0 : location!.hashCode) +
-    (socialLinks == null ? 0 : socialLinks!.hashCode);
+    (socialLinks == null ? 0 : socialLinks!.hashCode) +
+    (featured.hashCode);
 
   @override
-  String toString() => 'DirectoryOfGoodCreate[name=$name, focus=$focus, categoryId=$categoryId, imageUrl=$imageUrl, location=$location, socialLinks=$socialLinks]';
+  String toString() => 'DirectoryOfGoodCreate[name=$name, focus=$focus, categoryId=$categoryId, imageUrl=$imageUrl, location=$location, socialLinks=$socialLinks, featured=$featured]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -83,6 +88,7 @@ class DirectoryOfGoodCreate {
     } else {
       json[r'social_links'] = null;
     }
+      json[r'featured'] = this.featured;
     return json;
   }
 
@@ -111,6 +117,7 @@ class DirectoryOfGoodCreate {
         imageUrl: mapValueOfType<String>(json, r'image_url'),
         location: LocationSchema.fromJson(json[r'location']),
         socialLinks: SocialLinksSchema.fromJson(json[r'social_links']),
+        featured: mapValueOfType<bool>(json, r'featured') ?? false,
       );
     }
     return null;

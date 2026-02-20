@@ -33,7 +33,7 @@ class ActionSchema {
 
   DateTime date;
 
-  /// At least one image URL
+  /// List of image URLs
   List<String> imageUrls;
 
   String? linkedId;

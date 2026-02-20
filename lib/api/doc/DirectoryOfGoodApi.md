@@ -14,6 +14,7 @@ Method | HTTP request | Description
 [**getEntryDirectoryOfGoodEntryIdGet**](DirectoryOfGoodApi.md#getentrydirectoryofgoodentryidget) | **GET** /directory-of-good/{entry_id} | Get Entry
 [**listEntriesByUserDirectoryOfGoodByUserUserIdGet**](DirectoryOfGoodApi.md#listentriesbyuserdirectoryofgoodbyuseruseridget) | **GET** /directory-of-good/by-user/{user_id} | List Entries By User
 [**listEntriesDirectoryOfGoodGet**](DirectoryOfGoodApi.md#listentriesdirectoryofgoodget) | **GET** /directory-of-good/ | List Entries
+[**setFeaturedDirectoryOfGoodEntryIdFeaturePatch**](DirectoryOfGoodApi.md#setfeatureddirectoryofgoodentryidfeaturepatch) | **PATCH** /directory-of-good/{entry_id}/feature | Set Featured
 [**updateEntryDirectoryOfGoodEntryIdPatch**](DirectoryOfGoodApi.md#updateentrydirectoryofgoodentryidpatch) | **PATCH** /directory-of-good/{entry_id} | Update Entry
 
 
@@ -22,7 +23,7 @@ Method | HTTP request | Description
 
 Create Entry
 
-Create a new directory of good entry.
+Create a new directory of good entry and an action record.
 
 ### Example
 ```dart
@@ -223,6 +224,51 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **setFeaturedDirectoryOfGoodEntryIdFeaturePatch**
+> DirectoryOfGoodSchema setFeaturedDirectoryOfGoodEntryIdFeaturePatch(entryId, featureUpdate)
+
+Set Featured
+
+Feature or unfeature a directory of good entry.
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = DirectoryOfGoodApi();
+final entryId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final featureUpdate = FeatureUpdate(); // FeatureUpdate | 
+
+try {
+    final result = api_instance.setFeaturedDirectoryOfGoodEntryIdFeaturePatch(entryId, featureUpdate);
+    print(result);
+} catch (e) {
+    print('Exception when calling DirectoryOfGoodApi->setFeaturedDirectoryOfGoodEntryIdFeaturePatch: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **entryId** | **String**|  | 
+ **featureUpdate** | [**FeatureUpdate**](FeatureUpdate.md)|  | 
+
+### Return type
+
+[**DirectoryOfGoodSchema**](DirectoryOfGoodSchema.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

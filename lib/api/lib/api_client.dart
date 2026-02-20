@@ -216,6 +216,8 @@ class ApiClient {
           return EventDataBase.fromJson(value);
         case 'EventDataType':
           return EventDataTypeTypeTransformer().decode(value);
+        case 'FeatureUpdate':
+          return FeatureUpdate.fromJson(value);
         case 'InitiativeCreateSchema':
           return InitiativeCreateSchema.fromJson(value);
         case 'InitiativeSchema':

@@ -51,7 +51,7 @@
                     "directory-of-good"
                 ],
                 "summary": "Create Entry",
-                "description": "Create a new directory of good entry.",
+                "description": "Create a new directory of good entry and an action record.",
                 "operationId": "create_entry_directory_of_good__post",
                 "requestBody": {
                     "content": {
@@ -209,6 +209,50 @@
                                         "$ref": "#/components/schemas/DirectoryOfGoodSchema"
                                     },
                                     "title": "Response List Entries By User Directory Of Good By User  User Id  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/directory-of-good/{entry_id}/feature": {
+            "patch": {
+                "tags": [
+                    "directory-of-good"
+                ],
+                "summary": "Set Featured",
+                "description": "Feature or unfeature a directory of good entry.",
+                "operationId": "set_featured_directory_of_good__entry_id__feature_patch",
+                "parameters": [
+                    {
+                        "name": "entry_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Entry Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FeatureUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DirectoryOfGoodSchema"
                                 }
                             }
                         }
@@ -3124,7 +3168,7 @@
                         },
                         "type": "array",
                         "title": "Image Urls",
-                        "description": "At least one image URL"
+                        "description": "List of image URLs"
                     },
                     "linked_id": {
                         "anyOf": [
@@ -3548,6 +3592,11 @@
                                 "type": "null"
                             }
                         ]
+                    },
+                    "featured": {
+                        "type": "boolean",
+                        "title": "Featured",
+                        "default": false
                     }
                 },
                 "type": "object",
@@ -3639,6 +3688,11 @@
                             }
                         ],
                         "title": "User Id"
+                    },
+                    "featured": {
+                        "type": "boolean",
+                        "title": "Featured",
+                        "default": false
                     },
                     "created_at": {
                         "anyOf": [
@@ -3737,6 +3791,17 @@
                                 "type": "null"
                             }
                         ]
+                    },
+                    "featured": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Featured"
                     }
                 },
                 "type": "object",
@@ -3813,6 +3878,19 @@
                 ],
                 "title": "EventDataType",
                 "description": "Type discriminator for event_data payloads."
+            },
+            "FeatureUpdate": {
+                "properties": {
+                    "featured": {
+                        "type": "boolean",
+                        "title": "Featured"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "featured"
+                ],
+                "title": "FeatureUpdate"
             },
             "InitiativeCreateSchema": {
                 "properties": {

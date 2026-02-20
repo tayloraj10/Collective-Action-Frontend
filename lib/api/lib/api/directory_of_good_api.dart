@@ -18,7 +18,7 @@ class DirectoryOfGoodApi {
 
   /// Create Entry
   ///
-  /// Create a new directory of good entry.
+  /// Create a new directory of good entry and an action record.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -52,7 +52,7 @@ class DirectoryOfGoodApi {
 
   /// Create Entry
   ///
-  /// Create a new directory of good entry.
+  /// Create a new directory of good entry and an action record.
   ///
   /// Parameters:
   ///
@@ -285,6 +285,67 @@ class DirectoryOfGoodApi {
         .cast<DirectoryOfGoodSchema>()
         .toList(growable: false);
 
+    }
+    return null;
+  }
+
+  /// Set Featured
+  ///
+  /// Feature or unfeature a directory of good entry.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] entryId (required):
+  ///
+  /// * [FeatureUpdate] featureUpdate (required):
+  Future<Response> setFeaturedDirectoryOfGoodEntryIdFeaturePatchWithHttpInfo(String entryId, FeatureUpdate featureUpdate,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/directory-of-good/{entry_id}/feature'
+      .replaceAll('{entry_id}', entryId);
+
+    // ignore: prefer_final_locals
+    Object? postBody = featureUpdate;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'PATCH',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Set Featured
+  ///
+  /// Feature or unfeature a directory of good entry.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] entryId (required):
+  ///
+  /// * [FeatureUpdate] featureUpdate (required):
+  Future<DirectoryOfGoodSchema?> setFeaturedDirectoryOfGoodEntryIdFeaturePatch(String entryId, FeatureUpdate featureUpdate,) async {
+    final response = await setFeaturedDirectoryOfGoodEntryIdFeaturePatchWithHttpInfo(entryId, featureUpdate,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'DirectoryOfGoodSchema',) as DirectoryOfGoodSchema;
+    
     }
     return null;
   }

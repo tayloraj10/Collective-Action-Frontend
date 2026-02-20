@@ -16,6 +16,7 @@ Name | Type | Description | Notes
 **location** | [**LocationSchema**](LocationSchema.md) |  | [optional] 
 **socialLinks** | [**SocialLinksSchema**](SocialLinksSchema.md) |  | [optional] 
 **userId** | **String** |  | [optional] 
+**featured** | **bool** |  | [optional] [default to false]
 **createdAt** | [**DateTime**](DateTime.md) |  | [optional] 
 **updatedAt** | [**DateTime**](DateTime.md) |  | [optional] 
 

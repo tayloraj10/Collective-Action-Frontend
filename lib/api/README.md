@@ -82,6 +82,7 @@ Class | Method | HTTP request | Description
 *DirectoryOfGoodApi* | [**getEntryDirectoryOfGoodEntryIdGet**](doc//DirectoryOfGoodApi.md#getentrydirectoryofgoodentryidget) | **GET** /directory-of-good/{entry_id} | Get Entry
 *DirectoryOfGoodApi* | [**listEntriesByUserDirectoryOfGoodByUserUserIdGet**](doc//DirectoryOfGoodApi.md#listentriesbyuserdirectoryofgoodbyuseruseridget) | **GET** /directory-of-good/by-user/{user_id} | List Entries By User
 *DirectoryOfGoodApi* | [**listEntriesDirectoryOfGoodGet**](doc//DirectoryOfGoodApi.md#listentriesdirectoryofgoodget) | **GET** /directory-of-good/ | List Entries
+*DirectoryOfGoodApi* | [**setFeaturedDirectoryOfGoodEntryIdFeaturePatch**](doc//DirectoryOfGoodApi.md#setfeatureddirectoryofgoodentryidfeaturepatch) | **PATCH** /directory-of-good/{entry_id}/feature | Set Featured
 *DirectoryOfGoodApi* | [**updateEntryDirectoryOfGoodEntryIdPatch**](doc//DirectoryOfGoodApi.md#updateentrydirectoryofgoodentryidpatch) | **PATCH** /directory-of-good/{entry_id} | Update Entry
 *InitiativesApi* | [**createInitiativeInitiativesPost**](doc//InitiativesApi.md#createinitiativeinitiativespost) | **POST** /initiatives/ | Create Initiative
 *InitiativesApi* | [**getFeaturedInitiativesInitiativesFeaturedGet**](doc//InitiativesApi.md#getfeaturedinitiativesinitiativesfeaturedget) | **GET** /initiatives/featured | Get Featured Initiatives
@@ -171,6 +172,7 @@ Class | Method | HTTP request | Description
  - [DirectoryOfGoodUpdate](doc//DirectoryOfGoodUpdate.md)
  - [EventDataBase](doc//EventDataBase.md)
  - [EventDataType](doc//EventDataType.md)
+ - [FeatureUpdate](doc//FeatureUpdate.md)
  - [InitiativeCreateSchema](doc//InitiativeCreateSchema.md)
  - [InitiativeSchema](doc//InitiativeSchema.md)
  - [LinkCreateSchema](doc//LinkCreateSchema.md)

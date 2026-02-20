@@ -61,6 +61,7 @@ part 'model/directory_of_good_schema.dart';
 part 'model/directory_of_good_update.dart';
 part 'model/event_data_base.dart';
 part 'model/event_data_type.dart';
+part 'model/feature_update.dart';
 part 'model/initiative_create_schema.dart';
 part 'model/initiative_schema.dart';
 part 'model/link_create_schema.dart';

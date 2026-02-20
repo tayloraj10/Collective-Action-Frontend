@@ -24,6 +24,7 @@ doc/DirectoryOfGoodSchema.md
 doc/DirectoryOfGoodUpdate.md
 doc/EventDataBase.md
 doc/EventDataType.md
+doc/FeatureUpdate.md
 doc/InitiativeCreateSchema.md
 doc/InitiativeSchema.md
 doc/InitiativesApi.md
@@ -110,6 +111,7 @@ lib/model/directory_of_good_schema.dart
 lib/model/directory_of_good_update.dart
 lib/model/event_data_base.dart
 lib/model/event_data_type.dart
+lib/model/feature_update.dart
 lib/model/initiative_create_schema.dart
 lib/model/initiative_schema.dart
 lib/model/link_create_schema.dart
@@ -145,3 +147,4 @@ lib/model/user_type.dart
 lib/model/user_update.dart
 lib/model/zip_code_submission_event_data.dart
 pubspec.yaml
+test/feature_update_test.dart
