@@ -21,6 +21,7 @@ class DirectoryOfGoodSchema {
     this.location,
     this.socialLinks,
     this.userId,
+    this.featured = false,
     this.createdAt,
     this.updatedAt,
   });
@@ -41,6 +42,8 @@ class DirectoryOfGoodSchema {
 
   String? userId;
 
+  bool featured;
+
   DateTime? createdAt;
 
   DateTime? updatedAt;
@@ -55,6 +58,7 @@ class DirectoryOfGoodSchema {
     other.location == location &&
     other.socialLinks == socialLinks &&
     other.userId == userId &&
+    other.featured == featured &&
     other.createdAt == createdAt &&
     other.updatedAt == updatedAt;
 
@@ -69,11 +73,12 @@ class DirectoryOfGoodSchema {
     (location == null ? 0 : location!.hashCode) +
     (socialLinks == null ? 0 : socialLinks!.hashCode) +
     (userId == null ? 0 : userId!.hashCode) +
+    (featured.hashCode) +
     (createdAt == null ? 0 : createdAt!.hashCode) +
     (updatedAt == null ? 0 : updatedAt!.hashCode);
 
   @override
-  String toString() => 'DirectoryOfGoodSchema[id=$id, name=$name, focus=$focus, categoryId=$categoryId, imageUrl=$imageUrl, location=$location, socialLinks=$socialLinks, userId=$userId, createdAt=$createdAt, updatedAt=$updatedAt]';
+  String toString() => 'DirectoryOfGoodSchema[id=$id, name=$name, focus=$focus, categoryId=$categoryId, imageUrl=$imageUrl, location=$location, socialLinks=$socialLinks, userId=$userId, featured=$featured, createdAt=$createdAt, updatedAt=$updatedAt]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -113,6 +118,7 @@ class DirectoryOfGoodSchema {
     } else {
       json[r'user_id'] = null;
     }
+      json[r'featured'] = this.featured;
     if (this.createdAt != null) {
       json[r'created_at'] = this.createdAt!.toUtc().toIso8601String();
     } else {
@@ -153,6 +159,7 @@ class DirectoryOfGoodSchema {
         location: LocationSchema.fromJson(json[r'location']),
         socialLinks: SocialLinksSchema.fromJson(json[r'social_links']),
         userId: mapValueOfType<String>(json, r'user_id'),
+        featured: mapValueOfType<bool>(json, r'featured') ?? false,
         createdAt: mapDateTime(json, r'created_at', r''),
         updatedAt: mapDateTime(json, r'updated_at', r''),
       );

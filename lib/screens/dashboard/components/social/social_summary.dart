@@ -1,13 +1,15 @@
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/api/lib/api.dart';
+import 'package:collective_action_frontend/providers/action_provider.dart';
+import 'package:collective_action_frontend/providers/directory_of_good_provider.dart';
+import 'package:collective_action_frontend/providers/initiative_provider.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/social/directory_of_good_action_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/initiative_action_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/map_submission_action_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:collective_action_frontend/providers/action_provider.dart';
-import 'package:collective_action_frontend/providers/initiative_provider.dart';
 
 // Provider to extract stable, sorted initiative linkedIds from actions
 final _initiativeLinkedIdsProvider = Provider.autoDispose<List<String>>((ref) {
@@ -22,6 +24,23 @@ final _initiativeLinkedIdsProvider = Provider.autoDispose<List<String>>((ref) {
   );
   final linkedIds = initiativeActions.map((a) => a.linkedId!).toSet().toList()
     ..sort();
+  return List.unmodifiable(linkedIds);
+});
+
+// Provider to extract directory-of-good entry linkedIds from actions
+final _directoryOfGoodLinkedIdsProvider = Provider.autoDispose<List<String>>((
+  ref,
+) {
+  final actions = ref
+      .watch(activeActionProvider)
+      .maybeWhen(data: (actions) => actions, orElse: () => []);
+  final dogActions = actions.where(
+    (a) =>
+        a.actionType == ActionTypeValuesEnum.directoryOfGoodAddition.value &&
+        a.linkedId != null &&
+        a.linkedId!.isNotEmpty,
+  );
+  final linkedIds = dogActions.map((a) => a.linkedId!).toSet().toList()..sort();
   return List.unmodifiable(linkedIds);
 });
 
@@ -51,6 +70,10 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
     final initiativesMapAsync = linkedIds.isEmpty
         ? const AsyncValue.data(<String, InitiativeSchema>{})
         : ref.watch(initiativesByIdsProvider(linkedIds));
+    final directoryLinkedIds = ref.watch(_directoryOfGoodLinkedIdsProvider);
+    final directoryEntriesMapAsync = directoryLinkedIds.isEmpty
+        ? const AsyncValue.data(<String, DirectoryOfGoodSchema>{})
+        : ref.watch(directoryOfGoodEntriesByIdsProvider(directoryLinkedIds));
     final isMobile = AppConstants.isMobile(context);
     final cardColor = widget.color ?? Theme.of(context).colorScheme.primary;
 
@@ -240,14 +263,25 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                       ),
                     ),
                     data: (initiativesMap) {
-                      return _buildSocialList(
-                        context,
-                        cardColor,
-                        widget.icon,
-                        isMobile,
-                        actions,
-                        initiativesMap,
-                        _scrollController,
+                      return directoryEntriesMapAsync.when(
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (err, stack) => Center(
+                          child: Text(
+                            'Failed to load directory entries',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                        data: (directoryEntriesMap) => _buildSocialList(
+                          context,
+                          cardColor,
+                          widget.icon,
+                          isMobile,
+                          actions,
+                          initiativesMap,
+                          directoryEntriesMap,
+                          _scrollController,
+                        ),
                       );
                     },
                   );
@@ -267,60 +301,203 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
     bool isMobile,
     List<ActionSchema> actions,
     Map<String, InitiativeSchema> initiativesMap,
+    Map<String, DirectoryOfGoodSchema> directoryEntriesMap,
     ScrollController scrollController,
   ) {
-    // Sort actions by most recent date
-    final sortedActions = [...actions]
-      ..sort((a, b) => b.date.compareTo(a.date));
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Left-to-right, top-to-bottom layout for cards
-            Expanded(
-              child: Scrollbar(
-                thumbVisibility: true,
+    return buildSocialActivityList(
+      context,
+      cardColor,
+      isMobile,
+      actions,
+      initiativesMap,
+      directoryEntriesMap,
+      scrollController,
+    );
+  }
+}
+
+/// Reusable feed of action cards (map submissions, initiatives, directory of good).
+/// Used in [SocialSummary] and on the Social screen.
+Widget buildSocialActivityList(
+  BuildContext context,
+  Color cardColor,
+  bool isMobile,
+  List<ActionSchema> actions,
+  Map<String, InitiativeSchema> initiativesMap,
+  Map<String, DirectoryOfGoodSchema> directoryEntriesMap,
+  ScrollController scrollController,
+) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Scrollbar(
+              thumbVisibility: true,
+              controller: scrollController,
+              child: SingleChildScrollView(
                 controller: scrollController,
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  scrollDirection: Axis.vertical,
-                  child: ConstrainedBox(
-                    // Force the wrapped actions to take at least the full
-                    // available width so the scrollbar sits at the far right.
-                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
-                    child: Wrap(
-                      alignment: WrapAlignment.start,
-                      spacing: 0,
-                      runSpacing: 0,
-                      children: List.generate(sortedActions.length, (idx) {
-                        final action = sortedActions[idx];
-                        if (action.actionType ==
-                            ActionTypeValuesEnum.mapSubmission.value) {
-                          return MapSubmissionActionCard(action: action);
-                        }
-                        InitiativeSchema? initiative;
-                        if (action.actionType ==
-                                ActionTypeValuesEnum.initiative.value &&
-                            action.linkedId != null &&
-                            action.linkedId!.isNotEmpty) {
-                          initiative = initiativesMap[action.linkedId!];
-                        }
-                        return InitiativeActionCard(
+                scrollDirection: Axis.vertical,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                  child: Wrap(
+                    alignment: WrapAlignment.start,
+                    spacing: 0,
+                    runSpacing: 0,
+                    children: List.generate(actions.length, (idx) {
+                      final action = actions[idx];
+                      if (action.actionType ==
+                          ActionTypeValuesEnum.mapSubmission.value) {
+                        return MapSubmissionActionCard(action: action);
+                      }
+                      if (action.actionType ==
+                          ActionTypeValuesEnum.directoryOfGoodAddition.value) {
+                        final entry = action.linkedId != null
+                            ? directoryEntriesMap[action.linkedId!]
+                            : null;
+                        return DirectoryOfGoodActionCard(
                           action: action,
-                          initiative: initiative,
+                          entry: entry,
                         );
-                      }),
-                    ),
+                      }
+                      InitiativeSchema? initiative;
+                      if (action.actionType ==
+                              ActionTypeValuesEnum.initiative.value &&
+                          action.linkedId != null &&
+                          action.linkedId!.isNotEmpty) {
+                        initiative = initiativesMap[action.linkedId!];
+                      }
+                      return InitiativeActionCard(
+                        action: action,
+                        initiative: initiative,
+                      );
+                    }),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 8),
-            SummaryCount(count: actions.length, title: 'recent actions'),
-          ],
-        );
-      },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+/// Standalone activity feed for use on the Social page (right panel or tab).
+class SocialActivityFeed extends ConsumerStatefulWidget {
+  final ScrollController? scrollController;
+  final String? title;
+
+  const SocialActivityFeed({super.key, this.scrollController, this.title});
+
+  @override
+  ConsumerState<SocialActivityFeed> createState() => _SocialActivityFeedState();
+}
+
+class _SocialActivityFeedState extends ConsumerState<SocialActivityFeed> {
+  ScrollController? _ownScrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.scrollController == null) {
+      _ownScrollController = ScrollController();
+    }
+  }
+
+  @override
+  void dispose() {
+    _ownScrollController?.dispose();
+    super.dispose();
+  }
+
+  ScrollController get _scrollController =>
+      widget.scrollController ?? _ownScrollController!;
+
+  @override
+  Widget build(BuildContext context) {
+    final ref = this.ref;
+    final actionsAsync = ref.watch(activeActionProvider);
+    final linkedIds = ref.watch(_initiativeLinkedIdsProvider);
+    final initiativesMapAsync = linkedIds.isEmpty
+        ? const AsyncValue.data(<String, InitiativeSchema>{})
+        : ref.watch(initiativesByIdsProvider(linkedIds));
+    final directoryLinkedIds = ref.watch(_directoryOfGoodLinkedIdsProvider);
+    final directoryEntriesMapAsync = directoryLinkedIds.isEmpty
+        ? const AsyncValue.data(<String, DirectoryOfGoodSchema>{})
+        : ref.watch(directoryOfGoodEntriesByIdsProvider(directoryLinkedIds));
+    final isMobile = AppConstants.isMobile(context);
+    final cardColor = Theme.of(context).colorScheme.primary;
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        if (widget.title != null) ...[
+          Text(
+            widget.title!,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+        Expanded(
+          child: actionsAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, stack) => Center(
+              child: Text(
+                'Failed to load activity',
+                style: TextStyle(color: theme.colorScheme.error),
+              ),
+            ),
+            data: (actions) {
+              if (actions.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No recent activity.',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurface.withAlpha(153),
+                    ),
+                  ),
+                );
+              }
+              return initiativesMapAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(
+                  child: Text(
+                    'Failed to load initiatives',
+                    style: TextStyle(color: theme.colorScheme.error),
+                  ),
+                ),
+                data: (initiativesMap) {
+                  return directoryEntriesMapAsync.when(
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (e, _) => Center(
+                      child: Text(
+                        'Failed to load directory entries',
+                        style: TextStyle(color: theme.colorScheme.error),
+                      ),
+                    ),
+                    data: (directoryEntriesMap) => buildSocialActivityList(
+                      context,
+                      cardColor,
+                      isMobile,
+                      actions,
+                      initiativesMap,
+                      directoryEntriesMap,
+                      _scrollController,
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

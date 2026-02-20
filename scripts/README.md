@@ -29,6 +29,20 @@ After bumping, `lib/app/version.g.dart` is updated automatically.
 
 ---
 
+## Success sounds (generate list from assets)
+
+The app plays a random success sound from `assets/sounds/*.mp3`. The list of paths is generated into `lib/app/success_sounds.g.dart` so you don’t have to edit constants when adding new sounds.
+
+**Regenerate after adding or removing .mp3 files in `assets/sounds/`:**
+
+```bash
+dart run scripts/generate_success_sounds.dart
+```
+
+Run from the **project root**. The script scans `assets/sounds/`, writes all `.mp3` paths to `lib/app/success_sounds.g.dart`, and the app uses that list for random success sounds.
+
+---
+
 ## Google Maps API key (PowerShell)
 
 These scripts keep your real Maps key out of the repo by using a placeholder in `web/index.html` and injecting the key at run time. Key is read from the `GOOGLE_MAPS_API_KEY` env var or from a `.env` file in the project root (`GOOGLE_MAPS_API_KEY=...`).

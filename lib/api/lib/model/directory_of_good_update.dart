@@ -19,6 +19,7 @@ class DirectoryOfGoodUpdate {
     this.imageUrl,
     this.location,
     this.socialLinks,
+    this.featured,
   });
 
   String? name;
@@ -33,6 +34,8 @@ class DirectoryOfGoodUpdate {
 
   SocialLinksSchema? socialLinks;
 
+  bool? featured;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is DirectoryOfGoodUpdate &&
     other.name == name &&
@@ -40,7 +43,8 @@ class DirectoryOfGoodUpdate {
     other.categoryId == categoryId &&
     other.imageUrl == imageUrl &&
     other.location == location &&
-    other.socialLinks == socialLinks;
+    other.socialLinks == socialLinks &&
+    other.featured == featured;
 
   @override
   int get hashCode =>
@@ -50,10 +54,11 @@ class DirectoryOfGoodUpdate {
     (categoryId == null ? 0 : categoryId!.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
     (location == null ? 0 : location!.hashCode) +
-    (socialLinks == null ? 0 : socialLinks!.hashCode);
+    (socialLinks == null ? 0 : socialLinks!.hashCode) +
+    (featured == null ? 0 : featured!.hashCode);
 
   @override
-  String toString() => 'DirectoryOfGoodUpdate[name=$name, focus=$focus, categoryId=$categoryId, imageUrl=$imageUrl, location=$location, socialLinks=$socialLinks]';
+  String toString() => 'DirectoryOfGoodUpdate[name=$name, focus=$focus, categoryId=$categoryId, imageUrl=$imageUrl, location=$location, socialLinks=$socialLinks, featured=$featured]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -87,6 +92,11 @@ class DirectoryOfGoodUpdate {
     } else {
       json[r'social_links'] = null;
     }
+    if (this.featured != null) {
+      json[r'featured'] = this.featured;
+    } else {
+      json[r'featured'] = null;
+    }
     return json;
   }
 
@@ -115,6 +125,7 @@ class DirectoryOfGoodUpdate {
         imageUrl: mapValueOfType<String>(json, r'image_url'),
         location: LocationSchema.fromJson(json[r'location']),
         socialLinks: SocialLinksSchema.fromJson(json[r'social_links']),
+        featured: mapValueOfType<bool>(json, r'featured'),
       );
     }
     return null;

@@ -27,6 +27,14 @@ final directoryOfGoodEntryByIdProvider =
   },
 );
 
+final directoryOfGoodEntriesByIdsProvider =
+    FutureProvider.family<Map<String, DirectoryOfGoodSchema>, List<String>>(
+  (ref, ids) async {
+    final service = ref.watch(directoryOfGoodServiceProvider);
+    return service.getEntriesByIds(ids);
+  },
+);
+
 class DirectoryOfGoodEntriesNotifier
     extends AsyncNotifier<List<DirectoryOfGoodSchema>> {
   @override
