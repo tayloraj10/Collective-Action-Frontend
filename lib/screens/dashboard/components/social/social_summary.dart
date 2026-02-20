@@ -272,15 +272,28 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                             style: TextStyle(color: Colors.red),
                           ),
                         ),
-                        data: (directoryEntriesMap) => _buildSocialList(
-                          context,
-                          cardColor,
-                          widget.icon,
-                          isMobile,
-                          actions,
-                          initiativesMap,
-                          directoryEntriesMap,
-                          _scrollController,
+                        data: (directoryEntriesMap) => Column(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: _buildSocialList(
+                                context,
+                                cardColor,
+                                widget.icon,
+                                isMobile,
+                                actions,
+                                initiativesMap,
+                                directoryEntriesMap,
+                                _scrollController,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            SummaryCount(
+                              count: actions.length,
+                              title: 'recent activities',
+                            ),
+                          ],
                         ),
                       );
                     },

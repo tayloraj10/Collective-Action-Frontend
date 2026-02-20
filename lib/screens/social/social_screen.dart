@@ -139,12 +139,24 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
                     children: [
                       _buildHeader(context, isMobile, filteredEntries.length),
                       const SizedBox(height: 16),
-                      _buildSearchField(context),
-                      const SizedBox(height: 12),
-                      _buildCategoryFilter(
-                        context,
-                        categoriesAsync,
-                        allEntries,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 280),
+                              child: _buildSearchField(context),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildCategoryFilter(
+                              context,
+                              categoriesAsync,
+                              allEntries,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 16),
                       Expanded(
@@ -222,20 +234,30 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
             flex: 4,
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final panelWidth = constraints.maxWidth;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildHeader(context, isMobile, filteredEntries.length),
                     const SizedBox(height: 16),
-                    _buildSearchField(context),
-                    const SizedBox(height: 12),
-                    _buildCategoryFilter(
-                      context,
-                      categoriesAsync,
-                      allEntries,
-                      maxFilterWidth: panelWidth,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 280),
+                            child: _buildSearchField(context),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildCategoryFilter(
+                            context,
+                            categoriesAsync,
+                            allEntries,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 20),
                     Expanded(
@@ -322,9 +344,8 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
   Widget _buildCategoryFilter(
     BuildContext context,
     AsyncValue<List<CategorySchema>> categoriesAsync,
-    List<DirectoryOfGoodSchema> allEntries, {
-    double? maxFilterWidth,
-  }) {
+    List<DirectoryOfGoodSchema> allEntries,
+  ) {
     final theme = Theme.of(context);
     final categoryIdsInData = allEntries
         .map((e) => e.categoryId)
@@ -338,38 +359,33 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
         final categoriesInData = categories
             .where((c) => c.id != null && categoryIdsInData.contains(c.id))
             .toList();
-        final width = maxFilterWidth ?? MediaQuery.of(context).size.width;
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minWidth: width),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CategoryChip(
-                  label: 'All',
-                  compact: false,
-                  selected: _selectedCategoryId == null,
-                  onTap: () => setState(() => _selectedCategoryId = null),
-                  colorOverride: theme.colorScheme.primary,
-                ),
-                const SizedBox(width: 12),
-                ...categoriesInData.map((category) {
-                  final isSelected = _selectedCategoryId == category.id;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: CategoryChip(
-                      categoryId: category.id,
-                      compact: false,
-                      selected: isSelected,
-                      onTap: () =>
-                          setState(() => _selectedCategoryId = category.id),
-                    ),
-                  );
-                }),
-              ],
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CategoryChip(
+                label: 'All',
+                compact: false,
+                selected: _selectedCategoryId == null,
+                onTap: () => setState(() => _selectedCategoryId = null),
+                colorOverride: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              ...categoriesInData.map((category) {
+                final isSelected = _selectedCategoryId == category.id;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: CategoryChip(
+                    categoryId: category.id,
+                    compact: false,
+                    selected: isSelected,
+                    onTap: () =>
+                        setState(() => _selectedCategoryId = category.id),
+                  ),
+                );
+              }),
+            ],
           ),
         );
       },
