@@ -28,8 +28,9 @@ final _initiativeLinkedIdsProvider = Provider.autoDispose<List<String>>((ref) {
 });
 
 // Provider to extract directory-of-good entry linkedIds from actions
-final _directoryOfGoodLinkedIdsProvider =
-    Provider.autoDispose<List<String>>((ref) {
+final _directoryOfGoodLinkedIdsProvider = Provider.autoDispose<List<String>>((
+  ref,
+) {
   final actions = ref
       .watch(activeActionProvider)
       .maybeWhen(data: (actions) => actions, orElse: () => []);
@@ -39,8 +40,7 @@ final _directoryOfGoodLinkedIdsProvider =
         a.linkedId != null &&
         a.linkedId!.isNotEmpty,
   );
-  final linkedIds = dogActions.map((a) => a.linkedId!).toSet().toList()
-    ..sort();
+  final linkedIds = dogActions.map((a) => a.linkedId!).toSet().toList()..sort();
   return List.unmodifiable(linkedIds);
 });
 
@@ -304,9 +304,7 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
     Map<String, DirectoryOfGoodSchema> directoryEntriesMap,
     ScrollController scrollController,
   ) {
-    // Sort actions by most recent date
-    final sortedActions = [...actions]
-      ..sort((a, b) => b.date.compareTo(a.date));
+    // Use actions in backend order (no client-side sort)
     return LayoutBuilder(
       builder: (context, constraints) {
         return Column(
@@ -328,14 +326,15 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                       alignment: WrapAlignment.start,
                       spacing: 0,
                       runSpacing: 0,
-                      children: List.generate(sortedActions.length, (idx) {
-                        final action = sortedActions[idx];
+                      children: List.generate(actions.length, (idx) {
+                        final action = actions[idx];
                         if (action.actionType ==
                             ActionTypeValuesEnum.mapSubmission.value) {
                           return MapSubmissionActionCard(action: action);
                         }
                         if (action.actionType ==
-                            ActionTypeValuesEnum.directoryOfGoodAddition
+                            ActionTypeValuesEnum
+                                .directoryOfGoodAddition
                                 .value) {
                           final entry = action.linkedId != null
                               ? directoryEntriesMap[action.linkedId!]
