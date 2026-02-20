@@ -7,6 +7,7 @@ import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/providers/config_provider.dart';
 import 'package:collective_action_frontend/providers/directory_of_good_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/social/social_summary.dart';
 import 'package:collective_action_frontend/screens/social/directory_of_good_entry_card.dart';
 import 'package:collective_action_frontend/services/directory_of_good_service.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,13 @@ class SocialScreen extends ConsumerStatefulWidget {
 class _SocialScreenState extends ConsumerState<SocialScreen> {
   /// null = All categories
   String? _selectedCategoryId;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   List<DirectoryOfGoodSchema> _filterByCategory(
     List<DirectoryOfGoodSchema> entries,
@@ -33,6 +41,34 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
         .toList();
   }
 
+  static String _locationString(LocationSchema? loc) {
+    if (loc == null) return '';
+    final parts = <String>[
+      if (loc.city != null && loc.city!.isNotEmpty) loc.city!,
+      if (loc.state != null && loc.state!.isNotEmpty) loc.state!,
+      if (loc.country != null && loc.country!.isNotEmpty) loc.country!,
+    ];
+    return parts.join(' ');
+  }
+
+  List<DirectoryOfGoodSchema> _filterBySearch(
+    List<DirectoryOfGoodSchema> entries,
+    String query,
+  ) {
+    final q = query.trim().toLowerCase();
+    if (q.isEmpty) return entries;
+    return entries.where((e) {
+      final name = e.name.toLowerCase();
+      final focus = (e.focus ?? '').toLowerCase();
+      final loc = _locationString(e.location).toLowerCase();
+      final website = (e.socialLinks?.website ?? '').trim().toLowerCase();
+      return name.contains(q) ||
+          focus.contains(q) ||
+          loc.contains(q) ||
+          website.contains(q);
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isMobile = AppConstants.isMobile(context);
@@ -40,63 +76,255 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
     final categoriesAsync = ref.watch(categoriesProvider);
     final previousData = entriesAsync.asData?.value;
     final allEntries = entriesAsync.asData?.value ?? [];
-    final filteredEntries = _filterByCategory(allEntries, _selectedCategoryId);
+    final filteredEntries = _filterBySearch(
+      _filterByCategory(allEntries, _selectedCategoryId),
+      _searchController.text,
+    );
 
     return Scaffold(
       appBar: const CustomAppBar(),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(isMobile ? 16 : 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context, isMobile, filteredEntries.length),
-              SizedBox(height: isMobile ? 16 : 20),
-              _buildCategoryFilter(context, categoriesAsync, allEntries),
-              SizedBox(height: isMobile ? 16 : 20),
-              Expanded(
-                child: entriesAsync.when(
-                  loading: () {
-                    if (previousData != null && previousData.isNotEmpty) {
-                      final prevFiltered = _filterByCategory(
-                        previousData,
-                        _selectedCategoryId,
-                      );
-                      return _buildEntriesList(
-                        context,
-                        ref,
-                        entries: prevFiltered,
-                        isMobile: isMobile,
-                      );
-                    }
-                    return const Center(child: CircularProgressIndicator());
-                  },
-                  error: (err, _) => _buildError(context, ref, err),
-                  data: (entries) {
-                    if (filteredEntries.isEmpty) {
-                      return _buildEmpty(context);
-                    }
-                    return _buildEntriesList(
-                      context,
-                      ref,
-                      entries: filteredEntries,
-                      isMobile: isMobile,
-                    );
-                  },
-                ),
+        child: isMobile
+            ? _buildMobileLayout(
+                context,
+                ref,
+                entriesAsync,
+                categoriesAsync,
+                previousData,
+                allEntries,
+                filteredEntries,
+              )
+            : _buildDesktopLayout(
+                context,
+                ref,
+                entriesAsync,
+                categoriesAsync,
+                previousData,
+                allEntries,
+                filteredEntries,
               ),
+      ),
+    );
+  }
+
+  /// Mobile: tabs for Directory of Good and Activity feed.
+  Widget _buildMobileLayout(
+    BuildContext context,
+    WidgetRef ref,
+    AsyncValue<List<DirectoryOfGoodSchema>> entriesAsync,
+    AsyncValue<List<CategorySchema>> categoriesAsync,
+    List<DirectoryOfGoodSchema>? previousData,
+    List<DirectoryOfGoodSchema> allEntries,
+    List<DirectoryOfGoodSchema> filteredEntries,
+  ) {
+    final isMobile = true;
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          TabBar(
+            labelColor: Theme.of(context).colorScheme.primary,
+            tabs: const [
+              Tab(text: 'Directory of Good'),
+              Tab(text: 'Recent Activity'),
             ],
           ),
-        ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeader(context, isMobile, filteredEntries.length),
+                      const SizedBox(height: 16),
+                      _buildSearchField(context),
+                      const SizedBox(height: 12),
+                      _buildCategoryFilter(
+                        context,
+                        categoriesAsync,
+                        allEntries,
+                      ),
+                      const SizedBox(height: 16),
+                      Expanded(
+                        child: entriesAsync.when(
+                          loading: () {
+                            if (previousData != null &&
+                                previousData.isNotEmpty) {
+                              final prevFiltered = _filterBySearch(
+                                _filterByCategory(
+                                  previousData,
+                                  _selectedCategoryId,
+                                ),
+                                _searchController.text,
+                              );
+                              return _buildEntriesList(
+                                context,
+                                ref,
+                                entries: prevFiltered,
+                                isMobile: isMobile,
+                                compact: true,
+                              );
+                            }
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          },
+                          error: (err, _) => _buildError(context, ref, err),
+                          data: (_) {
+                            if (filteredEntries.isEmpty) {
+                              return _buildEmpty(context);
+                            }
+                            return _buildEntriesList(
+                              context,
+                              ref,
+                              entries: filteredEntries,
+                              isMobile: isMobile,
+                              compact: true,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: const SocialActivityFeed(title: 'Recent activity'),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  /// Desktop: left = Directory of Good (compact cards), right = Activity feed.
+  Widget _buildDesktopLayout(
+    BuildContext context,
+    WidgetRef ref,
+    AsyncValue<List<DirectoryOfGoodSchema>> entriesAsync,
+    AsyncValue<List<CategorySchema>> categoriesAsync,
+    List<DirectoryOfGoodSchema>? previousData,
+    List<DirectoryOfGoodSchema> allEntries,
+    List<DirectoryOfGoodSchema> filteredEntries,
+  ) {
+    final isMobile = false;
+
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 4,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final panelWidth = constraints.maxWidth;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildHeader(context, isMobile, filteredEntries.length),
+                    const SizedBox(height: 16),
+                    _buildSearchField(context),
+                    const SizedBox(height: 12),
+                    _buildCategoryFilter(
+                      context,
+                      categoriesAsync,
+                      allEntries,
+                      maxFilterWidth: panelWidth,
+                    ),
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: entriesAsync.when(
+                        loading: () {
+                          if (previousData != null && previousData.isNotEmpty) {
+                            final prevFiltered = _filterBySearch(
+                              _filterByCategory(
+                                previousData,
+                                _selectedCategoryId,
+                              ),
+                              _searchController.text,
+                            );
+                            return _buildEntriesList(
+                              context,
+                              ref,
+                              entries: prevFiltered,
+                              isMobile: isMobile,
+                              compact: true,
+                            );
+                          }
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        },
+                        error: (err, _) => _buildError(context, ref, err),
+                        data: (_) {
+                          if (filteredEntries.isEmpty) {
+                            return _buildEmpty(context);
+                          }
+                          return _buildEntriesList(
+                            context,
+                            ref,
+                            entries: filteredEntries,
+                            isMobile: isMobile,
+                            compact: true,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          const SizedBox(width: 24),
+          Expanded(
+            flex: 6,
+            child: SocialActivityFeed(title: 'Recent activity'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchField(BuildContext context) {
+    final theme = Theme.of(context);
+    return TextField(
+      controller: _searchController,
+      onChanged: (_) => setState(() {}),
+      decoration: InputDecoration(
+        hintText: 'Search entries...',
+        prefixIcon: const Icon(Icons.search_rounded),
+        suffixIcon: _searchController.text.isEmpty
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.clear_rounded),
+                onPressed: () {
+                  _searchController.clear();
+                  setState(() {});
+                },
+              ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
+        isDense: true,
+      ),
+      style: theme.textTheme.bodyMedium,
     );
   }
 
   Widget _buildCategoryFilter(
     BuildContext context,
     AsyncValue<List<CategorySchema>> categoriesAsync,
-    List<DirectoryOfGoodSchema> allEntries,
-  ) {
+    List<DirectoryOfGoodSchema> allEntries, {
+    double? maxFilterWidth,
+  }) {
     final theme = Theme.of(context);
     final categoryIdsInData = allEntries
         .map((e) => e.categoryId)
@@ -110,11 +338,11 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
         final categoriesInData = categories
             .where((c) => c.id != null && categoryIdsInData.contains(c.id))
             .toList();
-        final viewportWidth = MediaQuery.of(context).size.width;
+        final width = maxFilterWidth ?? MediaQuery.of(context).size.width;
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: ConstrainedBox(
-            constraints: BoxConstraints(minWidth: viewportWidth),
+            constraints: BoxConstraints(minWidth: width),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
@@ -210,24 +438,112 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
   }
 
   static const double _desktopCardMaxWidth = 720;
+  static const double _twoColumnSpacing = 6.0;
+  static const double _rowSpacing = 4.0;
 
   Widget _buildEntriesList(
     BuildContext context,
     WidgetRef ref, {
     required List<DirectoryOfGoodSchema> entries,
     required bool isMobile,
+    bool compact = false,
   }) {
-    final listView = ListView.separated(
-      padding: const EdgeInsets.only(bottom: 24),
-      itemCount: entries.length,
-      separatorBuilder: (_, _) => SizedBox(height: isMobile ? 12 : 16),
-      itemBuilder: (context, idx) {
-        return DirectoryOfGoodEntryCard(
-          entry: entries[idx],
-          isMobile: isMobile,
-        );
-      },
-    );
+    final int crossAxisCount = compact ? 2 : 1;
+
+    Widget listView;
+    if (crossAxisCount == 2) {
+      final featured = entries.where((e) => e.featured).toList();
+      final rest = entries.where((e) => !e.featured).toList();
+      listView = LayoutBuilder(
+        builder: (context, constraints) {
+          final cardWidth = (constraints.maxWidth - _twoColumnSpacing) / 2;
+          final fullWidth = constraints.maxWidth;
+          final theme = Theme.of(context);
+
+          Widget buildCard(DirectoryOfGoodSchema entry, [double? width]) {
+            final w = width ?? cardWidth;
+            return SizedBox(
+              width: w,
+              child: DirectoryOfGoodEntryCard(
+                entry: entry,
+                isMobile: isMobile,
+                compact: compact,
+              ),
+            );
+          }
+
+          List<Widget> buildRows(List<DirectoryOfGoodSchema> list) {
+            final rows = <Widget>[];
+            for (var i = 0; i < list.length; i += 2) {
+              final left = list[i];
+              final right = (i + 1 < list.length) ? list[i + 1] : null;
+              final singleCardFullWidth = right == null;
+              rows.add(
+                Padding(
+                  padding: const EdgeInsets.only(bottom: _rowSpacing),
+                  child: Row(
+                    mainAxisAlignment: right != null
+                        ? MainAxisAlignment.start
+                        : MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      buildCard(left, singleCardFullWidth ? fullWidth : null),
+                      if (right != null) ...[
+                        SizedBox(width: _twoColumnSpacing),
+                        buildCard(right),
+                      ],
+                    ],
+                  ),
+                ),
+              );
+            }
+            return rows;
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.only(bottom: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (featured.isNotEmpty) ...[
+                  Center(
+                    child: Text(
+                      'Featured',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  ...buildRows(featured),
+                  const SizedBox(height: 10),
+                ],
+                ...buildRows(rest),
+              ],
+            ),
+          );
+        },
+      );
+    } else {
+      final featuredFirst = [
+        ...entries.where((e) => e.featured),
+        ...entries.where((e) => !e.featured),
+      ];
+      listView = ListView.separated(
+        padding: const EdgeInsets.only(bottom: 24),
+        itemCount: featuredFirst.length,
+        separatorBuilder: (_, _) => SizedBox(height: isMobile ? 12 : 16),
+        itemBuilder: (context, idx) {
+          return DirectoryOfGoodEntryCard(
+            entry: featuredFirst[idx],
+            isMobile: isMobile,
+            compact: compact,
+          );
+        },
+      );
+    }
 
     final child = RefreshIndicator(
       onRefresh: () async {
@@ -236,7 +552,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
       child: listView,
     );
 
-    if (isMobile) return child;
+    if (isMobile || compact) return child;
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: _desktopCardMaxWidth),
