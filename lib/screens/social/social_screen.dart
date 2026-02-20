@@ -10,6 +10,7 @@ import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/social_summary.dart';
 import 'package:collective_action_frontend/screens/social/directory_of_good_entry_card.dart';
 import 'package:collective_action_frontend/services/directory_of_good_service.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -24,6 +25,9 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
   /// null = All categories
   String? _selectedCategoryId;
   final TextEditingController _searchController = TextEditingController();
+  /// Mobile: 0 = Directory of Good, 1 = Recent Activity. Kept in state so tab
+  /// switch can be deferred on mobile web (avoids crashes when changing tabs).
+  int _selectedMobileTabIndex = 0;
 
   @override
   void dispose() {
@@ -107,7 +111,9 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
     );
   }
 
-  /// Mobile: tabs for Directory of Good and Activity feed.
+  /// Mobile: tabs for Directory of Good and Activity feed. Uses IndexedStack
+  /// and deferred tab switch so changing tabs doesn't run during the tap
+  /// (avoids crashes on mobile web). Both tab contents stay mounted.
   Widget _buildMobileLayout(
     BuildContext context,
     WidgetRef ref,
@@ -118,98 +124,168 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
     List<DirectoryOfGoodSchema> filteredEntries,
   ) {
     final isMobile = true;
-    return DefaultTabController(
-      length: 2,
-      child: Column(
-        children: [
-          TabBar(
-            labelColor: Theme.of(context).colorScheme.primary,
-            tabs: const [
-              Tab(text: 'Directory of Good'),
-              Tab(text: 'Recent Activity'),
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+
+    return Column(
+      children: [
+        // Tab bar: defer switch so it doesn't run during the tap (mobile web).
+        Material(
+          color: theme.colorScheme.surface,
+          child: Row(
+            children: [
+              Expanded(
+                child: InkWell(
+                  onTap: () {
+                    scheduleAfterTap(context, () {
+                      if (mounted) setState(() => _selectedMobileTabIndex = 0);
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: _selectedMobileTabIndex == 0
+                              ? primary
+                              : Colors.transparent,
+                          width: 3,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      'Directory of Good',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: _selectedMobileTabIndex == 0
+                            ? primary
+                            : theme.colorScheme.onSurface.withAlpha(179),
+                        fontWeight: _selectedMobileTabIndex == 0
+                            ? FontWeight.w600
+                            : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: InkWell(
+                  onTap: () {
+                    scheduleAfterTap(context, () {
+                      if (mounted) setState(() => _selectedMobileTabIndex = 1);
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: _selectedMobileTabIndex == 1
+                              ? primary
+                              : Colors.transparent,
+                          width: 3,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      'Recent Activity',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: _selectedMobileTabIndex == 1
+                            ? primary
+                            : theme.colorScheme.onSurface.withAlpha(179),
+                        fontWeight: _selectedMobileTabIndex == 1
+                            ? FontWeight.w600
+                            : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
-          Expanded(
-            child: TabBarView(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildHeader(context, isMobile, filteredEntries.length),
-                      const SizedBox(height: 16),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Flexible(
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 280),
-                              child: _buildSearchField(context),
-                            ),
+        ),
+        Expanded(
+          child: IndexedStack(
+            index: _selectedMobileTabIndex,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(context, isMobile, filteredEntries.length),
+                    const SizedBox(height: 16),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 280),
+                            child: _buildSearchField(context),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildCategoryFilter(
-                              context,
-                              categoriesAsync,
-                              allEntries,
-                            ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildCategoryFilter(
+                            context,
+                            categoriesAsync,
+                            allEntries,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Expanded(
-                        child: entriesAsync.when(
-                          loading: () {
-                            if (previousData != null &&
-                                previousData.isNotEmpty) {
-                              final prevFiltered = _filterBySearch(
-                                _filterByCategory(
-                                  previousData,
-                                  _selectedCategoryId,
-                                ),
-                                _searchController.text,
-                              );
-                              return _buildEntriesList(
-                                context,
-                                ref,
-                                entries: prevFiltered,
-                                isMobile: isMobile,
-                                compact: true,
-                              );
-                            }
-                            return const Center(
-                              child: CircularProgressIndicator(),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: entriesAsync.when(
+                        loading: () {
+                          if (previousData != null &&
+                              previousData.isNotEmpty) {
+                            final prevFiltered = _filterBySearch(
+                              _filterByCategory(
+                                previousData,
+                                _selectedCategoryId,
+                              ),
+                              _searchController.text,
                             );
-                          },
-                          error: (err, _) => _buildError(context, ref, err),
-                          data: (_) {
-                            if (filteredEntries.isEmpty) {
-                              return _buildEmpty(context);
-                            }
                             return _buildEntriesList(
                               context,
                               ref,
-                              entries: filteredEntries,
+                              entries: prevFiltered,
                               isMobile: isMobile,
                               compact: true,
                             );
-                          },
-                        ),
+                          }
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        },
+                        error: (err, _) => _buildError(context, ref, err),
+                        data: (_) {
+                          if (filteredEntries.isEmpty) {
+                            return _buildEmpty(context);
+                          }
+                          return _buildEntriesList(
+                            context,
+                            ref,
+                            entries: filteredEntries,
+                            isMobile: isMobile,
+                            compact: true,
+                          );
+                        },
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: const SocialActivityFeed(title: 'Recent activity'),
-                ),
-              ],
-            ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: const SocialActivityFeed(title: 'Recent activity'),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

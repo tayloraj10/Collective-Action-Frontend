@@ -194,12 +194,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                   _selectedCampaignType = value;
                                   // _selectedPurpose = null; // uncomment when re-enabling zip code map
                                 });
-                                // Update URL when cleanup is selected
-                                if (value == MapCampaignTypeEnum.cleanupMap) {
-                                  safeGo(context, '/maps/cleanup');
-                                } else {
-                                  safeGo(context, '/maps');
-                                }
+                                // Update URL; always use /maps/cleanup to avoid
+                                // router redirect (/maps -> /maps/cleanup) which
+                                // can trigger double navigation and refresh on mobile web.
+                                safeGo(context, '/maps/cleanup');
                               }
                             },
                           ),

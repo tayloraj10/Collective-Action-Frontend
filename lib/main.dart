@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/router.dart';
@@ -16,6 +17,17 @@ import 'services/health_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Catch unhandled async errors so they don't kill the isolate (avoids tab
+  // crash and forced refresh on mobile browsers). Log and continue.
+  runZonedGuarded(() async {
+    await _initAndRun();
+  }, (Object error, StackTrace stackTrace) {
+    log('Unhandled async error', error: error, stackTrace: stackTrace);
+  });
+}
+
+Future<void> _initAndRun() async {
   usePathUrlStrategy();
   if (kIsWeb) {
     ImagePickerPlugin.registerWith(webPluginRegistrar);
@@ -25,6 +37,14 @@ void main() async {
     AppConstants.preloadAudioForWeb();
   }
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Catch Flutter framework errors; log and forward to default so we have a
+  // record without changing debug behavior. Reduces chance of opaque crash/refresh on web.
+  final previousOnError = FlutterError.onError;
+  FlutterError.onError = (FlutterErrorDetails details) {
+    log('FlutterError', error: details.exception, stackTrace: details.stack);
+    previousOnError?.call(details);
+  };
 
   // Call backend health check to spin up backend on app start
   HealthService().fetchHealth().then((value) {

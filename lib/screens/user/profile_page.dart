@@ -6,7 +6,7 @@ import 'package:collective_action_frontend/screens/dashboard/components/social/u
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:go_router/go_router.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key, required this.userId});
@@ -246,7 +246,7 @@ class UserProfileView extends ConsumerWidget {
                             child: Padding(
                               padding: const EdgeInsets.only(top: 12),
                               child: OutlinedButton(
-                                onPressed: () => context.go('/profile/$userId'),
+                                onPressed: () => safeGo(context, '/profile/$userId'),
                                 child: const Text('View full profile'),
                               ),
                             ),
