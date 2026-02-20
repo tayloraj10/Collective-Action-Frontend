@@ -1080,8 +1080,8 @@ class _StepDialogState extends ConsumerState<_StepDialog> {
     );
     _selectedStatusId = widget.step?.statusId;
 
-    // Set default status after this initState completes (avoid setState during build)
-    Future.microtask(() {
+    // Set default status after first frame (Flutter 3.38 / Riverpod 3.x: no ref in initState)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || _selectedStatusId != null) return;
       final statusesAsync = ref.read(statusesProvider);
       final allStatuses = statusesAsync.asData?.value ?? [];
@@ -1091,7 +1091,7 @@ class _StepDialogState extends ConsumerState<_StepDialog> {
             .toList(),
       );
 
-      if (stepStatuses.isNotEmpty) {
+      if (stepStatuses.isNotEmpty && mounted) {
         setState(() {
           _selectedStatusId = stepStatuses.first.id;
         });
