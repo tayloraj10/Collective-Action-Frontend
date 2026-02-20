@@ -110,8 +110,12 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   @override
   void initState() {
     super.initState();
-    _loadMarkerIcons();
-    _resetInactivityTimer();
+    // Defer async work to after first frame (Flutter 3.38 / Riverpod 3.x safety)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _loadMarkerIcons();
+      _resetInactivityTimer();
+    });
   }
 
   @override

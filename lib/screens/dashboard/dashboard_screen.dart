@@ -10,40 +10,45 @@ import 'package:collective_action_frontend/screens/dashboard/components/summary_
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DashboardScreen extends ConsumerWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isMobile = AppConstants.isMobile(context);
-    final authUser = ref.watch(authStateProvider).value;
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
 
-    // Fetch and set user data if logged in
-    // Capture refs before async operations to avoid unmount issues
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Sync user from auth after first frame (ref.read only in callbacks, not in build)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _syncUserFromAuth();
+    });
+  }
+
+  void _syncUserFromAuth() {
+    final authUser = ref.read(authStateProvider).value;
     if (authUser != null) {
-      final currentUserNotifier = ref.read(currentUserProvider.notifier);
-      Future.microtask(() async {
-        try {
-          final appUser = await UserService().fetchUserByFirebaseID(
-            userId: authUser.uid,
-          );
-          if (appUser != null) {
-            await currentUserNotifier.setUser(appUser);
-          }
-        } catch (e) {
-          // Silently handle errors if widget is disposed
+      UserService()
+          .fetchUserByFirebaseID(userId: authUser.uid)
+          .then((appUser) {
+        if (mounted && appUser != null) {
+          ref.read(currentUserProvider.notifier).setUser(appUser);
         }
       });
     } else {
-      final currentUserNotifier = ref.read(currentUserProvider.notifier);
-      Future.microtask(() async {
-        try {
-          await currentUserNotifier.clearUser();
-        } catch (e) {
-          // Silently handle errors if widget is disposed
-        }
-      });
+      ref.read(currentUserProvider.notifier).clearUser();
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen(authStateProvider, (_, _) {
+      _syncUserFromAuth();
+    });
+    final isMobile = AppConstants.isMobile(context);
 
     return Scaffold(
       appBar: const CustomAppBar(),

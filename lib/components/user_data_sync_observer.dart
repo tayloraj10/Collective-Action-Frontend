@@ -34,8 +34,10 @@ class _UserDataSyncObserverState extends ConsumerState<UserDataSyncObserver> {
   @override
   void initState() {
     super.initState();
-    // Initial sync on widget creation
-    _syncUserData();
+    // Defer sync to after first frame (Riverpod 3.x / Flutter 3.38: no async in initState)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _syncUserData();
+    });
   }
 
   void _syncUserData() {
