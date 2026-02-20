@@ -455,7 +455,9 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
               if (shouldLogout == true) {
                 await authService.signOut();
-                ref.read(currentUserProvider.notifier).clearUser();
+                if (context.mounted) {
+                  ref.read(currentUserProvider.notifier).clearUser();
+                }
               }
             },
             tooltip: 'Logout',

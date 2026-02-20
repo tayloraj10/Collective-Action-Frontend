@@ -7,6 +7,7 @@ import 'package:collective_action_frontend/services/user_service.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/navigation_button.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_pane.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -21,10 +22,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    // Sync user from auth after first frame (ref.read only in callbacks, not in build)
+    // Sync user from auth after first frame (ref.read only in callbacks, not in build).
+    // On mobile web, defer a bit longer so route transition can finish and avoid
+    // ref-after-dispose / overload during navigation (e.g. Home button).
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      _syncUserFromAuth();
+      if (kIsWeb && AppConstants.isMobile(context)) {
+        Future.delayed(const Duration(milliseconds: 180), () {
+          if (mounted) _syncUserFromAuth();
+        });
+      } else {
+        _syncUserFromAuth();
+      }
     });
   }
 
