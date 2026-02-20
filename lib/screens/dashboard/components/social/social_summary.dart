@@ -329,8 +329,41 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
   }
 }
 
+/// Builds a single action card for the feed. Used by [buildSocialActivityList].
+Widget _buildSocialActivityCard(
+  ActionSchema action,
+  Map<String, InitiativeSchema> initiativesMap,
+  Map<String, DirectoryOfGoodSchema> directoryEntriesMap,
+) {
+  if (action.actionType == ActionTypeValuesEnum.mapSubmission.value) {
+    return MapSubmissionActionCard(action: action);
+  }
+  if (action.actionType ==
+      ActionTypeValuesEnum.directoryOfGoodAddition.value) {
+    final entry = action.linkedId != null
+        ? directoryEntriesMap[action.linkedId!]
+        : null;
+    return DirectoryOfGoodActionCard(
+      action: action,
+      entry: entry,
+    );
+  }
+  InitiativeSchema? initiative;
+  if (action.actionType == ActionTypeValuesEnum.initiative.value &&
+      action.linkedId != null &&
+      action.linkedId!.isNotEmpty) {
+    initiative = initiativesMap[action.linkedId!];
+  }
+  return InitiativeActionCard(
+    action: action,
+    initiative: initiative,
+  );
+}
+
 /// Reusable feed of action cards (map submissions, initiatives, directory of good).
 /// Used in [SocialSummary] and on the Social screen.
+/// Uses [ListView.builder] so only visible items are built (avoids mobile web
+/// crashes when scrolling long lists).
 Widget buildSocialActivityList(
   BuildContext context,
   Color cardColor,
@@ -340,60 +373,26 @@ Widget buildSocialActivityList(
   Map<String, DirectoryOfGoodSchema> directoryEntriesMap,
   ScrollController scrollController,
 ) {
-  return LayoutBuilder(
-    builder: (context, constraints) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Scrollbar(
-              thumbVisibility: true,
-              controller: scrollController,
-              child: SingleChildScrollView(
-                controller: scrollController,
-                scrollDirection: Axis.vertical,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minWidth: constraints.maxWidth),
-                  child: Wrap(
-                    alignment: WrapAlignment.start,
-                    spacing: 0,
-                    runSpacing: 0,
-                    children: List.generate(actions.length, (idx) {
-                      final action = actions[idx];
-                      if (action.actionType ==
-                          ActionTypeValuesEnum.mapSubmission.value) {
-                        return MapSubmissionActionCard(action: action);
-                      }
-                      if (action.actionType ==
-                          ActionTypeValuesEnum.directoryOfGoodAddition.value) {
-                        final entry = action.linkedId != null
-                            ? directoryEntriesMap[action.linkedId!]
-                            : null;
-                        return DirectoryOfGoodActionCard(
-                          action: action,
-                          entry: entry,
-                        );
-                      }
-                      InitiativeSchema? initiative;
-                      if (action.actionType ==
-                              ActionTypeValuesEnum.initiative.value &&
-                          action.linkedId != null &&
-                          action.linkedId!.isNotEmpty) {
-                        initiative = initiativesMap[action.linkedId!];
-                      }
-                      return InitiativeActionCard(
-                        action: action,
-                        initiative: initiative,
-                      );
-                    }),
-                  ),
-                ),
-              ),
-            ),
+  return Scrollbar(
+    thumbVisibility: true,
+    controller: scrollController,
+    child: ListView.builder(
+      controller: scrollController,
+      itemCount: actions.length,
+      addAutomaticKeepAlives: true,
+      addRepaintBoundaries: true,
+      itemBuilder: (context, index) {
+        final action = actions[index];
+        return RepaintBoundary(
+          key: ValueKey<String>(action.id),
+          child: _buildSocialActivityCard(
+            action,
+            initiativesMap,
+            directoryEntriesMap,
           ),
-        ],
-      );
-    },
+        );
+      },
+    ),
   );
 }
 
