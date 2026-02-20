@@ -39,21 +39,26 @@ class InitiativeCard extends StatelessWidget {
         : initiative.goal!;
     final progress = (initiative.complete ?? 0.0) / goal;
 
+    final isPriority = initiative.priority == true;
+    final borderColor = isPriority
+        ? Color.lerp(cardColor, Colors.black, 0.5)!
+        : null;
+    final borderWidth = isPriority ? (isMobile ? 3.0 : 4.0) : 0.0;
+
     return Container(
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(isMobile ? 10 : 16),
-        border: initiative.priority == true
-            ? Border.all(
-                color: AppColors.highlightYelllow,
-                width: isMobile ? 1.5 : 2.5,
-              )
+        border: borderColor != null
+            ? Border.all(color: borderColor, width: borderWidth)
             : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(26),
-            blurRadius: isMobile ? 8 : 14,
-            offset: const Offset(0, 4),
+            color: Colors.black.withAlpha(isPriority ? 40 : 26),
+            blurRadius: isMobile
+                ? (isPriority ? 12 : 8)
+                : (isPriority ? 20 : 14),
+            offset: Offset(0, isPriority ? 6 : 4),
           ),
         ],
       ),
