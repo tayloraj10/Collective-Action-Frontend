@@ -37,6 +37,26 @@ class DirectoryOfGoodService {
     }
   }
 
+  Future<Map<String, DirectoryOfGoodSchema>> getEntriesByIds(
+      List<String> ids) async {
+    if (ids.isEmpty) return {};
+    try {
+      final results = await Future.wait(
+        ids.map((id) => _api.getEntryDirectoryOfGoodEntryIdGet(id)),
+      );
+      final map = <String, DirectoryOfGoodSchema>{};
+      for (var i = 0; i < ids.length; i++) {
+        final entry = results[i];
+        if (entry != null && entry.id != null) {
+          map[entry.id!] = entry;
+        }
+      }
+      return map;
+    } catch (e) {
+      throw Exception('Failed to fetch directory of good entries: $e');
+    }
+  }
+
   Future<DirectoryOfGoodSchema?> createEntry(
       DirectoryOfGoodCreate body) async {
     try {

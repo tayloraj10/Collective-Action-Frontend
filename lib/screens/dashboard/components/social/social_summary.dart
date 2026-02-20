@@ -1,13 +1,15 @@
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/api/lib/api.dart';
+import 'package:collective_action_frontend/providers/action_provider.dart';
+import 'package:collective_action_frontend/providers/directory_of_good_provider.dart';
+import 'package:collective_action_frontend/providers/initiative_provider.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/social/directory_of_good_action_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/initiative_action_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/map_submission_action_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:collective_action_frontend/providers/action_provider.dart';
-import 'package:collective_action_frontend/providers/initiative_provider.dart';
 
 // Provider to extract stable, sorted initiative linkedIds from actions
 final _initiativeLinkedIdsProvider = Provider.autoDispose<List<String>>((ref) {
@@ -21,6 +23,23 @@ final _initiativeLinkedIdsProvider = Provider.autoDispose<List<String>>((ref) {
         a.linkedId!.isNotEmpty,
   );
   final linkedIds = initiativeActions.map((a) => a.linkedId!).toSet().toList()
+    ..sort();
+  return List.unmodifiable(linkedIds);
+});
+
+// Provider to extract directory-of-good entry linkedIds from actions
+final _directoryOfGoodLinkedIdsProvider =
+    Provider.autoDispose<List<String>>((ref) {
+  final actions = ref
+      .watch(activeActionProvider)
+      .maybeWhen(data: (actions) => actions, orElse: () => []);
+  final dogActions = actions.where(
+    (a) =>
+        a.actionType == ActionTypeValuesEnum.directoryOfGoodAddition.value &&
+        a.linkedId != null &&
+        a.linkedId!.isNotEmpty,
+  );
+  final linkedIds = dogActions.map((a) => a.linkedId!).toSet().toList()
     ..sort();
   return List.unmodifiable(linkedIds);
 });
@@ -51,6 +70,10 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
     final initiativesMapAsync = linkedIds.isEmpty
         ? const AsyncValue.data(<String, InitiativeSchema>{})
         : ref.watch(initiativesByIdsProvider(linkedIds));
+    final directoryLinkedIds = ref.watch(_directoryOfGoodLinkedIdsProvider);
+    final directoryEntriesMapAsync = directoryLinkedIds.isEmpty
+        ? const AsyncValue.data(<String, DirectoryOfGoodSchema>{})
+        : ref.watch(directoryOfGoodEntriesByIdsProvider(directoryLinkedIds));
     final isMobile = AppConstants.isMobile(context);
     final cardColor = widget.color ?? Theme.of(context).colorScheme.primary;
 
@@ -240,14 +263,25 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                       ),
                     ),
                     data: (initiativesMap) {
-                      return _buildSocialList(
-                        context,
-                        cardColor,
-                        widget.icon,
-                        isMobile,
-                        actions,
-                        initiativesMap,
-                        _scrollController,
+                      return directoryEntriesMapAsync.when(
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (err, stack) => Center(
+                          child: Text(
+                            'Failed to load directory entries',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                        data: (directoryEntriesMap) => _buildSocialList(
+                          context,
+                          cardColor,
+                          widget.icon,
+                          isMobile,
+                          actions,
+                          initiativesMap,
+                          directoryEntriesMap,
+                          _scrollController,
+                        ),
                       );
                     },
                   );
@@ -267,6 +301,7 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
     bool isMobile,
     List<ActionSchema> actions,
     Map<String, InitiativeSchema> initiativesMap,
+    Map<String, DirectoryOfGoodSchema> directoryEntriesMap,
     ScrollController scrollController,
   ) {
     // Sort actions by most recent date
@@ -298,6 +333,17 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                         if (action.actionType ==
                             ActionTypeValuesEnum.mapSubmission.value) {
                           return MapSubmissionActionCard(action: action);
+                        }
+                        if (action.actionType ==
+                            ActionTypeValuesEnum.directoryOfGoodAddition
+                                .value) {
+                          final entry = action.linkedId != null
+                              ? directoryEntriesMap[action.linkedId!]
+                              : null;
+                          return DirectoryOfGoodActionCard(
+                            action: action,
+                            entry: entry,
+                          );
                         }
                         InitiativeSchema? initiative;
                         if (action.actionType ==
