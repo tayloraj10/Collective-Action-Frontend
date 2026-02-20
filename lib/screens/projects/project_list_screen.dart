@@ -23,6 +23,11 @@ class _ProjectListScreenState extends ConsumerState<ProjectListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(currentUserProvider, (prev, next) {
+      if (next.value == null && mounted && _showOnlyMyProjects) {
+        setState(() => _showOnlyMyProjects = false);
+      }
+    });
     final isMobile = AppConstants.isMobile(context);
     final projectsAsync = ref.watch(
       _showOnlyMyProjects ? projectsByCreatorProvider : activeProjectsProvider,
@@ -155,6 +160,9 @@ class _ProjectListScreenState extends ConsumerState<ProjectListScreen> {
 
   Widget _buildFilterToggle(bool isMobile) {
     final theme = Theme.of(context);
+    final currentUser = ref.watch(currentUserProvider).value;
+    final isLoggedIn = currentUser != null && currentUser.id != null;
+
     return Row(
       children: [
         ChoiceChip(
@@ -175,23 +183,27 @@ class _ProjectListScreenState extends ConsumerState<ProjectListScreen> {
                 : FontWeight.w500,
           ),
         ),
-        const SizedBox(width: 12),
-        ChoiceChip(
-          label: const Text('My Projects'),
-          selected: _showOnlyMyProjects,
-          onSelected: (selected) {
-            if (selected) {
-              setState(() => _showOnlyMyProjects = true);
-            }
-          },
-          selectedColor: theme.colorScheme.primary,
-          labelStyle: TextStyle(
-            color: _showOnlyMyProjects
-                ? theme.colorScheme.onPrimary
-                : theme.colorScheme.onSurface,
-            fontWeight: _showOnlyMyProjects ? FontWeight.w600 : FontWeight.w500,
+        if (isLoggedIn) ...[
+          const SizedBox(width: 12),
+          ChoiceChip(
+            label: const Text('My Projects'),
+            selected: _showOnlyMyProjects,
+            onSelected: (selected) {
+              if (selected) {
+                setState(() => _showOnlyMyProjects = true);
+              }
+            },
+            selectedColor: theme.colorScheme.primary,
+            labelStyle: TextStyle(
+              color: _showOnlyMyProjects
+                  ? theme.colorScheme.onPrimary
+                  : theme.colorScheme.onSurface,
+              fontWeight: _showOnlyMyProjects
+                  ? FontWeight.w600
+                  : FontWeight.w500,
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
