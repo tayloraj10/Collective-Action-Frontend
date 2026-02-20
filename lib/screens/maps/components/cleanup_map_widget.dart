@@ -537,15 +537,21 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
             ),
           ),
         ),
-        // Submit / Cancel bar (extra top padding on mobile to clear dropdown + Map info/Stats/Leaderboard row)
+        // Add-details bar: on mobile anchor at bottom (doesn't cover map or pin);
+        // on desktop keep at top.
         if (_pinDropped)
-          Padding(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).size.width < 600 ? 86 : 0,
-            ),
-            child: PinConfirmationBar(
-              onSubmit: _onSubmitPin,
-              onCancel: _cancel,
+          Align(
+            alignment: MediaQuery.sizeOf(context).width < 600
+                ? Alignment.bottomCenter
+                : Alignment.topCenter,
+            child: Padding(
+              padding: MediaQuery.sizeOf(context).width < 600
+                  ? const EdgeInsets.only(bottom: 72)
+                  : const EdgeInsets.only(top: 60),
+              child: PinConfirmationBar(
+                onSubmit: _onSubmitPin,
+                onCancel: _cancel,
+              ),
             ),
           ),
         // if (_confirmingRoute && _routePoints.length >= 2)

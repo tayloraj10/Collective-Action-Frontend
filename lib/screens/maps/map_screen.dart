@@ -46,7 +46,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   Widget build(BuildContext context) {
     ref.listen(campaignDrawerOpenProvider, (prev, next) {
-      if (next == false && mounted) setState(() => _showCampaignDrawer = false);
+      if (mounted) setState(() => _showCampaignDrawer = next);
     });
     // Watch active campaigns and filter by selected type
     final activeCampaignsAsync = ref.watch(activeMapCampaignsProvider);
@@ -261,7 +261,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                               color: Theme.of(context).colorScheme.surface,
                               child: IconButton(
                                 icon: const Icon(Icons.bar_chart_rounded),
-                                onPressed: () => scheduleAfterTap(context, () => StatsDialog.show(context)),
+                                onPressed: () => scheduleAfterTap(
+                                  context,
+                                  () => StatsDialog.show(context),
+                                ),
                                 tooltip: 'Cleanup & trash stats',
                                 padding: const EdgeInsets.all(8),
                                 constraints: const BoxConstraints(),
@@ -275,8 +278,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                               child: IconButton(
                                 icon: const Icon(Icons.emoji_events_outlined),
                                 onPressed: () => scheduleAfterTap(
-                                    context,
-                                    () => LeaderboardDialog.show(context)),
+                                  context,
+                                  () => LeaderboardDialog.show(context),
+                                ),
                                 tooltip: 'Leaderboard (bags cleaned)',
                                 padding: const EdgeInsets.all(8),
                                 constraints: const BoxConstraints(),
@@ -290,7 +294,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: Tooltip(
-                            message: ref.watch(mapFilterMySubmissionsOnlyProvider)
+                            message:
+                                ref.watch(mapFilterMySubmissionsOnlyProvider)
                                 ? 'Show all pins on the map'
                                 : 'Show only my cleanup & trash report pins',
                             child: Material(
@@ -300,9 +305,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                               child: InkWell(
                                 onTap: () {
                                   final notifier = ref.read(
-                                      mapFilterMySubmissionsOnlyProvider.notifier);
+                                    mapFilterMySubmissionsOnlyProvider.notifier,
+                                  );
                                   notifier.setFilter(
-                                      !ref.read(mapFilterMySubmissionsOnlyProvider));
+                                    !ref.read(
+                                      mapFilterMySubmissionsOnlyProvider,
+                                    ),
+                                  );
                                 },
                                 borderRadius: BorderRadius.circular(8),
                                 child: Padding(
@@ -314,13 +323,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Icon(
-                                        ref.watch(mapFilterMySubmissionsOnlyProvider)
+                                        ref.watch(
+                                              mapFilterMySubmissionsOnlyProvider,
+                                            )
                                             ? Icons.filter_alt
                                             : Icons.filter_alt_outlined,
                                         size: 22,
-                                        color: ref.watch(
-                                                mapFilterMySubmissionsOnlyProvider)
-                                            ? Theme.of(context).colorScheme.primary
+                                        color:
+                                            ref.watch(
+                                              mapFilterMySubmissionsOnlyProvider,
+                                            )
+                                            ? Theme.of(
+                                                context,
+                                              ).colorScheme.primary
                                             : null,
                                       ),
                                       const SizedBox(width: 6),
@@ -330,15 +345,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                             .textTheme
                                             .labelMedium
                                             ?.copyWith(
-                                              fontWeight: ref.watch(
-                                                      mapFilterMySubmissionsOnlyProvider)
+                                              fontWeight:
+                                                  ref.watch(
+                                                    mapFilterMySubmissionsOnlyProvider,
+                                                  )
                                                   ? FontWeight.w600
                                                   : null,
-                                              color: ref.watch(
-                                                      mapFilterMySubmissionsOnlyProvider)
-                                                  ? Theme.of(context)
-                                                      .colorScheme
-                                                      .primary
+                                              color:
+                                                  ref.watch(
+                                                    mapFilterMySubmissionsOnlyProvider,
+                                                  )
+                                                  ? Theme.of(
+                                                      context,
+                                                    ).colorScheme.primary
                                                   : null,
                                             ),
                                       ),
