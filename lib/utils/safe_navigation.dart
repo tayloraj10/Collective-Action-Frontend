@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 /// Delay used on mobile web so the browser finishes the tap/gesture before we
-/// navigate or pop. Reduces crashes and jank on mobile Chrome.
-const Duration _kMobileWebNavDelay = Duration(milliseconds: 120);
+/// navigate or pop. Reduces crashes and jank on mobile Chrome (Flutter 3.38 +
+/// Riverpod 3.x). Slightly longer delay helps avoid ref-after-dispose during
+/// route transition.
+const Duration _kMobileWebNavDelay = Duration(milliseconds: 220);
 
 /// True when running on web and the viewport is mobile-sized. Navigation and
 /// dialog open/close are more fragile on mobile Chrome; we defer with a short
