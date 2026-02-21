@@ -102,6 +102,8 @@ class _ProjectListScreenState extends ConsumerState<ProjectListScreen> {
     final count = projectsAsync.asData?.value.length ?? 0;
     final currentUser = ref.watch(currentUserProvider).value;
     final isLoggedIn = currentUser != null && currentUser.id != null;
+    final isAdmin = ref.watch(isCurrentUserAdminProvider);
+    final canCreateProject = !hasProject || isAdmin;
 
     return Row(
       children: [
@@ -138,7 +140,7 @@ class _ProjectListScreenState extends ConsumerState<ProjectListScreen> {
             ],
           ),
         ),
-        if (!hasProject) ...[
+        if (canCreateProject) ...[
           const SizedBox(width: 16),
           Tooltip(
             message: isLoggedIn
