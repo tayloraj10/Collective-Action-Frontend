@@ -101,11 +101,6 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
   Widget build(BuildContext context) {
     final isMobile = AppConstants.isMobile(context);
     final actionsAsync = ref.watch(activeActionProvider);
-    final submissions = actionsAsync.maybeWhen(
-      data: (actions) => _mapSubmissionsWithLocation(actions),
-      orElse: () => <ActionSchema>[],
-    );
-    final heatmaps = _buildHeatmaps(submissions);
 
     return Card(
       elevation: 2,
@@ -215,99 +210,99 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
               ),
               const SizedBox(height: 6),
               Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: actionsAsync.when(
-                    data: (_) {
-                      return Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          GoogleMap(
-                            initialCameraPosition: const CameraPosition(
-                              target: _defaultCenter,
-                              zoom: _defaultZoom,
-                            ),
-                            style: _mapDarkMode ? kDarkMapStyle : null,
-                            onMapCreated: (GoogleMapController c) async {
-                              _mapController = c;
-                              if (!mounted) return;
-                              _fitBoundsIfNeeded(submissions);
-                            },
-                            heatmaps: heatmaps,
-                            mapType: MapType.normal,
-                            zoomControlsEnabled: false,
-                            myLocationButtonEnabled: false,
-                            myLocationEnabled: false,
-                            liteModeEnabled: false,
-                          ),
-                          Positioned(
-                            top: 6,
-                            right: 6,
-                            child: Material(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.surface.withValues(alpha: 0.9),
-                              borderRadius: BorderRadius.circular(6),
-                              child: IconButton(
-                                iconSize: 20,
-                                icon: Icon(
-                                  _mapDarkMode
-                                      ? Icons.light_mode
-                                      : Icons.dark_mode,
-                                  size: 20,
-                                ),
-                                tooltip: _mapDarkMode
-                                    ? 'Map style: dark (tap for light)'
-                                    : 'Map style: light (tap for dark)',
-                                onPressed: () async {
-                                  setState(() => _mapDarkMode = !_mapDarkMode);
-                                  // ignore: deprecated_member_use
-                                  await _mapController?.setMapStyle(
-                                    _mapDarkMode ? kDarkMapStyle : null,
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                    loading: () => Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const CircularProgressIndicator(),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Loading map…',
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: isMobile ? 12 : 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    error: (e, _) => Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Text(
-                          'Could not load map',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: isMobile ? 12 : 14,
-                          ),
+                child: actionsAsync.when(
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Text(
+                        'Could not load map',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: isMobile ? 12 : 14,
                         ),
                       ),
                     ),
                   ),
+                  data: (actions) {
+                    final submissions =
+                        _mapSubmissionsWithLocation(actions);
+                    final heatmaps = _buildHeatmaps(submissions);
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                GoogleMap(
+                                  initialCameraPosition: const CameraPosition(
+                                    target: _defaultCenter,
+                                    zoom: _defaultZoom,
+                                  ),
+                                  style: _mapDarkMode
+                                      ? kDarkMapStyle
+                                      : null,
+                                  onMapCreated: (GoogleMapController c) async {
+                                    _mapController = c;
+                                    if (!mounted) return;
+                                    _fitBoundsIfNeeded(submissions);
+                                  },
+                                  heatmaps: heatmaps,
+                                  mapType: MapType.normal,
+                                  zoomControlsEnabled: false,
+                                  myLocationButtonEnabled: false,
+                                  myLocationEnabled: false,
+                                  liteModeEnabled: false,
+                                ),
+                                Positioned(
+                                  top: 6,
+                                  right: 6,
+                                  child: Material(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .surface
+                                        .withValues(alpha: 0.9),
+                                    borderRadius: BorderRadius.circular(6),
+                                    child: IconButton(
+                                      iconSize: 20,
+                                      icon: Icon(
+                                        _mapDarkMode
+                                            ? Icons.light_mode
+                                            : Icons.dark_mode,
+                                        size: 20,
+                                      ),
+                                      tooltip: _mapDarkMode
+                                          ? 'Map style: dark (tap for light)'
+                                          : 'Map style: light (tap for dark)',
+                                      onPressed: () async {
+                                        setState(
+                                            () => _mapDarkMode = !_mapDarkMode);
+                                        // ignore: deprecated_member_use
+                                        await _mapController?.setMapStyle(
+                                          _mapDarkMode ? kDarkMapStyle : null,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        SummaryCount(
+                          count: submissions.length,
+                          title: 'recent map submissions',
+                        ),
+                      ],
+                    );
+                  },
                 ),
-              ),
-              const SizedBox(height: 8),
-              SummaryCount(
-                count: submissions.length,
-                title: 'recent map submissions',
               ),
             ],
           ),
