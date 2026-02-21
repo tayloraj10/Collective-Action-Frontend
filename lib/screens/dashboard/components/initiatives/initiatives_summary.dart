@@ -116,12 +116,18 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
                                 child: FittedBox(
                                   fit: BoxFit.scaleDown,
                                   alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    'Initiatives',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.copyWith(fontWeight: FontWeight.w600),
+                                  child: Tooltip(
+                                    message:
+                                        'Community driven goals anyone can contribute to',
+                                    child: Text(
+                                      'Initiatives',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
                                   ),
                                 ),
                               ),

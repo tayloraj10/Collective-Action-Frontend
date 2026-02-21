@@ -163,10 +163,16 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                               child: FittedBox(
                                 fit: BoxFit.scaleDown,
                                 alignment: Alignment.centerLeft,
-                                child: Text(
-                                  'Maps',
-                                  style: Theme.of(context).textTheme.titleLarge
-                                      ?.copyWith(fontWeight: FontWeight.w600),
+                                child: Tooltip(
+                                  message:
+                                      'Maps of where people are doing good — see where the action is happening',
+                                  child: Text(
+                                    'Maps',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(fontWeight: FontWeight.w600),
+                                  ),
                                 ),
                               ),
                             ),

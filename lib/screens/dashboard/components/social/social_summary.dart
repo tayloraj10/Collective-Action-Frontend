@@ -140,14 +140,18 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                                   child: FittedBox(
                                     fit: BoxFit.scaleDown,
                                     alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      'Social',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                    child: Tooltip(
+                                      message:
+                                          'Recent activity from the collective community',
+                                      child: Text(
+                                        'Social',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                      ),
                                     ),
                                   ),
                                 ),

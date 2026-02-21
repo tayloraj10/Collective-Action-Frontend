@@ -71,10 +71,14 @@ class ProjectsSummary extends ConsumerWidget {
                             child: FittedBox(
                               fit: BoxFit.scaleDown,
                               alignment: Alignment.centerLeft,
-                              child: Text(
-                                'Projects',
-                                style: theme.textTheme.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.w600,
+                              child: Tooltip(
+                                message:
+                                    'Active projects you can contribute to',
+                                child: Text(
+                                  'Projects',
+                                  style: theme.textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
