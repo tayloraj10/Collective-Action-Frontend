@@ -1,5 +1,4 @@
 import 'package:collective_action_frontend/app/constants.dart';
-import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/providers/project_provider.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/projects/project_action_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
@@ -124,22 +123,9 @@ class ProjectsSummary extends ConsumerWidget {
               child: projectsAsync.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (err, _) => Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        size: 48,
-                        color: AppColors.errorRed.withAlpha(180),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Failed to load projects',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withAlpha(180),
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'Failed to load projects',
+                    style: TextStyle(color: Colors.red),
                   ),
                 ),
                 data: (projects) {

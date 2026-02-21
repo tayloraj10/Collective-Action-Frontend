@@ -1,6 +1,5 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
-import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
 import 'package:collective_action_frontend/screens/maps/map_styles.dart';
@@ -214,16 +213,9 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
                   error: (e, _) => Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Text(
-                        'Could not load map',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: isMobile ? 12 : 14,
-                        ),
-                      ),
+                    child: Text(
+                      'Failed to load map',
+                      style: TextStyle(color: Colors.red),
                     ),
                   ),
                   data: (actions) {
