@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:collective_action_frontend/app/success_sounds.g.dart';
 import 'package:collective_action_frontend/app/version.g.dart';
@@ -151,14 +152,18 @@ class AppConstants {
   }
 
   static AudioPlayer? _currentSuccessPlayer;
+  static Timer? _successSoundStopTimer;
 
   /// Convenience helper to play a random success sound once.
-  /// Stops any currently playing success sound first. Stops after [maxDuration] (default 10s).
+  /// Stops any currently playing success sound first. Stops after [maxDuration] (default 13s).
   /// Uses await play() and setVolume(1.0) for mobile web (iOS Safari). Unlock via [unlockAudioForWeb] on first tap.
   static Future<void> playRandomSuccessSound() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       if (prefs.getBool(soundEnabledPrefsKey) == false) return;
+      // Cancel any pending stop timer from a previous play
+      _successSoundStopTimer?.cancel();
+      _successSoundStopTimer = null;
       // Stop previous success sound if still playing
       if (_currentSuccessPlayer != null) {
         try {
@@ -173,7 +178,8 @@ class AppConstants {
       await player.setAsset(path);
       player.setVolume(1.0);
       await player.play();
-      Future.delayed(maxDuration, () async {
+      _successSoundStopTimer = Timer(maxDuration, () async {
+        _successSoundStopTimer = null;
         if (_currentSuccessPlayer != player) return;
         try {
           await player.stop();
@@ -183,6 +189,7 @@ class AppConstants {
       });
     } catch (_) {
       _currentSuccessPlayer = null;
+      _successSoundStopTimer = null;
     }
   }
 

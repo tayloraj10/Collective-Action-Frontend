@@ -124,12 +124,15 @@ class InitiativeActionSubmissionState
       // Refresh linked action lists (e.g. recent actions under an initiative)
       // using the same days window as the initiatives list screen (7 days).
       ref.invalidate(actionsByLinkedProvider((widget.initiative.id, 7)));
-      // Defer success UI so we don't run celebration + pop + snackbar in the same
-      // frame as provider invalidation (reduces mobile Chrome crashes after submit).
+      // Play sound immediately so it's still within the user gesture chain on mobile web.
+      if (mounted) {
+        AppConstants.playSuccessCelebration(context);
+      }
+      // Defer pop + snackbar so we don't run in the same frame as provider invalidation
+      // (reduces mobile Chrome crashes after submit).
       if (mounted) {
         scheduleAfterTap(context, () {
           if (!context.mounted) return;
-          AppConstants.playSuccessCelebration(context);
           Navigator.of(context).pop(true);
           ScaffoldMessenger.of(context).showSnackBar(
             CustomSnackBar.success('Action created!'),
