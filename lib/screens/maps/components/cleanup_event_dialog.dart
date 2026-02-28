@@ -198,7 +198,7 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
                               child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  '(about a plastic shopping bag)',
+                                  '(about a shopping bag)',
                                   style: Theme.of(context).textTheme.bodySmall,
                                 ),
                               ),
@@ -227,7 +227,7 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
                               child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  '(about a plastic garbage bag)',
+                                  '(about a garbage bag)',
                                   style: Theme.of(context).textTheme.bodySmall,
                                 ),
                               ),

@@ -1,11 +1,12 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
+import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/confirmation_dialog.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
+import 'package:collective_action_frontend/components/photo_thumbnail_strip.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/providers/map_events_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
-import 'package:collective_action_frontend/components/photo_thumbnail_strip.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -73,7 +74,18 @@ class TrashReportEventInfoDialog extends ConsumerWidget {
     final size = MediaQuery.sizeOf(context);
     final maxH = (size.height * 0.7).clamp(200.0, 500.0);
     final maxW = (size.width * 0.95).clamp(280.0, 400.0);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final accentColor = AppColors.warningOrange;
+    final surfaceVariant = isDark
+        ? theme.colorScheme.surfaceContainerHighest
+        : theme.colorScheme.surfaceContainerLow;
+    final imageUrls = _imageUrls(action, eventData);
+
     return Dialog(
+      elevation: 8,
+      shadowColor: theme.colorScheme.shadow.withValues(alpha: 0.25),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxWidth: maxW,
@@ -81,128 +93,194 @@ class TrashReportEventInfoDialog extends ConsumerWidget {
           minWidth: 280,
           minHeight: 200,
         ),
-        child: Material(
-          borderRadius: BorderRadius.circular(28),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Trash Report',
-                    style: Theme.of(context).textTheme.titleLarge,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Material(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Accent header
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        accentColor,
+                        accentColor.withValues(alpha: 0.85),
+                      ],
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                      Icons.delete_outline,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Trash Report',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.info_outline,
-                            size: 18,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Details',
-                            style: Theme.of(context).textTheme.titleSmall
-                                ?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      if (eventData?.location != null &&
-                          eventData!.location.isNotEmpty)
-                        _InfoRow(
-                          label: 'Location',
-                          value: eventData!.location,
-                          icon: Icons.location_on_outlined,
-                        ),
-                      const SizedBox(height: 20),
-                      const Divider(height: 1),
-                      const SizedBox(height: 16),
-                      _InfoRow(
-                        label: 'Date',
-                        value: _formatDate(action.date),
-                        icon: Icons.calendar_today_outlined,
-                      ),
-                      if (_imageUrls(action, eventData).isNotEmpty) ...[
-                        const SizedBox(height: 20),
-                        const Divider(height: 1),
-                        const SizedBox(height: 16),
+                if (imageUrls.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Row(
                           children: [
                             Icon(
                               Icons.image_outlined,
                               size: 18,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: accentColor,
                             ),
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 8),
                             Text(
-                              'Image${_imageUrls(action, eventData).length > 1 ? 's' : ''}',
-                              style: Theme.of(context).textTheme.titleSmall
-                                  ?.copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              'Photos',
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                color: accentColor,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 8),
                         PhotoThumbnailStrip(
-                          urls: _imageUrls(action, eventData),
-                          thumbSize: 48,
+                          urls: imageUrls,
+                          thumbSize: 52,
                           showArrows: false,
                           onTap: (index) {
                             PhotoViewerDialog.show(
                               context,
-                              urls: _imageUrls(action, eventData),
+                              urls: imageUrls,
                               initialIndex: index,
                             );
                           },
                         ),
                       ],
+                    ),
+                  ),
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ...() {
+                          final cards = <Widget>[];
+
+                          final hasLocation = eventData?.location != null &&
+                              eventData!.location.isNotEmpty;
+                          if (hasLocation) {
+                            cards.add(
+                              _SectionCard(
+                                surfaceVariant: surfaceVariant,
+                                accentColor: accentColor,
+                                icon: Icons.info_outline,
+                                title: 'Details',
+                                children: [
+                                  _InfoRow(
+                                    label: 'Location',
+                                    value: eventData!.location,
+                                    icon: Icons.location_on_outlined,
+                                    accentColor: accentColor,
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
+                          cards.add(
+                            _SectionCard(
+                              surfaceVariant: surfaceVariant,
+                              accentColor: accentColor,
+                              icon: Icons.calendar_today_outlined,
+                              title: 'Date',
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 2),
+                                  child: Text(
+                                    _formatDate(action.date),
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          return [
+                            for (var i = 0; i < cards.length; i++) ...[
+                              if (i > 0) const SizedBox(height: 8),
+                              cards[i],
+                            ],
+                          ];
+                        }(),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (isOwner) ...[
+                        OutlinedButton.icon(
+                          onPressed: () => _confirmAndDelete(
+                            context,
+                            ref,
+                            action,
+                            campaignId,
+                          ),
+                          icon: const Icon(Icons.delete_outline, size: 18),
+                          label: const Text('Delete'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: theme.colorScheme.error,
+                            side: BorderSide(color: theme.colorScheme.error),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                      ],
+                      FilledButton(
+                        onPressed: () => safePop(context),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                        ),
+                        child: const Text('Close'),
+                      ),
                     ],
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    if (isOwner) ...[
-                      TextButton.icon(
-                        onPressed: () => _confirmAndDelete(context, ref, action, campaignId),
-                        icon: const Icon(Icons.delete_outline, size: 18),
-                        label: const Text('Delete'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: Theme.of(context).colorScheme.error,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                    TextButton(
-                      onPressed: () => safePop(context),
-                      child: const Text('Close'),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -248,41 +326,117 @@ class TrashReportEventInfoDialog extends ConsumerWidget {
   }
 }
 
+class _SectionCard extends StatelessWidget {
+  final Color surfaceVariant;
+  final Color accentColor;
+  final IconData icon;
+  final String title;
+  final List<Widget> children;
+
+  const _SectionCard({
+    required this.surfaceVariant,
+    required this.accentColor,
+    required this.icon,
+    required this.title,
+    required this.children,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: surfaceVariant.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: accentColor.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 18, color: accentColor),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: accentColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ],
+          ),
+          if (children.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            ...children,
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class _InfoRow extends StatelessWidget {
   final String label;
   final String value;
   final IconData? icon;
+  final Color accentColor;
 
-  const _InfoRow({required this.label, required this.value, this.icon});
+  const _InfoRow({
+    required this.label,
+    required this.value,
+    required this.accentColor,
+    this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final muted = theme.colorScheme.onSurface.withValues(alpha: 0.62);
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (icon != null) ...[
-            Icon(
-              icon,
-              size: 18,
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurface.withValues(alpha: 0.6),
+            Container(
+              width: 32,
+              height: 32,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: accentColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, size: 16, color: accentColor),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
           ],
-          SizedBox(
-            width: icon != null ? 90 : 100,
-            child: Text(
-              '$label:',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-            ),
-          ),
           Expanded(
-            child: Text(value, style: Theme.of(context).textTheme.bodyMedium),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label.toUpperCase(),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: muted,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.9,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
