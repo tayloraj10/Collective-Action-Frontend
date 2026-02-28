@@ -68,6 +68,46 @@ class MapSubmissionActionCard extends ConsumerWidget {
     return '${date.month}/${date.day}/${date.year}';
   }
 
+  /// Returns (icon, numberString, tooltip) for each non-null stat. Same icons as [CleanupEventInfoDialog].
+  static List<(IconData, String, String)> _eventStatsFromAction(
+    ActionSchema action,
+  ) {
+    final eventData = action.eventData;
+    if (eventData == null) return [];
+    final parts = <(IconData, String, String)>[];
+    final smallBags = eventData['small_bags'];
+    if (smallBags != null) {
+      final n = smallBags is int ? smallBags : int.tryParse('$smallBags');
+      if (n != null && n > 0) {
+        parts.add((
+          Icons.shopping_bag_outlined,
+          '$n',
+          '${n} small bag${n == 1 ? '' : 's'} (about a shopping bag)',
+        ));
+      }
+    }
+    final largeBags = eventData['large_bags'];
+    if (largeBags != null) {
+      final n = largeBags is int ? largeBags : int.tryParse('$largeBags');
+      if (n != null && n > 0) {
+        parts.add((
+          Icons.delete_outline,
+          '$n',
+          '${n} large bag${n == 1 ? '' : 's'} (about a garbage bag)',
+        ));
+      }
+    }
+    final pounds = eventData['pounds'];
+    if (pounds != null) {
+      final n = pounds is num ? pounds : num.tryParse('$pounds');
+      if (n != null && n > 0) {
+        final s = n == n.toInt() ? '${n.toInt()}' : '$n';
+        parts.add((Icons.scale_outlined, s, '$s lb${n == 1 ? '' : 's'}'));
+      }
+    }
+    return parts;
+  }
+
   Future<void> _showInfoDialog(BuildContext context) async {
     final eventData = action.eventData;
     if (eventData == null) return;
@@ -120,6 +160,7 @@ class MapSubmissionActionCard extends ConsumerWidget {
     final isDark = theme.brightness == Brightness.dark;
     final title = _titleFromEventData(action);
     final imageUrls = _imageUrls(action);
+    final eventStats = _eventStatsFromAction(action);
 
     final cardColor = isDark ? AppColors.darkSurface : AppColors.white;
     final accentColor = AppColors.successGreen;
@@ -254,6 +295,42 @@ class MapSubmissionActionCard extends ConsumerWidget {
                           ),
                         ],
                       ),
+                      if (eventStats.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            for (final stat in eventStats) ...[
+                              if (stat != eventStats.first)
+                                SizedBox(width: isMobile ? 8 : 10),
+                              Tooltip(
+                                message: stat.$3,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      stat.$1,
+                                      size: isMobile ? 14 : 16,
+                                      color: accentColor,
+                                    ),
+                                    SizedBox(width: isMobile ? 2 : 3),
+                                    Text(
+                                      stat.$2,
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: theme.colorScheme.onSurface
+                                                .withAlpha(200),
+                                            fontSize: isMobile ? 10 : 11,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ],
                       if (imageUrls.isNotEmpty) ...[
                         const SizedBox(height: 6),
                         PhotoThumbnailStrip(
