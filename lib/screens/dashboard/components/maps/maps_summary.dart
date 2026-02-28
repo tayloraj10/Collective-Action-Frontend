@@ -24,6 +24,7 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
   GoogleMapController? _mapController;
   static const LatLng _defaultCenter = LatLng(39.8283, -98.5795); // US center
   static const double _defaultZoom = 3.5;
+  static const double _fitBoundsScreenPadding = 60.0;
 
   /// User preference for map style only (independent of app theme).
   bool _mapDarkMode = false;
@@ -70,9 +71,20 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
 
   Future<void> _fitBoundsIfNeeded(List<ActionSchema> submissions) async {
     if (submissions.isEmpty || _mapController == null) return;
+
     final points = submissions
         .map((a) => LatLng(a.latitude!.toDouble(), a.longitude!.toDouble()))
         .toList();
+
+    if (points.length == 1) {
+      await _mapController!.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: points.first, zoom: 10.0),
+        ),
+      );
+      return;
+    }
+
     double minLat = points.first.latitude;
     double maxLat = points.first.latitude;
     double minLng = points.first.longitude;
@@ -83,16 +95,18 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
       if (p.longitude < minLng) minLng = p.longitude;
       if (p.longitude > maxLng) maxLng = p.longitude;
     }
-    final latDiff = maxLat - minLat;
-    final lngDiff = maxLng - minLng;
-    final latPadding = latDiff > 0.001 ? latDiff * 0.15 : 0.05;
-    final lngPadding = lngDiff > 0.001 ? lngDiff * 0.15 : 0.05;
+
+    // Keep bounds tight; rely on screen padding rather than inflating lat/lng span.
+    final latDiff = (maxLat - minLat).abs();
+    final lngDiff = (maxLng - minLng).abs();
+    final latPadding = latDiff < 0.002 ? 0.02 : 0.0;
+    final lngPadding = lngDiff < 0.002 ? 0.02 : 0.0;
     final bounds = LatLngBounds(
       southwest: LatLng(minLat - latPadding, minLng - lngPadding),
       northeast: LatLng(maxLat + latPadding, maxLng + lngPadding),
     );
     await _mapController!.animateCamera(
-      CameraUpdate.newLatLngBounds(bounds, 60.0),
+      CameraUpdate.newLatLngBounds(bounds, _fitBoundsScreenPadding),
     );
   }
 
@@ -219,8 +233,7 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                     ),
                   ),
                   data: (actions) {
-                    final submissions =
-                        _mapSubmissionsWithLocation(actions);
+                    final submissions = _mapSubmissionsWithLocation(actions);
                     final heatmaps = _buildHeatmaps(submissions);
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -236,9 +249,7 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                                     target: _defaultCenter,
                                     zoom: _defaultZoom,
                                   ),
-                                  style: _mapDarkMode
-                                      ? kDarkMapStyle
-                                      : null,
+                                  style: _mapDarkMode ? kDarkMapStyle : null,
                                   onMapCreated: (GoogleMapController c) async {
                                     _mapController = c;
                                     if (!mounted) return;
@@ -255,9 +266,7 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                                   top: 6,
                                   right: 6,
                                   child: Material(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .surface
+                                    color: Theme.of(context).colorScheme.surface
                                         .withValues(alpha: 0.9),
                                     borderRadius: BorderRadius.circular(6),
                                     child: IconButton(
@@ -273,7 +282,8 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                                           : 'Map style: light (tap for dark)',
                                       onPressed: () async {
                                         setState(
-                                            () => _mapDarkMode = !_mapDarkMode);
+                                          () => _mapDarkMode = !_mapDarkMode,
+                                        );
                                         // ignore: deprecated_member_use
                                         await _mapController?.setMapStyle(
                                           _mapDarkMode ? kDarkMapStyle : null,
