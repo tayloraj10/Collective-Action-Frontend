@@ -18,6 +18,7 @@ import 'photo_viewer_dialog.dart';
 class TrashReportEventInfoDialog extends ConsumerWidget {
   final ActionSchema action;
   final TrashReportEventData? eventData;
+
   /// Campaign id for invalidating map events after delete (so pin disappears).
   final String? campaignId;
 
@@ -122,7 +123,7 @@ class TrashReportEventInfoDialog extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
-                      Icons.delete_outline,
+                          Icons.delete_outline,
                           color: Colors.white,
                           size: 24,
                         ),
@@ -188,7 +189,8 @@ class TrashReportEventInfoDialog extends ConsumerWidget {
                         ...() {
                           final cards = <Widget>[];
 
-                          final hasLocation = eventData?.location != null &&
+                          final hasLocation =
+                              eventData?.location != null &&
                               eventData!.location.isNotEmpty;
                           if (hasLocation) {
                             cards.add(
@@ -220,9 +222,8 @@ class TrashReportEventInfoDialog extends ConsumerWidget {
                                   padding: const EdgeInsets.only(top: 2),
                                   child: Text(
                                     _formatDate(action.date),
-                                    style: theme.textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.w600),
                                   ),
                                 ),
                               ],
@@ -312,15 +313,15 @@ class TrashReportEventInfoDialog extends ConsumerWidget {
           ref.invalidate(mapEventsForCampaignProvider(campaignId));
         }
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar.info('Map submission deleted!'),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(CustomSnackBar.info('Map submission deleted!'));
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar.error('Error deleting map submission'),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(CustomSnackBar.error('Error deleting map submission'));
       }
     }
   }
@@ -348,10 +349,7 @@ class _SectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: surfaceVariant.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: accentColor.withValues(alpha: 0.2),
-          width: 1,
-        ),
+        border: Border.all(color: accentColor.withValues(alpha: 0.2), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -364,16 +362,13 @@ class _SectionCard extends StatelessWidget {
               Text(
                 title,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: accentColor,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  color: accentColor,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
-          if (children.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            ...children,
-          ],
+          if (children.isNotEmpty) ...[const SizedBox(height: 10), ...children],
         ],
       ),
     );
