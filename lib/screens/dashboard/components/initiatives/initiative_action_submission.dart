@@ -101,43 +101,46 @@ class InitiativeActionSubmissionState
         throw Exception('Action creation returned no result');
       }
 
-      // Upload photos under the action's UUID so they stay associated, then update the action with the URLs.
-      if (_selectedPhotos.isNotEmpty) {
-        final photosService = PhotosService();
-        final actionsService = ActionsService();
-        final uploaded = await photosService.uploadSubmissionPhotosBatch(
-          created.id,
-          _selectedPhotos,
-        );
-        if (uploaded == null || uploaded.isEmpty) {
-          throw Exception('Photo upload returned no URLs');
-        }
-        await actionsService.updateActionPhotos(created.id, uploaded);
-        // Refresh global actions list after photo update
-        await notifier.refresh();
-      }
-      // Refresh initiative data used across the app:
-      // - featuredInitiativeProvider drives dashboard widgets
-      // - activeInitiativeProvider drives the full initiatives list screen
-      await featuredInitiatives.refresh();
-      await activeInitiatives.refresh();
-      // Refresh linked action lists (e.g. recent actions under an initiative)
-      // using the same days window as the initiatives list screen (7 days).
-      ref.invalidate(actionsByLinkedProvider((widget.initiative.id, 7)));
-      // Play sound immediately so it's still within the user gesture chain on mobile web.
+      // One async step: play celebration and schedule close so sound works on mobile web.
       if (mounted) {
         AppConstants.playSuccessCelebration(context);
       }
-      // Defer pop + snackbar so we don't run in the same frame as provider invalidation
-      // (reduces mobile Chrome crashes after submit).
       if (mounted) {
         scheduleAfterTap(context, () {
           if (!context.mounted) return;
           Navigator.of(context).pop(true);
-          ScaffoldMessenger.of(context).showSnackBar(
-            CustomSnackBar.success('Action created!'),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(CustomSnackBar.success('Action created!'));
         });
+      }
+
+      // Photo upload and refreshes after celebration (dialog may still be open briefly).
+      try {
+        if (_selectedPhotos.isNotEmpty) {
+          final photosService = PhotosService();
+          final actionsService = ActionsService();
+          final uploaded = await photosService.uploadSubmissionPhotosBatch(
+            created.id,
+            _selectedPhotos,
+          );
+          if (uploaded == null || uploaded.isEmpty) {
+            throw Exception('Photo upload returned no URLs');
+          }
+          await actionsService.updateActionPhotos(created.id, uploaded);
+          await notifier.refresh();
+        }
+        await featuredInitiatives.refresh();
+        await activeInitiatives.refresh();
+        ref.invalidate(actionsByLinkedProvider((widget.initiative.id, 7)));
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            CustomSnackBar.error(
+              'Action saved; some updates could not be applied.',
+            ),
+          );
+        }
       }
     } catch (e) {
       setState(() {
