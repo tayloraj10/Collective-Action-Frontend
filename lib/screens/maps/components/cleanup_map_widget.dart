@@ -86,6 +86,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   GoogleMapController? _mapController;
   LatLng? _userLocation;
   double? _currentZoom;
+  bool _didAutoZoomToData = false;
 
   /// User preference for map style only (independent of app theme).
   bool _mapDarkMode = false;
@@ -157,22 +158,22 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
 
   /// Fetches current position, updates state, shows on map, and zooms to it.
-  Future<void> _loadUserLocation() async {
-    if (!mounted) return;
+  Future<bool> _loadUserLocation() async {
+    if (!mounted) return false;
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!mounted) return;
+    if (!mounted) return false;
     if (!serviceEnabled && mounted) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(CustomSnackBar.warning('Location services are disabled'));
-      return;
+      return false;
     }
     LocationPermission permission = await Geolocator.checkPermission();
-    if (!mounted) return;
+    if (!mounted) return false;
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
     }
-    if (!mounted) return;
+    if (!mounted) return false;
     if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) {
       if (mounted) {
@@ -180,7 +181,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
           context,
         ).showSnackBar(CustomSnackBar.warning('Location permission denied'));
       }
-      return;
+      return false;
     }
     try {
       final position = await Geolocator.getCurrentPosition(
@@ -188,7 +189,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
           accuracy: LocationAccuracy.best,
         ),
       );
-      if (!mounted) return;
+      if (!mounted) return false;
       final latLng = LatLng(position.latitude, position.longitude);
       if (mounted) {
         setState(() => _userLocation = latLng);
@@ -196,12 +197,14 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       if (mounted) {
         await _goToUserLocation();
       }
+      return true;
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(CustomSnackBar.error('Could not get location: $e'));
       }
+      return false;
     }
   }
 
@@ -214,8 +217,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   }
 
   /// Zooms to show all markers and polylines on the map.
-  Future<void> _zoomToFullExtent() async {
-    if (!mounted || _mapController == null) return;
+  Future<bool> _zoomToFullExtent() async {
+    if (!mounted || _mapController == null) return false;
 
     final eventsAsync = ref.read(
       mapEventsForCampaignProvider(widget.campaign.id),
@@ -256,7 +259,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       allPoints.addAll(polyline.points);
     }
 
-    if (allPoints.isEmpty) return;
+    if (allPoints.isEmpty) return false;
 
     // Calculate bounds
     double minLat = allPoints.first.latitude;
@@ -284,6 +287,18 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
 
     await _mapController!.animateCamera(
       CameraUpdate.newLatLngBounds(bounds, 100.0),
+    );
+    return true;
+  }
+
+  Future<void> _zoomToUSAExtent() async {
+    if (!mounted || _mapController == null) return;
+    final usaBounds = LatLngBounds(
+      southwest: LatLng(24.396308, -124.848974),
+      northeast: LatLng(49.384358, -66.885444),
+    );
+    await _mapController!.animateCamera(
+      CameraUpdate.newLatLngBounds(usaBounds, 40.0),
     );
   }
 
@@ -319,19 +334,46 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     final gesturesEnabled =
         !_isAddEventDialogOpen && !_isInfoDialogOpen && !campaignDrawerOpen;
 
+    // If we don't have user location (permission denied/unavailable), auto-zoom
+    // to data extent once data arrives; if there's no data, keep USA extent.
+    if (_mapController != null &&
+        _userLocation == null &&
+        rawEvents != null &&
+        !_didAutoZoomToData) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted || _mapController == null || _didAutoZoomToData) return;
+        final didZoom = await _zoomToFullExtent();
+        if (!mounted || _mapController == null) return;
+        if (!didZoom) {
+          await _zoomToUSAExtent();
+        }
+        if (mounted) setState(() => _didAutoZoomToData = true);
+      });
+    }
+
     return Stack(
       fit: StackFit.expand,
       children: [
         GoogleMap(
           initialCameraPosition: const CameraPosition(
-            target: LatLng(40.7128, -74.0060),
-            zoom: 11.0,
+            target: LatLng(39.8283, -98.5795), // US center
+            zoom: 3.5,
           ),
           style: _mapDarkMode ? kDarkMapStyle : null,
           onMapCreated: (GoogleMapController c) async {
             if (!mounted || _isDisposed) return;
             _mapController = c;
-            _loadUserLocation();
+            final gotLocation = await _loadUserLocation();
+            if (!mounted || _isDisposed) return;
+            if (!gotLocation) {
+              // Try to zoom to extent of already-loaded data; otherwise show USA.
+              final didZoom = await _zoomToFullExtent();
+              if (!mounted || _isDisposed) return;
+              if (!didZoom) {
+                await _zoomToUSAExtent();
+              }
+              if (mounted) setState(() => _didAutoZoomToData = true);
+            }
             if (!mounted || _isDisposed) return;
             final zoom = await c.getZoomLevel();
             if (mounted && !_isDisposed) {
