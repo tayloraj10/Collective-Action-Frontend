@@ -2,11 +2,14 @@ import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/link.dart';
+import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/initiatives/initiative_submission_button.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
-class InitiativeCard extends StatelessWidget {
+class InitiativeCard extends ConsumerWidget {
   final InitiativeSchema initiative;
   final Color cardColor;
   final bool isMobile;
@@ -33,7 +36,7 @@ class InitiativeCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final goal = (initiative.goal == null || initiative.goal == 0)
         ? 1
         : initiative.goal!;
@@ -62,32 +65,57 @@ class InitiativeCard extends StatelessWidget {
           ),
         ],
       ),
-      padding: EdgeInsets.fromLTRB(
-        containerPadding,
-        containerPaddingTop,
-        containerPadding,
-        containerPadding,
-      ),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final hasBoundedHeight = constraints.maxHeight.isFinite;
-          final reserveHeight = progressHeight + (isMobile ? 12 : 16);
+          final reserveHeight = progressHeight + (isMobile ? 10 : 12);
 
-          Widget contentColumn() => Column(
+          // Title and "by" + avatar as one inline flow so "by" is always at title end.
+          final titleStyle = TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            fontSize: titleFontSize,
+            letterSpacing: 0.1,
+            height: 1.0,
+          );
+          final byStyle = TextStyle(
+            color: Colors.white.withAlpha(200),
+            fontWeight: FontWeight.w500,
+            fontSize: titleFontSize * 0.65,
+            letterSpacing: 0.1,
+          );
+
+          // Content without bottom reserve (for scroll mode: avoids extra scroll space).
+          Widget contentAboveProgress({required double bottomPad}) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
+              SizedBox(height: isMobile ? 4 : 6),
               Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Text(
-                      initiative.title,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: titleFontSize,
-                        letterSpacing: 0.1,
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(text: initiative.title, style: titleStyle),
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.middle,
+                            child: SizedBox(width: 6),
+                          ),
+                          TextSpan(text: 'by', style: byStyle),
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.middle,
+                            child: SizedBox(width: 3),
+                          ),
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.middle,
+                            child: _InitiativeCreatorAvatar(
+                              createdBy: initiative.createdBy,
+                              isMobile: isMobile,
+                            ),
+                          ),
+                        ],
                       ),
                       maxLines: null,
                       overflow: TextOverflow.visible,
@@ -96,73 +124,162 @@ class InitiativeCard extends StatelessWidget {
                   InitiativeSubmissionButton(initiative: initiative),
                 ],
               ),
+              // Link row (tiny gap above for tight layouts).
               if (initiative.link != null && initiative.link!.isNotEmpty)
-                GestureDetector(
-                  onTap: () async {
-                    final url = initiative.link!;
-                    AppConstants.openUrl(url);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-
-                    decoration: BoxDecoration(
-                      color: AppColors.white.withAlpha(25),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: LinkText(
-                      text: initiative.link!,
-                      fontSize: descFontSize,
-                      color: AppColors.blueAccent,
+                Padding(
+                  padding: EdgeInsets.only(top: isMobile ? 3 : 4),
+                  child: GestureDetector(
+                    onTap: () async {
+                      final url = initiative.link!;
+                      AppConstants.openUrl(url);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: AppColors.white.withAlpha(25),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: LinkText(
+                        text: initiative.link!,
+                        fontSize: descFontSize,
+                        color: AppColors.blueAccent,
+                      ),
                     ),
                   ),
                 ),
-              if (!hasBoundedHeight) SizedBox(height: reserveHeight),
+              SizedBox(height: bottomPad),
             ],
           );
 
+          // Extra top padding on progress bar so it's not too close to the link.
+          final progressBarTop = isMobile ? 18.0 : 20.0;
+
+          // Content keeps same insets; progress bar full width on mobile (no horizontal padding).
+          final contentPadding = EdgeInsets.fromLTRB(
+            containerPadding,
+            containerPaddingTop,
+            containerPadding,
+            0,
+          );
+          final progressBarPadding = isMobile
+              ? EdgeInsets.only(top: progressBarTop, bottom: containerPadding)
+              : EdgeInsets.fromLTRB(
+                  containerPadding,
+                  progressBarTop,
+                  containerPadding,
+                  containerPadding,
+                );
+
+          // When parent gives fixed height: scroll only when content overflows.
+          final scrollContent = contentAboveProgress(
+            bottomPad: isMobile ? 8 : 10,
+          );
+          final fullContent = contentAboveProgress(bottomPad: reserveHeight);
+
           return Stack(
             children: [
-              if (hasBoundedHeight)
+              if (hasBoundedHeight) ...[
+                SizedBox(height: constraints.maxHeight),
                 Positioned(
                   left: 0,
                   right: 0,
                   top: 0,
                   bottom: progressHeight,
-                  child: SingleChildScrollView(
-                    clipBehavior: Clip.hardEdge,
-                    child: contentColumn(),
+                  child: Padding(
+                    padding: contentPadding,
+                    child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(
+                        context,
+                      ).copyWith(scrollbars: false),
+                      child: SingleChildScrollView(
+                        clipBehavior: Clip.hardEdge,
+                        physics: const ClampingScrollPhysics(),
+                        child: scrollContent,
+                      ),
+                    ),
                   ),
-                )
-              else
-                contentColumn(),
+                ),
+              ] else
+                Padding(padding: contentPadding, child: fullContent),
 
-              // Pinned bottom progress bar (no flex widgets required).
+              // Pinned bottom progress bar (full width on mobile).
               Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: LinearPercentIndicator(
-                  animation: true,
-                  lineHeight: progressHeight,
-                  animationDuration: 1200,
-                  percent: progress.toDouble(),
-                  center: Text(
-                    '${(progress * 100).toStringAsFixed(2)}%',
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontWeight: FontWeight.w600,
-                      fontSize: progressFontSize,
+                child: Padding(
+                  padding: progressBarPadding,
+                  child: LinearPercentIndicator(
+                    animation: true,
+                    lineHeight: progressHeight,
+                    animationDuration: 1200,
+                    percent: progress.toDouble(),
+                    center: Text(
+                      '${(progress * 100).toStringAsFixed(2)}%',
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontWeight: FontWeight.w600,
+                        fontSize: progressFontSize,
+                      ),
                     ),
+                    progressColor: Colors.white,
+                    backgroundColor: Colors.white.withAlpha(46),
+                    barRadius: Radius.circular(24),
                   ),
-                  progressColor: Colors.white,
-                  backgroundColor: Colors.white.withAlpha(46),
-                  barRadius: Radius.circular(24),
                 ),
               ),
             ],
           );
         },
       ),
+    );
+  }
+}
+
+/// Avatar only for inline use after "by" in title; tooltip shows "Created by [name]".
+class _InitiativeCreatorAvatar extends ConsumerWidget {
+  final String createdBy;
+  final bool isMobile;
+
+  const _InitiativeCreatorAvatar({
+    required this.createdBy,
+    required this.isMobile,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userAsync = ref.watch(userProvider(createdBy));
+    final mutedColor = Colors.white.withAlpha(200);
+    final radius = isMobile ? 6.0 : 8.0;
+
+    return userAsync.when(
+      loading: () => Tooltip(
+        message: 'Created by...',
+        child: SizedBox(
+          width: radius * 2,
+          height: radius * 2,
+          child: CircularProgressIndicator(strokeWidth: 1.5, color: mutedColor),
+        ),
+      ),
+      error: (_, _) => Tooltip(
+        message: 'Created by Unknown',
+        child: UserAvatar(
+          userId: createdBy,
+          radius: radius,
+          showProfileOnTap: true,
+        ),
+      ),
+      data: (user) {
+        final name = user?.name ?? user?.email ?? 'Unknown';
+        return Tooltip(
+          message: 'Created by $name',
+          child: UserAvatar(
+            userId: createdBy,
+            radius: radius,
+            showProfileOnTap: true,
+          ),
+        );
+      },
     );
   }
 }
