@@ -147,4 +147,3 @@ lib/model/user_type.dart
 lib/model/user_update.dart
 lib/model/zip_code_submission_event_data.dart
 pubspec.yaml
-test/feature_update_test.dart

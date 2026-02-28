@@ -1306,7 +1306,7 @@
                     "links"
                 ],
                 "summary": "Create Link",
-                "description": "Create a link between a project and an initiative.",
+                "description": "Create a link; any combination of project_id, initiative_id, map_campaign_id.",
                 "operationId": "create_link_links__post",
                 "requestBody": {
                     "content": {
@@ -1370,7 +1370,7 @@
                     "links"
                 ],
                 "summary": "Update Link",
-                "description": "Update a link (change project or initiative).",
+                "description": "Update a link (change project and/or target).",
                 "operationId": "update_link_links__link_id__patch",
                 "parameters": [
                     {
@@ -1595,7 +1595,7 @@
                         "required": false,
                         "schema": {
                             "type": "integer",
-                            "default": 7,
+                            "default": 30,
                             "title": "Days"
                         }
                     },
@@ -4060,23 +4060,45 @@
             "LinkCreateSchema": {
                 "properties": {
                     "project_id": {
-                        "type": "string",
-                        "format": "uuid",
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
                         "title": "Project Id"
                     },
                     "initiative_id": {
-                        "type": "string",
-                        "format": "uuid",
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
                         "title": "Initiative Id"
+                    },
+                    "map_campaign_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Map Campaign Id"
                     }
                 },
                 "type": "object",
-                "required": [
-                    "project_id",
-                    "initiative_id"
-                ],
                 "title": "LinkCreateSchema",
-                "description": "Create a link between a project and an initiative."
+                "description": "Create a link; any combination of project_id, initiative_id, map_campaign_id."
             },
             "LinkSchema": {
                 "properties": {
@@ -4086,21 +4108,45 @@
                         "title": "Id"
                     },
                     "project_id": {
-                        "type": "string",
-                        "format": "uuid",
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
                         "title": "Project Id"
                     },
                     "initiative_id": {
-                        "type": "string",
-                        "format": "uuid",
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
                         "title": "Initiative Id"
+                    },
+                    "map_campaign_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Map Campaign Id"
                     }
                 },
                 "type": "object",
                 "required": [
-                    "id",
-                    "project_id",
-                    "initiative_id"
+                    "id"
                 ],
                 "title": "LinkSchema",
                 "description": "Link entity response schema."
@@ -4130,11 +4176,23 @@
                             }
                         ],
                         "title": "Initiative Id"
+                    },
+                    "map_campaign_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Map Campaign Id"
                     }
                 },
                 "type": "object",
                 "title": "LinkUpdateSchema",
-                "description": "Update a link (change project or initiative)."
+                "description": "Update a link (change project and/or target)."
             },
             "LocationSchema": {
                 "properties": {
@@ -4446,21 +4504,45 @@
                         "title": "Id"
                     },
                     "project_id": {
-                        "type": "string",
-                        "format": "uuid",
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
                         "title": "Project Id"
                     },
                     "initiative_id": {
-                        "type": "string",
-                        "format": "uuid",
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
                         "title": "Initiative Id"
+                    },
+                    "map_campaign_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Map Campaign Id"
                     }
                 },
                 "type": "object",
                 "required": [
-                    "id",
-                    "project_id",
-                    "initiative_id"
+                    "id"
                 ],
                 "title": "ProjectLinkSchema"
             },

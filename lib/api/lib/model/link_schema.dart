@@ -14,37 +14,55 @@ class LinkSchema {
   /// Returns a new [LinkSchema] instance.
   LinkSchema({
     required this.id,
-    required this.projectId,
-    required this.initiativeId,
+    this.projectId,
+    this.initiativeId,
+    this.mapCampaignId,
   });
 
   String id;
 
-  String projectId;
+  String? projectId;
 
-  String initiativeId;
+  String? initiativeId;
+
+  String? mapCampaignId;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is LinkSchema &&
     other.id == id &&
     other.projectId == projectId &&
-    other.initiativeId == initiativeId;
+    other.initiativeId == initiativeId &&
+    other.mapCampaignId == mapCampaignId;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (id.hashCode) +
-    (projectId.hashCode) +
-    (initiativeId.hashCode);
+    (projectId == null ? 0 : projectId!.hashCode) +
+    (initiativeId == null ? 0 : initiativeId!.hashCode) +
+    (mapCampaignId == null ? 0 : mapCampaignId!.hashCode);
 
   @override
-  String toString() => 'LinkSchema[id=$id, projectId=$projectId, initiativeId=$initiativeId]';
+  String toString() => 'LinkSchema[id=$id, projectId=$projectId, initiativeId=$initiativeId, mapCampaignId=$mapCampaignId]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'id'] = this.id;
+    if (this.projectId != null) {
       json[r'project_id'] = this.projectId;
+    } else {
+      json[r'project_id'] = null;
+    }
+    if (this.initiativeId != null) {
       json[r'initiative_id'] = this.initiativeId;
+    } else {
+      json[r'initiative_id'] = null;
+    }
+    if (this.mapCampaignId != null) {
+      json[r'map_campaign_id'] = this.mapCampaignId;
+    } else {
+      json[r'map_campaign_id'] = null;
+    }
     return json;
   }
 
@@ -68,8 +86,9 @@ class LinkSchema {
 
       return LinkSchema(
         id: mapValueOfType<String>(json, r'id')!,
-        projectId: mapValueOfType<String>(json, r'project_id')!,
-        initiativeId: mapValueOfType<String>(json, r'initiative_id')!,
+        projectId: mapValueOfType<String>(json, r'project_id'),
+        initiativeId: mapValueOfType<String>(json, r'initiative_id'),
+        mapCampaignId: mapValueOfType<String>(json, r'map_campaign_id'),
       );
     }
     return null;
@@ -118,8 +137,6 @@ class LinkSchema {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'id',
-    'project_id',
-    'initiative_id',
   };
 }
 

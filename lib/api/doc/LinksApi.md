@@ -23,7 +23,7 @@ Method | HTTP request | Description
 
 Create Link
 
-Create a link between a project and an initiative.
+Create a link; any combination of project_id, initiative_id, map_campaign_id.
 
 ### Example
 ```dart
@@ -277,7 +277,7 @@ No authorization required
 
 Update Link
 
-Update a link (change project or initiative).
+Update a link (change project and/or target).
 
 ### Example
 ```dart

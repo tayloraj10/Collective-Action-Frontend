@@ -15,25 +15,30 @@ class LinkUpdateSchema {
   LinkUpdateSchema({
     this.projectId,
     this.initiativeId,
+    this.mapCampaignId,
   });
 
   String? projectId;
 
   String? initiativeId;
 
+  String? mapCampaignId;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is LinkUpdateSchema &&
     other.projectId == projectId &&
-    other.initiativeId == initiativeId;
+    other.initiativeId == initiativeId &&
+    other.mapCampaignId == mapCampaignId;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (projectId == null ? 0 : projectId!.hashCode) +
-    (initiativeId == null ? 0 : initiativeId!.hashCode);
+    (initiativeId == null ? 0 : initiativeId!.hashCode) +
+    (mapCampaignId == null ? 0 : mapCampaignId!.hashCode);
 
   @override
-  String toString() => 'LinkUpdateSchema[projectId=$projectId, initiativeId=$initiativeId]';
+  String toString() => 'LinkUpdateSchema[projectId=$projectId, initiativeId=$initiativeId, mapCampaignId=$mapCampaignId]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -46,6 +51,11 @@ class LinkUpdateSchema {
       json[r'initiative_id'] = this.initiativeId;
     } else {
       json[r'initiative_id'] = null;
+    }
+    if (this.mapCampaignId != null) {
+      json[r'map_campaign_id'] = this.mapCampaignId;
+    } else {
+      json[r'map_campaign_id'] = null;
     }
     return json;
   }
@@ -71,6 +81,7 @@ class LinkUpdateSchema {
       return LinkUpdateSchema(
         projectId: mapValueOfType<String>(json, r'project_id'),
         initiativeId: mapValueOfType<String>(json, r'initiative_id'),
+        mapCampaignId: mapValueOfType<String>(json, r'map_campaign_id'),
       );
     }
     return null;

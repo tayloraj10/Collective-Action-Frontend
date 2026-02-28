@@ -209,7 +209,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **days** | **int**|  | [optional] [default to 7]
+ **days** | **int**|  | [optional] [default to 30]
  **actionType** | [**ActionTypeValuesEnum**](.md)|  | [optional] 
 
 ### Return type
