@@ -68,7 +68,11 @@ class InitiativeCard extends ConsumerWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final hasBoundedHeight = constraints.maxHeight.isFinite;
-          final reserveHeight = progressHeight + (isMobile ? 10 : 12);
+          // Reserve enough space for progress bar + top padding + bottom padding + visual gap
+          final progressBarGap = isMobile ? 14.0 : 18.0;
+          final reserveHeight = progressBarGap +
+              progressHeight +
+              containerPadding;
 
           // Title and "by" + avatar as one inline flow so "by" is always at title end.
           final titleStyle = TextStyle(
@@ -151,8 +155,8 @@ class InitiativeCard extends ConsumerWidget {
             ],
           );
 
-          // Extra top padding on progress bar so it's not too close to the link.
-          final progressBarTop = isMobile ? 18.0 : 20.0;
+          // Extra top padding on progress bar for clear separation from link.
+          final progressBarTop = progressBarGap;
 
           // Content keeps same insets; progress bar full width on mobile (no horizontal padding).
           final contentPadding = EdgeInsets.fromLTRB(
