@@ -70,14 +70,20 @@ class InitiativeCard extends ConsumerWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final hasBoundedHeight = constraints.maxHeight.isFinite;
-          // Tighter spacing on dashboard (no "by" row) to reduce unused space.
           final compact = !showCreatedBy;
-          final progressBarGap = compact
-              ? (isMobile ? 12.0 : 8.0)
-              : (isMobile ? 14.0 : 18.0);
-          final reserveHeight =
+          final hasLink =
+              initiative.link != null && initiative.link!.isNotEmpty;
+          // In grid with link, use larger gap so link never overlaps progress bar on small screens.
+          final progressBarGapBase = (hasBoundedHeight && compact)
+              ? (isMobile ? 6.0 : 6.0)
+              : compact
+              ? (isMobile ? 10.0 : 8.0)
+              : (isMobile ? 12.0 : 14.0);
+          final progressBarGap = (hasBoundedHeight && compact && hasLink)
+              ? (isMobile ? 10.0 : 10.0)
+              : progressBarGapBase;
+          final progressBarBlockHeight =
               progressBarGap + progressHeight + containerPadding;
-
           // Title and optionally "by" + avatar as one inline flow so "by" is always at title end.
           final titleStyle = TextStyle(
             color: Colors.white,
@@ -97,12 +103,38 @@ class InitiativeCard extends ConsumerWidget {
             letterSpacing: 0.1,
           );
 
-          // Content without bottom reserve (for scroll mode: avoids extra scroll space).
+          // Top padding: minimal but visible; tighter in grid so link is visible by default.
+          final topPad = (hasBoundedHeight && compact)
+              ? (isMobile ? 3.0 : 5.0)
+              : (isMobile ? 4.0 : 6.0);
+
+          final linkWidget =
+              initiative.link != null && initiative.link!.isNotEmpty
+              ? GestureDetector(
+                  onTap: () async {
+                    final url = initiative.link!;
+                    AppConstants.openUrl(url);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: AppColors.white.withAlpha(25),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: LinkText(
+                      text: initiative.link!,
+                      fontSize: descFontSize,
+                      color: AppColors.blueAccent,
+                    ),
+                  ),
+                )
+              : null;
+
           Widget contentAboveProgress({required double bottomPad}) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(height: isMobile ? 4 : 6),
+              SizedBox(height: topPad),
               Text.rich(
                 TextSpan(
                   children: [
@@ -134,34 +166,19 @@ class InitiativeCard extends ConsumerWidget {
                 maxLines: null,
                 overflow: TextOverflow.visible,
               ),
-              // Link row with clear separation from title.
-              if (initiative.link != null && initiative.link!.isNotEmpty)
+              if (linkWidget != null)
                 Padding(
-                  padding: EdgeInsets.only(top: isMobile ? 10.0 : 12.0),
-                  child: GestureDetector(
-                    onTap: () async {
-                      final url = initiative.link!;
-                      AppConstants.openUrl(url);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: AppColors.white.withAlpha(25),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: LinkText(
-                        text: initiative.link!,
-                        fontSize: descFontSize,
-                        color: AppColors.blueAccent,
-                      ),
-                    ),
+                  padding: EdgeInsets.only(
+                    top: (hasBoundedHeight && compact)
+                        ? (isMobile ? 8.0 : 10.0)
+                        : (isMobile ? 10.0 : 12.0),
                   ),
+                  child: linkWidget,
                 ),
               SizedBox(height: bottomPad),
             ],
           );
 
-          // Extra top padding on progress bar for clear separation from link.
           final progressBarTop = progressBarGap;
 
           // Reserve right side for the plus button so title never overlaps it.
@@ -181,104 +198,111 @@ class InitiativeCard extends ConsumerWidget {
                   containerPadding,
                 );
 
-          // When parent gives fixed height: scroll only when content overflows.
-          final bottomPad = compact
-              ? (isMobile ? 4.0 : 6.0)
-              : (isMobile ? 8.0 : 10.0);
+          // Minimal bottom padding; keep a little space above progress bar.
+          final bottomPad = (hasBoundedHeight && compact)
+              ? (isMobile ? 3.0 : 5.0)
+              : compact
+              ? (isMobile ? 5.0 : 6.0)
+              : (isMobile ? 6.0 : 8.0);
           final scrollContent = contentAboveProgress(bottomPad: bottomPad);
-          final fullContent = contentAboveProgress(bottomPad: reserveHeight);
+          final fullContent = contentAboveProgress(bottomPad: bottomPad);
 
-          return Stack(
-            children: [
-              if (hasBoundedHeight) ...[
-                SizedBox(height: constraints.maxHeight),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                  bottom: progressHeight,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Padding(
-                        padding: contentPadding,
-                        child: ScrollConfiguration(
-                          behavior: ScrollConfiguration.of(
-                            context,
-                          ).copyWith(scrollbars: false),
+          final progressBarWidget = Padding(
+            padding: progressBarPadding,
+            child: LinearPercentIndicator(
+              animation: true,
+              lineHeight: progressHeight,
+              animationDuration: 1200,
+              percent: progress.toDouble(),
+              center: Text(
+                '${(progress * 100).toStringAsFixed(2)}%',
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w600,
+                  fontSize: progressFontSize,
+                ),
+              ),
+              progressColor: Colors.white,
+              backgroundColor: Colors.white.withAlpha(46),
+              barRadius: Radius.circular(24),
+            ),
+          );
+
+          if (hasBoundedHeight) {
+            return SizedBox(
+              height: constraints.maxHeight,
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    bottom: progressBarBlockHeight,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Padding(
+                          padding: contentPadding,
                           child: SingleChildScrollView(
                             clipBehavior: Clip.hardEdge,
                             physics: const ClampingScrollPhysics(),
                             child: scrollContent,
                           ),
                         ),
-                      ),
-                      Positioned(
-                        top: 0,
-                        right: 0,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            top: isMobile ? 6.0 : 8.0,
-                            right: isMobile ? 6.0 : 8.0,
-                          ),
-                          child: InitiativeSubmissionButton(
-                            initiative: initiative,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ] else
-                SizedBox(
-                  width: constraints.maxWidth,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Padding(padding: contentPadding, child: fullContent),
-                      Positioned(
-                        top: 0,
-                        right: 0,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            top: isMobile ? 6.0 : 8.0,
-                            right: isMobile ? 6.0 : 8.0,
-                          ),
-                          child: InitiativeSubmissionButton(
-                            initiative: initiative,
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              top: isMobile ? 6.0 : 8.0,
+                              right: isMobile ? 6.0 : 8.0,
+                            ),
+                            child: InitiativeSubmissionButton(
+                              initiative: initiative,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: progressBarWidget,
+                  ),
+                ],
+              ),
+            );
+          }
 
-              // Pinned bottom progress bar (full width on mobile).
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: Padding(
-                  padding: progressBarPadding,
-                  child: LinearPercentIndicator(
-                    animation: true,
-                    lineHeight: progressHeight,
-                    animationDuration: 1200,
-                    percent: progress.toDouble(),
-                    center: Text(
-                      '${(progress * 100).toStringAsFixed(2)}%',
-                      style: TextStyle(
-                        color: Colors.black87,
-                        fontWeight: FontWeight.w600,
-                        fontSize: progressFontSize,
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                width: constraints.maxWidth,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Padding(padding: contentPadding, child: fullContent),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          top: isMobile ? 6.0 : 8.0,
+                          right: isMobile ? 6.0 : 8.0,
+                        ),
+                        child: InitiativeSubmissionButton(
+                          initiative: initiative,
+                        ),
                       ),
                     ),
-                    progressColor: Colors.white,
-                    backgroundColor: Colors.white.withAlpha(46),
-                    barRadius: Radius.circular(24),
-                  ),
+                  ],
                 ),
               ),
+              progressBarWidget,
             ],
           );
         },
