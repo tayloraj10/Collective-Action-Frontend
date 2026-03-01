@@ -44,9 +44,8 @@ class CurrentUserNotifier extends AsyncNotifier<UserSchema?> {
 /// Fetches and holds a user by their database user id (users table primary key).
 /// Use this for refresh/update after you have the user; for initial load when you
 /// only have Firebase UID, use [UserService.fetchUserByFirebaseID] then set [currentUserProvider].
-/// autoDispose limits cache growth when navigating away from profiles.
 final userProvider =
-    AsyncNotifierProvider.autoDispose.family<UserNotifier, UserSchema?, String>(
+    AsyncNotifierProvider.family<UserNotifier, UserSchema?, String>(
       (dbUserId) => UserNotifier(dbUserId),
     );
 

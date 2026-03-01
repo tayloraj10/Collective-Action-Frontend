@@ -9,9 +9,8 @@ final activeActionProvider =
 
 /// Fetches actions for a linked entity (e.g. initiative).
 /// [params] is (linkedId, days?). Pass null for days to get all actions.
-/// autoDispose limits cache when navigating away.
 final actionsByLinkedProvider =
-    FutureProvider.autoDispose.family<List<ActionSchema>, (String, int?)>(
+    FutureProvider.family<List<ActionSchema>, (String, int?)>(
       (ref, params) async {
         final (linkedId, days) = params;
         return await ActionsService().fetchActionsByLinked(

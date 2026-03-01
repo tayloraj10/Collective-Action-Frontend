@@ -12,9 +12,8 @@ final featuredInitiativeProvider =
       FeaturedInitiativeNotifier.new,
     );
 
-/// autoDispose limits cache when leaving screens that use this.
 final initiativesByIdsProvider =
-    FutureProvider.autoDispose.family<Map<String, InitiativeSchema>, List<String>>(
+    FutureProvider.family<Map<String, InitiativeSchema>, List<String>>(
   (ref, ids) async {
     final initiatives = await InitiativesService().fetchInitiativesByIds(ids);
     return {for (final i in initiatives) i.id: i};

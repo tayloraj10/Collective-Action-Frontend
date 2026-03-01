@@ -31,15 +31,14 @@ final mapCampaignsByCreatorProvider =
       MapCampaignsByCreatorNotifier.new,
     );
 
-/// autoDispose limits cache when leaving map screens.
 final mapCampaignByIdProvider =
-    FutureProvider.autoDispose.family<MapCampaignSchema?, String>((ref, campaignId) async {
+    FutureProvider.family<MapCampaignSchema?, String>((ref, campaignId) async {
   final service = ref.watch(mapServiceProvider);
   return service.getMapCampaign(campaignId);
 });
 
 final mapCampaignsByTypeProvider =
-    FutureProvider.autoDispose.family<List<MapCampaignSchema>, MapCampaignTypeEnum>(
+    FutureProvider.family<List<MapCampaignSchema>, MapCampaignTypeEnum>(
   (ref, campaignType) async {
     final service = ref.watch(mapServiceProvider);
     return service.listMapCampaignsByType(campaignType);
