@@ -79,27 +79,3 @@ class UserNotifier extends AsyncNotifier<UserSchema?> {
     }
   }
 }
-
-/// Provider for fetching a user by database user ID (not Firebase ID)
-// final databaseUserProvider =
-//     AsyncNotifierProvider.family<UserByUserIdNotifier, UserSchema?, String>(
-//       (userId) => UserByUserIdNotifier(userId),
-//     );
-
-class UserByUserIdNotifier extends AsyncNotifier<UserSchema?> {
-  final String userId;
-
-  UserByUserIdNotifier(this.userId);
-
-  @override
-  Future<UserSchema?> build() async {
-    return await UserService().fetchUserByUserID(userId: userId);
-  }
-
-  Future<void> refresh() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      return await UserService().fetchUserByUserID(userId: userId);
-    });
-  }
-}
