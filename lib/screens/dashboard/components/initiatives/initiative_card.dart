@@ -82,8 +82,12 @@ class InitiativeCard extends ConsumerWidget {
           final progressBarGap = (hasBoundedHeight && compact && hasLink)
               ? (isMobile ? 10.0 : 10.0)
               : progressBarGapBase;
+          // Less padding below progress bar on desktop to free space for content.
+          final bottomPadProgress = isMobile
+              ? containerPadding
+              : (containerPadding * 0.6).clamp(8.0, 14.0);
           final progressBarBlockHeight =
-              progressBarGap + progressHeight + containerPadding;
+              progressBarGap + progressHeight + bottomPadProgress;
           // Title and optionally "by" + avatar as one inline flow so "by" is always at title end.
           final titleStyle = TextStyle(
             color: Colors.white,
@@ -182,11 +186,11 @@ class InitiativeCard extends ConsumerWidget {
           final progressBarTop = progressBarGap;
 
           // Reserve right side for the plus button so title never overlaps it.
-          const double _plusButtonReserve = 44.0;
+          const double plusButtonReserve = 44.0;
           final contentPadding = EdgeInsets.fromLTRB(
             containerPadding,
             containerPaddingTop,
-            containerPadding + _plusButtonReserve,
+            containerPadding + plusButtonReserve,
             0,
           );
           final progressBarPadding = isMobile
@@ -195,7 +199,7 @@ class InitiativeCard extends ConsumerWidget {
                   containerPadding,
                   progressBarTop,
                   containerPadding,
-                  containerPadding,
+                  bottomPadProgress,
                 );
 
           // Minimal bottom padding; keep a little space above progress bar.
