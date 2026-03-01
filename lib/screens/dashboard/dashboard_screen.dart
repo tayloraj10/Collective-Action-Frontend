@@ -38,6 +38,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   void _syncUserFromAuth() {
+    if (!mounted) return;
     final authUser = ref.read(authStateProvider).value;
     if (authUser != null) {
       UserService()
@@ -48,7 +49,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         }
       });
     } else {
-      ref.read(currentUserProvider.notifier).clearUser();
+      if (mounted) ref.read(currentUserProvider.notifier).clearUser();
     }
   }
 

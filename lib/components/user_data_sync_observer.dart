@@ -41,6 +41,7 @@ class _UserDataSyncObserverState extends ConsumerState<UserDataSyncObserver> {
   }
 
   void _syncUserData() {
+    if (!mounted) return;
     final authUser = ref.read(authStateProvider).value;
     final currentUserId = authUser?.uid;
 
@@ -62,7 +63,7 @@ class _UserDataSyncObserverState extends ConsumerState<UserDataSyncObserver> {
         );
       } else {
         // User is logged out - clear user data
-        ref.read(currentUserProvider.notifier).clearUser();
+        if (mounted) ref.read(currentUserProvider.notifier).clearUser();
       }
     }
   }

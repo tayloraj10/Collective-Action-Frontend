@@ -31,6 +31,7 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
 
   @override
   void dispose() {
+    _mapController?.dispose();
     _mapController = null;
     super.dispose();
   }

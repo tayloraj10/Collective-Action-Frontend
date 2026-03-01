@@ -13,7 +13,6 @@ import 'package:collective_action_frontend/screens/projects/project_membership_b
 import 'package:collective_action_frontend/screens/projects/project_steps_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 
@@ -423,7 +422,6 @@ class _ProjectDetailScreenState extends ConsumerState<ProjectDetailScreen> {
     ProjectSchema project,
   ) async {
     // Store context references before any async operations
-    final navigator = GoRouter.of(context);
     final messenger = ScaffoldMessenger.of(context);
 
     final confirmed = await showDialog<bool>(
@@ -448,7 +446,7 @@ class _ProjectDetailScreenState extends ConsumerState<ProjectDetailScreen> {
     );
 
     if (confirmed == true) {
-      if (!mounted) return;
+      if (!context.mounted) return;
 
       try {
         final service = ref.read(projectsServiceProvider);
@@ -458,17 +456,17 @@ class _ProjectDetailScreenState extends ConsumerState<ProjectDetailScreen> {
         ref.invalidate(activeProjectsProvider);
         ref.invalidate(projectsByCreatorProvider);
 
-        if (!mounted) return;
+        if (!context.mounted) return;
 
-        // Navigate back to projects list
-        navigator.go('/projects');
+        // Navigate back to projects list (safe on mobile web to avoid crash)
+        safeGo(context, '/projects');
 
         // Show success message
         messenger.showSnackBar(
           CustomSnackBar.success('Project deleted successfully'),
         );
       } catch (e) {
-        if (!mounted) return;
+        if (!context.mounted) return;
 
         messenger.showSnackBar(
           CustomSnackBar.error('Failed to delete project: $e'),
@@ -586,13 +584,12 @@ class ProjectDetailDialog extends ConsumerWidget {
                 ),
                 FilledButton.icon(
                   onPressed: () {
-                    final router = GoRouter.of(context);
                     final route = '/projects/$projectId';
-                    // Pop then go in separate ticks to avoid mobile Chrome crash.
+                    // Pop then go with safe delay on mobile web to avoid crash.
                     scheduleAfterTap(context, () {
                       if (!context.mounted) return;
                       Navigator.of(context, rootNavigator: true).pop();
-                      Future.microtask(() => router.go(route));
+                      safeGo(context, route);
                     });
                   },
                   icon: const Icon(Icons.open_in_full_rounded, size: 18),

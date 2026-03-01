@@ -82,7 +82,7 @@ class MapSubmissionActionCard extends ConsumerWidget {
         parts.add((
           Icons.shopping_bag_outlined,
           '$n',
-          '${n} small bag${n == 1 ? '' : 's'} (about a shopping bag)',
+          '$n small bag${n == 1 ? '' : 's'} (about a shopping bag)',
         ));
       }
     }
@@ -93,7 +93,7 @@ class MapSubmissionActionCard extends ConsumerWidget {
         parts.add((
           Icons.delete_outline,
           '$n',
-          '${n} large bag${n == 1 ? '' : 's'} (about a garbage bag)',
+          '$n large bag${n == 1 ? '' : 's'} (about a garbage bag)',
         ));
       }
     }

@@ -17,10 +17,9 @@ final projectsByCreatorProvider =
       ProjectsByCreatorNotifier.new,
     );
 
-final projectByIdProvider = FutureProvider.family<ProjectSchema?, String>((
-  ref,
-  projectId,
-) async {
+/// autoDispose avoids unbounded cache growth when navigating between projects.
+final projectByIdProvider =
+    FutureProvider.autoDispose.family<ProjectSchema?, String>((ref, projectId) async {
   final service = ref.watch(projectsServiceProvider);
   return service.getProject(projectId);
 });
