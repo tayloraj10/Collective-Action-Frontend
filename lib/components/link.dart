@@ -4,6 +4,7 @@ class LinkText extends StatefulWidget {
   final String text;
   final double fontSize;
   final Color color;
+
   /// Null = no limit; set to 2 e.g. to cap at 2 lines with ellipsis.
   final int? maxLines;
   final FontWeight fontWeight;
