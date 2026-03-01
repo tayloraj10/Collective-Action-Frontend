@@ -11,8 +11,11 @@ class InitiativeSubmissionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.add),
-      padding: EdgeInsets.zero,
-      // constraints: BoxConstraints(),
+      style: IconButton.styleFrom(
+        padding: EdgeInsets.zero,
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
       tooltip: 'Add Submission',
       onPressed: () {
         scheduleAfterTap(context, () {

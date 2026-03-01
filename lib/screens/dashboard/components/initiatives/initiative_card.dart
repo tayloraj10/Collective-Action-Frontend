@@ -70,8 +70,11 @@ class InitiativeCard extends ConsumerWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final hasBoundedHeight = constraints.maxHeight.isFinite;
-          // Reserve enough space for progress bar + top padding + bottom padding + visual gap
-          final progressBarGap = isMobile ? 14.0 : 18.0;
+          // Tighter spacing on dashboard (no "by" row) to reduce unused space.
+          final compact = !showCreatedBy;
+          final progressBarGap = compact
+              ? (isMobile ? 12.0 : 8.0)
+              : (isMobile ? 14.0 : 18.0);
           final reserveHeight =
               progressBarGap + progressHeight + containerPadding;
 
@@ -100,49 +103,41 @@ class InitiativeCard extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(height: isMobile ? 4 : 6),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(text: initiative.title, style: titleStyle),
-                          if (showCreatedBy) ...[
-                            WidgetSpan(
-                              alignment: PlaceholderAlignment.middle,
-                              child: SizedBox(width: 6),
-                            ),
-                            WidgetSpan(
-                              alignment: PlaceholderAlignment.middle,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text('by', style: byStyle),
-                                  SizedBox(width: 4),
-                                  _InitiativeCreatorAvatar(
-                                    createdBy: initiative.createdBy,
-                                    isMobile: isMobile,
-                                    showCreatedBy: showCreatedBy,
-                                  ),
-                                ],
-                              ),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(text: initiative.title, style: titleStyle),
+                    if (showCreatedBy) ...[
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.middle,
+                        child: SizedBox(width: 6),
+                      ),
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.middle,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text('by', style: byStyle),
+                            SizedBox(width: 4),
+                            _InitiativeCreatorAvatar(
+                              createdBy: initiative.createdBy,
+                              isMobile: isMobile,
+                              showCreatedBy: showCreatedBy,
                             ),
                           ],
-                        ],
+                        ),
                       ),
-                      maxLines: null,
-                      overflow: TextOverflow.visible,
-                    ),
-                  ),
-                  InitiativeSubmissionButton(initiative: initiative),
-                ],
+                    ],
+                  ],
+                ),
+                maxLines: null,
+                overflow: TextOverflow.visible,
               ),
-              // Link row (tiny gap above for tight layouts).
+              // Link row with clear separation from title.
               if (initiative.link != null && initiative.link!.isNotEmpty)
                 Padding(
-                  padding: EdgeInsets.only(top: isMobile ? 3 : 4),
+                  padding: EdgeInsets.only(top: isMobile ? 10.0 : 12.0),
                   child: GestureDetector(
                     onTap: () async {
                       final url = initiative.link!;
@@ -169,11 +164,12 @@ class InitiativeCard extends ConsumerWidget {
           // Extra top padding on progress bar for clear separation from link.
           final progressBarTop = progressBarGap;
 
-          // Content keeps same insets; progress bar full width on mobile (no horizontal padding).
+          // Reserve right side for the plus button so title never overlaps it.
+          const double _plusButtonReserve = 44.0;
           final contentPadding = EdgeInsets.fromLTRB(
             containerPadding,
             containerPaddingTop,
-            containerPadding,
+            containerPadding + _plusButtonReserve,
             0,
           );
           final progressBarPadding = isMobile
@@ -186,9 +182,10 @@ class InitiativeCard extends ConsumerWidget {
                 );
 
           // When parent gives fixed height: scroll only when content overflows.
-          final scrollContent = contentAboveProgress(
-            bottomPad: isMobile ? 8 : 10,
-          );
+          final bottomPad = compact
+              ? (isMobile ? 4.0 : 6.0)
+              : (isMobile ? 8.0 : 10.0);
+          final scrollContent = contentAboveProgress(bottomPad: bottomPad);
           final fullContent = contentAboveProgress(bottomPad: reserveHeight);
 
           return Stack(
@@ -200,22 +197,61 @@ class InitiativeCard extends ConsumerWidget {
                   right: 0,
                   top: 0,
                   bottom: progressHeight,
-                  child: Padding(
-                    padding: contentPadding,
-                    child: ScrollConfiguration(
-                      behavior: ScrollConfiguration.of(
-                        context,
-                      ).copyWith(scrollbars: false),
-                      child: SingleChildScrollView(
-                        clipBehavior: Clip.hardEdge,
-                        physics: const ClampingScrollPhysics(),
-                        child: scrollContent,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Padding(
+                        padding: contentPadding,
+                        child: ScrollConfiguration(
+                          behavior: ScrollConfiguration.of(
+                            context,
+                          ).copyWith(scrollbars: false),
+                          child: SingleChildScrollView(
+                            clipBehavior: Clip.hardEdge,
+                            physics: const ClampingScrollPhysics(),
+                            child: scrollContent,
+                          ),
+                        ),
                       ),
-                    ),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            top: isMobile ? 6.0 : 8.0,
+                            right: isMobile ? 6.0 : 8.0,
+                          ),
+                          child: InitiativeSubmissionButton(
+                            initiative: initiative,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ] else
-                Padding(padding: contentPadding, child: fullContent),
+                SizedBox(
+                  width: constraints.maxWidth,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Padding(padding: contentPadding, child: fullContent),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            top: isMobile ? 6.0 : 8.0,
+                            right: isMobile ? 6.0 : 8.0,
+                          ),
+                          child: InitiativeSubmissionButton(
+                            initiative: initiative,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
               // Pinned bottom progress bar (full width on mobile).
               Positioned(
