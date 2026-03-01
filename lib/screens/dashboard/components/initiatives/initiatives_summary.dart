@@ -2,10 +2,14 @@
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/initiatives/initiative_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/providers/initiative_provider.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
+
+/// On mobile web we delay watching the provider to stagger dashboard load.
+const Duration _kMobileWebInitiativesDelay = Duration(milliseconds: 80);
 
 class InitiativesSummary extends ConsumerStatefulWidget {
   final IconData icon;
@@ -22,6 +26,24 @@ class InitiativesSummary extends ConsumerStatefulWidget {
 
 class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
   final ScrollController _scrollController = ScrollController();
+  bool _canLoadData = true;
+  bool _didScheduleDelay = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_didScheduleDelay) return;
+    if (kIsWeb && AppConstants.isMobile(context)) {
+      _didScheduleDelay = true;
+      _canLoadData = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Future.delayed(_kMobileWebInitiativesDelay, () {
+          if (mounted) setState(() => _canLoadData = true);
+        });
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -29,11 +51,73 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
     super.dispose();
   }
 
+  Widget _buildPlaceholder(BuildContext context, bool isMobile) {
+    final cardPaddingHeight = isMobile ? 4.0 : 6.0;
+    final cardPaddingWidth = isMobile ? 6.0 : 10.0;
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: cardPaddingWidth,
+          vertical: cardPaddingHeight,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => safeGo(context, '/initiatives'),
+                  child: Container(
+                    padding: EdgeInsets.all(isMobile ? 10 : 12),
+                    decoration: BoxDecoration(
+                      color: widget.color.withAlpha(26),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      widget.icon,
+                      color: widget.color,
+                      size: isMobile ? 20 : 28,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Initiatives',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            const Expanded(
+              child: Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isMobile = AppConstants.isMobile(context);
+        if (!_canLoadData) {
+          return _buildPlaceholder(context, isMobile);
+        }
         final double cardPaddingHeight = isMobile ? 4 : 6;
         final double cardPaddingWidth = isMobile ? 6 : 10;
         final double containerPadding = isMobile ? 8 : 14;
