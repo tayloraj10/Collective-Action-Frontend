@@ -182,8 +182,9 @@ class PaneLayout extends StatefulWidget {
 }
 
 class _PaneLayoutState extends State<PaneLayout> {
-  /// On mobile we defer building the second row to spread load.
-  static const Duration _kMobileSecondRowDelay = Duration(milliseconds: 120);
+  /// On mobile we defer building the second row so first row can load first.
+  /// Slower delay improves stability on mobile Chrome (less concurrent load).
+  static const Duration _kMobileSecondRowDelay = Duration(milliseconds: 280);
 
   bool _showSecondRow = true;
   bool _didScheduleDefer = false;

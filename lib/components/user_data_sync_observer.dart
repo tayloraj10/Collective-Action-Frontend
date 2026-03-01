@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/services/user_service.dart';
@@ -62,8 +64,17 @@ class _UserDataSyncObserverState extends ConsumerState<UserDataSyncObserver> {
           },
         );
       } else {
-        // User is logged out - clear user data
-        if (mounted) ref.read(currentUserProvider.notifier).clearUser();
+        // User is logged out - clear user data. On mobile web defer slightly so
+        // we don't trigger a big rebuild cascade during initial load (e.g. incognito).
+        if (mounted) {
+          if (kIsWeb && AppConstants.isMobile(context)) {
+            Future.delayed(const Duration(milliseconds: 100), () {
+              if (mounted) ref.read(currentUserProvider.notifier).clearUser();
+            });
+          } else {
+            ref.read(currentUserProvider.notifier).clearUser();
+          }
+        }
       }
     }
   }

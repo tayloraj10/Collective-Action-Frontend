@@ -19,9 +19,8 @@ final directoryOfGoodEntriesByUserProvider =
   DirectoryOfGoodEntriesByUserNotifier.new,
 );
 
-/// autoDispose limits cache when leaving social/directory screens.
 final directoryOfGoodEntryByIdProvider =
-    FutureProvider.autoDispose.family<DirectoryOfGoodSchema?, String>(
+    FutureProvider.family<DirectoryOfGoodSchema?, String>(
   (ref, entryId) async {
     final service = ref.watch(directoryOfGoodServiceProvider);
     return service.getEntry(entryId);
@@ -29,7 +28,7 @@ final directoryOfGoodEntryByIdProvider =
 );
 
 final directoryOfGoodEntriesByIdsProvider =
-    FutureProvider.autoDispose.family<Map<String, DirectoryOfGoodSchema>, List<String>>(
+    FutureProvider.family<Map<String, DirectoryOfGoodSchema>, List<String>>(
   (ref, ids) async {
     final service = ref.watch(directoryOfGoodServiceProvider);
     return service.getEntriesByIds(ids);
