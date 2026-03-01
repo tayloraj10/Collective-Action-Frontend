@@ -294,6 +294,7 @@ class _InitiativeListScreenState extends ConsumerState<InitiativeListScreen> {
                     ConstrainedBox(
                       constraints: BoxConstraints(
                         minHeight: itemMinHeight,
+                        minWidth: width,
                         maxWidth: width,
                       ),
                       child: InitiativeCard(

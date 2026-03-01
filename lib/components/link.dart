@@ -4,7 +4,6 @@ class LinkText extends StatefulWidget {
   final String text;
   final double fontSize;
   final Color color;
-  final int maxLines;
   final FontWeight fontWeight;
   final void Function()? onTap;
 
@@ -13,7 +12,6 @@ class LinkText extends StatefulWidget {
     required this.text,
     required this.fontSize,
     required this.color,
-    this.maxLines = 2,
     this.fontWeight = FontWeight.w500,
     this.onTap,
   });
@@ -35,9 +33,8 @@ class _LinkTextState extends State<LinkText> {
             color: widget.color,
             fontSize: widget.fontSize,
             fontWeight: widget.fontWeight,
-            overflow: TextOverflow.ellipsis,
+            overflow: TextOverflow.visible,
           ),
-          maxLines: widget.maxLines,
         ),
       ),
     );
