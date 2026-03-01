@@ -15,13 +15,13 @@ import 'firebase_options.dart';
 import 'providers/theme_provider.dart';
 import 'services/health_service.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Catch unhandled async errors so they don't kill the isolate (avoids tab
-  // crash and forced refresh on mobile browsers). Log and continue.
-  runZonedGuarded(() async {
-    await _initAndRun();
+void main() {
+  // Run bindings and runApp in the same zone so Flutter does not throw a zone
+  // mismatch. Catch unhandled async errors so they don't kill the isolate
+  // (avoids tab crash and forced refresh on mobile browsers).
+  runZonedGuarded(() {
+    WidgetsFlutterBinding.ensureInitialized();
+    _initAndRun();
   }, (Object error, StackTrace stackTrace) {
     log('Unhandled async error', error: error, stackTrace: stackTrace);
   });
