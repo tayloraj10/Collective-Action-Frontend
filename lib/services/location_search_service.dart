@@ -28,13 +28,24 @@ class LocationSearchService {
   LocationSearchService({http.Client? client}) : _client = client ?? http.Client();
 
   final http.Client _client;
+  bool _closed = false;
+
+  /// Closes the underlying HTTP client and releases connections. Call when
+  /// the service is no longer needed (e.g. from State.dispose). Idempotent.
+  void close() {
+    if (_closed) return;
+    _closed = true;
+    _client.close();
+  }
 
   static const _baseUrl = 'https://nominatim.openstreetmap.org';
   static const _limit = 8;
 
   /// Search for places by query (e.g. city name or "City, Country").
   /// Returns suggestions with [displayName], [city], [state], [country].
+  /// Do not call after [close].
   Future<List<LocationSuggestion>> search(String query) async {
+    if (_closed) return [];
     final trimmed = query.trim();
     if (trimmed.isEmpty) return [];
 

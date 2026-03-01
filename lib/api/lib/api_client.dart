@@ -66,6 +66,7 @@ class ApiClient {
         final request = StreamedRequest(method, uri);
         request.headers.addAll(headerParams);
         request.contentLength = body.length;
+        // Subscription is tied to request lifecycle; stream completes when send() returns.
         body.finalize().listen(
           request.sink.add,
           onDone: request.sink.close,

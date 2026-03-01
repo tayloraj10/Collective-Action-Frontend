@@ -153,6 +153,7 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
     _stateController.dispose();
     _countryController.dispose();
     _dirtyFields.dispose();
+    _locationSearchService.close();
     super.dispose();
   }
 
