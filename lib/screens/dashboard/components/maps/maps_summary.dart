@@ -3,11 +3,16 @@ import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
 import 'package:collective_action_frontend/screens/maps/map_styles.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+/// On web, delay building the map by this much so the rest of the dashboard
+/// can paint first (reduces mobile Chrome reloads when navigating back to home).
+const Duration _kDeferMapBuildOnWeb = Duration(milliseconds: 280);
 
 /// Dashboard Maps pane: Google Maps heatmap of recent Map Submission actions.
 class MapsSummary extends ConsumerStatefulWidget {
@@ -28,6 +33,22 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
 
   /// User preference for map style only (independent of app theme).
   bool _mapDarkMode = false;
+
+  /// On web we defer building the map so the dashboard can paint first.
+  bool _showMap = !kIsWeb;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_showMap) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Future.delayed(_kDeferMapBuildOnWeb, () {
+          if (mounted) setState(() => _showMap = true);
+        });
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -236,6 +257,31 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                   ),
                   data: (actions) {
                     final submissions = _mapSubmissionsWithLocation(actions);
+                    if (!_showMap) {
+                      // Placeholder while map build is deferred (web / mobile Chrome).
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Expanded(
+                            child: Center(
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: SummaryCount(
+                              count: submissions.length,
+                              title: 'recent map submissions',
+                            ),
+                          ),
+                        ],
+                      );
+                    }
                     final heatmaps = _buildHeatmaps(submissions);
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

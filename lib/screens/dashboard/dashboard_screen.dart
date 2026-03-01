@@ -171,11 +171,44 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 }
 
-class PaneLayout extends StatelessWidget {
+/// Builds the 4-pane dashboard. On mobile, the second row (Maps, Social) is
+/// built after a short delay so the first row can paint first and reduce
+/// peak load when navigating back to home (mobile Chrome).
+class PaneLayout extends StatefulWidget {
   const PaneLayout({super.key});
 
   @override
+  State<PaneLayout> createState() => _PaneLayoutState();
+}
+
+class _PaneLayoutState extends State<PaneLayout> {
+  /// On mobile we defer building the second row to spread load.
+  static const Duration _kMobileSecondRowDelay = Duration(milliseconds: 120);
+
+  bool _showSecondRow = true;
+  bool _didScheduleDefer = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Cannot use MediaQuery/context in initState; defer decision until here.
+    if (_didScheduleDefer) return;
+    _didScheduleDefer = true;
+    if (AppConstants.isMobile(context)) {
+      _showSecondRow = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Future.delayed(_kMobileSecondRowDelay, () {
+          if (mounted) setState(() => _showSecondRow = true);
+        });
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isMobile = AppConstants.isMobile(context);
+
     return Column(
       children: [
         Expanded(
@@ -201,25 +234,53 @@ class PaneLayout extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Expanded(
-          child: Row(
-            children: const [
-              Expanded(
-                child: SummaryPane(
-                  title: 'Maps',
-                  icon: Icons.map_outlined,
-                  color: AppColors.successGreen,
-                ),
-              ),
-              SizedBox(width: 6),
-              Expanded(
-                child: SummaryPane(
-                  title: 'Social',
-                  icon: Icons.people_outline,
-                  color: AppColors.warningOrange,
-                ),
-              ),
-            ],
-          ),
+          child: _showSecondRow
+              ? Row(
+                  children: const [
+                    Expanded(
+                      child: SummaryPane(
+                        title: 'Maps',
+                        icon: Icons.map_outlined,
+                        color: AppColors.successGreen,
+                      ),
+                    ),
+                    SizedBox(width: 6),
+                    Expanded(
+                      child: SummaryPane(
+                        title: 'Social',
+                        icon: Icons.people_outline,
+                        color: AppColors.warningOrange,
+                      ),
+                    ),
+                  ],
+                )
+              : (isMobile
+                  ? const Center(
+                      child: SizedBox(
+                        width: 28,
+                        height: 28,
+                        child: CircularProgressIndicator(strokeWidth: 2.5),
+                      ),
+                    )
+                  : Row(
+                      children: const [
+                        Expanded(
+                          child: SummaryPane(
+                            title: 'Maps',
+                            icon: Icons.map_outlined,
+                            color: AppColors.successGreen,
+                          ),
+                        ),
+                        SizedBox(width: 6),
+                        Expanded(
+                          child: SummaryPane(
+                            title: 'Social',
+                            icon: Icons.people_outline,
+                            color: AppColors.warningOrange,
+                          ),
+                        ),
+                      ],
+                    )),
         ),
       ],
     );
