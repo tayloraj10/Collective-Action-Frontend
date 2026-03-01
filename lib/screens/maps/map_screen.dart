@@ -38,7 +38,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   @override
   void dispose() {
-    _controller?.dispose();
+    // Do not call _controller.dispose() here. The GoogleMap widget owns the
+    // controller; on web, disposing before buildView completes causes an assertion.
+    _controller = null;
     _campaignDrawerScrollController.dispose();
     super.dispose();
   }

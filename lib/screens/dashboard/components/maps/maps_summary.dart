@@ -31,7 +31,8 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
 
   @override
   void dispose() {
-    _mapController?.dispose();
+    // Do not call _mapController.dispose() here. The GoogleMap widget owns the
+    // controller; on web, disposing before buildView completes causes an assertion.
     _mapController = null;
     super.dispose();
   }
