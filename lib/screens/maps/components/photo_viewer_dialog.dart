@@ -66,33 +66,50 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
     super.dispose();
   }
 
+  /// Delay on mobile web so the tap finishes and image work can settle before
+  /// we pop (reduces crashes when closing from dashboard on mobile Chrome).
+  static const Duration _kMobileWebCloseDelay = Duration(milliseconds: 280);
+
   void _close() {
-    // Prevent multiple taps from scheduling multiple pops (crashes on mobile Chrome).
+    if (!mounted) return;
     if (_isClosing) return;
     _isClosing = true;
 
-    // Capture navigator and set provider synchronously—do not use context in the
-    // delayed callback to avoid using disposed context or triggering rebuilds
-    // during route removal. Also avoids races with image disposal on web.
-    final navigator = Navigator.of(context);
+    // Capture navigator (and optionally container) synchronously. Do not use
+    // context in the delayed callback. Defer setClosed() until after pop so we
+    // don't trigger rebuilds while the dialog is still in the tree.
+    NavigatorState? navigator;
+    ProviderContainer? container;
     try {
-      final container = ProviderScope.containerOf(context);
-      container.read(photoViewerClosedAtProvider.notifier).setClosed();
-    } catch (_) {}
+      navigator = Navigator.of(context);
+      container = ProviderScope.containerOf(context);
+    } catch (_) {
+      // Context invalid; cannot pop safely.
+      return;
+    }
 
-    // On mobile web use a longer delay so (1) the tap is fully done and (2) any
-    // in-flight image decode/network work can settle before we dispose the route.
     final isMobileWeb = kIsWeb && AppConstants.isMobile(context);
-    final delay = isMobileWeb ? const Duration(milliseconds: 200) : null;
+    final delay = isMobileWeb ? _kMobileWebCloseDelay : null;
+
+    void doPop() {
+      final nav = navigator;
+      if (nav == null || !nav.mounted) return;
+      nav.pop();
+      // Notify after route is removed so we don't rebuild during pop.
+      final c = container;
+      if (c != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          try {
+            c.read(photoViewerClosedAtProvider.notifier).setClosed();
+          } catch (_) {}
+        });
+      }
+    }
 
     if (delay != null) {
-      Future.delayed(delay, () {
-        if (navigator.mounted) navigator.pop();
-      });
+      Future.delayed(delay, doPop);
     } else {
-      Future.microtask(() {
-        if (navigator.mounted) navigator.pop();
-      });
+      Future.microtask(doPop);
     }
   }
 
@@ -219,7 +236,7 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
                           controller: _pageController,
                           itemCount: widget.urls.length,
                           onPageChanged: (i) {
-                            if (mounted) setState(() => _currentIndex = i);
+                            if (mounted && !_isClosing) setState(() => _currentIndex = i);
                           },
                           itemBuilder: (context, index) {
                             return InteractiveViewer(
