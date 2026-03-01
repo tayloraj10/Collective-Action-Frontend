@@ -13,6 +13,7 @@ class InitiativeCard extends ConsumerWidget {
   final InitiativeSchema initiative;
   final Color cardColor;
   final bool isMobile;
+  final bool showCreatedBy;
   final double titleFontSize;
   final double descFontSize;
   final double progressHeight;
@@ -25,6 +26,7 @@ class InitiativeCard extends ConsumerWidget {
     required this.initiative,
     required this.cardColor,
     required this.isMobile,
+    this.showCreatedBy = true,
     required this.titleFontSize,
     required this.descFontSize,
     required this.progressHeight,
@@ -70,11 +72,10 @@ class InitiativeCard extends ConsumerWidget {
           final hasBoundedHeight = constraints.maxHeight.isFinite;
           // Reserve enough space for progress bar + top padding + bottom padding + visual gap
           final progressBarGap = isMobile ? 14.0 : 18.0;
-          final reserveHeight = progressBarGap +
-              progressHeight +
-              containerPadding;
+          final reserveHeight =
+              progressBarGap + progressHeight + containerPadding;
 
-          // Title and "by" + avatar as one inline flow so "by" is always at title end.
+          // Title and optionally "by" + avatar as one inline flow so "by" is always at title end.
           final titleStyle = TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w700,
@@ -82,10 +83,14 @@ class InitiativeCard extends ConsumerWidget {
             letterSpacing: 0.1,
             height: 1.0,
           );
+          // When showing created-by, use larger text on full initiatives page (showCreatedBy implies more space).
+          final byFontSize = showCreatedBy
+              ? titleFontSize * 0.82
+              : titleFontSize * 0.65;
           final byStyle = TextStyle(
             color: Colors.white.withAlpha(200),
             fontWeight: FontWeight.w500,
-            fontSize: titleFontSize * 0.65,
+            fontSize: byFontSize,
             letterSpacing: 0.1,
           );
 
@@ -103,22 +108,28 @@ class InitiativeCard extends ConsumerWidget {
                       TextSpan(
                         children: [
                           TextSpan(text: initiative.title, style: titleStyle),
-                          WidgetSpan(
-                            alignment: PlaceholderAlignment.middle,
-                            child: SizedBox(width: 6),
-                          ),
-                          TextSpan(text: 'by', style: byStyle),
-                          WidgetSpan(
-                            alignment: PlaceholderAlignment.middle,
-                            child: SizedBox(width: 3),
-                          ),
-                          WidgetSpan(
-                            alignment: PlaceholderAlignment.middle,
-                            child: _InitiativeCreatorAvatar(
-                              createdBy: initiative.createdBy,
-                              isMobile: isMobile,
+                          if (showCreatedBy) ...[
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: SizedBox(width: 6),
                             ),
-                          ),
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text('by', style: byStyle),
+                                  SizedBox(width: 4),
+                                  _InitiativeCreatorAvatar(
+                                    createdBy: initiative.createdBy,
+                                    isMobile: isMobile,
+                                    showCreatedBy: showCreatedBy,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                       maxLines: null,
@@ -244,17 +255,22 @@ class InitiativeCard extends ConsumerWidget {
 class _InitiativeCreatorAvatar extends ConsumerWidget {
   final String createdBy;
   final bool isMobile;
+  final bool showCreatedBy;
 
   const _InitiativeCreatorAvatar({
     required this.createdBy,
     required this.isMobile,
+    this.showCreatedBy = true,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userAsync = ref.watch(userProvider(createdBy));
     final mutedColor = Colors.white.withAlpha(200);
-    final radius = isMobile ? 6.0 : 8.0;
+    // Larger avatar when shown on full initiatives page (showCreatedBy = more space).
+    final radius = showCreatedBy
+        ? (isMobile ? 10.0 : 12.0)
+        : (isMobile ? 6.0 : 8.0);
 
     return userAsync.when(
       loading: () => Tooltip(
