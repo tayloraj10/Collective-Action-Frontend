@@ -30,7 +30,7 @@ class AppConstants {
     }
   }
 
-  static const String discordLink = 'https://discord.gg/NqGXmvqCNx';
+  static const String discordLink = 'https://discord.gg/QRcvXNgGfm';
 
   // Breakpoints
   static const double mobileBreakpoint = 600;
@@ -117,9 +117,7 @@ class AppConstants {
   static void preloadAudioForWeb() {
     if (!kIsWeb || _webUnlockPlayer != null) return;
     _webUnlockPlayer = AudioPlayer();
-    _webUnlockPlayer!
-        .setAsset(successSoundPaths.first)
-        .catchError((_) => null);
+    _webUnlockPlayer!.setAsset(successSoundPaths.first).catchError((_) => null);
   }
 
   /// Call from a user gesture handler on web so later sounds can play. Muted so user hears nothing.
