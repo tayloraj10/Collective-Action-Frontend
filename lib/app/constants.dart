@@ -30,7 +30,7 @@ class AppConstants {
     }
   }
 
-  static const String discordLink = 'https://discord.gg/QRcvXNgGfm';
+  static const String discordLink = 'https://discord.gg/TupVgmuhCA';
 
   // Breakpoints
   static const double mobileBreakpoint = 600;
