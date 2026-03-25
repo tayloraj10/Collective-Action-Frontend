@@ -1,14 +1,9 @@
 import 'dart:async';
 
-import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
-import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
-import 'package:collective_action_frontend/providers/directory_of_good_provider.dart';
-import 'package:collective_action_frontend/providers/initiative_provider.dart';
-import 'package:collective_action_frontend/providers/project_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/services/user_service.dart';
 import 'package:collective_action_frontend/services/health_service.dart';
@@ -27,12 +22,8 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
-  static const Duration _kWarmupMinDisplay = Duration(seconds: 2);
-  static const Duration _kWarmupMaxWait = Duration(seconds: 10);
-
-  static bool _didRunDashboardWarmupThisSession = false;
+  static const Duration _kWarmupDisplayDelay = Duration(milliseconds: 900);
   bool _showWarmupOverlay = false;
-  bool _warmupMinTimeElapsed = true;
   bool _healthCheckResponded = true;
 
   @override
@@ -69,15 +60,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   void _startDashboardWarmup() {
-    if (_didRunDashboardWarmupThisSession) return;
-    _didRunDashboardWarmupThisSession = true;
-    _showWarmupOverlay = true;
-    _warmupMinTimeElapsed = false;
     _healthCheckResponded = false;
 
-    Future.delayed(_kWarmupMinDisplay, () {
-      if (!mounted) return;
-      setState(() => _warmupMinTimeElapsed = true);
+    // Only show overlay if backend warmup is actually slow.
+    Future.delayed(_kWarmupDisplayDelay, () {
+      if (!mounted || _healthCheckResponded || _showWarmupOverlay) return;
+      setState(() {
+        _showWarmupOverlay = true;
+      });
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -88,24 +78,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   Future<void> _runWarmupHealthCheck() async {
     try {
-      await HealthService().fetchHealth().timeout(_kWarmupMaxWait);
+      final response = await HealthService.ensureStartupHealthCheck();
+      final hasData = (response ?? '').trim().isNotEmpty;
+      if (!mounted) return;
+      setState(() {
+        _healthCheckResponded = true;
+        // Hide immediately once health endpoint returns data.
+        _showWarmupOverlay = hasData ? false : _showWarmupOverlay;
+      });
     } catch (_) {
       // Continue even if the check fails or times out.
-    } finally {
       if (!mounted) return;
-      setState(() => _healthCheckResponded = true);
+      setState(() {
+        _healthCheckResponded = true;
+        _showWarmupOverlay = false;
+      });
     }
-  }
-
-  void _tryHideWarmupOverlay({required bool allPanelsSettled}) {
-    if (!_showWarmupOverlay) return;
-    if (!_warmupMinTimeElapsed || !_healthCheckResponded || !allPanelsSettled) {
-      return;
-    }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || !_showWarmupOverlay) return;
-      setState(() => _showWarmupOverlay = false);
-    });
   }
 
   @override
@@ -114,53 +102,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       _syncUserFromAuth();
     });
     final isMobile = AppConstants.isMobile(context);
-    final initiativesAsync = ref.watch(featuredInitiativeProvider);
-    final projectsAsync = ref.watch(activeProjectsProvider);
-    final actionsAsync = ref.watch(activeActionProvider);
-
-    final actions = actionsAsync.maybeWhen(
-      data: (value) => value,
-      orElse: () => const <ActionSchema>[],
-    );
-    final initiativeLinkedIds =
-        actions
-            .where(
-              (a) =>
-                  a.actionType == ActionTypeValuesEnum.initiative.value &&
-                  a.linkedId != null &&
-                  a.linkedId!.isNotEmpty,
-            )
-            .map((a) => a.linkedId!)
-            .toSet()
-            .toList()
-          ..sort();
-    final directoryLinkedIds =
-        actions
-            .where(
-              (a) =>
-                  a.actionType ==
-                      ActionTypeValuesEnum.directoryOfGoodAddition.value &&
-                  a.linkedId != null &&
-                  a.linkedId!.isNotEmpty,
-            )
-            .map((a) => a.linkedId!)
-            .toSet()
-            .toList()
-          ..sort();
-    final initiativesByIdsAsync = initiativeLinkedIds.isEmpty
-        ? const AsyncValue.data(<String, InitiativeSchema>{})
-        : ref.watch(initiativesByIdsProvider(initiativeLinkedIds));
-    final directoryByIdsAsync = directoryLinkedIds.isEmpty
-        ? const AsyncValue.data(<String, DirectoryOfGoodSchema>{})
-        : ref.watch(directoryOfGoodEntriesByIdsProvider(directoryLinkedIds));
-
-    final allPanelsSettled =
-        !initiativesAsync.isLoading &&
-        !projectsAsync.isLoading &&
-        !actionsAsync.isLoading &&
-        !initiativesByIdsAsync.isLoading &&
-        !directoryByIdsAsync.isLoading;
-    _tryHideWarmupOverlay(allPanelsSettled: allPanelsSettled);
 
     return Scaffold(
       appBar: const CustomAppBar(),

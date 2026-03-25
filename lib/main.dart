@@ -47,7 +47,7 @@ Future<void> _initAndRun() async {
   };
 
   // Call backend health check to spin up backend on app start
-  HealthService().fetchHealth().then((value) {
+  HealthService.ensureStartupHealthCheck().then((value) {
     log('Health check result:');
     log(value?.toString() ?? 'null');
   });
