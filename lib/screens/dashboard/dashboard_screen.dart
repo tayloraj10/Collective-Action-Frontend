@@ -1,9 +1,17 @@
+import 'dart:async';
+
+import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
+import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
+import 'package:collective_action_frontend/providers/directory_of_good_provider.dart';
+import 'package:collective_action_frontend/providers/initiative_provider.dart';
+import 'package:collective_action_frontend/providers/project_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/services/user_service.dart';
+import 'package:collective_action_frontend/services/health_service.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/navigation_button.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_pane.dart';
@@ -19,9 +27,18 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  static const Duration _kWarmupMinDisplay = Duration(seconds: 2);
+  static const Duration _kWarmupMaxWait = Duration(seconds: 10);
+
+  static bool _didRunDashboardWarmupThisSession = false;
+  bool _showWarmupOverlay = false;
+  bool _warmupMinTimeElapsed = true;
+  bool _healthCheckResponded = true;
+
   @override
   void initState() {
     super.initState();
+    _startDashboardWarmup();
     // Sync user from auth after first frame (ref.read only in callbacks, not in build).
     // On mobile web, defer a bit longer so route transition can finish and avoid
     // ref-after-dispose / overload during navigation (e.g. Home button).
@@ -41,9 +58,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     if (!mounted) return;
     final authUser = ref.read(authStateProvider).value;
     if (authUser != null) {
-      UserService()
-          .fetchUserByFirebaseID(userId: authUser.uid)
-          .then((appUser) {
+      UserService().fetchUserByFirebaseID(userId: authUser.uid).then((appUser) {
         if (mounted && appUser != null) {
           ref.read(currentUserProvider.notifier).setUser(appUser);
         }
@@ -53,120 +68,358 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     }
   }
 
+  void _startDashboardWarmup() {
+    if (_didRunDashboardWarmupThisSession) return;
+    _didRunDashboardWarmupThisSession = true;
+    _showWarmupOverlay = true;
+    _warmupMinTimeElapsed = false;
+    _healthCheckResponded = false;
+
+    Future.delayed(_kWarmupMinDisplay, () {
+      if (!mounted) return;
+      setState(() => _warmupMinTimeElapsed = true);
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _runWarmupHealthCheck();
+    });
+  }
+
+  Future<void> _runWarmupHealthCheck() async {
+    try {
+      await HealthService().fetchHealth().timeout(_kWarmupMaxWait);
+    } catch (_) {
+      // Continue even if the check fails or times out.
+    } finally {
+      if (!mounted) return;
+      setState(() => _healthCheckResponded = true);
+    }
+  }
+
+  void _tryHideWarmupOverlay({required bool allPanelsSettled}) {
+    if (!_showWarmupOverlay) return;
+    if (!_warmupMinTimeElapsed || !_healthCheckResponded || !allPanelsSettled) {
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_showWarmupOverlay) return;
+      setState(() => _showWarmupOverlay = false);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.listen(authStateProvider, (_, _) {
       _syncUserFromAuth();
     });
     final isMobile = AppConstants.isMobile(context);
+    final initiativesAsync = ref.watch(featuredInitiativeProvider);
+    final projectsAsync = ref.watch(activeProjectsProvider);
+    final actionsAsync = ref.watch(activeActionProvider);
+
+    final actions = actionsAsync.maybeWhen(
+      data: (value) => value,
+      orElse: () => const <ActionSchema>[],
+    );
+    final initiativeLinkedIds =
+        actions
+            .where(
+              (a) =>
+                  a.actionType == ActionTypeValuesEnum.initiative.value &&
+                  a.linkedId != null &&
+                  a.linkedId!.isNotEmpty,
+            )
+            .map((a) => a.linkedId!)
+            .toSet()
+            .toList()
+          ..sort();
+    final directoryLinkedIds =
+        actions
+            .where(
+              (a) =>
+                  a.actionType ==
+                      ActionTypeValuesEnum.directoryOfGoodAddition.value &&
+                  a.linkedId != null &&
+                  a.linkedId!.isNotEmpty,
+            )
+            .map((a) => a.linkedId!)
+            .toSet()
+            .toList()
+          ..sort();
+    final initiativesByIdsAsync = initiativeLinkedIds.isEmpty
+        ? const AsyncValue.data(<String, InitiativeSchema>{})
+        : ref.watch(initiativesByIdsProvider(initiativeLinkedIds));
+    final directoryByIdsAsync = directoryLinkedIds.isEmpty
+        ? const AsyncValue.data(<String, DirectoryOfGoodSchema>{})
+        : ref.watch(directoryOfGoodEntriesByIdsProvider(directoryLinkedIds));
+
+    final allPanelsSettled =
+        !initiativesAsync.isLoading &&
+        !projectsAsync.isLoading &&
+        !actionsAsync.isLoading &&
+        !initiativesByIdsAsync.isLoading &&
+        !directoryByIdsAsync.isLoading;
+    _tryHideWarmupOverlay(allPanelsSettled: allPanelsSettled);
 
     return Scaffold(
       appBar: const CustomAppBar(),
-      body: Column(
+      body: Stack(
         children: [
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 8 : 16,
-              vertical: isMobile ? 0 : 12,
-            ),
-            child: isMobile
-                ? null
-                //  Row(
-                //     children: [
-                //       Expanded(
-                //         child: NavigationButton(
-                //           icon: Icons.trending_up,
-                //           label: 'Initiatives',
-                //           color: AppColors.lightBlue,
-                //           onTap: () {
-                //             context.go('/initiatives');
-                //           },
-                //           small: true,
-                //         ),
-                //       ),
-                //       SizedBox(width: 4),
-                //       Expanded(
-                //         child: NavigationButton(
-                //           icon: Icons.assignment_outlined,
-                //           label: 'Projects',
-                //           color: AppColors.errorRed,
-                //           onTap: () {
-                //             context.go('/projects');
-                //           },
-                //           small: true,
-                //         ),
-                //       ),
-                //       SizedBox(width: 4),
-                //       Expanded(
-                //         child: NavigationButton(
-                //           icon: Icons.map_outlined,
-                //           label: 'Maps',
-                //           color: AppColors.successGreen,
-                //           onTap: () {
-                //             context.go('/maps');
-                //           },
-                //           small: true,
-                //         ),
-                //       ),
-                //       SizedBox(width: 4),
-                //       Expanded(
-                //         child: NavigationButton(
-                //           icon: Icons.people_outline,
-                //           label: 'Social',
-                //           color: AppColors.warningOrange,
-                //           onTap: () {
-                //             context.go('/social');
-                //           },
-                //           small: true,
-                //         ),
-                //       ),
-                //     ],
-                //   )
-                : SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        NavigationButton(
-                          icon: Icons.trending_up,
-                          label: 'Initiatives',
-                          color: AppColors.lightBlue,
-                          onTap: () => safeGo(context, '/initiatives'),
+          Column(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 8 : 16,
+                  vertical: isMobile ? 0 : 12,
+                ),
+                child: isMobile
+                    ? null
+                    //  Row(
+                    //     children: [
+                    //       Expanded(
+                    //         child: NavigationButton(
+                    //           icon: Icons.trending_up,
+                    //           label: 'Initiatives',
+                    //           color: AppColors.lightBlue,
+                    //           onTap: () {
+                    //             context.go('/initiatives');
+                    //           },
+                    //           small: true,
+                    //         ),
+                    //       ),
+                    //       SizedBox(width: 4),
+                    //       Expanded(
+                    //         child: NavigationButton(
+                    //           icon: Icons.assignment_outlined,
+                    //           label: 'Projects',
+                    //           color: AppColors.errorRed,
+                    //           onTap: () {
+                    //             context.go('/projects');
+                    //           },
+                    //           small: true,
+                    //         ),
+                    //       ),
+                    //       SizedBox(width: 4),
+                    //       Expanded(
+                    //         child: NavigationButton(
+                    //           icon: Icons.map_outlined,
+                    //           label: 'Maps',
+                    //           color: AppColors.successGreen,
+                    //           onTap: () {
+                    //             context.go('/maps');
+                    //           },
+                    //           small: true,
+                    //         ),
+                    //       ),
+                    //       SizedBox(width: 4),
+                    //       Expanded(
+                    //         child: NavigationButton(
+                    //           icon: Icons.people_outline,
+                    //           label: 'Social',
+                    //           color: AppColors.warningOrange,
+                    //           onTap: () {
+                    //             context.go('/social');
+                    //           },
+                    //           small: true,
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   )
+                    : SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            NavigationButton(
+                              icon: Icons.trending_up,
+                              label: 'Initiatives',
+                              color: AppColors.lightBlue,
+                              onTap: () => safeGo(context, '/initiatives'),
+                            ),
+                            SizedBox(width: 12),
+                            NavigationButton(
+                              icon: Icons.assignment_outlined,
+                              label: 'Projects',
+                              color: AppColors.errorRed,
+                              onTap: () => safeGo(context, '/projects'),
+                            ),
+                            SizedBox(width: 12),
+                            NavigationButton(
+                              icon: Icons.map_outlined,
+                              label: 'Maps',
+                              color: AppColors.successGreen,
+                              onTap: () => safeGo(context, '/maps/cleanup'),
+                            ),
+                            SizedBox(width: 12),
+                            NavigationButton(
+                              icon: Icons.people_outline,
+                              label: 'Social',
+                              color: AppColors.warningOrange,
+                              onTap: () => safeGo(context, '/social'),
+                            ),
+                          ],
                         ),
-                        SizedBox(width: 12),
-                        NavigationButton(
-                          icon: Icons.assignment_outlined,
-                          label: 'Projects',
-                          color: AppColors.errorRed,
-                          onTap: () => safeGo(context, '/projects'),
-                        ),
-                        SizedBox(width: 12),
-                        NavigationButton(
-                          icon: Icons.map_outlined,
-                          label: 'Maps',
-                          color: AppColors.successGreen,
-                          onTap: () => safeGo(context, '/maps/cleanup'),
-                        ),
-                        SizedBox(width: 12),
-                        NavigationButton(
-                          icon: Icons.people_outline,
-                          label: 'Social',
-                          color: AppColors.warningOrange,
-                          onTap: () => safeGo(context, '/social'),
-                        ),
-                      ],
-                    ),
-                  ),
+                      ),
+              ),
+              if (!isMobile) Divider(height: 1),
+              // 4-Pane Layout
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(isMobile ? 8 : 10),
+                  child: const PaneLayout(),
+                ),
+              ),
+            ],
           ),
-          if (!isMobile) Divider(height: 1),
-          // 4-Pane Layout
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.all(isMobile ? 8 : 10),
-              child: const PaneLayout(),
-            ),
-          ),
+          if (_showWarmupOverlay)
+            const Positioned.fill(child: _DashboardWarmupOverlay()),
         ],
       ),
+    );
+  }
+}
+
+class _DashboardWarmupOverlay extends StatelessWidget {
+  const _DashboardWarmupOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = AppConstants.isMobile(context);
+    return ColoredBox(
+      color: Colors.black.withValues(alpha: 0.22),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 620),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 20 : 28,
+              vertical: isMobile ? 24 : 32,
+            ),
+            child: Card(
+              elevation: 2,
+              color: Theme.of(
+                context,
+              ).colorScheme.surface.withValues(alpha: 0.97),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+                side: BorderSide(
+                  color: Theme.of(context).dividerColor.withValues(alpha: 0.25),
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 18 : 24,
+                  vertical: isMobile ? 20 : 24,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Getting Ready To Save The World?',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Take a few deep breaths while the data loads',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    const SizedBox(height: 14),
+                    const _BreathCycleIndicator(),
+                    const SizedBox(height: 12),
+                    Text(
+                      'The short wait helps keep costs down. Thanks for your patience.',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).textTheme.bodySmall?.color,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BreathCycleIndicator extends StatefulWidget {
+  const _BreathCycleIndicator();
+
+  @override
+  State<_BreathCycleIndicator> createState() => _BreathCycleIndicatorState();
+}
+
+class _BreathCycleIndicatorState extends State<_BreathCycleIndicator>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scale;
+  bool _isInhaling = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 4))
+          ..addStatusListener((status) {
+            if (!mounted) return;
+            if (status == AnimationStatus.forward && !_isInhaling) {
+              setState(() => _isInhaling = true);
+            } else if (status == AnimationStatus.reverse && _isInhaling) {
+              setState(() => _isInhaling = false);
+            }
+          });
+    _scale = Tween<double>(begin: 0.84, end: 1.18).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
+    );
+    _controller.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme.primary;
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Transform.scale(
+              scale: _scale.value,
+              child: Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: color.withValues(alpha: 0.14),
+                  border: Border.all(
+                    color: color.withValues(alpha: 0.55),
+                    width: 1.8,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              _isInhaling ? 'Breathe in...' : 'Breathe out...',
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -256,32 +509,32 @@ class _PaneLayoutState extends State<PaneLayout> {
                   ],
                 )
               : (isMobile
-                  ? const Center(
-                      child: SizedBox(
-                        width: 28,
-                        height: 28,
-                        child: CircularProgressIndicator(strokeWidth: 2.5),
-                      ),
-                    )
-                  : Row(
-                      children: const [
-                        Expanded(
-                          child: SummaryPane(
-                            title: 'Maps',
-                            icon: Icons.map_outlined,
-                            color: AppColors.successGreen,
-                          ),
+                    ? const Center(
+                        child: SizedBox(
+                          width: 28,
+                          height: 28,
+                          child: CircularProgressIndicator(strokeWidth: 2.5),
                         ),
-                        SizedBox(width: 6),
-                        Expanded(
-                          child: SummaryPane(
-                            title: 'Social',
-                            icon: Icons.people_outline,
-                            color: AppColors.warningOrange,
+                      )
+                    : Row(
+                        children: const [
+                          Expanded(
+                            child: SummaryPane(
+                              title: 'Maps',
+                              icon: Icons.map_outlined,
+                              color: AppColors.successGreen,
+                            ),
                           ),
-                        ),
-                      ],
-                    )),
+                          SizedBox(width: 6),
+                          Expanded(
+                            child: SummaryPane(
+                              title: 'Social',
+                              icon: Icons.people_outline,
+                              color: AppColors.warningOrange,
+                            ),
+                          ),
+                        ],
+                      )),
         ),
       ],
     );
