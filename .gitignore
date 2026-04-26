@@ -52,3 +52,4 @@ GoogleService-Info.plist
 
 # Local env (API keys for local dev – never commit)
 .env
+.claude
