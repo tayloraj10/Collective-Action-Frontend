@@ -1,6 +1,8 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
+import 'package:collective_action_frontend/components/directory_focus_text.dart';
+import 'package:collective_action_frontend/utils/external_network_image.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -88,6 +90,7 @@ class DirectoryOfGoodActionCard extends ConsumerWidget {
                     children: [
                       _buildEntryThumbnail(
                         context,
+                        action.id,
                         entry?.imageUrl,
                         accentColor,
                         isDark,
@@ -189,17 +192,17 @@ class DirectoryOfGoodActionCard extends ConsumerWidget {
                       ),
                       if (focus != null && focus.isNotEmpty) ...[
                         const SizedBox(height: 6),
-                        Tooltip(
-                          message: focus,
-                          child: Text(
-                            focus,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withAlpha(153),
-                              fontSize: isMobile ? 10 : 11,
-                              height: 1.3,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                        DirectoryFocusText(
+                          text: focus,
+                          isMobile: isMobile,
+                          compact: true,
+                          truncateOnDesktop: true,
+                          maxLinesCollapsed: 2,
+                          minCharsForExpand: 80,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withAlpha(153),
+                            fontSize: isMobile ? 10 : 11,
+                            height: 1.3,
                           ),
                         ),
                       ],
@@ -216,6 +219,7 @@ class DirectoryOfGoodActionCard extends ConsumerWidget {
 
   Widget _buildEntryThumbnail(
     BuildContext context,
+    String actionId,
     String? imageUrl,
     Color accentColor,
     bool isDark,
@@ -228,8 +232,9 @@ class DirectoryOfGoodActionCard extends ConsumerWidget {
     if (hasImage) {
       content = ClipRRect(
         borderRadius: BorderRadius.circular(10),
-        child: Image.network(
-          imageUrl,
+        child: ExternalOrDataImage(
+          key: ValueKey<String>('dog-thumb-$actionId-${imageUrl.hashCode}'),
+          url: imageUrl,
           width: size,
           height: size,
           fit: BoxFit.cover,

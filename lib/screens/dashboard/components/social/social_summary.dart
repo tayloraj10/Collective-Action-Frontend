@@ -1,3 +1,5 @@
+import 'dart:math' show max;
+
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
@@ -393,39 +395,50 @@ Widget buildSocialActivityList(
       ),
     );
   }
-  // Desktop: original Wrap layout
+  // Desktop: multi-column rows, built lazily (Wrap + List.generate built everything at once).
   return LayoutBuilder(
     builder: (context, constraints) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Scrollbar(
-              thumbVisibility: true,
-              controller: scrollController,
-              child: SingleChildScrollView(
-                controller: scrollController,
-                scrollDirection: Axis.vertical,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minWidth: constraints.maxWidth),
-                  child: Wrap(
-                    alignment: WrapAlignment.start,
-                    spacing: 0,
-                    runSpacing: 0,
-                    children: List.generate(actions.length, (idx) {
-                      final action = actions[idx];
-                      return _buildSocialActivityCard(
-                        action,
+      const double cardWidth = 180;
+      const double gap = 4;
+      final maxW = constraints.maxWidth;
+      final cols = maxW <= 0
+          ? 1
+          : (max(1, ((maxW + gap) / (cardWidth + gap)).floor()));
+      final rowCount = (actions.length + cols - 1) ~/ cols;
+
+      return Scrollbar(
+        thumbVisibility: true,
+        controller: scrollController,
+        child: ListView.builder(
+          controller: scrollController,
+          itemCount: rowCount,
+          padding: const EdgeInsets.only(bottom: 8),
+          itemBuilder: (context, rowIndex) {
+            final start = rowIndex * cols;
+            final end = start + cols > actions.length
+                ? actions.length
+                : start + cols;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: gap),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (int i = start; i < end; i++) ...[
+                    if (i > start) SizedBox(width: gap),
+                    RepaintBoundary(
+                      key: ValueKey<String>(actions[i].id),
+                      child: _buildSocialActivityCard(
+                        actions[i],
                         initiativesMap,
                         directoryEntriesMap,
-                      );
-                    }),
-                  ),
-                ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
-            ),
-          ),
-        ],
+            );
+          },
+        ),
       );
     },
   );

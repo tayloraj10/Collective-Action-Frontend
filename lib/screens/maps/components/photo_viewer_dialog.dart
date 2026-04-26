@@ -1,5 +1,6 @@
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/providers/map_zoom_provider.dart';
+import 'package:collective_action_frontend/utils/external_network_image.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -239,35 +240,65 @@ class _PhotoViewerDialogState extends State<PhotoViewerDialog> {
                             if (mounted && !_isClosing) setState(() => _currentIndex = i);
                           },
                           itemBuilder: (context, index) {
+                            final url = widget.urls[index];
+                            final dataBytes = decodeDataUriImageBytes(url);
+                            final imageWidget = dataBytes != null
+                                ? Image.memory(
+                                    dataBytes,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (_, _, _) => Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.broken_image_outlined,
+                                            size: 48,
+                                            color: Colors.white70,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            'Failed to load image',
+                                            style: theme.textTheme.bodyMedium
+                                                ?.copyWith(
+                                                  color: Colors.white70,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : Image(
+                                    image: NetworkImage(
+                                      normalizeExternalImageUrl(url),
+                                      webHtmlElementStrategy:
+                                          WebHtmlElementStrategy.prefer,
+                                    ),
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (_, _, _) => Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.broken_image_outlined,
+                                            size: 48,
+                                            color: Colors.white70,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            'Failed to load image',
+                                            style: theme.textTheme.bodyMedium
+                                                ?.copyWith(
+                                                  color: Colors.white70,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
                             return InteractiveViewer(
                               minScale: 0.5,
                               maxScale: 4,
-                              child: Image(
-                                image: NetworkImage(
-                                  widget.urls[index],
-                                  webHtmlElementStrategy:
-                                      WebHtmlElementStrategy.prefer,
-                                ),
-                                fit: BoxFit.contain,
-                                errorBuilder: (_, _, _) => Center(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.broken_image_outlined,
-                                        size: 48,
-                                        color: Colors.white70,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'Failed to load image',
-                                        style: theme.textTheme.bodyMedium
-                                            ?.copyWith(color: Colors.white70),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                              child: imageWidget,
                             );
                           },
                         ),

@@ -25,6 +25,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
   /// null = All categories
   String? _selectedCategoryId;
   final TextEditingController _searchController = TextEditingController();
+
   /// Mobile: 0 = Directory of Good, 1 = Recent Activity. Kept in state so tab
   /// switch can be deferred on mobile web (avoids crashes when changing tabs).
   int _selectedMobileTabIndex = 0;
@@ -239,8 +240,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
                     Expanded(
                       child: entriesAsync.when(
                         loading: () {
-                          if (previousData != null &&
-                              previousData.isNotEmpty) {
+                          if (previousData != null && previousData.isNotEmpty) {
                             final prevFiltered = _filterBySearch(
                               _filterByCategory(
                                 previousData,
@@ -533,6 +533,11 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
   static const double _twoColumnSpacing = 6.0;
   static const double _rowSpacing = 4.0;
 
+  /// Stable key so list slots don't reuse the wrong entry (and web image views)
+  /// after search/filter reorders the list.
+  static Key _directoryEntryKey(DirectoryOfGoodSchema e) =>
+      ValueKey<String>('directory-of-good-${e.id ?? e.name}');
+
   Widget _buildEntriesList(
     BuildContext context,
     WidgetRef ref, {
@@ -557,6 +562,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
             return SizedBox(
               width: w,
               child: DirectoryOfGoodEntryCard(
+                key: _directoryEntryKey(entry),
                 entry: entry,
                 isMobile: isMobile,
                 compact: compact,
@@ -564,42 +570,39 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
             );
           }
 
-          List<Widget> buildRows(List<DirectoryOfGoodSchema> list) {
-            final rows = <Widget>[];
-            for (var i = 0; i < list.length; i += 2) {
-              final left = list[i];
-              final right = (i + 1 < list.length) ? list[i + 1] : null;
-              final singleCardFullWidth = right == null;
-              rows.add(
-                Padding(
-                  padding: const EdgeInsets.only(bottom: _rowSpacing),
-                  child: Row(
-                    mainAxisAlignment: right != null
-                        ? MainAxisAlignment.start
-                        : MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      buildCard(left, singleCardFullWidth ? fullWidth : null),
-                      if (right != null) ...[
-                        SizedBox(width: _twoColumnSpacing),
-                        buildCard(right),
-                      ],
-                    ],
-                  ),
-                ),
-              );
-            }
-            return rows;
+          /// One row: two cards or a single centered full-width card.
+          Widget buildPairRow(
+            DirectoryOfGoodSchema left,
+            DirectoryOfGoodSchema? right,
+          ) {
+            final singleCardFullWidth = right == null;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: _rowSpacing),
+              child: Row(
+                mainAxisAlignment: right != null
+                    ? MainAxisAlignment.start
+                    : MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  buildCard(left, singleCardFullWidth ? fullWidth : null),
+                  if (right != null) ...[
+                    SizedBox(width: _twoColumnSpacing),
+                    buildCard(right),
+                  ],
+                ],
+              ),
+            );
           }
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (featured.isNotEmpty) ...[
-                  Center(
+          final featuredRowCount = (featured.length + 1) ~/ 2;
+          final restRowCount = (rest.length + 1) ~/ 2;
+
+          return CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              if (featured.isNotEmpty) ...[
+                SliverToBoxAdapter(
+                  child: Center(
                     child: Text(
                       'Featured',
                       style: theme.textTheme.titleMedium?.copyWith(
@@ -608,13 +611,31 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  ...buildRows(featured),
-                  const SizedBox(height: 10),
-                ],
-                ...buildRows(rest),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 6)),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate((context, rowIndex) {
+                    final i = rowIndex * 2;
+                    final left = featured[i];
+                    final right = i + 1 < featured.length
+                        ? featured[i + 1]
+                        : null;
+                    return buildPairRow(left, right);
+                  }, childCount: featuredRowCount),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 10)),
               ],
-            ),
+              if (restRowCount > 0)
+                SliverList(
+                  delegate: SliverChildBuilderDelegate((context, rowIndex) {
+                    final i = rowIndex * 2;
+                    final left = rest[i];
+                    final right = i + 1 < rest.length ? rest[i + 1] : null;
+                    return buildPairRow(left, right);
+                  }, childCount: restRowCount),
+                ),
+              const SliverToBoxAdapter(child: SizedBox(height: 24)),
+            ],
           );
         },
       );
@@ -628,8 +649,10 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
         itemCount: featuredFirst.length,
         separatorBuilder: (_, _) => SizedBox(height: isMobile ? 12 : 16),
         itemBuilder: (context, idx) {
+          final entry = featuredFirst[idx];
           return DirectoryOfGoodEntryCard(
-            entry: featuredFirst[idx],
+            key: _directoryEntryKey(entry),
+            entry: entry,
             isMobile: isMobile,
             compact: compact,
           );

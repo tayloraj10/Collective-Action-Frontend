@@ -2,7 +2,9 @@ import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/category_chip.dart';
+import 'package:collective_action_frontend/components/directory_focus_text.dart';
 import 'package:collective_action_frontend/screens/maps/components/photo_viewer_dialog.dart';
+import 'package:collective_action_frontend/utils/external_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -160,8 +162,10 @@ class DirectoryOfGoodEntryCard extends ConsumerWidget {
                               ),
                             ),
                           ),
-                          child: Text(
-                            entry.focus!,
+                          child: DirectoryFocusText(
+                            text: entry.focus!,
+                            isMobile: isMobile,
+                            compact: compact,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurface.withAlpha(
                                 isDark ? 200 : 170,
@@ -201,9 +205,9 @@ class DirectoryOfGoodEntryCard extends ConsumerWidget {
                       onTap:
                           (entry.imageUrl != null &&
                               entry.imageUrl!.trim().isNotEmpty)
-                          ? () => PhotoViewerDialog.show(
+                            ? () => PhotoViewerDialog.show(
                               context,
-                              urls: [entry.imageUrl!],
+                              urls: [entry.imageUrl!.trim()],
                             )
                           : null,
                       child: MouseRegion(
@@ -218,8 +222,11 @@ class DirectoryOfGoodEntryCard extends ConsumerWidget {
                                 borderRadius: BorderRadius.circular(
                                   compact ? 8 : 12,
                                 ),
-                                child: Image.network(
-                                  entry.imageUrl!,
+                                child: ExternalOrDataImage(
+                                  key: ValueKey(
+                                    'dog-img-${entry.id ?? entry.name}-${entry.imageUrl.hashCode}',
+                                  ),
+                                  url: entry.imageUrl!,
                                   width: compact ? 56 : (isMobile ? 72 : 80),
                                   height: compact ? 56 : (isMobile ? 72 : 80),
                                   fit: BoxFit.cover,
