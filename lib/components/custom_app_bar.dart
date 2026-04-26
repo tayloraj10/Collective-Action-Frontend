@@ -433,7 +433,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
           )
         else
           AppBarIconButton(
-            icon: Icons.login,
+            icon: Icons.person_add_rounded,
             onPressed: () => safeGo(context, '/login'),
             tooltip: 'Login',
             backgroundColor: Colors.white.withAlpha(38),
