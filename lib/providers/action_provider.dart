@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collective_action_frontend/api/lib/api.dart';
+import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/services/actions_service.dart';
 
 final activeActionProvider =
@@ -13,9 +14,11 @@ final actionsByLinkedProvider =
     FutureProvider.family<List<ActionSchema>, (String, int?)>(
       (ref, params) async {
         final (linkedId, days) = params;
+        final user = ref.watch(currentUserProvider).value;
         return await ActionsService().fetchActionsByLinked(
           linkedId,
           days: days,
+          forUserId: user?.id,
         ) ?? [];
       },
     );
@@ -26,9 +29,11 @@ class ActiveActionNotifier extends AsyncNotifier<List<ActionSchema>> {
 
   @override
   Future<List<ActionSchema>> build() async {
+    final user = ref.watch(currentUserProvider).value;
     return await ActionsService().fetchLatestActions(
           days: days,
           actionType: actionType,
+          forUserId: user?.id,
         ) ??
         [];
   }
@@ -36,9 +41,11 @@ class ActiveActionNotifier extends AsyncNotifier<List<ActionSchema>> {
   Future<void> refresh() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
+      final user = ref.read(currentUserProvider).value;
       return await ActionsService().fetchLatestActions(
             days: days,
             actionType: actionType,
+            forUserId: user?.id,
           ) ??
           [];
     });
@@ -50,9 +57,11 @@ class ActiveActionNotifier extends AsyncNotifier<List<ActionSchema>> {
       final created = await ActionsService().createAction(action);
       // Optionally refresh the list after creation
       state = await AsyncValue.guard(() async {
+        final user = ref.read(currentUserProvider).value;
         return await ActionsService().fetchLatestActions(
               days: days,
               actionType: actionType,
+              forUserId: user?.id,
             ) ??
             [];
       });
@@ -69,9 +78,11 @@ class ActiveActionNotifier extends AsyncNotifier<List<ActionSchema>> {
       final deleted = await ActionsService().deleteAction(action);
       // Refresh the list after deletion
       state = await AsyncValue.guard(() async {
+        final user = ref.read(currentUserProvider).value;
         return await ActionsService().fetchLatestActions(
               days: days,
               actionType: actionType,
+              forUserId: user?.id,
             ) ??
             [];
       });
@@ -81,4 +92,5 @@ class ActiveActionNotifier extends AsyncNotifier<List<ActionSchema>> {
       rethrow;
     }
   }
+
 }

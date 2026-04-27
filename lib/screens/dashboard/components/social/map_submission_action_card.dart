@@ -5,6 +5,7 @@ import 'package:collective_action_frontend/components/confirmation_dialog.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/social/action_like_row.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_info_dialog.dart';
 import 'package:collective_action_frontend/components/photo_thumbnail_strip.dart';
@@ -343,6 +344,11 @@ class MapSubmissionActionCard extends ConsumerWidget {
                           theme: theme,
                         ),
                       ],
+                      ActionLikeRow(
+                        action: action,
+                        isMobile: isMobile,
+                        iconColor: accentColor,
+                      ),
                     ],
                   ),
                 ),

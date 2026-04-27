@@ -12,14 +12,43 @@ class ActionsService {
   Future<List<ActionSchema>?> fetchLatestActions({
     int? days,
     ActionTypeValuesEnum? actionType,
+    String? forUserId,
   }) async {
     try {
       return await _api.getLatestActionsActionsRecentGet(
         days: days,
         actionType: actionType,
+        forUserId: forUserId,
       );
     } catch (e) {
       throw Exception('Failed to fetch initiatives: $e');
+    }
+  }
+
+  /// Like an action. Returns the updated action (like counts, liked_by_me).
+  Future<ActionSchema?> addActionLike(
+    String actionId,
+    String userId,
+  ) async {
+    try {
+      return await _api.addActionLikeActionsActionIdLikePost(
+        actionId,
+        ActionLikeBody(userId: userId),
+      );
+    } catch (e) {
+      throw Exception('Failed to like action: $e');
+    }
+  }
+
+  /// Remove the current user's like. Returns the updated action.
+  Future<ActionSchema?> removeActionLike(
+    String actionId,
+    String userId,
+  ) async {
+    try {
+      return await _api.removeActionLikeActionsActionIdLikeDelete(actionId, userId);
+    } catch (e) {
+      throw Exception('Failed to remove like: $e');
     }
   }
 
@@ -58,11 +87,13 @@ class ActionsService {
   Future<List<ActionSchema>?> fetchActionsByLinked(
     String linkedId, {
     int? days,
+    String? forUserId,
   }) async {
     try {
       return await _api.getActionsByLinkedActionsByLinkedLinkedIdGet(
         linkedId,
         days: days,
+        forUserId: forUserId,
       );
     } catch (e) {
       throw Exception('Failed to fetch actions by linked: $e');
@@ -71,8 +102,16 @@ class ActionsService {
 
   /// Map events are actions with latitude/longitude (and optional event_data).
   /// Use [linkedId] as the map campaign id to get events for that campaign.
-  Future<List<ActionSchema>> fetchMapEvents(String campaignId, {int? days}) async {
-    final list = await fetchActionsByLinked(campaignId, days: days);
+  Future<List<ActionSchema>> fetchMapEvents(
+    String campaignId, {
+    int? days,
+    String? forUserId,
+  }) async {
+    final list = await fetchActionsByLinked(
+      campaignId,
+      days: days,
+      forUserId: forUserId,
+    );
     if (list == null) return [];
     return list
         .where((a) => a.latitude != null && a.longitude != null)

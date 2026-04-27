@@ -10,6 +10,7 @@ import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/components/confirmation_dialog.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/components/photo_thumbnail_strip.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/social/action_like_row.dart';
 import 'package:collective_action_frontend/screens/maps/components/photo_viewer_dialog.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
 
@@ -239,6 +240,11 @@ class InitiativeActionCard extends ConsumerWidget {
                       theme: theme,
                     ),
                   ],
+                  ActionLikeRow(
+                    action: action,
+                    isMobile: isMobile,
+                    iconColor: accentColor,
+                  ),
                 ],
               ),
             ),
