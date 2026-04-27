@@ -2,6 +2,7 @@ import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/directory_focus_text.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/social/action_like_row.dart';
 import 'package:collective_action_frontend/utils/external_network_image.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
@@ -206,6 +207,11 @@ class DirectoryOfGoodActionCard extends ConsumerWidget {
                           ),
                         ),
                       ],
+                      ActionLikeRow(
+                        action: action,
+                        isMobile: isMobile,
+                        iconColor: accentColor,
+                      ),
                     ],
                   ),
                 ),

@@ -23,6 +23,9 @@ class ActionSchema {
     this.latitude,
     this.longitude,
     this.eventData = const {},
+    this.likeUserIds = const [],
+    this.likeCount = 0,
+    this.likedByMe = false,
   });
 
   String id;
@@ -46,6 +49,13 @@ class ActionSchema {
 
   Map<String, Object>? eventData;
 
+  /// Database user ids who liked this action (newest first).
+  List<String> likeUserIds;
+
+  int likeCount;
+
+  bool likedByMe;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is ActionSchema &&
     other.id == id &&
@@ -57,7 +67,10 @@ class ActionSchema {
     other.userId == userId &&
     other.latitude == latitude &&
     other.longitude == longitude &&
-    _deepEquality.equals(other.eventData, eventData);
+    _deepEquality.equals(other.eventData, eventData) &&
+    _deepEquality.equals(other.likeUserIds, likeUserIds) &&
+    other.likeCount == likeCount &&
+    other.likedByMe == likedByMe;
 
   @override
   int get hashCode =>
@@ -71,10 +84,13 @@ class ActionSchema {
     (userId == null ? 0 : userId!.hashCode) +
     (latitude == null ? 0 : latitude!.hashCode) +
     (longitude == null ? 0 : longitude!.hashCode) +
-    (eventData == null ? 0 : eventData!.hashCode);
+    (eventData == null ? 0 : eventData!.hashCode) +
+    (likeUserIds.hashCode) +
+    (likeCount.hashCode) +
+    (likedByMe.hashCode);
 
   @override
-  String toString() => 'ActionSchema[id=$id, actionType=$actionType, amount=$amount, date=$date, imageUrls=$imageUrls, linkedId=$linkedId, userId=$userId, latitude=$latitude, longitude=$longitude, eventData=$eventData]';
+  String toString() => 'ActionSchema[id=$id, actionType=$actionType, amount=$amount, date=$date, imageUrls=$imageUrls, linkedId=$linkedId, userId=$userId, latitude=$latitude, longitude=$longitude, eventData=$eventData, likeUserIds=$likeUserIds, likeCount=$likeCount, likedByMe=$likedByMe]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -112,6 +128,9 @@ class ActionSchema {
     } else {
       json[r'event_data'] = null;
     }
+      json[r'like_user_ids'] = this.likeUserIds;
+      json[r'like_count'] = this.likeCount;
+      json[r'liked_by_me'] = this.likedByMe;
     return json;
   }
 
@@ -152,6 +171,11 @@ class ActionSchema {
             ? null
             : num.parse('${json[r'longitude']}'),
         eventData: mapCastOfType<String, Object>(json, r'event_data') ?? const {},
+        likeUserIds: json[r'like_user_ids'] is Iterable
+            ? (json[r'like_user_ids'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
+        likeCount: mapValueOfType<int>(json, r'like_count') ?? 0,
+        likedByMe: mapValueOfType<bool>(json, r'liked_by_me') ?? false,
       );
     }
     return null;

@@ -159,6 +159,8 @@ No authorization required
 
 Delete Project
 
+Delete a project. Fails with 409 if any link references this project.
+
 ### Example
 ```dart
 import 'package:collective_action_api/api.dart';

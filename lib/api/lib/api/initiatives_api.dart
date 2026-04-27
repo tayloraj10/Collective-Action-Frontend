@@ -68,6 +68,55 @@ class InitiativesApi {
     return null;
   }
 
+  /// Delete Initiative
+  ///
+  /// Delete an initiative. Fails with 409 if any link references this initiative.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] initiativeId (required):
+  Future<Response> deleteInitiativeInitiativesInitiativeIdDeleteWithHttpInfo(String initiativeId,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/initiatives/{initiative_id}'
+      .replaceAll('{initiative_id}', initiativeId);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'DELETE',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Delete Initiative
+  ///
+  /// Delete an initiative. Fails with 409 if any link references this initiative.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] initiativeId (required):
+  Future<void> deleteInitiativeInitiativesInitiativeIdDelete(String initiativeId,) async {
+    final response = await deleteInitiativeInitiativesInitiativeIdDeleteWithHttpInfo(initiativeId,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+  }
+
   /// Get Featured Initiatives
   ///
   /// Note: This method returns the HTTP [Response].

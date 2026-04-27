@@ -16,6 +16,63 @@ class ActionsApi {
 
   final ApiClient apiClient;
 
+  /// Add Action Like
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] actionId (required):
+  ///
+  /// * [ActionLikeBody] actionLikeBody (required):
+  Future<Response> addActionLikeActionsActionIdLikePostWithHttpInfo(String actionId, ActionLikeBody actionLikeBody,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/actions/{action_id}/like'
+      .replaceAll('{action_id}', actionId);
+
+    // ignore: prefer_final_locals
+    Object? postBody = actionLikeBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Add Action Like
+  ///
+  /// Parameters:
+  ///
+  /// * [String] actionId (required):
+  ///
+  /// * [ActionLikeBody] actionLikeBody (required):
+  Future<ActionSchema?> addActionLikeActionsActionIdLikePost(String actionId, ActionLikeBody actionLikeBody,) async {
+    final response = await addActionLikeActionsActionIdLikePostWithHttpInfo(actionId, actionLikeBody,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ActionSchema',) as ActionSchema;
+    
+    }
+    return null;
+  }
+
   /// Create Action
   ///
   /// Note: This method returns the HTTP [Response].
@@ -128,7 +185,10 @@ class ActionsApi {
   /// Parameters:
   ///
   /// * [String] actionId (required):
-  Future<Response> getActionActionsActionIdGetWithHttpInfo(String actionId,) async {
+  ///
+  /// * [String] forUserId:
+  ///   If set, includes whether this user liked the action.
+  Future<Response> getActionActionsActionIdGetWithHttpInfo(String actionId, { String? forUserId, }) async {
     // ignore: prefer_const_declarations
     final path = r'/actions/{action_id}'
       .replaceAll('{action_id}', actionId);
@@ -139,6 +199,10 @@ class ActionsApi {
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
     final formParams = <String, String>{};
+
+    if (forUserId != null) {
+      queryParams.addAll(_queryParams('', 'for_user_id', forUserId));
+    }
 
     const contentTypes = <String>[];
 
@@ -159,8 +223,11 @@ class ActionsApi {
   /// Parameters:
   ///
   /// * [String] actionId (required):
-  Future<ActionSchema?> getActionActionsActionIdGet(String actionId,) async {
-    final response = await getActionActionsActionIdGetWithHttpInfo(actionId,);
+  ///
+  /// * [String] forUserId:
+  ///   If set, includes whether this user liked the action.
+  Future<ActionSchema?> getActionActionsActionIdGet(String actionId, { String? forUserId, }) async {
+    final response = await getActionActionsActionIdGetWithHttpInfo(actionId,  forUserId: forUserId, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -184,7 +251,10 @@ class ActionsApi {
   ///
   /// * [int] days:
   ///   Only return actions from the last N days
-  Future<Response> getActionsByLinkedActionsByLinkedLinkedIdGetWithHttpInfo(String linkedId, { int? days, }) async {
+  ///
+  /// * [String] forUserId:
+  ///   If set, each action includes whether this user liked it.
+  Future<Response> getActionsByLinkedActionsByLinkedLinkedIdGetWithHttpInfo(String linkedId, { int? days, String? forUserId, }) async {
     // ignore: prefer_const_declarations
     final path = r'/actions/by_linked/{linked_id}'
       .replaceAll('{linked_id}', linkedId);
@@ -198,6 +268,9 @@ class ActionsApi {
 
     if (days != null) {
       queryParams.addAll(_queryParams('', 'days', days));
+    }
+    if (forUserId != null) {
+      queryParams.addAll(_queryParams('', 'for_user_id', forUserId));
     }
 
     const contentTypes = <String>[];
@@ -222,8 +295,11 @@ class ActionsApi {
   ///
   /// * [int] days:
   ///   Only return actions from the last N days
-  Future<List<ActionSchema>?> getActionsByLinkedActionsByLinkedLinkedIdGet(String linkedId, { int? days, }) async {
-    final response = await getActionsByLinkedActionsByLinkedLinkedIdGetWithHttpInfo(linkedId,  days: days, );
+  ///
+  /// * [String] forUserId:
+  ///   If set, each action includes whether this user liked it.
+  Future<List<ActionSchema>?> getActionsByLinkedActionsByLinkedLinkedIdGet(String linkedId, { int? days, String? forUserId, }) async {
+    final response = await getActionsByLinkedActionsByLinkedLinkedIdGetWithHttpInfo(linkedId,  days: days, forUserId: forUserId, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -249,7 +325,10 @@ class ActionsApi {
   /// * [int] days:
   ///
   /// * [ActionTypeValuesEnum] actionType:
-  Future<Response> getLatestActionsActionsRecentGetWithHttpInfo({ int? days, ActionTypeValuesEnum? actionType, }) async {
+  ///
+  /// * [String] forUserId:
+  ///   If set, each action includes whether this user liked it.
+  Future<Response> getLatestActionsActionsRecentGetWithHttpInfo({ int? days, ActionTypeValuesEnum? actionType, String? forUserId, }) async {
     // ignore: prefer_const_declarations
     final path = r'/actions/recent';
 
@@ -266,6 +345,9 @@ class ActionsApi {
     if (actionType != null) {
       queryParams.addAll(_queryParams('', 'action_type', actionType));
     }
+    if (forUserId != null) {
+      queryParams.addAll(_queryParams('', 'for_user_id', forUserId));
+    }
 
     const contentTypes = <String>[];
 
@@ -288,8 +370,11 @@ class ActionsApi {
   /// * [int] days:
   ///
   /// * [ActionTypeValuesEnum] actionType:
-  Future<List<ActionSchema>?> getLatestActionsActionsRecentGet({ int? days, ActionTypeValuesEnum? actionType, }) async {
-    final response = await getLatestActionsActionsRecentGetWithHttpInfo( days: days, actionType: actionType, );
+  ///
+  /// * [String] forUserId:
+  ///   If set, each action includes whether this user liked it.
+  Future<List<ActionSchema>?> getLatestActionsActionsRecentGet({ int? days, ActionTypeValuesEnum? actionType, String? forUserId, }) async {
+    final response = await getLatestActionsActionsRecentGetWithHttpInfo( days: days, actionType: actionType, forUserId: forUserId, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -313,7 +398,10 @@ class ActionsApi {
   /// Parameters:
   ///
   /// * [int] limit:
-  Future<Response> listActionsActionsGetWithHttpInfo({ int? limit, }) async {
+  ///
+  /// * [String] forUserId:
+  ///   If set, each action includes whether this user liked it.
+  Future<Response> listActionsActionsGetWithHttpInfo({ int? limit, String? forUserId, }) async {
     // ignore: prefer_const_declarations
     final path = r'/actions/';
 
@@ -326,6 +414,9 @@ class ActionsApi {
 
     if (limit != null) {
       queryParams.addAll(_queryParams('', 'limit', limit));
+    }
+    if (forUserId != null) {
+      queryParams.addAll(_queryParams('', 'for_user_id', forUserId));
     }
 
     const contentTypes = <String>[];
@@ -347,8 +438,11 @@ class ActionsApi {
   /// Parameters:
   ///
   /// * [int] limit:
-  Future<List<ActionSchema>?> listActionsActionsGet({ int? limit, }) async {
-    final response = await listActionsActionsGetWithHttpInfo( limit: limit, );
+  ///
+  /// * [String] forUserId:
+  ///   If set, each action includes whether this user liked it.
+  Future<List<ActionSchema>?> listActionsActionsGet({ int? limit, String? forUserId, }) async {
+    final response = await listActionsActionsGetWithHttpInfo( limit: limit, forUserId: forUserId, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -361,6 +455,67 @@ class ActionsApi {
         .cast<ActionSchema>()
         .toList(growable: false);
 
+    }
+    return null;
+  }
+
+  /// Remove Action Like
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] actionId (required):
+  ///
+  /// * [String] userId (required):
+  ///   Database id of the user unliking the action
+  Future<Response> removeActionLikeActionsActionIdLikeDeleteWithHttpInfo(String actionId, String userId,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/actions/{action_id}/like'
+      .replaceAll('{action_id}', actionId);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+      queryParams.addAll(_queryParams('', 'user_id', userId));
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'DELETE',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Remove Action Like
+  ///
+  /// Parameters:
+  ///
+  /// * [String] actionId (required):
+  ///
+  /// * [String] userId (required):
+  ///   Database id of the user unliking the action
+  Future<ActionSchema?> removeActionLikeActionsActionIdLikeDelete(String actionId, String userId,) async {
+    final response = await removeActionLikeActionsActionIdLikeDeleteWithHttpInfo(actionId, userId,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ActionSchema',) as ActionSchema;
+    
     }
     return null;
   }

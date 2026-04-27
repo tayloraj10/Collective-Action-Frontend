@@ -10,6 +10,7 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**createInitiativeInitiativesPost**](InitiativesApi.md#createinitiativeinitiativespost) | **POST** /initiatives/ | Create Initiative
+[**deleteInitiativeInitiativesInitiativeIdDelete**](InitiativesApi.md#deleteinitiativeinitiativesinitiativeiddelete) | **DELETE** /initiatives/{initiative_id} | Delete Initiative
 [**getFeaturedInitiativesInitiativesFeaturedGet**](InitiativesApi.md#getfeaturedinitiativesinitiativesfeaturedget) | **GET** /initiatives/featured | Get Featured Initiatives
 [**getInitiativeInitiativesInitiativeIdGet**](InitiativesApi.md#getinitiativeinitiativesinitiativeidget) | **GET** /initiatives/{initiative_id} | Get Initiative
 [**getInitiativesByIdsInitiativesByIdsGet**](InitiativesApi.md#getinitiativesbyidsinitiativesbyidsget) | **GET** /initiatives/by-ids | Get Initiatives By Ids
@@ -56,6 +57,48 @@ No authorization required
 
  - **Content-Type**: application/json
  - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteInitiativeInitiativesInitiativeIdDelete**
+> deleteInitiativeInitiativesInitiativeIdDelete(initiativeId)
+
+Delete Initiative
+
+Delete an initiative. Fails with 409 if any link references this initiative.
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = InitiativesApi();
+final initiativeId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+
+try {
+    api_instance.deleteInitiativeInitiativesInitiativeIdDelete(initiativeId);
+} catch (e) {
+    print('Exception when calling InitiativesApi->deleteInitiativeInitiativesInitiativeIdDelete: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **initiativeId** | **String**|  | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

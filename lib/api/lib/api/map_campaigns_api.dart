@@ -68,6 +68,55 @@ class MapCampaignsApi {
     return null;
   }
 
+  /// Delete Map Campaign
+  ///
+  /// Delete a map campaign. Fails with 409 if any link references this campaign.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] campaignId (required):
+  Future<Response> deleteMapCampaignMapCampaignsCampaignIdDeleteWithHttpInfo(String campaignId,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/map-campaigns/{campaign_id}'
+      .replaceAll('{campaign_id}', campaignId);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'DELETE',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Delete Map Campaign
+  ///
+  /// Delete a map campaign. Fails with 409 if any link references this campaign.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] campaignId (required):
+  Future<void> deleteMapCampaignMapCampaignsCampaignIdDelete(String campaignId,) async {
+    final response = await deleteMapCampaignMapCampaignsCampaignIdDeleteWithHttpInfo(campaignId,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+  }
+
   /// Get Map Campaign
   ///
   /// Note: This method returns the HTTP [Response].

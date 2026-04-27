@@ -45,6 +45,7 @@ part 'api/statuses_api.dart';
 part 'api/users_api.dart';
 
 part 'model/action_create_schema.dart';
+part 'model/action_like_body.dart';
 part 'model/action_photos_update.dart';
 part 'model/action_schema.dart';
 part 'model/action_type_create.dart';
@@ -84,6 +85,7 @@ part 'model/project_step_update_schema.dart';
 part 'model/project_update_schema.dart';
 part 'model/quote_create_schema.dart';
 part 'model/quote_schema.dart';
+part 'model/sheet_sync_response.dart';
 part 'model/social_links_schema.dart';
 part 'model/status_create.dart';
 part 'model/status_schema.dart';

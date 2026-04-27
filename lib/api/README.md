@@ -64,12 +64,14 @@ Class | Method | HTTP request | Description
 *ActionTypesApi* | [**getActionTypeActionTypesActionTypeIdGet**](doc//ActionTypesApi.md#getactiontypeactiontypesactiontypeidget) | **GET** /action_types/{action_type_id} | Get Action Type
 *ActionTypesApi* | [**listActionTypesActionTypesGet**](doc//ActionTypesApi.md#listactiontypesactiontypesget) | **GET** /action_types/ | List Action Types
 *ActionTypesApi* | [**updateActionTypeActionTypesActionTypeIdPut**](doc//ActionTypesApi.md#updateactiontypeactiontypesactiontypeidput) | **PUT** /action_types/{action_type_id} | Update Action Type
+*ActionsApi* | [**addActionLikeActionsActionIdLikePost**](doc//ActionsApi.md#addactionlikeactionsactionidlikepost) | **POST** /actions/{action_id}/like | Add Action Like
 *ActionsApi* | [**createActionActionsPost**](doc//ActionsApi.md#createactionactionspost) | **POST** /actions/ | Create Action
 *ActionsApi* | [**deleteActionActionsActionIdDelete**](doc//ActionsApi.md#deleteactionactionsactioniddelete) | **DELETE** /actions/{action_id} | Delete Action
 *ActionsApi* | [**getActionActionsActionIdGet**](doc//ActionsApi.md#getactionactionsactionidget) | **GET** /actions/{action_id} | Get Action
 *ActionsApi* | [**getActionsByLinkedActionsByLinkedLinkedIdGet**](doc//ActionsApi.md#getactionsbylinkedactionsbylinkedlinkedidget) | **GET** /actions/by_linked/{linked_id} | Get Actions By Linked
 *ActionsApi* | [**getLatestActionsActionsRecentGet**](doc//ActionsApi.md#getlatestactionsactionsrecentget) | **GET** /actions/recent | Get Latest Actions
 *ActionsApi* | [**listActionsActionsGet**](doc//ActionsApi.md#listactionsactionsget) | **GET** /actions/ | List Actions
+*ActionsApi* | [**removeActionLikeActionsActionIdLikeDelete**](doc//ActionsApi.md#removeactionlikeactionsactionidlikedelete) | **DELETE** /actions/{action_id}/like | Remove Action Like
 *ActionsApi* | [**updateActionPhotosActionsActionIdPhotosPatch**](doc//ActionsApi.md#updateactionphotosactionsactionidphotospatch) | **PATCH** /actions/{action_id}/photos | Update Action Photos
 *CategoriesApi* | [**createCategoryCategoriesPost**](doc//CategoriesApi.md#createcategorycategoriespost) | **POST** /categories/ | Create Category
 *CategoriesApi* | [**deleteCategoryCategoriesCategoryIdDelete**](doc//CategoriesApi.md#deletecategorycategoriescategoryiddelete) | **DELETE** /categories/{category_id} | Delete Category
@@ -83,8 +85,10 @@ Class | Method | HTTP request | Description
 *DirectoryOfGoodApi* | [**listEntriesByUserDirectoryOfGoodByUserUserIdGet**](doc//DirectoryOfGoodApi.md#listentriesbyuserdirectoryofgoodbyuseruseridget) | **GET** /directory-of-good/by-user/{user_id} | List Entries By User
 *DirectoryOfGoodApi* | [**listEntriesDirectoryOfGoodGet**](doc//DirectoryOfGoodApi.md#listentriesdirectoryofgoodget) | **GET** /directory-of-good/ | List Entries
 *DirectoryOfGoodApi* | [**setFeaturedDirectoryOfGoodEntryIdFeaturePatch**](doc//DirectoryOfGoodApi.md#setfeatureddirectoryofgoodentryidfeaturepatch) | **PATCH** /directory-of-good/{entry_id}/feature | Set Featured
+*DirectoryOfGoodApi* | [**syncFromGoogleSheetDirectoryOfGoodSyncFromGoogleSheetPost**](doc//DirectoryOfGoodApi.md#syncfromgooglesheetdirectoryofgoodsyncfromgooglesheetpost) | **POST** /directory-of-good/sync-from-google-sheet | Sync From Google Sheet
 *DirectoryOfGoodApi* | [**updateEntryDirectoryOfGoodEntryIdPatch**](doc//DirectoryOfGoodApi.md#updateentrydirectoryofgoodentryidpatch) | **PATCH** /directory-of-good/{entry_id} | Update Entry
 *InitiativesApi* | [**createInitiativeInitiativesPost**](doc//InitiativesApi.md#createinitiativeinitiativespost) | **POST** /initiatives/ | Create Initiative
+*InitiativesApi* | [**deleteInitiativeInitiativesInitiativeIdDelete**](doc//InitiativesApi.md#deleteinitiativeinitiativesinitiativeiddelete) | **DELETE** /initiatives/{initiative_id} | Delete Initiative
 *InitiativesApi* | [**getFeaturedInitiativesInitiativesFeaturedGet**](doc//InitiativesApi.md#getfeaturedinitiativesinitiativesfeaturedget) | **GET** /initiatives/featured | Get Featured Initiatives
 *InitiativesApi* | [**getInitiativeInitiativesInitiativeIdGet**](doc//InitiativesApi.md#getinitiativeinitiativesinitiativeidget) | **GET** /initiatives/{initiative_id} | Get Initiative
 *InitiativesApi* | [**getInitiativesByIdsInitiativesByIdsGet**](doc//InitiativesApi.md#getinitiativesbyidsinitiativesbyidsget) | **GET** /initiatives/by-ids | Get Initiatives By Ids
@@ -99,6 +103,7 @@ Class | Method | HTTP request | Description
 *LinksApi* | [**listLinksLinksGet**](doc//LinksApi.md#listlinkslinksget) | **GET** /links/ | List Links
 *LinksApi* | [**updateLinkLinksLinkIdPatch**](doc//LinksApi.md#updatelinklinkslinkidpatch) | **PATCH** /links/{link_id} | Update Link
 *MapCampaignsApi* | [**createMapCampaignMapCampaignsPost**](doc//MapCampaignsApi.md#createmapcampaignmapcampaignspost) | **POST** /map-campaigns/ | Create Map Campaign
+*MapCampaignsApi* | [**deleteMapCampaignMapCampaignsCampaignIdDelete**](doc//MapCampaignsApi.md#deletemapcampaignmapcampaignscampaigniddelete) | **DELETE** /map-campaigns/{campaign_id} | Delete Map Campaign
 *MapCampaignsApi* | [**getMapCampaignMapCampaignsCampaignIdGet**](doc//MapCampaignsApi.md#getmapcampaignmapcampaignscampaignidget) | **GET** /map-campaigns/{campaign_id} | Get Map Campaign
 *MapCampaignsApi* | [**listActiveMapCampaignsMapCampaignsActiveGet**](doc//MapCampaignsApi.md#listactivemapcampaignsmapcampaignsactiveget) | **GET** /map-campaigns/active | List Active Map Campaigns
 *MapCampaignsApi* | [**listMapCampaignsByCreatorMapCampaignsCreatorUserIdGet**](doc//MapCampaignsApi.md#listmapcampaignsbycreatormapcampaignscreatoruseridget) | **GET** /map-campaigns/creator/{user_id} | List Map Campaigns By Creator
@@ -156,6 +161,7 @@ Class | Method | HTTP request | Description
 ## Documentation For Models
 
  - [ActionCreateSchema](doc//ActionCreateSchema.md)
+ - [ActionLikeBody](doc//ActionLikeBody.md)
  - [ActionPhotosUpdate](doc//ActionPhotosUpdate.md)
  - [ActionSchema](doc//ActionSchema.md)
  - [ActionTypeCreate](doc//ActionTypeCreate.md)
@@ -195,6 +201,7 @@ Class | Method | HTTP request | Description
  - [ProjectUpdateSchema](doc//ProjectUpdateSchema.md)
  - [QuoteCreateSchema](doc//QuoteCreateSchema.md)
  - [QuoteSchema](doc//QuoteSchema.md)
+ - [SheetSyncResponse](doc//SheetSyncResponse.md)
  - [SocialLinksSchema](doc//SocialLinksSchema.md)
  - [StatusCreate](doc//StatusCreate.md)
  - [StatusSchema](doc//StatusSchema.md)

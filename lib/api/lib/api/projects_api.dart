@@ -192,6 +192,8 @@ class ProjectsApi {
 
   /// Delete Project
   ///
+  /// Delete a project. Fails with 409 if any link references this project.
+  ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
@@ -224,6 +226,8 @@ class ProjectsApi {
   }
 
   /// Delete Project
+  ///
+  /// Delete a project. Fails with 409 if any link references this project.
   ///
   /// Parameters:
   ///

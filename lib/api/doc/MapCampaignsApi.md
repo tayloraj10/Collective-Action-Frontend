@@ -10,6 +10,7 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**createMapCampaignMapCampaignsPost**](MapCampaignsApi.md#createmapcampaignmapcampaignspost) | **POST** /map-campaigns/ | Create Map Campaign
+[**deleteMapCampaignMapCampaignsCampaignIdDelete**](MapCampaignsApi.md#deletemapcampaignmapcampaignscampaigniddelete) | **DELETE** /map-campaigns/{campaign_id} | Delete Map Campaign
 [**getMapCampaignMapCampaignsCampaignIdGet**](MapCampaignsApi.md#getmapcampaignmapcampaignscampaignidget) | **GET** /map-campaigns/{campaign_id} | Get Map Campaign
 [**listActiveMapCampaignsMapCampaignsActiveGet**](MapCampaignsApi.md#listactivemapcampaignsmapcampaignsactiveget) | **GET** /map-campaigns/active | List Active Map Campaigns
 [**listMapCampaignsByCreatorMapCampaignsCreatorUserIdGet**](MapCampaignsApi.md#listmapcampaignsbycreatormapcampaignscreatoruseridget) | **GET** /map-campaigns/creator/{user_id} | List Map Campaigns By Creator
@@ -55,6 +56,48 @@ No authorization required
 
  - **Content-Type**: application/json
  - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteMapCampaignMapCampaignsCampaignIdDelete**
+> deleteMapCampaignMapCampaignsCampaignIdDelete(campaignId)
+
+Delete Map Campaign
+
+Delete a map campaign. Fails with 409 if any link references this campaign.
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = MapCampaignsApi();
+final campaignId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+
+try {
+    api_instance.deleteMapCampaignMapCampaignsCampaignIdDelete(campaignId);
+} catch (e) {
+    print('Exception when calling MapCampaignsApi->deleteMapCampaignMapCampaignsCampaignIdDelete: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **campaignId** | **String**|  | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
