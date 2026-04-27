@@ -15,6 +15,7 @@ Method | HTTP request | Description
 [**listEntriesByUserDirectoryOfGoodByUserUserIdGet**](DirectoryOfGoodApi.md#listentriesbyuserdirectoryofgoodbyuseruseridget) | **GET** /directory-of-good/by-user/{user_id} | List Entries By User
 [**listEntriesDirectoryOfGoodGet**](DirectoryOfGoodApi.md#listentriesdirectoryofgoodget) | **GET** /directory-of-good/ | List Entries
 [**setFeaturedDirectoryOfGoodEntryIdFeaturePatch**](DirectoryOfGoodApi.md#setfeatureddirectoryofgoodentryidfeaturepatch) | **PATCH** /directory-of-good/{entry_id}/feature | Set Featured
+[**syncFromGoogleSheetDirectoryOfGoodSyncFromGoogleSheetPost**](DirectoryOfGoodApi.md#syncfromgooglesheetdirectoryofgoodsyncfromgooglesheetpost) | **POST** /directory-of-good/sync-from-google-sheet | Sync From Google Sheet
 [**updateEntryDirectoryOfGoodEntryIdPatch**](DirectoryOfGoodApi.md#updateentrydirectoryofgoodentryidpatch) | **PATCH** /directory-of-good/{entry_id} | Update Entry
 
 
@@ -269,6 +270,49 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **syncFromGoogleSheetDirectoryOfGoodSyncFromGoogleSheetPost**
+> SheetSyncResponse syncFromGoogleSheetDirectoryOfGoodSyncFromGoogleSheetPost(xSyncSecret)
+
+Sync From Google Sheet
+
+Upsert directory rows from the configured 'Interesting People' Google Sheet.  **Credentials:** If ``GOOGLE_APPLICATION_CREDENTIALS`` is set to a service account JSON path, that key is used. Otherwise **Application Default Credentials** are used (e.g. Cloud Run / GCE runtime service account). Enable the Google Sheets API for the project and share the spreadsheet with that service account email.  When ``DIRECTORY_GOOGLE_SHEET_SYNC_SECRET`` is set, the same value must be sent in the ``X-Sync-Secret`` header.
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = DirectoryOfGoodApi();
+final xSyncSecret = xSyncSecret_example; // String | 
+
+try {
+    final result = api_instance.syncFromGoogleSheetDirectoryOfGoodSyncFromGoogleSheetPost(xSyncSecret);
+    print(result);
+} catch (e) {
+    print('Exception when calling DirectoryOfGoodApi->syncFromGoogleSheetDirectoryOfGoodSyncFromGoogleSheetPost: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **xSyncSecret** | **String**|  | [optional] 
+
+### Return type
+
+[**SheetSyncResponse**](SheetSyncResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

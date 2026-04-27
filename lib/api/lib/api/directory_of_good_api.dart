@@ -350,6 +350,66 @@ class DirectoryOfGoodApi {
     return null;
   }
 
+  /// Sync From Google Sheet
+  ///
+  /// Upsert directory rows from the configured 'Interesting People' Google Sheet.  **Credentials:** If ``GOOGLE_APPLICATION_CREDENTIALS`` is set to a service account JSON path, that key is used. Otherwise **Application Default Credentials** are used (e.g. Cloud Run / GCE runtime service account). Enable the Google Sheets API for the project and share the spreadsheet with that service account email.  When ``DIRECTORY_GOOGLE_SHEET_SYNC_SECRET`` is set, the same value must be sent in the ``X-Sync-Secret`` header.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] xSyncSecret:
+  Future<Response> syncFromGoogleSheetDirectoryOfGoodSyncFromGoogleSheetPostWithHttpInfo({ String? xSyncSecret, }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/directory-of-good/sync-from-google-sheet';
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    if (xSyncSecret != null) {
+      headerParams[r'X-Sync-Secret'] = parameterToString(xSyncSecret);
+    }
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Sync From Google Sheet
+  ///
+  /// Upsert directory rows from the configured 'Interesting People' Google Sheet.  **Credentials:** If ``GOOGLE_APPLICATION_CREDENTIALS`` is set to a service account JSON path, that key is used. Otherwise **Application Default Credentials** are used (e.g. Cloud Run / GCE runtime service account). Enable the Google Sheets API for the project and share the spreadsheet with that service account email.  When ``DIRECTORY_GOOGLE_SHEET_SYNC_SECRET`` is set, the same value must be sent in the ``X-Sync-Secret`` header.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] xSyncSecret:
+  Future<SheetSyncResponse?> syncFromGoogleSheetDirectoryOfGoodSyncFromGoogleSheetPost({ String? xSyncSecret, }) async {
+    final response = await syncFromGoogleSheetDirectoryOfGoodSyncFromGoogleSheetPostWithHttpInfo( xSyncSecret: xSyncSecret, );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SheetSyncResponse',) as SheetSyncResponse;
+    
+    }
+    return null;
+  }
+
   /// Update Entry
   ///
   /// Update a directory of good entry (partial update).

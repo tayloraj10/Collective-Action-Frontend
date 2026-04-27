@@ -66,7 +66,6 @@ class ApiClient {
         final request = StreamedRequest(method, uri);
         request.headers.addAll(headerParams);
         request.contentLength = body.length;
-        // Subscription is tied to request lifecycle; stream completes when send() returns.
         body.finalize().listen(
           request.sink.add,
           onDone: request.sink.close,
@@ -185,6 +184,8 @@ class ApiClient {
           return value is DateTime ? value : DateTime.tryParse(value);
         case 'ActionCreateSchema':
           return ActionCreateSchema.fromJson(value);
+        case 'ActionLikeBody':
+          return ActionLikeBody.fromJson(value);
         case 'ActionPhotosUpdate':
           return ActionPhotosUpdate.fromJson(value);
         case 'ActionSchema':
@@ -263,6 +264,8 @@ class ApiClient {
           return QuoteCreateSchema.fromJson(value);
         case 'QuoteSchema':
           return QuoteSchema.fromJson(value);
+        case 'SheetSyncResponse':
+          return SheetSyncResponse.fromJson(value);
         case 'SocialLinksSchema':
           return SocialLinksSchema.fromJson(value);
         case 'StatusCreate':

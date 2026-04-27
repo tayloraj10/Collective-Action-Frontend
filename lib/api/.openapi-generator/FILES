@@ -3,6 +3,7 @@
 README.md
 analysis_options.yaml
 doc/ActionCreateSchema.md
+doc/ActionLikeBody.md
 doc/ActionPhotosUpdate.md
 doc/ActionSchema.md
 doc/ActionTypeCreate.md
@@ -55,6 +56,7 @@ doc/QuoteCreateSchema.md
 doc/QuoteSchema.md
 doc/QuotesApi.md
 doc/SchemasApi.md
+doc/SheetSyncResponse.md
 doc/SocialLinksSchema.md
 doc/StatusCreate.md
 doc/StatusSchema.md
@@ -95,6 +97,7 @@ lib/auth/http_basic_auth.dart
 lib/auth/http_bearer_auth.dart
 lib/auth/oauth.dart
 lib/model/action_create_schema.dart
+lib/model/action_like_body.dart
 lib/model/action_photos_update.dart
 lib/model/action_schema.dart
 lib/model/action_type_create.dart
@@ -134,6 +137,7 @@ lib/model/project_step_update_schema.dart
 lib/model/project_update_schema.dart
 lib/model/quote_create_schema.dart
 lib/model/quote_schema.dart
+lib/model/sheet_sync_response.dart
 lib/model/social_links_schema.dart
 lib/model/status_create.dart
 lib/model/status_schema.dart
@@ -147,3 +151,4 @@ lib/model/user_type.dart
 lib/model/user_update.dart
 lib/model/zip_code_submission_event_data.dart
 pubspec.yaml
+test/sheet_sync_response_test.dart

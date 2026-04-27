@@ -77,6 +77,46 @@
                 }
             }
         },
+        "/directory-of-good/sync-from-google-sheet": {
+            "post": {
+                "tags": [
+                    "directory-of-good"
+                ],
+                "summary": "Sync From Google Sheet",
+                "description": "Upsert directory rows from the configured 'Interesting People' Google Sheet.\n\n**Credentials:** If ``GOOGLE_APPLICATION_CREDENTIALS`` is set to a service account JSON\npath, that key is used. Otherwise **Application Default Credentials** are used (e.g. Cloud\nRun / GCE runtime service account). Enable the Google Sheets API for the project and share\nthe spreadsheet with that service account email.\n\nWhen ``DIRECTORY_GOOGLE_SHEET_SYNC_SECRET`` is set, the same value must be sent in\nthe ``X-Sync-Secret`` header.",
+                "operationId": "sync_from_google_sheet_directory_of_good_sync_from_google_sheet_post",
+                "parameters": [
+                    {
+                        "name": "X-Sync-Secret",
+                        "in": "header",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "title": "X-Sync-Secret"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SheetSyncResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/directory-of-good/{entry_id}": {
             "get": {
                 "tags": [
@@ -476,6 +516,31 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "tags": [
+                    "initiatives"
+                ],
+                "summary": "Delete Initiative",
+                "description": "Delete an initiative. Fails with 409 if any link references this initiative.",
+                "operationId": "delete_initiative_initiatives__initiative_id__delete",
+                "parameters": [
+                    {
+                        "name": "initiative_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Initiative Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
+                    }
+                }
             }
         },
         "/map-campaigns/": {
@@ -658,6 +723,31 @@
                                 }
                             }
                         }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "map-campaigns"
+                ],
+                "summary": "Delete Map Campaign",
+                "description": "Delete a map campaign. Fails with 409 if any link references this campaign.",
+                "operationId": "delete_map_campaign_map_campaigns__campaign_id__delete",
+                "parameters": [
+                    {
+                        "name": "campaign_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Campaign Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
                     }
                 }
             }
@@ -857,6 +947,7 @@
                     "projects"
                 ],
                 "summary": "Delete Project",
+                "description": "Delete a project. Fails with 409 if any link references this project.",
                 "operationId": "delete_project_projects__project_id__delete",
                 "parameters": [
                     {
@@ -1561,6 +1652,25 @@
                             "type": "integer",
                             "title": "Limit"
                         }
+                    },
+                    {
+                        "name": "for_user_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "If set, each action includes whether this user liked it.",
+                            "title": "For User Id"
+                        },
+                        "description": "If set, each action includes whether this user liked it."
                     }
                 ],
                 "responses": {
@@ -1606,6 +1716,25 @@
                         "schema": {
                             "$ref": "#/components/schemas/ActionTypeValuesEnum"
                         }
+                    },
+                    {
+                        "name": "for_user_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "If set, each action includes whether this user liked it.",
+                            "title": "For User Id"
+                        },
+                        "description": "If set, each action includes whether this user liked it."
                     }
                 ],
                 "responses": {
@@ -1619,6 +1748,92 @@
                                         "$ref": "#/components/schemas/ActionSchema"
                                     },
                                     "title": "Response Get Latest Actions Actions Recent Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/actions/{action_id}/like": {
+            "post": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Add Action Like",
+                "operationId": "add_action_like_actions__action_id__like_post",
+                "parameters": [
+                    {
+                        "name": "action_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Action Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ActionLikeBody"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Remove Action Like",
+                "operationId": "remove_action_like_actions__action_id__like_delete",
+                "parameters": [
+                    {
+                        "name": "action_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Action Id"
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "description": "Database id of the user unliking the action",
+                            "title": "User Id"
+                        },
+                        "description": "Database id of the user unliking the action"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionSchema"
                                 }
                             }
                         }
@@ -1687,6 +1902,25 @@
                             "format": "uuid",
                             "title": "Action Id"
                         }
+                    },
+                    {
+                        "name": "for_user_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "If set, includes whether this user liked the action.",
+                            "title": "For User Id"
+                        },
+                        "description": "If set, includes whether this user liked the action."
                     }
                 ],
                 "responses": {
@@ -1770,6 +2004,25 @@
                             "title": "Days"
                         },
                         "description": "Only return actions from the last N days"
+                    },
+                    {
+                        "name": "for_user_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "If set, each action includes whether this user liked it.",
+                            "title": "For User Id"
+                        },
+                        "description": "If set, each action includes whether this user liked it."
                     }
                 ],
                 "responses": {
@@ -3121,6 +3374,21 @@
                 ],
                 "title": "ActionCreateSchema"
             },
+            "ActionLikeBody": {
+                "properties": {
+                    "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "User Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "user_id"
+                ],
+                "title": "ActionLikeBody",
+                "description": "Database user id ([users].id) of the account performing the like.\n\nLikes are not anonymous: the id must refer to an existing, active user row.\nClients should only send this after the user has registered / signed in on the app."
+            },
             "ActionPhotosUpdate": {
                 "properties": {
                     "image_urls": {
@@ -3227,6 +3495,25 @@
                             }
                         ],
                         "title": "Event Data"
+                    },
+                    "like_user_ids": {
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "type": "array",
+                        "title": "Like User Ids",
+                        "description": "Database user ids who liked this action (newest first)."
+                    },
+                    "like_count": {
+                        "type": "integer",
+                        "title": "Like Count",
+                        "default": 0
+                    },
+                    "liked_by_me": {
+                        "type": "boolean",
+                        "title": "Liked By Me",
+                        "default": false
                     }
                 },
                 "type": "object",
@@ -5007,6 +5294,42 @@
                     "active"
                 ],
                 "title": "QuoteSchema"
+            },
+            "SheetSyncResponse": {
+                "properties": {
+                    "created": {
+                        "type": "integer",
+                        "title": "Created"
+                    },
+                    "updated": {
+                        "type": "integer",
+                        "title": "Updated"
+                    },
+                    "skipped": {
+                        "type": "integer",
+                        "title": "Skipped"
+                    },
+                    "rows_seen": {
+                        "type": "integer",
+                        "title": "Rows Seen"
+                    },
+                    "errors": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Errors"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "created",
+                    "updated",
+                    "skipped",
+                    "rows_seen",
+                    "errors"
+                ],
+                "title": "SheetSyncResponse"
             },
             "SocialLinksSchema": {
                 "properties": {
