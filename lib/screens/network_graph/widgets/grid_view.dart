@@ -369,7 +369,17 @@ class _ItemAvatar extends StatelessWidget {
         child: hasImage
             ? ExternalOrDataImage(
                 url: imageUrl!, width: size, height: size,
-                fit: BoxFit.cover)
+                fit: BoxFit.cover,
+                preferHtmlElementOnWeb: false,
+                errorBuilder: (context, error, stackTrace) => Center(
+                  child: Text(
+                    name.isNotEmpty ? name[0].toUpperCase() : '?',
+                    style: TextStyle(
+                        color: color,
+                        fontSize: size * 0.38,
+                        fontWeight: FontWeight.w700),
+                  ),
+                ))
             : Center(
                 child: Text(
                   name.isNotEmpty ? name[0].toUpperCase() : '?',

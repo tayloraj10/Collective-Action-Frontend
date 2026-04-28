@@ -53,6 +53,22 @@ These scripts keep your real Maps key out of the repo by using a placeholder in 
 | **restore_maps_key.ps1** | Restores `web/index.html` so the Maps key is the placeholder again. Use as a **postDebugTask** so the key is never committed. |
 | **serve_web.ps1** | Runs Flutter web locally with the key injected, then restores `web/index.html` on exit. Usage: `.\scripts\serve_web.ps1` or `.\scripts\serve_web.ps1 -Device chrome` |
 
+### Quick command: maps + local backend + easier hot refresh
+
+Use this when running from **PowerShell** and you want:
+- Google Maps to load (API key injected),
+- local backend (`http://localhost:8080`) instead of prod,
+- easier/more reliable hot reload on Chrome while developing.
+
+```powershell
+.\scripts\inject_maps_key.ps1; try { flutter run -d chrome --web-renderer html } finally { .\scripts\restore_maps_key.ps1 }
+```
+
+Notes:
+- Start your local backend first on `http://localhost:8080`.
+- This runs in debug mode, so this codebase uses the local backend URL.
+- The `finally` block ensures `web/index.html` is restored even if run exits with an error.
+
 ---
 
 ## OpenAPI / API codegen (Node.js)

@@ -6,7 +6,36 @@
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
-      "args": ["-d", "chrome"],
+      "args": [
+        "-d",
+        "chrome"
+      ],
+      "preLaunchTask": "inject-maps-key",
+      "postDebugTask": "restore-maps-key"
+    },
+    {
+      "name": "Flutter Web Profile (with Maps key)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/main.dart",
+      "args": [
+        "-d",
+        "chrome"
+      ],
+      "preLaunchTask": "inject-maps-key",
+      "postDebugTask": "restore-maps-key"
+    },
+    {
+      "name": "Flutter Web Release (with Maps key)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/main.dart",
+      "args": [
+        "-d",
+        "chrome"
+      ],
       "preLaunchTask": "inject-maps-key",
       "postDebugTask": "restore-maps-key"
     }

@@ -63,7 +63,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/network',
-        redirect: (context, state) => '/network/graph',
+        redirect: (context, state) {
+          if (state.uri.path == '/network') {
+            return '/network/graph';
+          }
+          return null;
+        },
         routes: [
           GoRoute(
             path: 'graph',
@@ -71,9 +76,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 const NetworkGraphScreen(initialView: NetworkView.graph),
           ),
           GoRoute(
-            path: 'directory',
+            path: 'circuit',
             builder: (context, state) =>
                 const NetworkGraphScreen(initialView: NetworkView.grid),
+          ),
+          GoRoute(
+            path: 'directory',
+            redirect: (_, _) => '/network/circuit',
           ),
           GoRoute(
             path: 'map',

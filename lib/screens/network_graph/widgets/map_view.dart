@@ -173,13 +173,22 @@ class _NetworkMapViewState extends State<NetworkMapView> {
             padding: const EdgeInsets.symmetric(
                 horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.black.withAlpha(160),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.black.withAlpha(160)
+                  : Colors.white.withAlpha(220),
               borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Theme.of(context).dividerColor.withAlpha(120),
+              ),
             ),
             child: Text(
               '$geocodedCount locations mapped',
-              style: const TextStyle(
-                  color: Colors.white, fontSize: 12),
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.onSurface,
+                fontSize: 12,
+              ),
             ),
           ),
         ),

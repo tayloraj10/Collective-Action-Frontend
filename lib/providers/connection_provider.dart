@@ -23,6 +23,43 @@ final connectionSummaryProvider =
       return ref.read(_connectionServiceProvider).getSummaries(toType);
     });
 
+class EntityConnectionsQuery {
+  const EntityConnectionsQuery({
+    required this.toType,
+    required this.toId,
+    this.connectionType,
+  });
+
+  final String toType;
+  final String toId;
+  final String? connectionType;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is EntityConnectionsQuery &&
+          other.toType == toType &&
+          other.toId == toId &&
+          other.connectionType == connectionType;
+
+  @override
+  int get hashCode => Object.hash(toType, toId, connectionType);
+}
+
+final entityConnectionsProvider =
+    FutureProvider.family<
+      List<ConnectionWithUserSchema>,
+      EntityConnectionsQuery
+    >((ref, query) async {
+      return ref
+          .read(_connectionServiceProvider)
+          .getConnectionsForEntity(
+            toType: query.toType,
+            toId: query.toId,
+            connectionType: query.connectionType,
+          );
+    });
+
 // ── Current user's connections ────────────────────────────────────────────
 
 class MyConnectionsNotifier
@@ -80,12 +117,23 @@ class MyConnectionsNotifier
     }
   }
 
-  Future<void> disconnect(String toType, String toId) async {
+  Future<void> disconnect(
+    String toType,
+    String toId, {
+    String? fromType,
+    String? fromId,
+  }) async {
     final userId = ref.read(currentUserProvider).value?.id;
     if (userId == null) return;
 
     final conn = state.value
-        ?.where((c) => c.toType == toType && c.toId == toId)
+        ?.where(
+          (c) =>
+              c.toType == toType &&
+              c.toId == toId &&
+              (fromType == null || c.fromType == fromType) &&
+              (fromId == null || c.fromId == fromId),
+        )
         .firstOrNull;
     if (conn == null) return;
 
@@ -104,6 +152,7 @@ class MyConnectionsNotifier
 }
 
 final myConnectionsProvider =
-    AsyncNotifierProvider<MyConnectionsNotifier, List<ConnectionWithUserSchema>>(
-      MyConnectionsNotifier.new,
-    );
+    AsyncNotifierProvider<
+      MyConnectionsNotifier,
+      List<ConnectionWithUserSchema>
+    >(MyConnectionsNotifier.new);

@@ -48,6 +48,25 @@ class ConnectionService {
         .toList();
   }
 
+  Future<List<ConnectionWithUserSchema>> getConnectionsForEntity({
+    required String toType,
+    required String toId,
+    String? connectionType,
+  }) async {
+    final response = await _dio.get(
+      '/connections/entity/$toType/$toId',
+      queryParameters: {
+        if (connectionType != null && connectionType.isNotEmpty)
+          'connection_type': connectionType,
+      },
+    );
+    return (response.data as List)
+        .map(
+          (j) => ConnectionWithUserSchema.fromJson(j as Map<String, dynamic>)!,
+        )
+        .toList();
+  }
+
   /// One request to get aggregated counts + avatar previews for all entities
   /// of [toType] ('initiative' or 'directory_of_good').
   Future<Map<String, ConnectionSummarySchema>> getSummaries(String toType) async {
