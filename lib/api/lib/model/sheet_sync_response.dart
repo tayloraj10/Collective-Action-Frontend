@@ -17,6 +17,7 @@ class SheetSyncResponse {
     required this.updated,
     required this.skipped,
     required this.rowsSeen,
+    required this.geocoded,
     this.errors = const [],
   });
 
@@ -28,6 +29,8 @@ class SheetSyncResponse {
 
   int rowsSeen;
 
+  int geocoded;
+
   List<String> errors;
 
   @override
@@ -36,6 +39,7 @@ class SheetSyncResponse {
     other.updated == updated &&
     other.skipped == skipped &&
     other.rowsSeen == rowsSeen &&
+    other.geocoded == geocoded &&
     _deepEquality.equals(other.errors, errors);
 
   @override
@@ -45,10 +49,11 @@ class SheetSyncResponse {
     (updated.hashCode) +
     (skipped.hashCode) +
     (rowsSeen.hashCode) +
+    (geocoded.hashCode) +
     (errors.hashCode);
 
   @override
-  String toString() => 'SheetSyncResponse[created=$created, updated=$updated, skipped=$skipped, rowsSeen=$rowsSeen, errors=$errors]';
+  String toString() => 'SheetSyncResponse[created=$created, updated=$updated, skipped=$skipped, rowsSeen=$rowsSeen, geocoded=$geocoded, errors=$errors]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -56,6 +61,7 @@ class SheetSyncResponse {
       json[r'updated'] = this.updated;
       json[r'skipped'] = this.skipped;
       json[r'rows_seen'] = this.rowsSeen;
+      json[r'geocoded'] = this.geocoded;
       json[r'errors'] = this.errors;
     return json;
   }
@@ -83,6 +89,7 @@ class SheetSyncResponse {
         updated: mapValueOfType<int>(json, r'updated')!,
         skipped: mapValueOfType<int>(json, r'skipped')!,
         rowsSeen: mapValueOfType<int>(json, r'rows_seen')!,
+        geocoded: mapValueOfType<int>(json, r'geocoded')!,
         errors: json[r'errors'] is Iterable
             ? (json[r'errors'] as Iterable).cast<String>().toList(growable: false)
             : const [],
@@ -137,6 +144,7 @@ class SheetSyncResponse {
     'updated',
     'skipped',
     'rows_seen',
+    'geocoded',
     'errors',
   };
 }

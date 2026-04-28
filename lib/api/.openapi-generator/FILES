@@ -18,6 +18,11 @@ doc/CategorySchema.md
 doc/CleanupEventData.md
 doc/CleanupRouteEventData.md
 doc/CleanupWaypoint.md
+doc/ConnectionCreateSchema.md
+doc/ConnectionSchema.md
+doc/ConnectionSummarySchema.md
+doc/ConnectionWithUserSchema.md
+doc/ConnectionsApi.md
 doc/DefaultApi.md
 doc/DirectoryOfGoodApi.md
 doc/DirectoryOfGoodCreate.md
@@ -26,6 +31,7 @@ doc/DirectoryOfGoodUpdate.md
 doc/EventDataBase.md
 doc/EventDataType.md
 doc/FeatureUpdate.md
+doc/ImageProxyApi.md
 doc/InitiativeCreateSchema.md
 doc/InitiativeSchema.md
 doc/InitiativesApi.md
@@ -40,6 +46,7 @@ doc/MapCampaignTypeEnum.md
 doc/MapCampaignsApi.md
 doc/MemberIdsByRole.md
 doc/PhotosApi.md
+doc/PreviewUserSchema.md
 doc/ProjectCreateSchema.md
 doc/ProjectLinkSchema.md
 doc/ProjectRoleCreateSchema.md
@@ -76,8 +83,10 @@ lib/api.dart
 lib/api/action_types_api.dart
 lib/api/actions_api.dart
 lib/api/categories_api.dart
+lib/api/connections_api.dart
 lib/api/default_api.dart
 lib/api/directory_of_good_api.dart
+lib/api/image_proxy_api.dart
 lib/api/initiatives_api.dart
 lib/api/links_api.dart
 lib/api/map_campaigns_api.dart
@@ -109,6 +118,10 @@ lib/model/category_schema.dart
 lib/model/cleanup_event_data.dart
 lib/model/cleanup_route_event_data.dart
 lib/model/cleanup_waypoint.dart
+lib/model/connection_create_schema.dart
+lib/model/connection_schema.dart
+lib/model/connection_summary_schema.dart
+lib/model/connection_with_user_schema.dart
 lib/model/directory_of_good_create.dart
 lib/model/directory_of_good_schema.dart
 lib/model/directory_of_good_update.dart
@@ -125,6 +138,7 @@ lib/model/map_campaign_create_schema.dart
 lib/model/map_campaign_schema.dart
 lib/model/map_campaign_type_enum.dart
 lib/model/member_ids_by_role.dart
+lib/model/preview_user_schema.dart
 lib/model/project_create_schema.dart
 lib/model/project_link_schema.dart
 lib/model/project_role_create_schema.dart
@@ -151,4 +165,10 @@ lib/model/user_type.dart
 lib/model/user_update.dart
 lib/model/zip_code_submission_event_data.dart
 pubspec.yaml
-test/sheet_sync_response_test.dart
+test/connection_create_schema_test.dart
+test/connection_schema_test.dart
+test/connection_summary_schema_test.dart
+test/connection_with_user_schema_test.dart
+test/connections_api_test.dart
+test/image_proxy_api_test.dart
+test/preview_user_schema_test.dart

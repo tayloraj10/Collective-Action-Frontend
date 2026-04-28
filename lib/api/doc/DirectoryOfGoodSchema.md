@@ -17,6 +17,8 @@ Name | Type | Description | Notes
 **socialLinks** | [**SocialLinksSchema**](SocialLinksSchema.md) |  | [optional] 
 **userId** | **String** |  | [optional] 
 **featured** | **bool** |  | [optional] [default to false]
+**latitude** | **num** |  | [optional] 
+**longitude** | **num** |  | [optional] 
 **createdAt** | [**DateTime**](DateTime.md) |  | [optional] 
 **updatedAt** | [**DateTime**](DateTime.md) |  | [optional] 
 

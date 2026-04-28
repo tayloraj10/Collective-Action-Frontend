@@ -208,6 +208,14 @@ class ApiClient {
           return CleanupRouteEventData.fromJson(value);
         case 'CleanupWaypoint':
           return CleanupWaypoint.fromJson(value);
+        case 'ConnectionCreateSchema':
+          return ConnectionCreateSchema.fromJson(value);
+        case 'ConnectionSchema':
+          return ConnectionSchema.fromJson(value);
+        case 'ConnectionSummarySchema':
+          return ConnectionSummarySchema.fromJson(value);
+        case 'ConnectionWithUserSchema':
+          return ConnectionWithUserSchema.fromJson(value);
         case 'DirectoryOfGoodCreate':
           return DirectoryOfGoodCreate.fromJson(value);
         case 'DirectoryOfGoodSchema':
@@ -240,6 +248,8 @@ class ApiClient {
           return MapCampaignTypeEnumTypeTransformer().decode(value);
         case 'MemberIdsByRole':
           return MemberIdsByRole.fromJson(value);
+        case 'PreviewUserSchema':
+          return PreviewUserSchema.fromJson(value);
         case 'ProjectCreateSchema':
           return ProjectCreateSchema.fromJson(value);
         case 'ProjectLinkSchema':

@@ -78,6 +78,11 @@ Class | Method | HTTP request | Description
 *CategoriesApi* | [**getCategoryCategoriesCategoryIdGet**](doc//CategoriesApi.md#getcategorycategoriescategoryidget) | **GET** /categories/{category_id} | Get Category
 *CategoriesApi* | [**listCategoriesCategoriesGet**](doc//CategoriesApi.md#listcategoriescategoriesget) | **GET** /categories/ | List Categories
 *CategoriesApi* | [**updateCategoryCategoriesCategoryIdPut**](doc//CategoriesApi.md#updatecategorycategoriescategoryidput) | **PUT** /categories/{category_id} | Update Category
+*ConnectionsApi* | [**createConnectionConnectionsPost**](doc//ConnectionsApi.md#createconnectionconnectionspost) | **POST** /connections/ | Create Connection
+*ConnectionsApi* | [**deleteConnectionConnectionsConnectionIdDelete**](doc//ConnectionsApi.md#deleteconnectionconnectionsconnectioniddelete) | **DELETE** /connections/{connection_id} | Delete Connection
+*ConnectionsApi* | [**getConnectionSummaryConnectionsSummaryToTypeGet**](doc//ConnectionsApi.md#getconnectionsummaryconnectionssummarytotypeget) | **GET** /connections/summary/{to_type} | Get Connection Summary
+*ConnectionsApi* | [**getConnectionsForEntityConnectionsEntityToTypeToIdGet**](doc//ConnectionsApi.md#getconnectionsforentityconnectionsentitytotypetoidget) | **GET** /connections/entity/{to_type}/{to_id} | Get Connections For Entity
+*ConnectionsApi* | [**getConnectionsForUserConnectionsUserUserIdGet**](doc//ConnectionsApi.md#getconnectionsforuserconnectionsuseruseridget) | **GET** /connections/user/{user_id} | Get Connections For User
 *DefaultApi* | [**healthHealthGet**](doc//DefaultApi.md#healthhealthget) | **GET** /health | Health
 *DirectoryOfGoodApi* | [**createEntryDirectoryOfGoodPost**](doc//DirectoryOfGoodApi.md#createentrydirectoryofgoodpost) | **POST** /directory-of-good/ | Create Entry
 *DirectoryOfGoodApi* | [**deleteEntryDirectoryOfGoodEntryIdDelete**](doc//DirectoryOfGoodApi.md#deleteentrydirectoryofgoodentryiddelete) | **DELETE** /directory-of-good/{entry_id} | Delete Entry
@@ -87,6 +92,7 @@ Class | Method | HTTP request | Description
 *DirectoryOfGoodApi* | [**setFeaturedDirectoryOfGoodEntryIdFeaturePatch**](doc//DirectoryOfGoodApi.md#setfeatureddirectoryofgoodentryidfeaturepatch) | **PATCH** /directory-of-good/{entry_id}/feature | Set Featured
 *DirectoryOfGoodApi* | [**syncFromGoogleSheetDirectoryOfGoodSyncFromGoogleSheetPost**](doc//DirectoryOfGoodApi.md#syncfromgooglesheetdirectoryofgoodsyncfromgooglesheetpost) | **POST** /directory-of-good/sync-from-google-sheet | Sync From Google Sheet
 *DirectoryOfGoodApi* | [**updateEntryDirectoryOfGoodEntryIdPatch**](doc//DirectoryOfGoodApi.md#updateentrydirectoryofgoodentryidpatch) | **PATCH** /directory-of-good/{entry_id} | Update Entry
+*ImageProxyApi* | [**proxyImageImageProxyGet**](doc//ImageProxyApi.md#proxyimageimageproxyget) | **GET** /image-proxy/ | Proxy Image
 *InitiativesApi* | [**createInitiativeInitiativesPost**](doc//InitiativesApi.md#createinitiativeinitiativespost) | **POST** /initiatives/ | Create Initiative
 *InitiativesApi* | [**deleteInitiativeInitiativesInitiativeIdDelete**](doc//InitiativesApi.md#deleteinitiativeinitiativesinitiativeiddelete) | **DELETE** /initiatives/{initiative_id} | Delete Initiative
 *InitiativesApi* | [**getFeaturedInitiativesInitiativesFeaturedGet**](doc//InitiativesApi.md#getfeaturedinitiativesinitiativesfeaturedget) | **GET** /initiatives/featured | Get Featured Initiatives
@@ -173,6 +179,10 @@ Class | Method | HTTP request | Description
  - [CleanupEventData](doc//CleanupEventData.md)
  - [CleanupRouteEventData](doc//CleanupRouteEventData.md)
  - [CleanupWaypoint](doc//CleanupWaypoint.md)
+ - [ConnectionCreateSchema](doc//ConnectionCreateSchema.md)
+ - [ConnectionSchema](doc//ConnectionSchema.md)
+ - [ConnectionSummarySchema](doc//ConnectionSummarySchema.md)
+ - [ConnectionWithUserSchema](doc//ConnectionWithUserSchema.md)
  - [DirectoryOfGoodCreate](doc//DirectoryOfGoodCreate.md)
  - [DirectoryOfGoodSchema](doc//DirectoryOfGoodSchema.md)
  - [DirectoryOfGoodUpdate](doc//DirectoryOfGoodUpdate.md)
@@ -189,6 +199,7 @@ Class | Method | HTTP request | Description
  - [MapCampaignSchema](doc//MapCampaignSchema.md)
  - [MapCampaignTypeEnum](doc//MapCampaignTypeEnum.md)
  - [MemberIdsByRole](doc//MemberIdsByRole.md)
+ - [PreviewUserSchema](doc//PreviewUserSchema.md)
  - [ProjectCreateSchema](doc//ProjectCreateSchema.md)
  - [ProjectLinkSchema](doc//ProjectLinkSchema.md)
  - [ProjectRoleCreateSchema](doc//ProjectRoleCreateSchema.md)

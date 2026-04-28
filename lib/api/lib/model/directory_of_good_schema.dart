@@ -22,6 +22,8 @@ class DirectoryOfGoodSchema {
     this.socialLinks,
     this.userId,
     this.featured = false,
+    this.latitude,
+    this.longitude,
     this.createdAt,
     this.updatedAt,
   });
@@ -44,6 +46,10 @@ class DirectoryOfGoodSchema {
 
   bool featured;
 
+  num? latitude;
+
+  num? longitude;
+
   DateTime? createdAt;
 
   DateTime? updatedAt;
@@ -59,6 +65,8 @@ class DirectoryOfGoodSchema {
     other.socialLinks == socialLinks &&
     other.userId == userId &&
     other.featured == featured &&
+    other.latitude == latitude &&
+    other.longitude == longitude &&
     other.createdAt == createdAt &&
     other.updatedAt == updatedAt;
 
@@ -74,11 +82,13 @@ class DirectoryOfGoodSchema {
     (socialLinks == null ? 0 : socialLinks!.hashCode) +
     (userId == null ? 0 : userId!.hashCode) +
     (featured.hashCode) +
+    (latitude == null ? 0 : latitude!.hashCode) +
+    (longitude == null ? 0 : longitude!.hashCode) +
     (createdAt == null ? 0 : createdAt!.hashCode) +
     (updatedAt == null ? 0 : updatedAt!.hashCode);
 
   @override
-  String toString() => 'DirectoryOfGoodSchema[id=$id, name=$name, focus=$focus, categoryId=$categoryId, imageUrl=$imageUrl, location=$location, socialLinks=$socialLinks, userId=$userId, featured=$featured, createdAt=$createdAt, updatedAt=$updatedAt]';
+  String toString() => 'DirectoryOfGoodSchema[id=$id, name=$name, focus=$focus, categoryId=$categoryId, imageUrl=$imageUrl, location=$location, socialLinks=$socialLinks, userId=$userId, featured=$featured, latitude=$latitude, longitude=$longitude, createdAt=$createdAt, updatedAt=$updatedAt]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -119,6 +129,16 @@ class DirectoryOfGoodSchema {
       json[r'user_id'] = null;
     }
       json[r'featured'] = this.featured;
+    if (this.latitude != null) {
+      json[r'latitude'] = this.latitude;
+    } else {
+      json[r'latitude'] = null;
+    }
+    if (this.longitude != null) {
+      json[r'longitude'] = this.longitude;
+    } else {
+      json[r'longitude'] = null;
+    }
     if (this.createdAt != null) {
       json[r'created_at'] = this.createdAt!.toUtc().toIso8601String();
     } else {
@@ -160,6 +180,12 @@ class DirectoryOfGoodSchema {
         socialLinks: SocialLinksSchema.fromJson(json[r'social_links']),
         userId: mapValueOfType<String>(json, r'user_id'),
         featured: mapValueOfType<bool>(json, r'featured') ?? false,
+        latitude: json[r'latitude'] == null
+            ? null
+            : num.parse('${json[r'latitude']}'),
+        longitude: json[r'longitude'] == null
+            ? null
+            : num.parse('${json[r'longitude']}'),
         createdAt: mapDateTime(json, r'created_at', r''),
         updatedAt: mapDateTime(json, r'updated_at', r''),
       );
