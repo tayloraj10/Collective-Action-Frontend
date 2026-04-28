@@ -69,6 +69,7 @@ Class | Method | HTTP request | Description
 *ActionsApi* | [**deleteActionActionsActionIdDelete**](doc//ActionsApi.md#deleteactionactionsactioniddelete) | **DELETE** /actions/{action_id} | Delete Action
 *ActionsApi* | [**getActionActionsActionIdGet**](doc//ActionsApi.md#getactionactionsactionidget) | **GET** /actions/{action_id} | Get Action
 *ActionsApi* | [**getActionsByLinkedActionsByLinkedLinkedIdGet**](doc//ActionsApi.md#getactionsbylinkedactionsbylinkedlinkedidget) | **GET** /actions/by_linked/{linked_id} | Get Actions By Linked
+*ActionsApi* | [**getActionsByUserActionsUserUserIdGet**](doc//ActionsApi.md#getactionsbyuseractionsuseruseridget) | **GET** /actions/user/{user_id} | Get Actions By User
 *ActionsApi* | [**getLatestActionsActionsRecentGet**](doc//ActionsApi.md#getlatestactionsactionsrecentget) | **GET** /actions/recent | Get Latest Actions
 *ActionsApi* | [**listActionsActionsGet**](doc//ActionsApi.md#listactionsactionsget) | **GET** /actions/ | List Actions
 *ActionsApi* | [**removeActionLikeActionsActionIdLikeDelete**](doc//ActionsApi.md#removeactionlikeactionsactionidlikedelete) | **DELETE** /actions/{action_id}/like | Remove Action Like
@@ -159,6 +160,7 @@ Class | Method | HTTP request | Description
 *UsersApi* | [**deleteUserUsersUserIdDelete**](doc//UsersApi.md#deleteuserusersuseriddelete) | **DELETE** /users/{user_id} | Delete User
 *UsersApi* | [**getUserByFirebaseIdUsersFirebaseIdGet**](doc//UsersApi.md#getuserbyfirebaseidusersfirebaseidget) | **GET** /users/{firebase_id} | Get User By Firebase Id
 *UsersApi* | [**getUserByUserIdUsersDbUserIdGet**](doc//UsersApi.md#getuserbyuseridusersdbuseridget) | **GET** /users/db/{user_id} | Get User By User Id
+*UsersApi* | [**getUserStatsUsersDbUserIdStatsGet**](doc//UsersApi.md#getuserstatsusersdbuseridstatsget) | **GET** /users/db/{user_id}/stats | Get User Stats
 *UsersApi* | [**listUsersUsersGet**](doc//UsersApi.md#listusersusersget) | **GET** /users/ | List Users
 *UsersApi* | [**updateUserPhotoUsersUserIdPhotoPatch**](doc//UsersApi.md#updateuserphotousersuseridphotopatch) | **PATCH** /users/{user_id}/photo | Update User Photo
 *UsersApi* | [**updateUserUsersUserIdPatch**](doc//UsersApi.md#updateuserusersuseridpatch) | **PATCH** /users/{user_id} | Update User
@@ -197,6 +199,7 @@ Class | Method | HTTP request | Description
  - [LocationSchema](doc//LocationSchema.md)
  - [MapCampaignCreateSchema](doc//MapCampaignCreateSchema.md)
  - [MapCampaignSchema](doc//MapCampaignSchema.md)
+ - [MapCampaignStatsSchema](doc//MapCampaignStatsSchema.md)
  - [MapCampaignTypeEnum](doc//MapCampaignTypeEnum.md)
  - [MemberIdsByRole](doc//MemberIdsByRole.md)
  - [PreviewUserSchema](doc//PreviewUserSchema.md)
@@ -222,6 +225,7 @@ Class | Method | HTTP request | Description
  - [UserCreate](doc//UserCreate.md)
  - [UserPhotoUpdate](doc//UserPhotoUpdate.md)
  - [UserSchema](doc//UserSchema.md)
+ - [UserStatsSchema](doc//UserStatsSchema.md)
  - [UserType](doc//UserType.md)
  - [UserUpdate](doc//UserUpdate.md)
  - [ZipCodeSubmissionEventData](doc//ZipCodeSubmissionEventData.md)

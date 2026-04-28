@@ -2043,6 +2043,79 @@
                 }
             }
         },
+        "/actions/user/{user_id}": {
+            "get": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Get Actions By User",
+                "description": "All actions submitted by a specific user, newest first.",
+                "operationId": "get_actions_by_user_actions_user__user_id__get",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "User Id"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "Maximum number of actions to return",
+                            "title": "Limit"
+                        },
+                        "description": "Maximum number of actions to return"
+                    },
+                    {
+                        "name": "action_type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/components/schemas/ActionTypeValuesEnum"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "title": "Action Type"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ActionSchema"
+                                    },
+                                    "title": "Response Get Actions By User Actions User  User Id  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/connections/": {
             "post": {
                 "tags": [
@@ -3309,6 +3382,40 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/UserSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/db/{user_id}/stats": {
+            "get": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get User Stats",
+                "description": "Aggregated contribution and impact stats for a user.",
+                "operationId": "get_user_stats_users_db__user_id__stats_get",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "User Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserStatsSchema"
                                 }
                             }
                         }
@@ -5150,6 +5257,55 @@
                 ],
                 "title": "MapCampaignSchema"
             },
+            "MapCampaignStatsSchema": {
+                "properties": {
+                    "campaign_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Campaign Id"
+                    },
+                    "campaign_name": {
+                        "type": "string",
+                        "title": "Campaign Name",
+                        "default": "Unknown campaign"
+                    },
+                    "submission_count": {
+                        "type": "integer",
+                        "title": "Submission Count",
+                        "default": 0
+                    },
+                    "cleanup_count": {
+                        "type": "integer",
+                        "title": "Cleanup Count",
+                        "default": 0
+                    },
+                    "trash_report_count": {
+                        "type": "integer",
+                        "title": "Trash Report Count",
+                        "default": 0
+                    },
+                    "total_bags": {
+                        "type": "integer",
+                        "title": "Total Bags",
+                        "default": 0
+                    },
+                    "total_pounds": {
+                        "type": "number",
+                        "title": "Total Pounds",
+                        "default": 0.0
+                    }
+                },
+                "type": "object",
+                "title": "MapCampaignStatsSchema",
+                "description": "Stats for a single map campaign the user has submitted to."
+            },
             "MapCampaignTypeEnum": {
                 "type": "string",
                 "enum": [
@@ -6241,6 +6397,158 @@
                 },
                 "type": "object",
                 "title": "UserSchema"
+            },
+            "UserStatsSchema": {
+                "properties": {
+                    "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "User Id"
+                    },
+                    "map_submission_count": {
+                        "type": "integer",
+                        "title": "Map Submission Count",
+                        "default": 0
+                    },
+                    "cleanup_count": {
+                        "type": "integer",
+                        "title": "Cleanup Count",
+                        "default": 0
+                    },
+                    "trash_report_count": {
+                        "type": "integer",
+                        "title": "Trash Report Count",
+                        "default": 0
+                    },
+                    "total_small_bags": {
+                        "type": "integer",
+                        "title": "Total Small Bags",
+                        "default": 0
+                    },
+                    "total_large_bags": {
+                        "type": "integer",
+                        "title": "Total Large Bags",
+                        "default": 0
+                    },
+                    "total_bags": {
+                        "type": "integer",
+                        "title": "Total Bags",
+                        "default": 0
+                    },
+                    "total_pounds": {
+                        "type": "number",
+                        "title": "Total Pounds",
+                        "default": 0.0
+                    },
+                    "initiative_action_count": {
+                        "type": "integer",
+                        "title": "Initiative Action Count",
+                        "default": 0
+                    },
+                    "initiatives_participated": {
+                        "type": "integer",
+                        "title": "Initiatives Participated",
+                        "default": 0
+                    },
+                    "map_campaign_breakdown": {
+                        "items": {
+                            "$ref": "#/components/schemas/MapCampaignStatsSchema"
+                        },
+                        "type": "array",
+                        "title": "Map Campaign Breakdown",
+                        "default": []
+                    },
+                    "action_type_counts": {
+                        "additionalProperties": {
+                            "type": "integer"
+                        },
+                        "type": "object",
+                        "title": "Action Type Counts",
+                        "default": {}
+                    },
+                    "follows_count": {
+                        "type": "integer",
+                        "title": "Follows Count",
+                        "default": 0
+                    },
+                    "contributions_count": {
+                        "type": "integer",
+                        "title": "Contributions Count",
+                        "default": 0
+                    },
+                    "org_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Org Id"
+                    },
+                    "org_name": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Org Name"
+                    },
+                    "org_followers_count": {
+                        "type": "integer",
+                        "title": "Org Followers Count",
+                        "default": 0
+                    },
+                    "org_partnerships_count": {
+                        "type": "integer",
+                        "title": "Org Partnerships Count",
+                        "default": 0
+                    },
+                    "org_initiative_connections": {
+                        "type": "integer",
+                        "title": "Org Initiative Connections",
+                        "default": 0
+                    },
+                    "total_actions": {
+                        "type": "integer",
+                        "title": "Total Actions",
+                        "default": 0
+                    },
+                    "first_action_date": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "First Action Date"
+                    },
+                    "last_action_date": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Last Action Date"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "user_id"
+                ],
+                "title": "UserStatsSchema"
             },
             "UserType": {
                 "type": "string",

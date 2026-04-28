@@ -42,6 +42,7 @@ doc/LinksApi.md
 doc/LocationSchema.md
 doc/MapCampaignCreateSchema.md
 doc/MapCampaignSchema.md
+doc/MapCampaignStatsSchema.md
 doc/MapCampaignTypeEnum.md
 doc/MapCampaignsApi.md
 doc/MemberIdsByRole.md
@@ -74,6 +75,7 @@ doc/TrashReportEventData.md
 doc/UserCreate.md
 doc/UserPhotoUpdate.md
 doc/UserSchema.md
+doc/UserStatsSchema.md
 doc/UserType.md
 doc/UserUpdate.md
 doc/UsersApi.md
@@ -136,6 +138,7 @@ lib/model/link_update_schema.dart
 lib/model/location_schema.dart
 lib/model/map_campaign_create_schema.dart
 lib/model/map_campaign_schema.dart
+lib/model/map_campaign_stats_schema.dart
 lib/model/map_campaign_type_enum.dart
 lib/model/member_ids_by_role.dart
 lib/model/preview_user_schema.dart
@@ -161,7 +164,10 @@ lib/model/trash_report_event_data.dart
 lib/model/user_create.dart
 lib/model/user_photo_update.dart
 lib/model/user_schema.dart
+lib/model/user_stats_schema.dart
 lib/model/user_type.dart
 lib/model/user_update.dart
 lib/model/zip_code_submission_event_data.dart
 pubspec.yaml
+test/map_campaign_stats_schema_test.dart
+test/user_stats_schema_test.dart

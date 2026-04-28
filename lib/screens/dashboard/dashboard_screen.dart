@@ -116,57 +116,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
                 child: isMobile
                     ? null
-                    //  Row(
-                    //     children: [
-                    //       Expanded(
-                    //         child: NavigationButton(
-                    //           icon: Icons.trending_up,
-                    //           label: 'Initiatives',
-                    //           color: AppColors.lightBlue,
-                    //           onTap: () {
-                    //             context.go('/initiatives');
-                    //           },
-                    //           small: true,
-                    //         ),
-                    //       ),
-                    //       SizedBox(width: 4),
-                    //       Expanded(
-                    //         child: NavigationButton(
-                    //           icon: Icons.assignment_outlined,
-                    //           label: 'Projects',
-                    //           color: AppColors.errorRed,
-                    //           onTap: () {
-                    //             context.go('/projects');
-                    //           },
-                    //           small: true,
-                    //         ),
-                    //       ),
-                    //       SizedBox(width: 4),
-                    //       Expanded(
-                    //         child: NavigationButton(
-                    //           icon: Icons.map_outlined,
-                    //           label: 'Maps',
-                    //           color: AppColors.successGreen,
-                    //           onTap: () {
-                    //             context.go('/maps');
-                    //           },
-                    //           small: true,
-                    //         ),
-                    //       ),
-                    //       SizedBox(width: 4),
-                    //       Expanded(
-                    //         child: NavigationButton(
-                    //           icon: Icons.people_outline,
-                    //           label: 'Social',
-                    //           color: AppColors.warningOrange,
-                    //           onTap: () {
-                    //             context.go('/social');
-                    //           },
-                    //           small: true,
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   )
                     : SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
@@ -197,6 +146,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                               label: 'Social',
                               color: AppColors.warningOrange,
                               onTap: () => safeGo(context, '/social'),
+                            ),
+                            SizedBox(width: 12),
+                            NavigationButton(
+                              icon: Icons.hub_outlined,
+                              label: 'Network',
+                              color: AppColors.statusInReview,
+                              onTap: () => safeGo(context, '/network'),
                             ),
                           ],
                         ),

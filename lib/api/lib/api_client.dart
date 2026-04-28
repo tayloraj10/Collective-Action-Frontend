@@ -244,6 +244,8 @@ class ApiClient {
           return MapCampaignCreateSchema.fromJson(value);
         case 'MapCampaignSchema':
           return MapCampaignSchema.fromJson(value);
+        case 'MapCampaignStatsSchema':
+          return MapCampaignStatsSchema.fromJson(value);
         case 'MapCampaignTypeEnum':
           return MapCampaignTypeEnumTypeTransformer().decode(value);
         case 'MemberIdsByRole':
@@ -294,6 +296,8 @@ class ApiClient {
           return UserPhotoUpdate.fromJson(value);
         case 'UserSchema':
           return UserSchema.fromJson(value);
+        case 'UserStatsSchema':
+          return UserStatsSchema.fromJson(value);
         case 'UserType':
           return UserTypeTypeTransformer().decode(value);
         case 'UserUpdate':
