@@ -71,6 +71,10 @@ dev_dependencies:
     sdk: flutter
   openapi_generator: ^6.1.0
 
+dependency_overrides:
+  graphify:
+    path: third_party/graphify
+
 # Generate app icons and web favicon. Add assets/images/app_icon.png (512x512 or 1024x1024), then run:
 #   dart run flutter_launcher_icons
 flutter_launcher_icons:

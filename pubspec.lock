@@ -707,10 +707,9 @@ packages:
   graphify:
     dependency: "direct main"
     description:
-      name: graphify
-      sha256: c4553052b3659720d65c3e02ed987786bd115df39d9b1e1ef6eca02504643ca5
-      url: "https://pub.dev"
-    source: hosted
+      path: "third_party/graphify"
+      relative: true
+    source: path
     version: "1.2.1"
   graphs:
     dependency: transitive
