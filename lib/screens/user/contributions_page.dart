@@ -1,8 +1,6 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
-import 'package:collective_action_frontend/models/connection_model.dart';
-import 'package:collective_action_frontend/models/user_stats_model.dart';
 import 'package:collective_action_frontend/providers/connection_provider.dart';
 import 'package:collective_action_frontend/providers/directory_of_good_provider.dart';
 import 'package:collective_action_frontend/providers/initiative_provider.dart';
@@ -112,10 +110,10 @@ class _PageBody extends StatelessWidget {
   });
 
   final String userId;
-  final UserStatsModel stats;
+  final UserStatsSchema stats;
   final UserSchema? user;
   final List<ActionSchema> actions;
-  final List<ConnectionModel> conns;
+  final List<ConnectionWithUserSchema> conns;
   final List<DirectoryOfGoodSchema> dogs;
   final List<InitiativeSchema> inits;
   final List<MapCampaignSchema> campaigns;
@@ -155,7 +153,7 @@ class _Header extends StatelessWidget {
   });
 
   final String userId;
-  final UserStatsModel stats;
+  final UserStatsSchema stats;
   final UserSchema? user;
 
   @override
@@ -217,7 +215,7 @@ class _Header extends StatelessWidget {
                             color: colors.textMuted, fontSize: 13)),
                   ]),
                 ],
-                if (stats.hasOrg) ...[
+                if (stats.orgId != null) ...[
                   const SizedBox(height: 6),
                   _OrgBadge(name: stats.orgName ?? ''),
                 ],
@@ -331,7 +329,7 @@ const _kInitColor = Color(0xFF3B82F6); // AppColors.lightBlue
 
 class _TwoCardHero extends StatelessWidget {
   const _TwoCardHero({required this.stats, required this.isMobile});
-  final UserStatsModel stats;
+  final UserStatsSchema stats;
   final bool isMobile;
 
   @override
@@ -411,7 +409,7 @@ class _Detail {
 
 class _MapContribCard extends StatelessWidget {
   const _MapContribCard({required this.stats});
-  final UserStatsModel stats;
+  final UserStatsSchema stats;
 
   @override
   Widget build(BuildContext context) {
@@ -488,7 +486,7 @@ class _MapContribCard extends StatelessWidget {
 
 class _CampaignTile extends StatelessWidget {
   const _CampaignTile({required this.campaign});
-  final MapCampaignStats campaign;
+  final MapCampaignStatsSchema campaign;
 
   @override
   Widget build(BuildContext context) {
@@ -654,9 +652,9 @@ class _DesktopBody extends StatelessWidget {
     required this.campaigns,
   });
 
-  final UserStatsModel stats;
+  final UserStatsSchema stats;
   final List<ActionSchema> actions;
-  final List<ConnectionModel> conns;
+  final List<ConnectionWithUserSchema> conns;
   final List<DirectoryOfGoodSchema> dogs;
   final List<InitiativeSchema> inits;
   final List<MapCampaignSchema> campaigns;
@@ -674,7 +672,7 @@ class _DesktopBody extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (stats.hasOrg) ...[
+                if (stats.orgId != null) ...[
                   _Section(label: 'Organization', color: const Color(0xFF0D9488),
                       icon: Icons.people_outline),
                   const SizedBox(height: 12),
@@ -724,9 +722,9 @@ class _MobileBody extends StatelessWidget {
     required this.campaigns,
   });
 
-  final UserStatsModel stats;
+  final UserStatsSchema stats;
   final List<ActionSchema> actions;
-  final List<ConnectionModel> conns;
+  final List<ConnectionWithUserSchema> conns;
   final List<DirectoryOfGoodSchema> dogs;
   final List<InitiativeSchema> inits;
   final List<MapCampaignSchema> campaigns;
@@ -738,7 +736,7 @@ class _MobileBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (stats.hasOrg) ...[
+          if (stats.orgId != null) ...[
             _Section(label: 'Organization', color: const Color(0xFF0D9488),
                 icon: Icons.people_outline),
             const SizedBox(height: 12),
@@ -795,7 +793,7 @@ class _Section extends StatelessWidget {
 
 class _OrgStatsCard extends StatelessWidget {
   const _OrgStatsCard({required this.stats});
-  final UserStatsModel stats;
+  final UserStatsSchema stats;
 
   @override
   Widget build(BuildContext context) {
@@ -865,7 +863,7 @@ class _ConnectionsList extends StatelessWidget {
     required this.inits,
   });
 
-  final List<ConnectionModel> conns;
+  final List<ConnectionWithUserSchema> conns;
   final List<DirectoryOfGoodSchema> dogs;
   final List<InitiativeSchema> inits;
 
@@ -876,10 +874,10 @@ class _ConnectionsList extends StatelessWidget {
     final initById = {for (final i in inits) i.id: i};
 
     final follows = conns
-        .where((c) => c.isFollow && c.fromType == 'user')
+        .where((c) => c.connectionType == 'follow' && c.fromType == 'user')
         .toList();
     final contribs = conns
-        .where((c) => c.isContribution && c.fromType == 'user')
+        .where((c) => c.connectionType == 'contribution' && c.fromType == 'user')
         .toList();
 
     if (follows.isEmpty && contribs.isEmpty) {

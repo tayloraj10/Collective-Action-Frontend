@@ -1,6 +1,5 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
-import 'package:collective_action_frontend/models/user_stats_model.dart';
 import 'package:dio/dio.dart';
 
 class UserStatsService {
@@ -12,9 +11,9 @@ class UserStatsService {
 
   final Dio _dio;
 
-  Future<UserStatsModel> getStats(String userId) async {
+  Future<UserStatsSchema> getStats(String userId) async {
     final r = await _dio.get('/users/db/$userId/stats');
-    return UserStatsModel.fromJson(r.data as Map<String, dynamic>);
+    return UserStatsSchema.fromJson(r.data as Map<String, dynamic>)!;
   }
 
   Future<List<ActionSchema>> getUserActions(String userId,

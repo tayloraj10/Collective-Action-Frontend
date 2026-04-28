@@ -63,7 +63,24 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/network',
-        builder: (context, state) => const NetworkGraphScreen(),
+        redirect: (context, state) => '/network/graph',
+        routes: [
+          GoRoute(
+            path: 'graph',
+            builder: (context, state) =>
+                const NetworkGraphScreen(initialView: NetworkView.graph),
+          ),
+          GoRoute(
+            path: 'directory',
+            builder: (context, state) =>
+                const NetworkGraphScreen(initialView: NetworkView.grid),
+          ),
+          GoRoute(
+            path: 'map',
+            builder: (context, state) =>
+                const NetworkGraphScreen(initialView: NetworkView.map),
+          ),
+        ],
       ),
       GoRoute(
         path: '/contributions/:userId',
