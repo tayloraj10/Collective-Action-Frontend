@@ -165,10 +165,3 @@ lib/model/user_type.dart
 lib/model/user_update.dart
 lib/model/zip_code_submission_event_data.dart
 pubspec.yaml
-test/connection_create_schema_test.dart
-test/connection_schema_test.dart
-test/connection_summary_schema_test.dart
-test/connection_with_user_schema_test.dart
-test/connections_api_test.dart
-test/image_proxy_api_test.dart
-test/preview_user_schema_test.dart

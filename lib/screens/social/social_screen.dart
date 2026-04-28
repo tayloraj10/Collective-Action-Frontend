@@ -42,7 +42,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
   ) {
     if (categoryId == null) return entries;
     return entries
-        .where((e) => e.categoryId != null && e.categoryId == categoryId)
+        .where((e) => e.categoryIds.contains(categoryId))
         .toList();
   }
 
@@ -423,47 +423,52 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
     List<DirectoryOfGoodSchema> allEntries,
   ) {
     final theme = Theme.of(context);
-    final categoryIdsInData = allEntries
-        .map((e) => e.categoryId)
-        .whereType<String>()
-        .toSet();
+    final isMobile = AppConstants.isMobile(context);
 
     return categoriesAsync.when(
       loading: () => const SizedBox.shrink(),
       error: (_, _) => const SizedBox.shrink(),
       data: (categories) {
-        final categoriesInData = categories
-            .where((c) => c.id != null && categoryIdsInData.contains(c.id))
-            .toList();
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CategoryChip(
-                label: 'All',
-                compact: false,
-                selected: _selectedCategoryId == null,
-                onTap: () => setState(() => _selectedCategoryId = null),
-                colorOverride: theme.colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              ...categoriesInData.map((category) {
-                final isSelected = _selectedCategoryId == category.id;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: CategoryChip(
-                    categoryId: category.id,
-                    compact: false,
-                    selected: isSelected,
-                    onTap: () =>
-                        setState(() => _selectedCategoryId = category.id),
-                  ),
-                );
-              }),
-            ],
+        final sorted = [...categories]
+          ..sort((a, b) => a.name.compareTo(b.name));
+
+        final chips = <Widget>[
+          CategoryChip(
+            label: 'All',
+            compact: true,
+            selected: _selectedCategoryId == null,
+            onTap: () => setState(() => _selectedCategoryId = null),
+            colorOverride: theme.colorScheme.primary,
           ),
-        );
+          ...sorted.map((category) {
+            final isSelected = _selectedCategoryId == category.id;
+            return CategoryChip(
+              categoryId: category.id,
+              compact: true,
+              selected: isSelected,
+              onTap: () => setState(() => _selectedCategoryId = category.id),
+            );
+          }),
+        ];
+
+        if (isMobile) {
+          // Mobile: single scrollable row.
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: chips
+                  .map((c) => Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: c,
+                      ))
+                  .toList(),
+            ),
+          );
+        }
+
+        // Desktop: wrap onto as many lines as needed — no clipping.
+        return Wrap(spacing: 8, runSpacing: 6, children: chips);
       },
     );
   }
@@ -1038,7 +1043,7 @@ class _AddDirectoryOfGoodEntryDialogState
       final create = DirectoryOfGoodCreate(
         name: _nameController.text.trim(),
         focus: _trimOrNull(_focusController.text),
-        categoryId: _selectedCategoryId,
+        categoryIds: _selectedCategoryId != null ? [_selectedCategoryId!] : [],
         imageUrl: _trimOrNull(_imageUrlController.text),
         location: location,
         socialLinks: socialLinks,

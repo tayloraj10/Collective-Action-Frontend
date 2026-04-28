@@ -15,7 +15,7 @@ class DirectoryOfGoodCreate {
   DirectoryOfGoodCreate({
     required this.name,
     this.focus,
-    this.categoryId,
+    this.categoryIds = const [],
     this.imageUrl,
     this.location,
     this.socialLinks,
@@ -26,7 +26,7 @@ class DirectoryOfGoodCreate {
 
   String? focus;
 
-  String? categoryId;
+  List<String> categoryIds;
 
   String? imageUrl;
 
@@ -40,7 +40,7 @@ class DirectoryOfGoodCreate {
   bool operator ==(Object other) => identical(this, other) || other is DirectoryOfGoodCreate &&
     other.name == name &&
     other.focus == focus &&
-    other.categoryId == categoryId &&
+    _deepEquality.equals(other.categoryIds, categoryIds) &&
     other.imageUrl == imageUrl &&
     other.location == location &&
     other.socialLinks == socialLinks &&
@@ -51,14 +51,14 @@ class DirectoryOfGoodCreate {
     // ignore: unnecessary_parenthesis
     (name.hashCode) +
     (focus == null ? 0 : focus!.hashCode) +
-    (categoryId == null ? 0 : categoryId!.hashCode) +
+    (categoryIds.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
     (location == null ? 0 : location!.hashCode) +
     (socialLinks == null ? 0 : socialLinks!.hashCode) +
     (featured.hashCode);
 
   @override
-  String toString() => 'DirectoryOfGoodCreate[name=$name, focus=$focus, categoryId=$categoryId, imageUrl=$imageUrl, location=$location, socialLinks=$socialLinks, featured=$featured]';
+  String toString() => 'DirectoryOfGoodCreate[name=$name, focus=$focus, categoryIds=$categoryIds, imageUrl=$imageUrl, location=$location, socialLinks=$socialLinks, featured=$featured]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -68,11 +68,7 @@ class DirectoryOfGoodCreate {
     } else {
       json[r'focus'] = null;
     }
-    if (this.categoryId != null) {
-      json[r'category_id'] = this.categoryId;
-    } else {
-      json[r'category_id'] = null;
-    }
+      json[r'category_ids'] = this.categoryIds;
     if (this.imageUrl != null) {
       json[r'image_url'] = this.imageUrl;
     } else {
@@ -113,7 +109,9 @@ class DirectoryOfGoodCreate {
       return DirectoryOfGoodCreate(
         name: mapValueOfType<String>(json, r'name')!,
         focus: mapValueOfType<String>(json, r'focus'),
-        categoryId: mapValueOfType<String>(json, r'category_id'),
+        categoryIds: json[r'category_ids'] is Iterable
+            ? (json[r'category_ids'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
         imageUrl: mapValueOfType<String>(json, r'image_url'),
         location: LocationSchema.fromJson(json[r'location']),
         socialLinks: SocialLinksSchema.fromJson(json[r'social_links']),

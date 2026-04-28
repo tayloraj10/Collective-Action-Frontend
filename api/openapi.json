@@ -4294,17 +4294,14 @@
                         ],
                         "title": "Focus"
                     },
-                    "category_id": {
-                        "anyOf": [
-                            {
-                                "type": "string",
-                                "format": "uuid"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Category Id"
+                    "category_ids": {
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "type": "array",
+                        "title": "Category Ids",
+                        "default": []
                     },
                     "image_url": {
                         "anyOf": [
@@ -4378,17 +4375,14 @@
                         ],
                         "title": "Focus"
                     },
-                    "category_id": {
-                        "anyOf": [
-                            {
-                                "type": "string",
-                                "format": "uuid"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Category Id"
+                    "category_ids": {
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "type": "array",
+                        "title": "Category Ids",
+                        "default": []
                     },
                     "image_url": {
                         "anyOf": [
@@ -4515,17 +4509,20 @@
                         ],
                         "title": "Focus"
                     },
-                    "category_id": {
+                    "category_ids": {
                         "anyOf": [
                             {
-                                "type": "string",
-                                "format": "uuid"
+                                "items": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "type": "array"
                             },
                             {
                                 "type": "null"
                             }
                         ],
-                        "title": "Category Id"
+                        "title": "Category Ids"
                     },
                     "image_url": {
                         "anyOf": [
