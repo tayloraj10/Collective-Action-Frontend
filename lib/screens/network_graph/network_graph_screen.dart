@@ -10,6 +10,7 @@ import 'package:collective_action_frontend/screens/network_graph/widgets/entity_
 import 'package:collective_action_frontend/screens/network_graph/widgets/circuit_view.dart';
 import 'package:collective_action_frontend/screens/network_graph/widgets/map_view.dart';
 import 'package:collective_action_frontend/screens/user/profile_page.dart';
+import 'package:collective_action_frontend/theme/category_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,21 +27,6 @@ const _kMapColor = Color(0xFF16A34A);
 const _kInitColor = Color(0xFF3B82F6);
 const _kHubColor = Color(0xFF6366F1);
 const _kUserColor = Color(0xFF8B5CF6);
-
-const _kCategoryColors = [
-  Color(0xFF6366F1),
-  Color(0xFF0EA5E9),
-  Color(0xFF10B981),
-  Color(0xFFF59E0B),
-  Color(0xFFEC4899),
-  Color(0xFF8B5CF6),
-  Color(0xFF14B8A6),
-  Color(0xFFF97316),
-  Color(0xFF84CC16),
-  Color(0xFFEF4444),
-  Color(0xFF06B6D4),
-  Color(0xFFA855F7),
-];
 
 class _NetworkColors {
   const _NetworkColors({
@@ -772,9 +758,12 @@ class _GraphViewState extends State<_GraphView> {
     final borderHex = _hex(colors.border);
     final textHex = _hex(colors.textPrimary);
     final catColorMap = <String?, String>{};
-    for (int i = 0; i < visibleCategories.length; i++) {
-      catColorMap[visibleCategories[i].id] = _hex(
-        _kCategoryColors[i % _kCategoryColors.length],
+    for (final cat in visibleCategories) {
+      catColorMap[cat.id] = _hex(
+        CategoryColors.resolve(
+          categoryName: cat.name,
+          stableKey: cat.id,
+        ),
       );
     }
 
