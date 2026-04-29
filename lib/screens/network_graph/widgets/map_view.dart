@@ -669,7 +669,7 @@ class _NetworkMapViewState extends State<NetworkMapView> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No geocoded entries yet.\nRun the sheet sync to populate coordinates.',
+              'No map data yet',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface.withAlpha(120),
