@@ -240,17 +240,51 @@ class UserProfileView extends ConsumerWidget {
                               ),
                             ),
                           ),
-                        if (showViewFullProfileButton)
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 12),
-                              child: OutlinedButton(
-                                onPressed: () => safeGo(context, '/profile/$userId'),
-                                child: const Text('View full profile'),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              OutlinedButton.icon(
+                                icon: const Icon(
+                                  Icons.bar_chart_outlined,
+                                  size: 16,
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AppColors.successGreen,
+                                  side: BorderSide(
+                                    color: AppColors.successGreen.withAlpha(160),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                ),
+                                label: const Text('Contribution stats'),
+                                onPressed: () =>
+                                    safeGo(context, '/contributions/$userId'),
                               ),
-                            ),
+                              if (showViewFullProfileButton)
+                                OutlinedButton.icon(
+                                  icon: const Icon(Icons.open_in_new, size: 16),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: AppColors.lightBlue,
+                                    side: BorderSide(
+                                      color: AppColors.lightBlue.withAlpha(160),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 12,
+                                    ),
+                                  ),
+                                  onPressed: () =>
+                                      safeGo(context, '/profile/$userId'),
+                                  label: const Text('Open full profile'),
+                                ),
+                            ],
                           ),
+                        ),
                       ],
                     ),
                   ),

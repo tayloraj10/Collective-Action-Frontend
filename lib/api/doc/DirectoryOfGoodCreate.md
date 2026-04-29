@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **name** | **String** |  | 
 **focus** | **String** |  | [optional] 
-**categoryId** | **String** |  | [optional] 
+**categoryIds** | **List<String>** |  | [optional] [default to const []]
 **imageUrl** | **String** |  | [optional] 
 **location** | [**LocationSchema**](LocationSchema.md) |  | [optional] 
 **socialLinks** | [**SocialLinksSchema**](SocialLinksSchema.md) |  | [optional] 

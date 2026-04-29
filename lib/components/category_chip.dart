@@ -1,4 +1,5 @@
 import 'package:collective_action_frontend/providers/config_provider.dart';
+import 'package:collective_action_frontend/theme/category_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -39,38 +40,6 @@ class CategoryChip extends ConsumerWidget {
     this.colorOverride,
   });
 
-  /// Topic-related colors. Keys are lowercase; category name is matched
-  /// case-insensitively. Longer keys are checked first so "mental health"
-  /// wins over "health". Add entries as you add categories.
-  static const List<MapEntry<String, Color>> _topicColors = [
-    MapEntry('environment', Color(0xFF16A34A)), // green – planet, eco
-    MapEntry('water', Color(0xFF0284C7)), // blue – water, ocean
-    MapEntry('trash', Color(0xFF64748B)), // slate – cleanup, waste
-    MapEntry('animals', Color(0xFFEA580C)), // orange – wildlife
-    MapEntry('fitness', Color(0xFFDC2626)), // red – activity, movement
-  ];
-
-  /// Fallback palette when category name doesn't match [_topicColors].
-  static const List<Color> _palette = [
-    Color(0xFF059669),
-    Color(0xFF2563EB),
-    Color(0xFF7C3AED),
-    Color(0xFFEA580C),
-    Color(0xFF0D9488),
-    Color(0xFFCA8A04),
-    Color(0xFF0284C7),
-    Color(0xFFEC4899),
-  ];
-
-  static Color _colorForCategory(String name) {
-    final lower = name.toLowerCase();
-    for (final entry in _topicColors) {
-      if (lower.contains(entry.key)) return entry.value;
-    }
-    final hash = lower.hashCode.abs();
-    return _palette[hash % _palette.length];
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final displayLabel = label ?? _resolveName(ref, categoryId);
@@ -84,7 +53,11 @@ class CategoryChip extends ConsumerWidget {
         ? const EdgeInsets.symmetric(horizontal: 8, vertical: 4)
         : const EdgeInsets.symmetric(horizontal: 10, vertical: 6);
     final fontSize = compact ? 11.0 : 12.0;
-    final color = colorOverride ?? _colorForCategory(displayLabel);
+    final color = colorOverride ??
+        CategoryColors.resolve(
+          categoryName: displayLabel,
+          stableKey: categoryId ?? displayLabel,
+        );
 
     final backgroundColor = selected
         ? color

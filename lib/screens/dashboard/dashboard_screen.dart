@@ -96,6 +96,61 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     }
   }
 
+  List<Widget> _dashboardNavRowChildren(BuildContext context) {
+    const gap = SizedBox(width: 12);
+    void go(String route) => safeGo(context, route);
+    Widget nav({
+      required IconData icon,
+      required String label,
+      required Color color,
+      required String route,
+    }) {
+      return NavigationButton(
+        icon: icon,
+        label: label,
+        color: color,
+        onTap: () => go(route),
+      );
+    }
+
+    return [
+      nav(
+        icon: Icons.trending_up,
+        label: 'Initiatives',
+        color: AppColors.lightBlue,
+        route: '/initiatives',
+      ),
+      gap,
+      nav(
+        icon: Icons.assignment_outlined,
+        label: 'Projects',
+        color: AppColors.errorRed,
+        route: '/projects',
+      ),
+      gap,
+      nav(
+        icon: Icons.map_outlined,
+        label: 'Maps',
+        color: AppColors.successGreen,
+        route: '/maps/cleanup',
+      ),
+      gap,
+      nav(
+        icon: Icons.people_outline,
+        label: 'Social',
+        color: AppColors.warningOrange,
+        route: '/social',
+      ),
+      gap,
+      nav(
+        icon: Icons.hub_outlined,
+        label: 'Network',
+        color: AppColors.statusInReview,
+        route: '/network',
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.listen(authStateProvider, (_, _) {
@@ -116,89 +171,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
                 child: isMobile
                     ? null
-                    //  Row(
-                    //     children: [
-                    //       Expanded(
-                    //         child: NavigationButton(
-                    //           icon: Icons.trending_up,
-                    //           label: 'Initiatives',
-                    //           color: AppColors.lightBlue,
-                    //           onTap: () {
-                    //             context.go('/initiatives');
-                    //           },
-                    //           small: true,
-                    //         ),
-                    //       ),
-                    //       SizedBox(width: 4),
-                    //       Expanded(
-                    //         child: NavigationButton(
-                    //           icon: Icons.assignment_outlined,
-                    //           label: 'Projects',
-                    //           color: AppColors.errorRed,
-                    //           onTap: () {
-                    //             context.go('/projects');
-                    //           },
-                    //           small: true,
-                    //         ),
-                    //       ),
-                    //       SizedBox(width: 4),
-                    //       Expanded(
-                    //         child: NavigationButton(
-                    //           icon: Icons.map_outlined,
-                    //           label: 'Maps',
-                    //           color: AppColors.successGreen,
-                    //           onTap: () {
-                    //             context.go('/maps');
-                    //           },
-                    //           small: true,
-                    //         ),
-                    //       ),
-                    //       SizedBox(width: 4),
-                    //       Expanded(
-                    //         child: NavigationButton(
-                    //           icon: Icons.people_outline,
-                    //           label: 'Social',
-                    //           color: AppColors.warningOrange,
-                    //           onTap: () {
-                    //             context.go('/social');
-                    //           },
-                    //           small: true,
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   )
                     : SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
-                          children: [
-                            NavigationButton(
-                              icon: Icons.trending_up,
-                              label: 'Initiatives',
-                              color: AppColors.lightBlue,
-                              onTap: () => safeGo(context, '/initiatives'),
-                            ),
-                            SizedBox(width: 12),
-                            NavigationButton(
-                              icon: Icons.assignment_outlined,
-                              label: 'Projects',
-                              color: AppColors.errorRed,
-                              onTap: () => safeGo(context, '/projects'),
-                            ),
-                            SizedBox(width: 12),
-                            NavigationButton(
-                              icon: Icons.map_outlined,
-                              label: 'Maps',
-                              color: AppColors.successGreen,
-                              onTap: () => safeGo(context, '/maps/cleanup'),
-                            ),
-                            SizedBox(width: 12),
-                            NavigationButton(
-                              icon: Icons.people_outline,
-                              label: 'Social',
-                              color: AppColors.warningOrange,
-                              onTap: () => safeGo(context, '/social'),
-                            ),
-                          ],
+                          children: _dashboardNavRowChildren(context),
                         ),
                       ),
               ),

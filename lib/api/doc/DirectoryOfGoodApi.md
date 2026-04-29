@@ -279,7 +279,7 @@ No authorization required
 
 Sync From Google Sheet
 
-Upsert directory rows from the configured 'Interesting People' Google Sheet.  **Credentials:** If ``GOOGLE_APPLICATION_CREDENTIALS`` is set to a service account JSON path, that key is used. Otherwise **Application Default Credentials** are used (e.g. Cloud Run / GCE runtime service account). Enable the Google Sheets API for the project and share the spreadsheet with that service account email.  When ``DIRECTORY_GOOGLE_SHEET_SYNC_SECRET`` is set, the same value must be sent in the ``X-Sync-Secret`` header.
+Upsert directory rows from the configured 'Interesting People' Google Sheet, then geocode any entries that are still missing coordinates.  **Credentials:** If ``GOOGLE_APPLICATION_CREDENTIALS`` is set to a service account JSON path, that key is used. Otherwise **Application Default Credentials** are used (e.g. Cloud Run / GCE runtime service account). Enable the Google Sheets API for the project and share the spreadsheet with that service account email.  When ``DIRECTORY_GOOGLE_SHEET_SYNC_SECRET`` is set, the same value must be sent in the ``X-Sync-Secret`` header.
 
 ### Example
 ```dart

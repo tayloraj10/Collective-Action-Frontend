@@ -1,5 +1,7 @@
 import 'package:collective_action_frontend/screens/dashboard/dashboard_screen.dart';
 import 'package:collective_action_frontend/screens/initiatives/initiative_list_screen.dart';
+import 'package:collective_action_frontend/screens/network_graph/network_graph_screen.dart';
+import 'package:collective_action_frontend/screens/user/contributions_page.dart';
 import 'package:collective_action_frontend/screens/projects/project_list_screen.dart';
 import 'package:collective_action_frontend/screens/projects/project_detail_screen.dart';
 import 'package:collective_action_frontend/screens/maps/map_screen.dart';
@@ -58,6 +60,44 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/social',
         builder: (context, state) => const SocialScreen(),
+      ),
+      GoRoute(
+        path: '/network',
+        redirect: (context, state) {
+          if (state.uri.path == '/network') {
+            return '/network/graph';
+          }
+          return null;
+        },
+        routes: [
+          GoRoute(
+            path: 'graph',
+            builder: (context, state) =>
+                const NetworkGraphScreen(initialView: NetworkView.graph),
+          ),
+          GoRoute(
+            path: 'circuit',
+            builder: (context, state) =>
+                const NetworkGraphScreen(initialView: NetworkView.grid),
+          ),
+          GoRoute(
+            path: 'directory',
+            redirect: (_, _) => '/network/circuit',
+          ),
+          GoRoute(
+            path: 'map',
+            builder: (context, state) =>
+                const NetworkGraphScreen(initialView: NetworkView.map),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/contributions/:userId',
+        builder: (context, state) {
+          final userId = state.pathParameters['userId'] ?? '';
+          if (userId.isEmpty) return const DashboardScreen();
+          return ContributionsPage(userId: userId);
+        },
       ),
       GoRoute(
         path: '/health',

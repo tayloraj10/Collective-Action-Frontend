@@ -30,5 +30,6 @@ analyzer:
   exclude:
     - lib/api/**
     - old_code/**
+    - third_party/graphify/**
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

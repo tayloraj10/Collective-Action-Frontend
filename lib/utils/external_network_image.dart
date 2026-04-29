@@ -58,6 +58,7 @@ class ExternalOrDataImage extends StatelessWidget {
     this.fit = BoxFit.cover,
     this.alignment = Alignment.center,
     this.errorBuilder,
+    this.preferHtmlElementOnWeb = true,
   });
 
   final String url;
@@ -66,6 +67,7 @@ class ExternalOrDataImage extends StatelessWidget {
   final BoxFit fit;
   final Alignment alignment;
   final ImageErrorWidgetBuilder? errorBuilder;
+  final bool preferHtmlElementOnWeb;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +83,12 @@ class ExternalOrDataImage extends StatelessWidget {
       );
     }
     return Image(
-      image: externalNetworkImageProvider(url),
+      image: NetworkImage(
+        normalizeExternalImageUrl(url),
+        webHtmlElementStrategy: preferHtmlElementOnWeb
+            ? WebHtmlElementStrategy.prefer
+            : WebHtmlElementStrategy.never,
+      ),
       width: width,
       height: height,
       fit: fit,

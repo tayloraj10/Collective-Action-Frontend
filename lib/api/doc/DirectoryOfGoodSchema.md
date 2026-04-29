@@ -11,12 +11,14 @@ Name | Type | Description | Notes
 **id** | **String** |  | [optional] 
 **name** | **String** |  | 
 **focus** | **String** |  | [optional] 
-**categoryId** | **String** |  | [optional] 
+**categoryIds** | **List<String>** |  | [optional] [default to const []]
 **imageUrl** | **String** |  | [optional] 
 **location** | [**LocationSchema**](LocationSchema.md) |  | [optional] 
 **socialLinks** | [**SocialLinksSchema**](SocialLinksSchema.md) |  | [optional] 
 **userId** | **String** |  | [optional] 
 **featured** | **bool** |  | [optional] [default to false]
+**latitude** | **num** |  | [optional] 
+**longitude** | **num** |  | [optional] 
 **createdAt** | [**DateTime**](DateTime.md) |  | [optional] 
 **updatedAt** | [**DateTime**](DateTime.md) |  | [optional] 
 

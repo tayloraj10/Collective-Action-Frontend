@@ -316,6 +316,83 @@ class ActionsApi {
     return null;
   }
 
+  /// Get Actions By User
+  ///
+  /// All actions submitted by a specific user, newest first.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] userId (required):
+  ///
+  /// * [int] limit:
+  ///   Maximum number of actions to return
+  ///
+  /// * [ActionTypeValuesEnum] actionType:
+  Future<Response> getActionsByUserActionsUserUserIdGetWithHttpInfo(String userId, { int? limit, ActionTypeValuesEnum? actionType, }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/actions/user/{user_id}'
+      .replaceAll('{user_id}', userId);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    if (limit != null) {
+      queryParams.addAll(_queryParams('', 'limit', limit));
+    }
+    if (actionType != null) {
+      queryParams.addAll(_queryParams('', 'action_type', actionType));
+    }
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get Actions By User
+  ///
+  /// All actions submitted by a specific user, newest first.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] userId (required):
+  ///
+  /// * [int] limit:
+  ///   Maximum number of actions to return
+  ///
+  /// * [ActionTypeValuesEnum] actionType:
+  Future<List<ActionSchema>?> getActionsByUserActionsUserUserIdGet(String userId, { int? limit, ActionTypeValuesEnum? actionType, }) async {
+    final response = await getActionsByUserActionsUserUserIdGetWithHttpInfo(userId,  limit: limit, actionType: actionType, );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final responseBody = await _decodeBodyBytes(response);
+      return (await apiClient.deserializeAsync(responseBody, 'List<ActionSchema>') as List)
+        .cast<ActionSchema>()
+        .toList(growable: false);
+
+    }
+    return null;
+  }
+
   /// Get Latest Actions
   ///
   /// Note: This method returns the HTTP [Response].

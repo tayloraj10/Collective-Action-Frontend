@@ -13,6 +13,7 @@ Method | HTTP request | Description
 [**deleteUserUsersUserIdDelete**](UsersApi.md#deleteuserusersuseriddelete) | **DELETE** /users/{user_id} | Delete User
 [**getUserByFirebaseIdUsersFirebaseIdGet**](UsersApi.md#getuserbyfirebaseidusersfirebaseidget) | **GET** /users/{firebase_id} | Get User By Firebase Id
 [**getUserByUserIdUsersDbUserIdGet**](UsersApi.md#getuserbyuseridusersdbuseridget) | **GET** /users/db/{user_id} | Get User By User Id
+[**getUserStatsUsersDbUserIdStatsGet**](UsersApi.md#getuserstatsusersdbuseridstatsget) | **GET** /users/db/{user_id}/stats | Get User Stats
 [**listUsersUsersGet**](UsersApi.md#listusersusersget) | **GET** /users/ | List Users
 [**updateUserPhotoUsersUserIdPhotoPatch**](UsersApi.md#updateuserphotousersuseridphotopatch) | **PATCH** /users/{user_id}/photo | Update User Photo
 [**updateUserUsersUserIdPatch**](UsersApi.md#updateuserusersuseridpatch) | **PATCH** /users/{user_id} | Update User
@@ -177,6 +178,49 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**UserSchema**](UserSchema.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getUserStatsUsersDbUserIdStatsGet**
+> UserStatsSchema getUserStatsUsersDbUserIdStatsGet(userId)
+
+Get User Stats
+
+Aggregated contribution and impact stats for a user.
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = UsersApi();
+final userId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+
+try {
+    final result = api_instance.getUserStatsUsersDbUserIdStatsGet(userId);
+    print(result);
+} catch (e) {
+    print('Exception when calling UsersApi->getUserStatsUsersDbUserIdStatsGet: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **userId** | **String**|  | 
+
+### Return type
+
+[**UserStatsSchema**](UserStatsSchema.md)
 
 ### Authorization
 

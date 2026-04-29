@@ -68,6 +68,91 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
         ),
       ),
       actions: [
+        // Dashboard (home) on mobile: section links live in the app bar so the body
+        // nav strip does not consume vertical space.
+        if (isMobile && isHomeRoute)
+          PopupMenuButton<String>(
+            tooltip: 'Go to section',
+            offset: const Offset(0, kToolbarHeight - 4),
+            onSelected: (route) => safeGo(context, route),
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                value: '/initiatives',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.trending_up,
+                      color: AppColors.lightBlue,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('Initiatives'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: '/projects',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.assignment_outlined,
+                      color: AppColors.errorRed,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('Projects'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: '/maps/cleanup',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.map_outlined,
+                      color: AppColors.successGreen,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('Maps'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: '/social',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.people_outline,
+                      color: AppColors.warningOrange,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('Social'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: '/network',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.hub_outlined,
+                      color: AppColors.statusInReview,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('Network'),
+                  ],
+                ),
+              ),
+            ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+              child: Icon(Icons.apps_outlined),
+            ),
+          ),
+
         // Info Button
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2),

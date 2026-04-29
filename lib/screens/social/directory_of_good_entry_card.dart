@@ -143,11 +143,16 @@ class DirectoryOfGoodEntryCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (entry.categoryId != null &&
-                          entry.categoryId!.isNotEmpty) ...[
-                        CategoryChip(
-                          categoryId: entry.categoryId,
-                          compact: true,
+                      if (entry.categoryIds.isNotEmpty) ...[
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: entry.categoryIds
+                              .map((id) => CategoryChip(
+                                    categoryId: id,
+                                    compact: true,
+                                  ))
+                              .toList(),
                         ),
                         SizedBox(height: compact ? 4 : (isMobile ? 6 : 8)),
                       ],

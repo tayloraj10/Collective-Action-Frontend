@@ -69,6 +69,7 @@ Class | Method | HTTP request | Description
 *ActionsApi* | [**deleteActionActionsActionIdDelete**](doc//ActionsApi.md#deleteactionactionsactioniddelete) | **DELETE** /actions/{action_id} | Delete Action
 *ActionsApi* | [**getActionActionsActionIdGet**](doc//ActionsApi.md#getactionactionsactionidget) | **GET** /actions/{action_id} | Get Action
 *ActionsApi* | [**getActionsByLinkedActionsByLinkedLinkedIdGet**](doc//ActionsApi.md#getactionsbylinkedactionsbylinkedlinkedidget) | **GET** /actions/by_linked/{linked_id} | Get Actions By Linked
+*ActionsApi* | [**getActionsByUserActionsUserUserIdGet**](doc//ActionsApi.md#getactionsbyuseractionsuseruseridget) | **GET** /actions/user/{user_id} | Get Actions By User
 *ActionsApi* | [**getLatestActionsActionsRecentGet**](doc//ActionsApi.md#getlatestactionsactionsrecentget) | **GET** /actions/recent | Get Latest Actions
 *ActionsApi* | [**listActionsActionsGet**](doc//ActionsApi.md#listactionsactionsget) | **GET** /actions/ | List Actions
 *ActionsApi* | [**removeActionLikeActionsActionIdLikeDelete**](doc//ActionsApi.md#removeactionlikeactionsactionidlikedelete) | **DELETE** /actions/{action_id}/like | Remove Action Like
@@ -78,6 +79,11 @@ Class | Method | HTTP request | Description
 *CategoriesApi* | [**getCategoryCategoriesCategoryIdGet**](doc//CategoriesApi.md#getcategorycategoriescategoryidget) | **GET** /categories/{category_id} | Get Category
 *CategoriesApi* | [**listCategoriesCategoriesGet**](doc//CategoriesApi.md#listcategoriescategoriesget) | **GET** /categories/ | List Categories
 *CategoriesApi* | [**updateCategoryCategoriesCategoryIdPut**](doc//CategoriesApi.md#updatecategorycategoriescategoryidput) | **PUT** /categories/{category_id} | Update Category
+*ConnectionsApi* | [**createConnectionConnectionsPost**](doc//ConnectionsApi.md#createconnectionconnectionspost) | **POST** /connections/ | Create Connection
+*ConnectionsApi* | [**deleteConnectionConnectionsConnectionIdDelete**](doc//ConnectionsApi.md#deleteconnectionconnectionsconnectioniddelete) | **DELETE** /connections/{connection_id} | Delete Connection
+*ConnectionsApi* | [**getConnectionSummaryConnectionsSummaryToTypeGet**](doc//ConnectionsApi.md#getconnectionsummaryconnectionssummarytotypeget) | **GET** /connections/summary/{to_type} | Get Connection Summary
+*ConnectionsApi* | [**getConnectionsForEntityConnectionsEntityToTypeToIdGet**](doc//ConnectionsApi.md#getconnectionsforentityconnectionsentitytotypetoidget) | **GET** /connections/entity/{to_type}/{to_id} | Get Connections For Entity
+*ConnectionsApi* | [**getConnectionsForUserConnectionsUserUserIdGet**](doc//ConnectionsApi.md#getconnectionsforuserconnectionsuseruseridget) | **GET** /connections/user/{user_id} | Get Connections For User
 *DefaultApi* | [**healthHealthGet**](doc//DefaultApi.md#healthhealthget) | **GET** /health | Health
 *DirectoryOfGoodApi* | [**createEntryDirectoryOfGoodPost**](doc//DirectoryOfGoodApi.md#createentrydirectoryofgoodpost) | **POST** /directory-of-good/ | Create Entry
 *DirectoryOfGoodApi* | [**deleteEntryDirectoryOfGoodEntryIdDelete**](doc//DirectoryOfGoodApi.md#deleteentrydirectoryofgoodentryiddelete) | **DELETE** /directory-of-good/{entry_id} | Delete Entry
@@ -87,6 +93,7 @@ Class | Method | HTTP request | Description
 *DirectoryOfGoodApi* | [**setFeaturedDirectoryOfGoodEntryIdFeaturePatch**](doc//DirectoryOfGoodApi.md#setfeatureddirectoryofgoodentryidfeaturepatch) | **PATCH** /directory-of-good/{entry_id}/feature | Set Featured
 *DirectoryOfGoodApi* | [**syncFromGoogleSheetDirectoryOfGoodSyncFromGoogleSheetPost**](doc//DirectoryOfGoodApi.md#syncfromgooglesheetdirectoryofgoodsyncfromgooglesheetpost) | **POST** /directory-of-good/sync-from-google-sheet | Sync From Google Sheet
 *DirectoryOfGoodApi* | [**updateEntryDirectoryOfGoodEntryIdPatch**](doc//DirectoryOfGoodApi.md#updateentrydirectoryofgoodentryidpatch) | **PATCH** /directory-of-good/{entry_id} | Update Entry
+*ImageProxyApi* | [**proxyImageImageProxyGet**](doc//ImageProxyApi.md#proxyimageimageproxyget) | **GET** /image-proxy/ | Proxy Image
 *InitiativesApi* | [**createInitiativeInitiativesPost**](doc//InitiativesApi.md#createinitiativeinitiativespost) | **POST** /initiatives/ | Create Initiative
 *InitiativesApi* | [**deleteInitiativeInitiativesInitiativeIdDelete**](doc//InitiativesApi.md#deleteinitiativeinitiativesinitiativeiddelete) | **DELETE** /initiatives/{initiative_id} | Delete Initiative
 *InitiativesApi* | [**getFeaturedInitiativesInitiativesFeaturedGet**](doc//InitiativesApi.md#getfeaturedinitiativesinitiativesfeaturedget) | **GET** /initiatives/featured | Get Featured Initiatives
@@ -153,6 +160,7 @@ Class | Method | HTTP request | Description
 *UsersApi* | [**deleteUserUsersUserIdDelete**](doc//UsersApi.md#deleteuserusersuseriddelete) | **DELETE** /users/{user_id} | Delete User
 *UsersApi* | [**getUserByFirebaseIdUsersFirebaseIdGet**](doc//UsersApi.md#getuserbyfirebaseidusersfirebaseidget) | **GET** /users/{firebase_id} | Get User By Firebase Id
 *UsersApi* | [**getUserByUserIdUsersDbUserIdGet**](doc//UsersApi.md#getuserbyuseridusersdbuseridget) | **GET** /users/db/{user_id} | Get User By User Id
+*UsersApi* | [**getUserStatsUsersDbUserIdStatsGet**](doc//UsersApi.md#getuserstatsusersdbuseridstatsget) | **GET** /users/db/{user_id}/stats | Get User Stats
 *UsersApi* | [**listUsersUsersGet**](doc//UsersApi.md#listusersusersget) | **GET** /users/ | List Users
 *UsersApi* | [**updateUserPhotoUsersUserIdPhotoPatch**](doc//UsersApi.md#updateuserphotousersuseridphotopatch) | **PATCH** /users/{user_id}/photo | Update User Photo
 *UsersApi* | [**updateUserUsersUserIdPatch**](doc//UsersApi.md#updateuserusersuseridpatch) | **PATCH** /users/{user_id} | Update User
@@ -173,6 +181,10 @@ Class | Method | HTTP request | Description
  - [CleanupEventData](doc//CleanupEventData.md)
  - [CleanupRouteEventData](doc//CleanupRouteEventData.md)
  - [CleanupWaypoint](doc//CleanupWaypoint.md)
+ - [ConnectionCreateSchema](doc//ConnectionCreateSchema.md)
+ - [ConnectionSchema](doc//ConnectionSchema.md)
+ - [ConnectionSummarySchema](doc//ConnectionSummarySchema.md)
+ - [ConnectionWithUserSchema](doc//ConnectionWithUserSchema.md)
  - [DirectoryOfGoodCreate](doc//DirectoryOfGoodCreate.md)
  - [DirectoryOfGoodSchema](doc//DirectoryOfGoodSchema.md)
  - [DirectoryOfGoodUpdate](doc//DirectoryOfGoodUpdate.md)
@@ -187,8 +199,10 @@ Class | Method | HTTP request | Description
  - [LocationSchema](doc//LocationSchema.md)
  - [MapCampaignCreateSchema](doc//MapCampaignCreateSchema.md)
  - [MapCampaignSchema](doc//MapCampaignSchema.md)
+ - [MapCampaignStatsSchema](doc//MapCampaignStatsSchema.md)
  - [MapCampaignTypeEnum](doc//MapCampaignTypeEnum.md)
  - [MemberIdsByRole](doc//MemberIdsByRole.md)
+ - [PreviewUserSchema](doc//PreviewUserSchema.md)
  - [ProjectCreateSchema](doc//ProjectCreateSchema.md)
  - [ProjectLinkSchema](doc//ProjectLinkSchema.md)
  - [ProjectRoleCreateSchema](doc//ProjectRoleCreateSchema.md)
@@ -211,6 +225,7 @@ Class | Method | HTTP request | Description
  - [UserCreate](doc//UserCreate.md)
  - [UserPhotoUpdate](doc//UserPhotoUpdate.md)
  - [UserSchema](doc//UserSchema.md)
+ - [UserStatsSchema](doc//UserStatsSchema.md)
  - [UserType](doc//UserType.md)
  - [UserUpdate](doc//UserUpdate.md)
  - [ZipCodeSubmissionEventData](doc//ZipCodeSubmissionEventData.md)

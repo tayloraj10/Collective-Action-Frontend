@@ -83,7 +83,7 @@
                     "directory-of-good"
                 ],
                 "summary": "Sync From Google Sheet",
-                "description": "Upsert directory rows from the configured 'Interesting People' Google Sheet.\n\n**Credentials:** If ``GOOGLE_APPLICATION_CREDENTIALS`` is set to a service account JSON\npath, that key is used. Otherwise **Application Default Credentials** are used (e.g. Cloud\nRun / GCE runtime service account). Enable the Google Sheets API for the project and share\nthe spreadsheet with that service account email.\n\nWhen ``DIRECTORY_GOOGLE_SHEET_SYNC_SECRET`` is set, the same value must be sent in\nthe ``X-Sync-Secret`` header.",
+                "description": "Upsert directory rows from the configured 'Interesting People' Google Sheet,\nthen geocode any entries that are still missing coordinates.\n\n**Credentials:** If ``GOOGLE_APPLICATION_CREDENTIALS`` is set to a service account JSON\npath, that key is used. Otherwise **Application Default Credentials** are used (e.g. Cloud\nRun / GCE runtime service account). Enable the Google Sheets API for the project and share\nthe spreadsheet with that service account email.\n\nWhen ``DIRECTORY_GOOGLE_SHEET_SYNC_SECRET`` is set, the same value must be sent in\nthe ``X-Sync-Secret`` header.",
                 "operationId": "sync_from_google_sheet_directory_of_good_sync_from_google_sheet_post",
                 "parameters": [
                     {
@@ -2043,6 +2043,336 @@
                 }
             }
         },
+        "/actions/user/{user_id}": {
+            "get": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Get Actions By User",
+                "description": "All actions submitted by a specific user, newest first.",
+                "operationId": "get_actions_by_user_actions_user__user_id__get",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "User Id"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "Maximum number of actions to return",
+                            "title": "Limit"
+                        },
+                        "description": "Maximum number of actions to return"
+                    },
+                    {
+                        "name": "action_type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/components/schemas/ActionTypeValuesEnum"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "title": "Action Type"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ActionSchema"
+                                    },
+                                    "title": "Response Get Actions By User Actions User  User Id  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/connections/": {
+            "post": {
+                "tags": [
+                    "connections"
+                ],
+                "summary": "Create Connection",
+                "operationId": "create_connection_connections__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ConnectionCreateSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConnectionSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/connections/{connection_id}": {
+            "delete": {
+                "tags": [
+                    "connections"
+                ],
+                "summary": "Delete Connection",
+                "operationId": "delete_connection_connections__connection_id__delete",
+                "parameters": [
+                    {
+                        "name": "connection_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Connection Id"
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "description": "ID of the user requesting deletion",
+                            "title": "User Id"
+                        },
+                        "description": "ID of the user requesting deletion"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
+                    }
+                }
+            }
+        },
+        "/connections/entity/{to_type}/{to_id}": {
+            "get": {
+                "tags": [
+                    "connections"
+                ],
+                "summary": "Get Connections For Entity",
+                "description": "All connections to a specific entity, optionally filtered by type.",
+                "operationId": "get_connections_for_entity_connections_entity__to_type___to_id__get",
+                "parameters": [
+                    {
+                        "name": "to_type",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "To Type"
+                        }
+                    },
+                    {
+                        "name": "to_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "To Id"
+                        }
+                    },
+                    {
+                        "name": "connection_type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "Filter by connection_type",
+                            "title": "Connection Type"
+                        },
+                        "description": "Filter by connection_type"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ConnectionWithUserSchema"
+                                    },
+                                    "title": "Response Get Connections For Entity Connections Entity  To Type   To Id  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/connections/user/{user_id}": {
+            "get": {
+                "tags": [
+                    "connections"
+                ],
+                "summary": "Get Connections For User",
+                "description": "All connections created by a specific user, optionally filtered by type.",
+                "operationId": "get_connections_for_user_connections_user__user_id__get",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "User Id"
+                        }
+                    },
+                    {
+                        "name": "connection_type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "title": "Connection Type"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ConnectionSchema"
+                                    },
+                                    "title": "Response Get Connections For User Connections User  User Id  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/connections/summary/{to_type}": {
+            "get": {
+                "tags": [
+                    "connections"
+                ],
+                "summary": "Get Connection Summary",
+                "description": "Aggregated connection counts + avatar previews for every entity of `to_type`.\nOne request covers all cards on the Connect screen.",
+                "operationId": "get_connection_summary_connections_summary__to_type__get",
+                "parameters": [
+                    {
+                        "name": "to_type",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "To Type"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ConnectionSummarySchema"
+                                    },
+                                    "title": "Response Get Connection Summary Connections Summary  To Type  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/image-proxy/": {
+            "get": {
+                "tags": [
+                    "image-proxy"
+                ],
+                "summary": "Proxy Image",
+                "operationId": "proxy_image_image_proxy__get",
+                "parameters": [
+                    {
+                        "name": "url",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Absolute image URL to proxy",
+                            "title": "Url"
+                        },
+                        "description": "Absolute image URL to proxy"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/categories/": {
             "get": {
                 "tags": [
@@ -3059,6 +3389,40 @@
                 }
             }
         },
+        "/users/db/{user_id}/stats": {
+            "get": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get User Stats",
+                "description": "Aggregated contribution and impact stats for a user.",
+                "operationId": "get_user_stats_users_db__user_id__stats_get",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "User Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserStatsSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/photos/profile/{user_id}": {
             "post": {
                 "tags": [
@@ -3820,6 +4184,206 @@
                 "type": "object",
                 "title": "CleanupWaypoint"
             },
+            "ConnectionCreateSchema": {
+                "properties": {
+                    "created_by": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Created By"
+                    },
+                    "from_type": {
+                        "type": "string",
+                        "title": "From Type"
+                    },
+                    "from_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "From Id"
+                    },
+                    "to_type": {
+                        "type": "string",
+                        "title": "To Type"
+                    },
+                    "to_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "To Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "created_by",
+                    "from_type",
+                    "from_id",
+                    "to_type",
+                    "to_id"
+                ],
+                "title": "ConnectionCreateSchema"
+            },
+            "ConnectionSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "created_by": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Created By"
+                    },
+                    "from_type": {
+                        "type": "string",
+                        "title": "From Type"
+                    },
+                    "from_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "From Id"
+                    },
+                    "to_type": {
+                        "type": "string",
+                        "title": "To Type"
+                    },
+                    "to_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "To Id"
+                    },
+                    "connection_type": {
+                        "type": "string",
+                        "title": "Connection Type"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "created_by",
+                    "from_type",
+                    "from_id",
+                    "to_type",
+                    "to_id",
+                    "connection_type",
+                    "created_at"
+                ],
+                "title": "ConnectionSchema"
+            },
+            "ConnectionSummarySchema": {
+                "properties": {
+                    "to_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "To Id"
+                    },
+                    "total_count": {
+                        "type": "integer",
+                        "title": "Total Count"
+                    },
+                    "user_count": {
+                        "type": "integer",
+                        "title": "User Count"
+                    },
+                    "org_count": {
+                        "type": "integer",
+                        "title": "Org Count"
+                    },
+                    "preview_users": {
+                        "items": {
+                            "$ref": "#/components/schemas/PreviewUserSchema"
+                        },
+                        "type": "array",
+                        "title": "Preview Users"
+                    },
+                    "org_ids": {
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "type": "array",
+                        "title": "Org Ids"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "to_id",
+                    "total_count",
+                    "user_count",
+                    "org_count",
+                    "preview_users",
+                    "org_ids"
+                ],
+                "title": "ConnectionSummarySchema",
+                "description": "Aggregated connection info for one entity — used by the bulk summary endpoint."
+            },
+            "ConnectionWithUserSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "created_by": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Created By"
+                    },
+                    "from_type": {
+                        "type": "string",
+                        "title": "From Type"
+                    },
+                    "from_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "From Id"
+                    },
+                    "to_type": {
+                        "type": "string",
+                        "title": "To Type"
+                    },
+                    "to_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "To Id"
+                    },
+                    "connection_type": {
+                        "type": "string",
+                        "title": "Connection Type"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At"
+                    },
+                    "user": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/PreviewUserSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "created_by",
+                    "from_type",
+                    "from_id",
+                    "to_type",
+                    "to_id",
+                    "connection_type",
+                    "created_at"
+                ],
+                "title": "ConnectionWithUserSchema",
+                "description": "Connection with the creator's basic profile, used in per-entity listings."
+            },
             "DirectoryOfGoodCreate": {
                 "properties": {
                     "name": {
@@ -3837,17 +4401,14 @@
                         ],
                         "title": "Focus"
                     },
-                    "category_id": {
-                        "anyOf": [
-                            {
-                                "type": "string",
-                                "format": "uuid"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Category Id"
+                    "category_ids": {
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "type": "array",
+                        "title": "Category Ids",
+                        "default": []
                     },
                     "image_url": {
                         "anyOf": [
@@ -3921,17 +4482,14 @@
                         ],
                         "title": "Focus"
                     },
-                    "category_id": {
-                        "anyOf": [
-                            {
-                                "type": "string",
-                                "format": "uuid"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Category Id"
+                    "category_ids": {
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "type": "array",
+                        "title": "Category Ids",
+                        "default": []
                     },
                     "image_url": {
                         "anyOf": [
@@ -3980,6 +4538,28 @@
                         "type": "boolean",
                         "title": "Featured",
                         "default": false
+                    },
+                    "latitude": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Latitude"
+                    },
+                    "longitude": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Longitude"
                     },
                     "created_at": {
                         "anyOf": [
@@ -4036,17 +4616,20 @@
                         ],
                         "title": "Focus"
                     },
-                    "category_id": {
+                    "category_ids": {
                         "anyOf": [
                             {
-                                "type": "string",
-                                "format": "uuid"
+                                "items": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "type": "array"
                             },
                             {
                                 "type": "null"
                             }
                         ],
-                        "title": "Category Id"
+                        "title": "Category Ids"
                     },
                     "image_url": {
                         "anyOf": [
@@ -4674,6 +5257,55 @@
                 ],
                 "title": "MapCampaignSchema"
             },
+            "MapCampaignStatsSchema": {
+                "properties": {
+                    "campaign_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Campaign Id"
+                    },
+                    "campaign_name": {
+                        "type": "string",
+                        "title": "Campaign Name",
+                        "default": "Unknown campaign"
+                    },
+                    "submission_count": {
+                        "type": "integer",
+                        "title": "Submission Count",
+                        "default": 0
+                    },
+                    "cleanup_count": {
+                        "type": "integer",
+                        "title": "Cleanup Count",
+                        "default": 0
+                    },
+                    "trash_report_count": {
+                        "type": "integer",
+                        "title": "Trash Report Count",
+                        "default": 0
+                    },
+                    "total_bags": {
+                        "type": "integer",
+                        "title": "Total Bags",
+                        "default": 0
+                    },
+                    "total_pounds": {
+                        "type": "number",
+                        "title": "Total Pounds",
+                        "default": 0.0
+                    }
+                },
+                "type": "object",
+                "title": "MapCampaignStatsSchema",
+                "description": "Stats for a single map campaign the user has submitted to."
+            },
             "MapCampaignTypeEnum": {
                 "type": "string",
                 "enum": [
@@ -4713,6 +5345,42 @@
                 "type": "object",
                 "title": "MemberIdsByRole",
                 "description": "Only 'members', 'owners', and 'developers' are allowed."
+            },
+            "PreviewUserSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "name": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Name"
+                    },
+                    "photo_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Photo Url"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id"
+                ],
+                "title": "PreviewUserSchema"
             },
             "ProjectCreateSchema": {
                 "properties": {
@@ -5313,6 +5981,10 @@
                         "type": "integer",
                         "title": "Rows Seen"
                     },
+                    "geocoded": {
+                        "type": "integer",
+                        "title": "Geocoded"
+                    },
                     "errors": {
                         "items": {
                             "type": "string"
@@ -5327,6 +5999,7 @@
                     "updated",
                     "skipped",
                     "rows_seen",
+                    "geocoded",
                     "errors"
                 ],
                 "title": "SheetSyncResponse"
@@ -5724,6 +6397,158 @@
                 },
                 "type": "object",
                 "title": "UserSchema"
+            },
+            "UserStatsSchema": {
+                "properties": {
+                    "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "User Id"
+                    },
+                    "map_submission_count": {
+                        "type": "integer",
+                        "title": "Map Submission Count",
+                        "default": 0
+                    },
+                    "cleanup_count": {
+                        "type": "integer",
+                        "title": "Cleanup Count",
+                        "default": 0
+                    },
+                    "trash_report_count": {
+                        "type": "integer",
+                        "title": "Trash Report Count",
+                        "default": 0
+                    },
+                    "total_small_bags": {
+                        "type": "integer",
+                        "title": "Total Small Bags",
+                        "default": 0
+                    },
+                    "total_large_bags": {
+                        "type": "integer",
+                        "title": "Total Large Bags",
+                        "default": 0
+                    },
+                    "total_bags": {
+                        "type": "integer",
+                        "title": "Total Bags",
+                        "default": 0
+                    },
+                    "total_pounds": {
+                        "type": "number",
+                        "title": "Total Pounds",
+                        "default": 0.0
+                    },
+                    "initiative_action_count": {
+                        "type": "integer",
+                        "title": "Initiative Action Count",
+                        "default": 0
+                    },
+                    "initiatives_participated": {
+                        "type": "integer",
+                        "title": "Initiatives Participated",
+                        "default": 0
+                    },
+                    "map_campaign_breakdown": {
+                        "items": {
+                            "$ref": "#/components/schemas/MapCampaignStatsSchema"
+                        },
+                        "type": "array",
+                        "title": "Map Campaign Breakdown",
+                        "default": []
+                    },
+                    "action_type_counts": {
+                        "additionalProperties": {
+                            "type": "integer"
+                        },
+                        "type": "object",
+                        "title": "Action Type Counts",
+                        "default": {}
+                    },
+                    "follows_count": {
+                        "type": "integer",
+                        "title": "Follows Count",
+                        "default": 0
+                    },
+                    "contributions_count": {
+                        "type": "integer",
+                        "title": "Contributions Count",
+                        "default": 0
+                    },
+                    "org_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Org Id"
+                    },
+                    "org_name": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Org Name"
+                    },
+                    "org_followers_count": {
+                        "type": "integer",
+                        "title": "Org Followers Count",
+                        "default": 0
+                    },
+                    "org_partnerships_count": {
+                        "type": "integer",
+                        "title": "Org Partnerships Count",
+                        "default": 0
+                    },
+                    "org_initiative_connections": {
+                        "type": "integer",
+                        "title": "Org Initiative Connections",
+                        "default": 0
+                    },
+                    "total_actions": {
+                        "type": "integer",
+                        "title": "Total Actions",
+                        "default": 0
+                    },
+                    "first_action_date": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "First Action Date"
+                    },
+                    "last_action_date": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Last Action Date"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "user_id"
+                ],
+                "title": "UserStatsSchema"
             },
             "UserType": {
                 "type": "string",
