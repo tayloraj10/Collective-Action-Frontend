@@ -122,13 +122,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
       gap,
       nav(
-        icon: Icons.assignment_outlined,
-        label: 'Projects',
-        color: AppColors.errorRed,
-        route: '/projects',
-      ),
-      gap,
-      nav(
         icon: Icons.map_outlined,
         label: 'Maps',
         color: AppColors.successGreen,
@@ -136,17 +129,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
       gap,
       nav(
-        icon: Icons.people_outline,
-        label: 'Social',
-        color: AppColors.warningOrange,
+        icon: Icons.dynamic_feed_outlined,
+        label: 'Community',
+        color: AppColors.errorRed,
         route: '/social',
       ),
       gap,
       nav(
-        icon: Icons.hub_outlined,
-        label: 'Network',
-        color: AppColors.statusInReview,
-        route: '/network',
+        icon: Icons.people_outline,
+        label: 'Actions',
+        color: AppColors.warningOrange,
+        route: '/social',
       ),
     ];
   }
@@ -395,8 +388,8 @@ class _PaneLayoutState extends State<PaneLayout> {
               SizedBox(width: 6),
               Expanded(
                 child: SummaryPane(
-                  title: 'Projects',
-                  icon: Icons.assignment_outlined,
+                  title: 'Community',
+                  icon: Icons.dynamic_feed_outlined,
                   color: AppColors.errorRed,
                 ),
               ),
@@ -418,7 +411,7 @@ class _PaneLayoutState extends State<PaneLayout> {
                     SizedBox(width: 6),
                     Expanded(
                       child: SummaryPane(
-                        title: 'Social',
+                        title: 'Actions',
                         icon: Icons.people_outline,
                         color: AppColors.warningOrange,
                       ),
@@ -445,7 +438,7 @@ class _PaneLayoutState extends State<PaneLayout> {
                           SizedBox(width: 6),
                           Expanded(
                             child: SummaryPane(
-                              title: 'Social',
+                              title: 'Actions',
                               icon: Icons.people_outline,
                               color: AppColors.warningOrange,
                             ),

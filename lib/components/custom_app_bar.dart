@@ -91,20 +91,6 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                 ),
               ),
               PopupMenuItem<String>(
-                value: '/projects',
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.assignment_outlined,
-                      color: AppColors.errorRed,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 12),
-                    const Text('Projects'),
-                  ],
-                ),
-              ),
-              PopupMenuItem<String>(
                 value: '/maps/cleanup',
                 child: Row(
                   children: [
@@ -123,12 +109,26 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                 child: Row(
                   children: [
                     Icon(
+                      Icons.dynamic_feed_outlined,
+                      color: AppColors.errorRed,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('Community'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: '/social',
+                child: Row(
+                  children: [
+                    Icon(
                       Icons.people_outline,
                       color: AppColors.warningOrange,
                       size: 22,
                     ),
                     const SizedBox(width: 12),
-                    const Text('Social'),
+                    const Text('Actions'),
                   ],
                 ),
               ),

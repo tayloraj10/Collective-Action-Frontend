@@ -2,10 +2,12 @@ import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
 import 'package:collective_action_frontend/providers/initiative_provider.dart';
+import 'package:collective_action_frontend/providers/project_provider.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/initiatives/initiative_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/initiative_action_card.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -123,6 +125,8 @@ class _InitiativeListScreenState extends ConsumerState<InitiativeListScreen> {
                 ],
               ),
               SizedBox(height: isMobile ? 20 : 28),
+              _ProjectWorkspaceEntry(isMobile: isMobile),
+              SizedBox(height: isMobile ? 16 : 20),
               // Initiatives List/Grid
               Expanded(
                 child: Builder(
@@ -486,6 +490,64 @@ class _InitiativeListScreenState extends ConsumerState<InitiativeListScreen> {
             },
           );
         },
+      ),
+    );
+  }
+}
+
+class _ProjectWorkspaceEntry extends ConsumerWidget {
+  final bool isMobile;
+
+  const _ProjectWorkspaceEntry({required this.isMobile});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final projectCount = ref.watch(activeProjectsProvider).asData?.value.length;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(isMobile ? 12 : 16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withAlpha(100),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: theme.dividerColor.withAlpha(120)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.assignment_outlined,
+            color: theme.colorScheme.primary,
+            size: isMobile ? 22 : 26,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Project Workspace',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  projectCount == null
+                      ? 'Open projects and execution details'
+                      : '$projectCount active projects and execution details',
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          OutlinedButton.icon(
+            onPressed: () => safeGo(context, '/projects'),
+            icon: const Icon(Icons.open_in_new),
+            label: const Text('Open'),
+          ),
+        ],
       ),
     );
   }

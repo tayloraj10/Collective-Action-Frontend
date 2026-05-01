@@ -1,8 +1,8 @@
 import 'package:collective_action_frontend/app/constants.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/feed/activity_feed_summary.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/initiatives/initiatives_summary.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/maps/maps_summary.dart';
-import 'package:collective_action_frontend/screens/dashboard/components/projects/projects_summary.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/social_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
@@ -25,11 +25,11 @@ class SummaryPane extends StatelessWidget {
       switch (title) {
         case 'Initiatives':
           return '/initiatives';
-        case 'Projects':
-          return '/projects';
+        case 'Community':
+          return '/social';
         case 'Maps':
           return '/maps/cleanup';
-        case 'Social':
+        case 'Actions':
           return '/social';
         default:
           return null;
@@ -41,11 +41,11 @@ class SummaryPane extends StatelessWidget {
       return InitiativesSummary(icon: icon, color: color);
     }
 
-    if (title == 'Projects') {
-      return ProjectsSummary(icon: icon, color: color);
+    if (title == 'Community') {
+      return ActivityFeedSummary(icon: icon, color: color);
     }
 
-    if (title == "Social") {
+    if (title == 'Actions') {
       return SocialSummary(icon: icon, color: color);
     }
 
@@ -111,7 +111,7 @@ class SummaryPane extends StatelessWidget {
                         ),
                       ),
                     ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: InkWell(
                       borderRadius: BorderRadius.circular(6),

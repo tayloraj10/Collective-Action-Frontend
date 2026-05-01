@@ -83,7 +83,7 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Initiatives',
@@ -173,7 +173,7 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: InkWell(
                         borderRadius: BorderRadius.circular(6),

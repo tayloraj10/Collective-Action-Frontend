@@ -112,7 +112,7 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Row(
                     children: [
@@ -144,9 +144,9 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                                     alignment: Alignment.centerLeft,
                                     child: Tooltip(
                                       message:
-                                          'Recent activity from the collective community',
+                                          'Recent actions taken across the app',
                                       child: Text(
-                                        'Social',
+                                        'Actions',
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleLarge

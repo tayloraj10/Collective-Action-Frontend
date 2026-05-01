@@ -26,7 +26,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
   String? _selectedCategoryId;
   final TextEditingController _searchController = TextEditingController();
 
-  /// Mobile: 0 = Directory of Good, 1 = Recent Activity. Kept in state so tab
+  /// Mobile: 0 = Directory of Good, 1 = Action Feed. Kept in state so tab
   /// switch can be deferred on mobile web (avoids crashes when changing tabs).
   int _selectedMobileTabIndex = 0;
 
@@ -189,7 +189,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
                       ),
                     ),
                     child: Text(
-                      'Recent Activity',
+                      'Action Feed',
                       textAlign: TextAlign.center,
                       style: theme.textTheme.titleSmall?.copyWith(
                         color: _selectedMobileTabIndex == 1
@@ -280,7 +280,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.all(16),
-                child: const SocialActivityFeed(title: 'Recent activity'),
+                child: const SocialActivityFeed(title: 'Action feed'),
               ),
             ],
           ),
@@ -289,7 +289,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
     );
   }
 
-  /// Desktop: left = Directory of Good (compact cards), right = Activity feed.
+  /// Desktop: left = Directory of Good (compact cards), right = Action feed.
   Widget _buildDesktopLayout(
     BuildContext context,
     WidgetRef ref,
@@ -382,7 +382,7 @@ class _SocialScreenState extends ConsumerState<SocialScreen> {
           const SizedBox(width: 24),
           Expanded(
             flex: 6,
-            child: SocialActivityFeed(title: 'Recent activity'),
+            child: SocialActivityFeed(title: 'Action feed'),
           ),
         ],
       ),

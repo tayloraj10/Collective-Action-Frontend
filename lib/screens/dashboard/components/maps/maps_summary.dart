@@ -171,7 +171,7 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: InkWell(
                       borderRadius: BorderRadius.circular(6),
