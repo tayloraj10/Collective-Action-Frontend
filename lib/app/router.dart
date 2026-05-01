@@ -5,6 +5,7 @@ import 'package:collective_action_frontend/screens/user/contributions_page.dart'
 import 'package:collective_action_frontend/screens/projects/project_list_screen.dart';
 import 'package:collective_action_frontend/screens/projects/project_detail_screen.dart';
 import 'package:collective_action_frontend/screens/maps/map_screen.dart';
+import 'package:collective_action_frontend/screens/social/directory_of_good_entry_details.dart';
 import 'package:collective_action_frontend/screens/social/social_screen.dart';
 import 'package:collective_action_frontend/screens/login/login_screen.dart';
 import 'package:collective_action_frontend/screens/health_check_screen.dart';
@@ -60,6 +61,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/social',
         builder: (context, state) => const SocialScreen(),
+        routes: [
+          GoRoute(
+            path: 'directory/:entryId',
+            builder: (context, state) {
+              final entryId = state.pathParameters['entryId'] ?? '';
+              if (entryId.isEmpty) return const SocialScreen();
+              return DirectoryOfGoodEntryPage(entryId: entryId);
+            },
+          ),
+        ],
       ),
       GoRoute(
         path: '/network',
@@ -80,10 +91,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) =>
                 const NetworkGraphScreen(initialView: NetworkView.grid),
           ),
-          GoRoute(
-            path: 'directory',
-            redirect: (_, _) => '/network/circuit',
-          ),
+          GoRoute(path: 'directory', redirect: (_, _) => '/network/circuit'),
           GoRoute(
             path: 'map',
             builder: (context, state) =>

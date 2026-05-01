@@ -45,7 +45,7 @@ class _PageColors {
   }
 }
 
-const _kBlue   = Color(0xFF58A6FF);
+const _kBlue = Color(0xFF58A6FF);
 const _kOrange = Color(0xFFF0883E);
 
 // ── Page ───────────────────────────────────────────────────────────────────
@@ -60,23 +60,24 @@ class ContributionsPage extends ConsumerWidget {
     final colors = _PageColors.of(context);
     final isMobile = AppConstants.isMobile(context);
     final statsAsync = ref.watch(userStatsProvider(userId));
-    final userAsync  = ref.watch(userProvider(userId));
+    final userAsync = ref.watch(userProvider(userId));
     final actionsAsync = ref.watch(userRecentActionsProvider(userId));
-    final conns     = ref.watch(myConnectionsProvider).value ?? [];
-    final dogs      = ref.watch(directoryOfGoodEntriesProvider).value ?? [];
-    final inits     = ref.watch(activeInitiativeProvider).value ?? [];
+    final conns = ref.watch(userConnectionsProvider(userId)).value ?? [];
+    final dogs = ref.watch(directoryOfGoodEntriesProvider).value ?? [];
+    final inits = ref.watch(activeInitiativeProvider).value ?? [];
     final campaigns = ref.watch(activeMapCampaignsProvider).value ?? [];
 
     return Scaffold(
       backgroundColor: colors.bg,
       appBar: const CustomAppBar(),
       body: statsAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: _kBlue),
-        ),
+        loading: () =>
+            const Center(child: CircularProgressIndicator(color: _kBlue)),
         error: (e, _) => Center(
-          child: Text('Could not load stats: $e',
-              style: TextStyle(color: colors.textMuted)),
+          child: Text(
+            'Could not load stats: $e',
+            style: TextStyle(color: colors.textMuted),
+          ),
         ),
         data: (stats) => _PageBody(
           userId: userId,
@@ -129,13 +130,21 @@ class _PageBody extends StatelessWidget {
           _TwoCardHero(stats: stats, isMobile: isMobile),
           isMobile
               ? _MobileBody(
-                  stats: stats, actions: actions,
-                  conns: conns, dogs: dogs, inits: inits,
-                  campaigns: campaigns)
+                  stats: stats,
+                  actions: actions,
+                  conns: conns,
+                  dogs: dogs,
+                  inits: inits,
+                  campaigns: campaigns,
+                )
               : _DesktopBody(
-                  stats: stats, actions: actions,
-                  conns: conns, dogs: dogs, inits: inits,
-                  campaigns: campaigns),
+                  stats: stats,
+                  actions: actions,
+                  conns: conns,
+                  dogs: dogs,
+                  inits: inits,
+                  campaigns: campaigns,
+                ),
           const SizedBox(height: 60),
         ],
       ),
@@ -161,10 +170,11 @@ class _Header extends StatelessWidget {
     final colors = _PageColors.of(context);
     final name = user?.name ?? '';
     final loc = user?.location;
-    final locStr = [loc?.city, loc?.state, loc?.country]
-        .whereType<String>()
-        .where((s) => s.isNotEmpty)
-        .join(', ');
+    final locStr = [
+      loc?.city,
+      loc?.state,
+      loc?.country,
+    ].whereType<String>().where((s) => s.isNotEmpty).join(', ');
 
     return Container(
       color: colors.surface,
@@ -177,19 +187,26 @@ class _Header extends StatelessWidget {
             alignment: Alignment.center,
             children: [
               Container(
-                width: 72, height: 72,
+                width: 72,
+                height: 72,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
                       color: _kBlue.withAlpha(60),
-                      blurRadius: 20, spreadRadius: 2,
+                      blurRadius: 20,
+                      spreadRadius: 2,
                     ),
                   ],
                 ),
               ),
-              UserAvatar(userId: userId, radius: 34, enableHero: false,
-                  borderWidth: 2, accentColorOverride: _kBlue),
+              UserAvatar(
+                userId: userId,
+                radius: 34,
+                enableHero: false,
+                borderWidth: 2,
+                accentColorOverride: _kBlue,
+              ),
             ],
           ),
           const SizedBox(width: 20),
@@ -198,22 +215,31 @@ class _Header extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (name.isNotEmpty)
-                  Text(name,
-                      style: TextStyle(
-                          color: colors.textPrimary,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.5)),
+                  Text(
+                    name,
+                    style: TextStyle(
+                      color: colors.textPrimary,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
                 if (locStr.isNotEmpty) ...[
                   const SizedBox(height: 4),
-                  Row(children: [
-                    Icon(Icons.location_on_outlined,
-                        size: 13, color: colors.textMuted),
-                    const SizedBox(width: 4),
-                    Text(locStr,
-                        style: TextStyle(
-                            color: colors.textMuted, fontSize: 13)),
-                  ]),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 13,
+                        color: colors.textMuted,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        locStr,
+                        style: TextStyle(color: colors.textMuted, fontSize: 13),
+                      ),
+                    ],
+                  ),
                 ],
                 if (stats.orgId != null) ...[
                   const SizedBox(height: 6),
@@ -224,29 +250,33 @@ class _Header extends StatelessWidget {
                   Text(
                     'Active since ${DateFormat('MMM yyyy').format(stats.firstActionDate!)} · '
                     '${stats.totalActions} actions',
-                    style: TextStyle(
-                        color: colors.textMuted, fontSize: 12),
+                    style: TextStyle(color: colors.textMuted, fontSize: 12),
                   ),
                 ],
                 const SizedBox(height: 14),
-                Row(children: [
-                  _HeaderBtn(
-                    icon: Icons.link_outlined,
-                    label: 'Copy link',
-                    onTap: () {
-                      final b = Uri.base;
-                      final origin = '${b.scheme}://${b.host}'
-                          '${b.port != 0 && b.port != 80 && b.port != 443 ? ":${b.port}" : ""}';
-                      Clipboard.setData(
-                          ClipboardData(text: '$origin/profile/$userId'));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
+                Row(
+                  children: [
+                    _HeaderBtn(
+                      icon: Icons.link_outlined,
+                      label: 'Copy link',
+                      onTap: () {
+                        final b = Uri.base;
+                        final origin =
+                            '${b.scheme}://${b.host}'
+                            '${b.port != 0 && b.port != 80 && b.port != 443 ? ":${b.port}" : ""}';
+                        Clipboard.setData(
+                          ClipboardData(text: '$origin/profile/$userId'),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
                             content: Text('Link copied'),
-                            duration: Duration(seconds: 2)),
-                      );
-                    },
-                  ),
-                ]),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -261,24 +291,28 @@ class _OrgBadge extends StatelessWidget {
   final String name;
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0D9488).withAlpha(25),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-              color: const Color(0xFF0D9488).withAlpha(80)),
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+    decoration: BoxDecoration(
+      color: const Color(0xFF0D9488).withAlpha(25),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: const Color(0xFF0D9488).withAlpha(80)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(Icons.people_outline, size: 11, color: Color(0xFF0D9488)),
+        const SizedBox(width: 5),
+        Text(
+          name,
+          style: const TextStyle(
+            color: Color(0xFF0D9488),
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.people_outline,
-              size: 11, color: Color(0xFF0D9488)),
-          const SizedBox(width: 5),
-          Text(name,
-              style: const TextStyle(
-                  color: Color(0xFF0D9488),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600)),
-        ]),
-      );
+      ],
+    ),
+  );
 }
 
 class _HeaderBtn extends StatelessWidget {
@@ -295,36 +329,41 @@ class _HeaderBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = _PageColors.of(context);
     return GestureDetector(
-        onTap: onTap,
-        child: MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: colors.surface2,
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: colors.border),
-            ),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
+      onTap: onTap,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: colors.surface2,
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: colors.border),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
               Icon(icon, size: 13, color: colors.textMuted),
               const SizedBox(width: 5),
-              Text(label,
-                  style: TextStyle(
-                      color: colors.textMuted,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500)),
-            ]),
+              Text(
+                label,
+                style: TextStyle(
+                  color: colors.textMuted,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ),
-      );
+      ),
+    );
   }
 }
 
 // ── Hero metric row ────────────────────────────────────────────────────────
 
 // Dashboard-matching accent colours.
-const _kMapColor  = Color(0xFF16A34A); // AppColors.successGreen
+const _kMapColor = Color(0xFF16A34A); // AppColors.successGreen
 const _kInitColor = Color(0xFF3B82F6); // AppColors.lightBlue
 
 class _TwoCardHero extends StatelessWidget {
@@ -335,9 +374,9 @@ class _TwoCardHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = _PageColors.of(context);
-    final hasMap  = stats.mapSubmissionCount > 0;
-    final hasInit = stats.initiativesParticipated > 0 ||
-        stats.initiativeActionCount > 0;
+    final hasMap = stats.mapSubmissionCount > 0;
+    final hasInit =
+        stats.initiativesParticipated > 0 || stats.initiativeActionCount > 0;
     if (!hasMap && !hasInit) return const SizedBox.shrink();
 
     final cards = <Widget>[
@@ -347,15 +386,17 @@ class _TwoCardHero extends StatelessWidget {
           icon: Icons.trending_up,
           title: 'Initiatives',
           bigNumber: '${stats.initiativeActionCount}',
-          bigLabel: 'contribution${stats.initiativeActionCount == 1 ? '' : 's'}',
+          bigLabel:
+              'contribution${stats.initiativeActionCount == 1 ? '' : 's'}',
           details: [
             if (stats.initiativesParticipated > 0)
-              _Detail('${stats.initiativesParticipated}',
-                  'initiative${stats.initiativesParticipated == 1 ? '' : 's'} participated in'),
+              _Detail(
+                '${stats.initiativesParticipated}',
+                'initiative${stats.initiativesParticipated == 1 ? '' : 's'} participated in',
+              ),
           ],
         ),
-      if (hasMap)
-        _MapContribCard(stats: stats),
+      if (hasMap) _MapContribCard(stats: stats),
     ];
 
     return Container(
@@ -375,24 +416,29 @@ class _TwoCardHero extends StatelessWidget {
           isMobile
               ? Column(
                   children: cards
-                      .map((c) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: c,
-                          ))
+                      .map(
+                        (c) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: c,
+                        ),
+                      )
                       .toList(),
                 )
               : IntrinsicHeight(
                   child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: cards
-                      .map((c) => Expanded(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: cards
+                        .map(
+                          (c) => Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(right: 12),
                               child: c,
                             ),
-                          ))
-                      .toList(),
-                )),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
         ],
       ),
     );
@@ -423,45 +469,57 @@ class _MapContribCard extends StatelessWidget {
         border: Border.all(color: _kMapColor.withAlpha(50)),
         boxShadow: [
           BoxShadow(
-              color: _kMapColor.withAlpha(18),
-              blurRadius: 18,
-              offset: const Offset(0, 4)),
+            color: _kMapColor.withAlpha(18),
+            blurRadius: 18,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Card title
-          Row(children: [
-            const Icon(Icons.map_outlined, size: 13, color: _kMapColor),
-            const SizedBox(width: 6),
-            const Text('Map Contributions',
+          Row(
+            children: [
+              const Icon(Icons.map_outlined, size: 13, color: _kMapColor),
+              const SizedBox(width: 6),
+              const Text(
+                'Map Contributions',
                 style: TextStyle(
-                    color: _kMapColor,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.6)),
-          ]),
+                  color: _kMapColor,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.6,
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 12),
           // Big number
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('${stats.mapSubmissionCount}',
-                  style: TextStyle(
-                      color: colors.textPrimary,
-                      fontSize: 48,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -2,
-                      height: 1)),
+              Text(
+                '${stats.mapSubmissionCount}',
+                style: TextStyle(
+                  color: colors.textPrimary,
+                  fontSize: 48,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -2,
+                  height: 1,
+                ),
+              ),
               const SizedBox(width: 8),
               Padding(
                 padding: EdgeInsets.only(bottom: 6),
-                child: Text('submissions',
-                    style: TextStyle(
-                        color: colors.textMuted,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500)),
+                child: Text(
+                  'submissions',
+                  style: TextStyle(
+                    color: colors.textMuted,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ],
           ),
@@ -514,22 +572,30 @@ class _CampaignTile extends StatelessWidget {
         children: [
           Icon(Icons.map_outlined, size: 13, color: _kMapColor.withAlpha(180)),
           const SizedBox(height: 6),
-          Text('${campaign.submissionCount}',
-              style: const TextStyle(
-                  color: _kMapColor,
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                  height: 1)),
+          Text(
+            '${campaign.submissionCount}',
+            style: const TextStyle(
+              color: _kMapColor,
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
+              height: 1,
+            ),
+          ),
           const SizedBox(height: 3),
-          Text(campaign.campaignName,
-              style: TextStyle(
-                  color: colors.textPrimary,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600)),
+          Text(
+            campaign.campaignName,
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           if (details.isNotEmpty) ...[
             const SizedBox(height: 3),
-            Text(details.join(' · '),
-                style: TextStyle(color: colors.textMuted, fontSize: 10)),
+            Text(
+              details.join(' · '),
+              style: TextStyle(color: colors.textMuted, fontSize: 10),
+            ),
           ],
         ],
       ),
@@ -565,45 +631,57 @@ class _ContribCard extends StatelessWidget {
         border: Border.all(color: color.withAlpha(50)),
         boxShadow: [
           BoxShadow(
-              color: color.withAlpha(18),
-              blurRadius: 18,
-              offset: const Offset(0, 4)),
+            color: color.withAlpha(18),
+            blurRadius: 18,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Card title
-          Row(children: [
-            Icon(icon, size: 13, color: color),
-            const SizedBox(width: 6),
-            Text(title,
+          Row(
+            children: [
+              Icon(icon, size: 13, color: color),
+              const SizedBox(width: 6),
+              Text(
+                title,
                 style: TextStyle(
-                    color: color,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.6)),
-          ]),
+                  color: color,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.6,
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 12),
           // Big number + label
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(bigNumber,
-                  style: TextStyle(
-                      color: colors.textPrimary,
-                      fontSize: 48,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -2,
-                      height: 1)),
+              Text(
+                bigNumber,
+                style: TextStyle(
+                  color: colors.textPrimary,
+                  fontSize: 48,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -2,
+                  height: 1,
+                ),
+              ),
               const SizedBox(width: 8),
               Padding(
                 padding: const EdgeInsets.only(bottom: 6),
-                child: Text(bigLabel,
-                    style: TextStyle(
-                        color: colors.textMuted,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500)),
+                child: Text(
+                  bigLabel,
+                  style: TextStyle(
+                    color: colors.textMuted,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ],
           ),
@@ -615,23 +693,31 @@ class _ContribCard extends StatelessWidget {
             Wrap(
               spacing: 16,
               runSpacing: 4,
-              children: details.map((d) => RichText(
-                text: TextSpan(children: [
-                  TextSpan(
-                    text: '${d.value} ',
-                    style: TextStyle(
-                        color: color,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700),
-                  ),
-                  TextSpan(
-                    text: d.label,
-                    style: TextStyle(
-                        color: colors.textMuted,
-                        fontSize: 12),
-                  ),
-                ]),
-              )).toList(),
+              children: details
+                  .map(
+                    (d) => RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '${d.value} ',
+                            style: TextStyle(
+                              color: color,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          TextSpan(
+                            text: d.label,
+                            style: TextStyle(
+                              color: colors.textMuted,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
             ),
           ],
         ],
@@ -673,17 +759,22 @@ class _DesktopBody extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (stats.orgId != null) ...[
-                  _Section(label: 'Organization', color: const Color(0xFF0D9488),
-                      icon: Icons.people_outline),
+                  _Section(
+                    label: 'Organization',
+                    color: const Color(0xFF0D9488),
+                    icon: Icons.people_outline,
+                  ),
                   const SizedBox(height: 12),
                   _OrgStatsCard(stats: stats),
                   const SizedBox(height: 28),
                 ],
-                _Section(label: 'Connections', color: _kBlue,
-                    icon: Icons.hub_outlined),
+                _Section(
+                  label: 'Connections',
+                  color: _kBlue,
+                  icon: Icons.hub_outlined,
+                ),
                 const SizedBox(height: 12),
-                _ConnectionsList(
-                    conns: conns, dogs: dogs, inits: inits),
+                _ConnectionsList(conns: conns, dogs: dogs, inits: inits),
               ],
             ),
           ),
@@ -695,11 +786,17 @@ class _DesktopBody extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (actions.isNotEmpty) ...[
-                  _Section(label: 'Activity', color: _kOrange,
-                      icon: Icons.history_outlined),
+                  _Section(
+                    label: 'Activity',
+                    color: _kOrange,
+                    icon: Icons.history_outlined,
+                  ),
                   const SizedBox(height: 12),
-                  _Timeline(actions: actions, inits: inits,
-                      campaigns: campaigns),
+                  _Timeline(
+                    actions: actions,
+                    inits: inits,
+                    campaigns: campaigns,
+                  ),
                 ],
               ],
             ),
@@ -737,23 +834,31 @@ class _MobileBody extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (stats.orgId != null) ...[
-            _Section(label: 'Organization', color: const Color(0xFF0D9488),
-                icon: Icons.people_outline),
+            _Section(
+              label: 'Organization',
+              color: const Color(0xFF0D9488),
+              icon: Icons.people_outline,
+            ),
             const SizedBox(height: 12),
             _OrgStatsCard(stats: stats),
             const SizedBox(height: 24),
           ],
-          _Section(label: 'Connections', color: _kBlue,
-              icon: Icons.hub_outlined),
+          _Section(
+            label: 'Connections',
+            color: _kBlue,
+            icon: Icons.hub_outlined,
+          ),
           const SizedBox(height: 12),
           _ConnectionsList(conns: conns, dogs: dogs, inits: inits),
           if (actions.isNotEmpty) ...[
             const SizedBox(height: 24),
-            _Section(label: 'Activity', color: _kOrange,
-                icon: Icons.history_outlined),
+            _Section(
+              label: 'Activity',
+              color: _kOrange,
+              icon: Icons.history_outlined,
+            ),
             const SizedBox(height: 12),
-            _Timeline(actions: actions, inits: inits,
-                campaigns: campaigns),
+            _Timeline(actions: actions, inits: inits, campaigns: campaigns),
           ],
         ],
       ),
@@ -774,20 +879,24 @@ class _Section extends StatelessWidget {
   final IconData icon;
 
   @override
-  Widget build(BuildContext context) => Row(children: [
-        Icon(icon, size: 13, color: color),
-        const SizedBox(width: 7),
-        Text(label.toUpperCase(),
-            style: TextStyle(
-                color: color,
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.2)),
-        const SizedBox(width: 10),
-        Expanded(child: Container(height: 1, color: color.withAlpha(30))),
-      ]);
+  Widget build(BuildContext context) => Row(
+    children: [
+      Icon(icon, size: 13, color: color),
+      const SizedBox(width: 7),
+      Text(
+        label.toUpperCase(),
+        style: TextStyle(
+          color: color,
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.2,
+        ),
+      ),
+      const SizedBox(width: 10),
+      Expanded(child: Container(height: 1, color: color.withAlpha(30))),
+    ],
+  );
 }
-
 
 // ── Org stats card ─────────────────────────────────────────────────────────
 
@@ -814,8 +923,7 @@ class _OrgStatsCard extends StatelessWidget {
           ],
           if (stats.orgInitiativeConnections > 0) ...[
             _vDiv(),
-            _OrgStat(
-                '${stats.orgInitiativeConnections}', 'initiatives', c),
+            _OrgStat('${stats.orgInitiativeConnections}', 'initiatives', c),
           ],
         ],
       ),
@@ -823,8 +931,11 @@ class _OrgStatsCard extends StatelessWidget {
   }
 
   Widget _vDiv() => Container(
-      width: 1, height: 32, margin: const EdgeInsets.symmetric(horizontal: 16),
-      color: const Color(0xFF0D9488).withAlpha(30));
+    width: 1,
+    height: 32,
+    margin: const EdgeInsets.symmetric(horizontal: 16),
+    color: const Color(0xFF0D9488).withAlpha(30),
+  );
 }
 
 class _OrgStat extends StatelessWidget {
@@ -837,20 +948,21 @@ class _OrgStat extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = _PageColors.of(context);
     return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(value,
-              style: TextStyle(
-                  color: color,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  height: 1)),
-          const SizedBox(height: 2),
-          Text(label,
-              style: TextStyle(
-                  color: colors.textMuted, fontSize: 11)),
-        ],
-      );
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            color: color,
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            height: 1,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(label, style: TextStyle(color: colors.textMuted, fontSize: 11)),
+      ],
+    );
   }
 }
 
@@ -870,30 +982,37 @@ class _ConnectionsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = _PageColors.of(context);
-    final dogById  = {for (final d in dogs) (d.id ?? d.name): d};
+    final dogById = {for (final d in dogs) (d.id ?? d.name): d};
     final initById = {for (final i in inits) i.id: i};
 
     final follows = conns
         .where((c) => c.connectionType == 'follow' && c.fromType == 'user')
         .toList();
     final contribs = conns
-        .where((c) => c.connectionType == 'contribution' && c.fromType == 'user')
+        .where(
+          (c) => c.connectionType == 'contribution' && c.fromType == 'user',
+        )
         .toList();
 
     if (follows.isEmpty && contribs.isEmpty) {
-      return Text('No connections yet.',
-          style: TextStyle(color: colors.textMuted, fontSize: 13));
+      return Text(
+        'No connections yet.',
+        style: TextStyle(color: colors.textMuted, fontSize: 13),
+      );
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (follows.isNotEmpty) ...[
-          Text('${follows.length} org${follows.length == 1 ? '' : 's'} followed',
-              style: TextStyle(
-                  color: colors.textMuted,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600)),
+          Text(
+            '${follows.length} org${follows.length == 1 ? '' : 's'} followed',
+            style: TextStyle(
+              color: colors.textMuted,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 8),
           Wrap(
             spacing: 6,
@@ -908,11 +1027,13 @@ class _ConnectionsList extends StatelessWidget {
           const SizedBox(height: 14),
         if (contribs.isNotEmpty) ...[
           Text(
-              '${contribs.length} initiative${contribs.length == 1 ? '' : 's'} connected',
-              style: TextStyle(
-                  color: colors.textMuted,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600)),
+            '${contribs.length} initiative${contribs.length == 1 ? '' : 's'} connected',
+            style: TextStyle(
+              color: colors.textMuted,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 8),
           Wrap(
             spacing: 6,
@@ -936,22 +1057,28 @@ class _Tag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.fromLTRB(8, 4, 10, 4),
-        decoration: BoxDecoration(
-          color: color.withAlpha(14),
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: color.withAlpha(40)),
+    padding: const EdgeInsets.fromLTRB(8, 4, 10, 4),
+    decoration: BoxDecoration(
+      color: color.withAlpha(14),
+      borderRadius: BorderRadius.circular(6),
+      border: Border.all(color: color.withAlpha(40)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 11, color: color.withAlpha(180)),
+        const SizedBox(width: 5),
+        Text(
+          label,
+          style: TextStyle(
+            color: color,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(icon, size: 11, color: color.withAlpha(180)),
-          const SizedBox(width: 5),
-          Text(label,
-              style: TextStyle(
-                  color: color,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500)),
-        ]),
-      );
+      ],
+    ),
+  );
 }
 
 // ── Activity timeline ──────────────────────────────────────────────────────
@@ -996,8 +1123,8 @@ class _Timeline extends StatelessWidget {
     if (t.contains('initiative')) {
       final init = inits.firstWhere(
         (i) => i.id == linked,
-        orElse: () => InitiativeSchema(
-            id: linked, title: '', action: '', createdBy: ''),
+        orElse: () =>
+            InitiativeSchema(id: linked, title: '', action: '', createdBy: ''),
       );
       if (init.title.isNotEmpty) return init.title;
     }
@@ -1012,7 +1139,8 @@ class _Timeline extends StatelessWidget {
 
   static String _detail(ActionSchema a) {
     final ed = a.eventData ?? {};
-    final bags = ((ed['small_bags'] as num?)?.toInt() ?? 0) +
+    final bags =
+        ((ed['small_bags'] as num?)?.toInt() ?? 0) +
         ((ed['large_bags'] as num?)?.toInt() ?? 0);
     final lbs = (ed['pounds'] as num?)?.toDouble() ?? 0;
     if (bags > 0 && lbs > 0) {
@@ -1042,15 +1170,17 @@ class _Timeline extends StatelessWidget {
                 child: Column(
                   children: [
                     Container(
-                      width: 8, height: 8,
+                      width: 8,
+                      height: 8,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: dot,
                         boxShadow: [
                           BoxShadow(
-                              color: dot.withAlpha(80),
-                              blurRadius: 6,
-                              spreadRadius: 1),
+                            color: dot.withAlpha(80),
+                            blurRadius: 6,
+                            spreadRadius: 1,
+                          ),
                         ],
                       ),
                     ),
@@ -1068,8 +1198,7 @@ class _Timeline extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.only(
-                      bottom: isLast ? 0 : 14),
+                  padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
                   child: Row(
                     children: [
                       Expanded(
@@ -1080,16 +1209,18 @@ class _Timeline extends StatelessWidget {
                             Text(
                               _label(a),
                               style: TextStyle(
-                                  color: dot,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500),
+                                color: dot,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                             if (_entityName(a) != null)
                               Text(
                                 _entityName(a)!,
                                 style: TextStyle(
-                                    color: colors.textMuted,
-                                    fontSize: 11),
+                                  color: colors.textMuted,
+                                  fontSize: 11,
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -1097,15 +1228,17 @@ class _Timeline extends StatelessWidget {
                         ),
                       ),
                       if (_detail(a).isNotEmpty)
-                        Text(_detail(a),
-                            style: TextStyle(
-                                color: colors.textMuted,
-                                fontSize: 12)),
+                        Text(
+                          _detail(a),
+                          style: TextStyle(
+                            color: colors.textMuted,
+                            fontSize: 12,
+                          ),
+                        ),
                       const SizedBox(width: 8),
                       Text(
                         DateFormat('MMM d').format(a.date),
-                        style: TextStyle(
-                            color: colors.textMuted, fontSize: 11),
+                        style: TextStyle(color: colors.textMuted, fontSize: 11),
                       ),
                     ],
                   ),

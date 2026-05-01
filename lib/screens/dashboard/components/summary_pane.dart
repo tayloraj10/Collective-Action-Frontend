@@ -29,7 +29,7 @@ class SummaryPane extends StatelessWidget {
           return '/network';
         case 'Maps':
           return '/maps/cleanup';
-        case 'Actions':
+        case 'Action':
           return '/social';
         default:
           return null;
@@ -45,7 +45,7 @@ class SummaryPane extends StatelessWidget {
       return ActivityFeedSummary(icon: icon, color: color);
     }
 
-    if (title == 'Actions') {
+    if (title == 'Action') {
       return SocialSummary(icon: icon, color: color);
     }
 

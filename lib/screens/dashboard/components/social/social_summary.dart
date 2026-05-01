@@ -107,7 +107,7 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Actions',
+                    'Action',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,
@@ -314,16 +314,17 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
 Widget _buildSocialActivityCard(
   ActionSchema action,
   Map<String, InitiativeSchema> initiativesMap,
-  Map<String, DirectoryOfGoodSchema> directoryEntriesMap,
-) {
+  Map<String, DirectoryOfGoodSchema> directoryEntriesMap, {
+  bool feedMode = false,
+}) {
   if (action.actionType == ActionTypeValuesEnum.mapSubmission.value) {
-    return MapSubmissionActionCard(action: action);
+    return MapSubmissionActionCard(action: action, feedMode: feedMode);
   }
   if (action.actionType == ActionTypeValuesEnum.directoryOfGoodAddition.value) {
     final entry = action.linkedId != null
         ? directoryEntriesMap[action.linkedId!]
         : null;
-    return DirectoryOfGoodActionCard(action: action, entry: entry);
+    return DirectoryOfGoodActionCard(action: action, entry: entry, feedMode: feedMode);
   }
   InitiativeSchema? initiative;
   if (action.actionType == ActionTypeValuesEnum.initiative.value &&
@@ -331,13 +332,14 @@ Widget _buildSocialActivityCard(
       action.linkedId!.isNotEmpty) {
     initiative = initiativesMap[action.linkedId!];
   }
-  return InitiativeActionCard(action: action, initiative: initiative);
+  return InitiativeActionCard(action: action, initiative: initiative, feedMode: feedMode);
 }
 
 /// Reusable feed of action cards (map submissions, initiatives, directory of good).
 /// Used in [SocialSummary] and on the Social screen.
-/// Desktop: Wrap layout so cards flow and take less vertical space.
-/// Mobile: ListView.builder so only visible items are built (avoids scroll crashes).
+/// feedMode: vertical list with full-width timeline cards (used on the /social page).
+/// !feedMode desktop: multi-column grid with compact cards (used in dashboard summary).
+/// Mobile always uses a vertical list.
 Widget buildSocialActivityList(
   BuildContext context,
   Color cardColor,
@@ -345,15 +347,17 @@ Widget buildSocialActivityList(
   List<ActionSchema> actions,
   Map<String, InitiativeSchema> initiativesMap,
   Map<String, DirectoryOfGoodSchema> directoryEntriesMap,
-  ScrollController scrollController,
-) {
-  if (isMobile) {
+  ScrollController scrollController, {
+  bool feedMode = false,
+}) {
+  if (isMobile || feedMode) {
     return Scrollbar(
       thumbVisibility: true,
       controller: scrollController,
       child: ListView.builder(
         controller: scrollController,
         itemCount: actions.length,
+        padding: feedMode ? const EdgeInsets.only(bottom: 8) : EdgeInsets.zero,
         addAutomaticKeepAlives: true,
         addRepaintBoundaries: true,
         itemBuilder: (context, index) {
@@ -364,13 +368,14 @@ Widget buildSocialActivityList(
               action,
               initiativesMap,
               directoryEntriesMap,
+              feedMode: feedMode,
             ),
           );
         },
       ),
     );
   }
-  // Desktop: multi-column rows, built lazily (Wrap + List.generate built everything at once).
+  // Dashboard desktop: multi-column compact grid.
   return LayoutBuilder(
     builder: (context, constraints) {
       const double cardWidth = 180;
@@ -525,6 +530,7 @@ class _SocialActivityFeedState extends ConsumerState<SocialActivityFeed> {
                       initiativesMap,
                       directoryEntriesMap,
                       _scrollController,
+                      feedMode: true,
                     ),
                   );
                 },

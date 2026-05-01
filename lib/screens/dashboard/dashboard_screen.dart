@@ -137,7 +137,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       gap,
       nav(
         icon: Icons.people_outline,
-        label: 'Actions',
+        label: 'Action',
         color: AppColors.warningOrange,
         route: '/social',
       ),
@@ -411,7 +411,7 @@ class _PaneLayoutState extends State<PaneLayout> {
                     SizedBox(width: 10),
                     Expanded(
                       child: SummaryPane(
-                        title: 'Actions',
+                        title: 'Action',
                         icon: Icons.people_outline,
                         color: AppColors.warningOrange,
                       ),
@@ -438,7 +438,7 @@ class _PaneLayoutState extends State<PaneLayout> {
                           SizedBox(width: 10),
                           Expanded(
                             child: SummaryPane(
-                              title: 'Actions',
+                              title: 'Action',
                               icon: Icons.people_outline,
                               color: AppColors.warningOrange,
                             ),

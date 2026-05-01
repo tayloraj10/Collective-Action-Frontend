@@ -138,7 +138,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                       size: 22,
                     ),
                     const SizedBox(width: 12),
-                    const Text('Actions'),
+                    const Text('Action'),
                   ],
                 ),
               ),
