@@ -30,7 +30,17 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final user = ref.watch(currentUserProvider).value;
 
     return AppBar(
-      elevation: 2,
+      elevation: 3,
+      backgroundColor: Colors.transparent,
+      flexibleSpace: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [AppColors.darkBlue, AppColors.lightBlue],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+      ),
       centerTitle: isMobile ? false : true,
       leadingWidth: !isHomeRoute ? 66 : null,
       leading: !isHomeRoute
@@ -105,7 +115,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                 ),
               ),
               PopupMenuItem<String>(
-                value: '/social',
+                value: '/network',
                 child: Row(
                   children: [
                     Icon(

@@ -46,7 +46,13 @@ class DirectoryOfGoodActionCard extends ConsumerWidget {
     final isFeatured = entry?.featured == true;
     final cardColor = isDark ? AppColors.darkSurface : AppColors.white;
     final accentColor = AppColors.warningOrange;
-    final subtleAccent = AppColors.warningOrange.withAlpha(isDark ? 150 : 255);
+    final headerGradient = LinearGradient(
+      colors: isDark
+          ? [const Color(0xFF7C2D12).withAlpha(220), AppColors.warningOrange.withAlpha(180)]
+          : [const Color(0xFF7C2D12), AppColors.warningOrange],
+      begin: Alignment.bottomLeft,
+      end: Alignment.topRight,
+    );
 
     return Container(
       width: expandToFullWidth ? (isMobile ? double.infinity : 180) : 180,
@@ -85,8 +91,13 @@ class DirectoryOfGoodActionCard extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: EdgeInsets.all(isMobile ? 8 : 10),
-                  color: subtleAccent,
+                  padding: EdgeInsets.fromLTRB(
+                    isMobile ? 8 : 10,
+                    isMobile ? 9 : 11,
+                    isMobile ? 8 : 10,
+                    isMobile ? 9 : 11,
+                  ),
+                  decoration: BoxDecoration(gradient: headerGradient),
                   child: Row(
                     children: [
                       _buildEntryThumbnail(
@@ -103,28 +114,24 @@ class DirectoryOfGoodActionCard extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Row(
-                              children: [
-                                Text(
-                                  'Directory of Good',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.onSurface
-                                        .withAlpha(180),
-                                    fontSize: isMobile ? 9 : 10,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              'Directory of Good',
+                              style: TextStyle(
+                                color: Colors.white.withAlpha(200),
+                                fontSize: isMobile ? 9 : 10,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.2,
+                              ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               title,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: theme.colorScheme.onSurface,
-                                fontSize: isMobile ? 11 : 12,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                fontSize: 12,
                                 height: 1.2,
-                                letterSpacing: -0.2,
+                                letterSpacing: -0.1,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,

@@ -26,7 +26,7 @@ class SummaryPane extends StatelessWidget {
         case 'Initiatives':
           return '/initiatives';
         case 'Community':
-          return '/social';
+          return '/network';
         case 'Maps':
           return '/maps/cleanup';
         case 'Actions':
@@ -53,189 +53,106 @@ class SummaryPane extends StatelessWidget {
       return MapsSummary(icon: icon, color: color);
     }
 
-    // Match InitiativesSummary padding
     final isMobile = AppConstants.isMobile(context);
-    final double cardPaddingHeight = isMobile ? 4 : 6;
-    final double cardPaddingWidth = isMobile ? 6 : 10;
     final route = routeForTitle(title);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final gradStart = isDark
+        ? Color.lerp(color, Colors.black, 0.45)!
+        : Color.lerp(color, Colors.black, 0.28)!;
+    final gradEnd = isDark
+        ? Color.lerp(color, Colors.black, 0.15)!
+        : color;
 
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: cardPaddingWidth,
-            vertical: cardPaddingHeight,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  if (route != null)
-                    InkWell(
-                      borderRadius: BorderRadius.circular(8),
-                      onTap: () => safeGo(context, route),
-                      child: Container(
-                        padding: EdgeInsets.all(isMobile ? 10 : 12),
-                        decoration: BoxDecoration(
-                          color: color.withAlpha(26),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.only(top: isMobile ? 2 : 0),
-                          child: Icon(
-                            icon,
-                            color: color,
-                            size: isMobile ? 20 : 28,
-                          ),
-                        ),
-                      ),
-                    )
-                  else
-                    Container(
-                      padding: EdgeInsets.all(isMobile ? 10 : 12),
-                      decoration: BoxDecoration(
-                        color: color.withAlpha(26),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.only(top: isMobile ? 2 : 0),
-                        child: Icon(
-                          icon,
-                          color: color,
-                          size: isMobile ? 20 : 28,
-                        ),
-                      ),
-                    ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(6),
-                      onTap: (!isMobile || route == null)
-                          ? null
-                          : () => safeGo(context, route),
-                      splashColor: (!isMobile || route == null)
-                          ? null
-                          : Theme.of(context).colorScheme.primary.withAlpha(30),
-                      highlightColor: (!isMobile || route == null)
-                          ? null
-                          : Theme.of(context).colorScheme.primary.withAlpha(20),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: route == null
-                            ? Text(
-                                title,
-                                style: Theme.of(context).textTheme.titleLarge
-                                    ?.copyWith(fontWeight: FontWeight.w600),
-                              )
-                            : Row(
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Flexible(
-                                    child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(
-                                        title,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                      ),
-                                    ),
-                                  ),
-                                  if (isMobile) ...[
-                                    const SizedBox(width: 6),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 4),
-                                      child: Container(
-                                        width: 20,
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurface.withAlpha(18),
-                                          border: Border.all(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface
-                                                .withAlpha(38),
-                                          ),
-                                        ),
-                                        child: Icon(
-                                          Icons.open_in_new,
-                                          size: 14,
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge
-                                              ?.color
-                                              ?.withAlpha(210),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              // Centered Under Construction text
-              Expanded(
-                child: Center(
-                  child: Text(
-                    'Under Construction',
-                    textAlign: TextAlign.center,
-                    softWrap: true,
-                    maxLines: 2,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: isMobile ? 20 : 35,
-                      letterSpacing: 2.5,
-                      foreground: Paint()
-                        ..shader =
-                            LinearGradient(
-                              colors: [Colors.black, Colors.grey.shade600],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ).createShader(
-                              Rect.fromLTWH(
-                                0,
-                                0,
-                                isMobile ? 180 : 260,
-                                isMobile ? 40 : 60,
-                              ),
-                            ),
-                      shadows: [
-                        Shadow(
-                          color: Colors.black.withAlpha(89),
-                          blurRadius: 12,
-                          offset: Offset(0, 4),
-                        ),
-                        Shadow(
-                          color: Colors.white.withAlpha(77),
-                          blurRadius: 2,
-                          offset: Offset(0, 0),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              SummaryCount(count: 0),
-            ],
+    Widget gradientHeader = InkWell(
+      onTap: route != null ? () => safeGo(context, route) : null,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.fromLTRB(14, isMobile ? 9 : 12, 14, isMobile ? 9 : 12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [gradStart, gradEnd],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
         ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(isMobile ? 5 : 7),
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(38),
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: Icon(icon, color: Colors.white, size: isMobile ? 17 : 20),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: isMobile ? 14 : 16,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ),
+            if (route != null)
+              Icon(
+                Icons.chevron_right_rounded,
+                color: Colors.white.withAlpha(200),
+                size: 18,
+              ),
+          ],
+        ),
+      ),
+    );
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          gradientHeader,
+          Expanded(
+            child: Center(
+              child: Text(
+                'Under Construction',
+                textAlign: TextAlign.center,
+                softWrap: true,
+                maxLines: 2,
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: isMobile ? 20 : 35,
+                  letterSpacing: 2.5,
+                  foreground: Paint()
+                    ..shader = LinearGradient(
+                      colors: [color.withAlpha(180), color.withAlpha(80)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ).createShader(
+                      Rect.fromLTWH(
+                        0,
+                        0,
+                        isMobile ? 180 : 260,
+                        isMobile ? 40 : 60,
+                      ),
+                    ),
+                  shadows: [
+                    Shadow(
+                      color: color.withAlpha(60),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(12, 0, 12, isMobile ? 8 : 10),
+            child: SummaryCount(count: 0),
+          ),
+        ],
       ),
     );
   }

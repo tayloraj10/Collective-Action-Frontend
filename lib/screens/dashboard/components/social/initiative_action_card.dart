@@ -11,6 +11,7 @@ import 'package:collective_action_frontend/components/confirmation_dialog.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
 import 'package:collective_action_frontend/components/photo_thumbnail_strip.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/action_like_row.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:collective_action_frontend/screens/maps/components/photo_viewer_dialog.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
 
@@ -46,10 +47,15 @@ class InitiativeActionCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    // Use AppColors from theme.dart
     final cardColor = isDark ? AppColors.darkSurface : AppColors.white;
     final accentColor = AppColors.lightBlue;
-    final subtleAccent = AppColors.lightBlue.withAlpha(isDark ? 150 : 255);
+    final headerGradient = LinearGradient(
+      colors: isDark
+          ? [const Color(0xFF1E3A8A).withAlpha(220), AppColors.lightBlue.withAlpha(180)]
+          : [const Color(0xFF1E3A8A), AppColors.lightBlue],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
 
     InitiativeSchema? linkedInitiative = initiative;
 
@@ -75,42 +81,53 @@ class InitiativeActionCard extends ConsumerWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(14),
-        child: Column(
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => safeGo(context, '/social'),
+            borderRadius: BorderRadius.circular(14),
+            splashColor: AppColors.lightBlue.withAlpha(30),
+            highlightColor: AppColors.lightBlue.withAlpha(15),
+            child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             // Header section with gradient
             Container(
-              padding: EdgeInsets.all(isMobile ? 8 : 10),
-              color: subtleAccent,
+              padding: EdgeInsets.fromLTRB(
+                isMobile ? 8 : 10,
+                isMobile ? 9 : 11,
+                isMobile ? 8 : 10,
+                isMobile ? 9 : 11,
+              ),
+              decoration: BoxDecoration(gradient: headerGradient),
               child: Row(
                 children: [
-                  // User avatar
                   MouseRegion(
                     cursor: SystemMouseCursors.click,
                     child: UserAvatar(
                       userId: action.userId,
                       showTooltip: true,
                       enableHero: true,
-                      heroTagSuffix:
-                          action.id, // Use action ID to make hero tag unique
+                      heroTagSuffix: action.id,
                       showProfileOnTap: true,
+                      accentColorOverride: Colors.white.withAlpha(180),
+                      borderWidth: 1.5,
                     ),
                   ),
                   const SizedBox(width: 8),
-                  // Title
                   Expanded(
                     child: Text(
                       linkedInitiative?.title ?? _titleForAction(action),
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.onSurface,
-                        fontSize: isMobile ? 12 : 13,
-                        height: 1.2,
-                        letterSpacing: -0.2,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        fontSize: 12,
+                        height: 1.25,
+                        letterSpacing: -0.1,
                       ),
-                      maxLines: null,
-                      overflow: TextOverflow.visible,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -249,6 +266,8 @@ class InitiativeActionCard extends ConsumerWidget {
               ),
             ),
           ],
+        ),
+          ),
         ),
       ),
     );

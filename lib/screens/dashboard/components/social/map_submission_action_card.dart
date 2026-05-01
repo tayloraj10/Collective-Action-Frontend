@@ -165,7 +165,13 @@ class MapSubmissionActionCard extends ConsumerWidget {
 
     final cardColor = isDark ? AppColors.darkSurface : AppColors.white;
     final accentColor = AppColors.successGreen;
-    final subtleAccent = AppColors.successGreen.withAlpha(isDark ? 150 : 255);
+    final headerGradient = LinearGradient(
+      colors: isDark
+          ? [const Color(0xFF14532D).withAlpha(220), AppColors.successGreen.withAlpha(180)]
+          : [const Color(0xFF14532D), AppColors.successGreen],
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
+    );
 
     final canShowInfoDialog =
         action.eventData != null &&
@@ -203,8 +209,13 @@ class MapSubmissionActionCard extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: EdgeInsets.all(isMobile ? 8 : 10),
-                  color: subtleAccent,
+                  padding: EdgeInsets.fromLTRB(
+                    isMobile ? 8 : 10,
+                    isMobile ? 9 : 11,
+                    isMobile ? 8 : 10,
+                    isMobile ? 9 : 11,
+                  ),
+                  decoration: BoxDecoration(gradient: headerGradient),
                   child: Row(
                     children: [
                       MouseRegion(
@@ -217,18 +228,20 @@ class MapSubmissionActionCard extends ConsumerWidget {
                           enableHero: true,
                           heroTagSuffix: action.id,
                           showProfileOnTap: true,
+                          accentColorOverride: Colors.white.withAlpha(180),
+                          borderWidth: 1.5,
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           title,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: theme.colorScheme.onSurface,
-                            fontSize: isMobile ? 12 : 13,
-                            height: 1.2,
-                            letterSpacing: -0.2,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            fontSize: 12,
+                            height: 1.25,
+                            letterSpacing: -0.1,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,

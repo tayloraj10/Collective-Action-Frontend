@@ -132,7 +132,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         icon: Icons.dynamic_feed_outlined,
         label: 'Community',
         color: AppColors.errorRed,
-        route: '/social',
+        route: '/network',
       ),
       gap,
       nav(
@@ -157,25 +157,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         children: [
           Column(
             children: [
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 8 : 16,
-                  vertical: isMobile ? 0 : 12,
+              if (!isMobile)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: _dashboardNavRowChildren(context),
+                    ),
+                  ),
                 ),
-                child: isMobile
-                    ? null
-                    : SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: _dashboardNavRowChildren(context),
-                        ),
-                      ),
-              ),
-              if (!isMobile) Divider(height: 1),
               // 4-Pane Layout
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.all(isMobile ? 8 : 10),
+                  padding: EdgeInsets.fromLTRB(
+                    isMobile ? 6 : 12,
+                    isMobile ? 6 : 4,
+                    isMobile ? 6 : 12,
+                    isMobile ? 6 : 10,
+                  ),
                   child: const PaneLayout(),
                 ),
               ),
@@ -385,7 +385,7 @@ class _PaneLayoutState extends State<PaneLayout> {
                   color: AppColors.lightBlue,
                 ),
               ),
-              SizedBox(width: 6),
+              SizedBox(width: 10),
               Expanded(
                 child: SummaryPane(
                   title: 'Community',
@@ -396,7 +396,7 @@ class _PaneLayoutState extends State<PaneLayout> {
             ],
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 10),
         Expanded(
           child: _showSecondRow
               ? Row(
@@ -408,7 +408,7 @@ class _PaneLayoutState extends State<PaneLayout> {
                         color: AppColors.successGreen,
                       ),
                     ),
-                    SizedBox(width: 6),
+                    SizedBox(width: 10),
                     Expanded(
                       child: SummaryPane(
                         title: 'Actions',
@@ -435,7 +435,7 @@ class _PaneLayoutState extends State<PaneLayout> {
                               color: AppColors.successGreen,
                             ),
                           ),
-                          SizedBox(width: 6),
+                          SizedBox(width: 10),
                           Expanded(
                             child: SummaryPane(
                               title: 'Actions',
