@@ -51,61 +51,96 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
     super.dispose();
   }
 
-  Widget _buildPlaceholder(BuildContext context, bool isMobile) {
-    final cardPaddingHeight = isMobile ? 4.0 : 6.0;
-    final cardPaddingWidth = isMobile ? 6.0 : 10.0;
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: cardPaddingWidth,
-          vertical: cardPaddingHeight,
+  Widget _buildGradientHeader(BuildContext context, bool isMobile) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final gradStart = isDark
+        ? Color.lerp(widget.color, Colors.black, 0.45)!
+        : const Color(0xFF1E3A8A);
+    final gradEnd = isDark
+        ? Color.lerp(widget.color, Colors.black, 0.15)!
+        : widget.color;
+
+    return InkWell(
+      onTap: () => safeGo(context, '/initiatives'),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.fromLTRB(14, isMobile ? 9 : 12, 14, isMobile ? 9 : 12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [gradStart, gradEnd],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Row(
-              children: [
-                InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: () => safeGo(context, '/initiatives'),
-                  child: Container(
-                    padding: EdgeInsets.all(isMobile ? 10 : 12),
-                    decoration: BoxDecoration(
-                      color: widget.color.withAlpha(26),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      widget.icon,
-                      color: widget.color,
-                      size: isMobile ? 20 : 28,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Initiatives',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            const Expanded(
-              child: Center(
-                child: SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
+            Container(
+              padding: EdgeInsets.all(isMobile ? 5 : 7),
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(38),
+                borderRadius: BorderRadius.circular(9),
               ),
+              child: Icon(
+                widget.icon,
+                color: Colors.white,
+                size: isMobile ? 17 : 20,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Initiatives',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: isMobile ? 14 : 16,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  if (!isMobile)
+                    Text(
+                      'Community driven goals',
+                      style: TextStyle(
+                        color: Colors.white.withAlpha(210),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        height: 1.3,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Colors.white.withAlpha(200),
+              size: 18,
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder(BuildContext context, bool isMobile) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          _buildGradientHeader(context, isMobile),
+          const Expanded(
+            child: Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -118,15 +153,15 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
         if (!_canLoadData) {
           return _buildPlaceholder(context, isMobile);
         }
-        final double cardPaddingHeight = isMobile ? 4 : 6;
-        final double cardPaddingWidth = isMobile ? 6 : 10;
-        final double containerPadding = isMobile ? 8 : 14;
-        final double containerPaddingTop = 2;
         final double titleFontSize = isMobile ? 14 : 18;
         final double descFontSize = isMobile ? 11 : 13;
         final double progressHeight = isMobile ? 16 : 24;
         final double progressFontSize = isMobile ? 10 : 14;
         final double spacing = isMobile ? 8 : 14;
+        final double containerPadding = isMobile ? 8 : 14;
+        const double containerPaddingTop = 2;
+        // Approximate header + content padding height for grid aspect ratio.
+        const double reservedHeight = 85.0;
         final List<Color> palette = [
           Colors.green,
           Colors.blue,
@@ -139,339 +174,145 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
           Colors.amber,
           Colors.deepPurple,
         ];
-        return Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: cardPaddingWidth,
-              vertical: cardPaddingHeight,
-            ),
+
+        Widget buildList(List initiatives) {
+          if (initiatives.isEmpty) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('No initiatives found.'),
+                const SizedBox(height: 8),
+                SummaryCount(count: initiatives.length),
+              ],
+            );
+          }
+          return Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    InkWell(
-                      borderRadius: BorderRadius.circular(8),
-                      onTap: () => safeGo(context, '/initiatives'),
-                      child: Container(
-                        padding: EdgeInsets.all(isMobile ? 10 : 12),
-                        decoration: BoxDecoration(
-                          color: widget.color.withAlpha(26),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.only(top: isMobile ? 2 : 0),
-                          child: Icon(
-                            widget.icon,
-                            color: widget.color,
-                            size: isMobile ? 20 : 28,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(6),
-                        onTap: isMobile
-                            ? () => safeGo(context, '/initiatives')
-                            : null,
-                        splashColor: isMobile
-                            ? Theme.of(
-                                context,
-                              ).colorScheme.primary.withAlpha(30)
-                            : null,
-                        highlightColor: isMobile
-                            ? Theme.of(
-                                context,
-                              ).colorScheme.primary.withAlpha(20)
-                            : null,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 2),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Flexible(
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  alignment: Alignment.centerLeft,
-                                  child: Tooltip(
-                                    message:
-                                        'Community driven goals anyone can contribute to',
-                                    child: Text(
-                                      'Initiatives',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                    ),
-                                  ),
+                Expanded(
+                  child: Scrollbar(
+                    controller: _scrollController,
+                    thickness: isMobile ? 4 : 6,
+                    child: isMobile
+                        ? ListView.separated(
+                            controller: _scrollController,
+                            scrollDirection: Axis.vertical,
+                            itemCount: initiatives.length,
+                            separatorBuilder: (context, idx) =>
+                                const SizedBox(height: 10),
+                            itemBuilder: (context, idx) {
+                              final initiative = initiatives[idx];
+                              final cardColor = palette[idx % palette.length];
+                              return InitiativeCard(
+                                initiative: initiative,
+                                cardColor: cardColor,
+                                isMobile: isMobile,
+                                showCreatedBy: false,
+                                titleFontSize: titleFontSize,
+                                descFontSize: descFontSize,
+                                progressHeight: progressHeight,
+                                progressFontSize: progressFontSize,
+                                spacing: spacing,
+                                containerPadding: containerPadding,
+                                containerPaddingTop: containerPaddingTop,
+                              );
+                            },
+                          )
+                        : GridView.builder(
+                            controller: _scrollController,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 12,
+                                  mainAxisSpacing: 12,
+                                  childAspectRatio:
+                                      (constraints.maxWidth / 2) /
+                                      ((constraints.maxHeight - reservedHeight) /
+                                          2),
                                 ),
-                              ),
-                              if (isMobile) ...[
-                                const SizedBox(width: 6),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 4),
-                                  child: Container(
-                                    width: 20,
-                                    height: 20,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface.withAlpha(18),
-                                      border: Border.all(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurface.withAlpha(38),
-                                      ),
-                                    ),
-                                    child: Icon(
-                                      Icons.open_in_new,
-                                      size: 14,
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge
-                                          ?.color
-                                          ?.withAlpha(210),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ],
+                            itemCount: initiatives.length,
+                            itemBuilder: (context, idx) {
+                              final initiative = initiatives[idx];
+                              final cardColor = palette[idx % palette.length];
+                              return InitiativeCard(
+                                initiative: initiative,
+                                cardColor: cardColor,
+                                isMobile: isMobile,
+                                showCreatedBy: false,
+                                titleFontSize: titleFontSize,
+                                descFontSize: descFontSize,
+                                progressHeight: progressHeight,
+                                progressFontSize: progressFontSize,
+                                spacing: spacing,
+                                containerPadding: containerPadding,
+                                containerPaddingTop: containerPaddingTop,
+                              );
+                            },
                           ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-                SizedBox(height: isMobile ? 8 : 8),
-                // Riverpod AsyncNotifierProvider usage
+                const SizedBox(height: 4),
                 Builder(
                   builder: (context) {
-                    final initiativesAsync = ref.watch(
-                      featuredInitiativeProvider,
-                    );
-                    final previousData = initiativesAsync.asData?.value;
-                    return initiativesAsync.when(
-                      loading: () {
-                        if (previousData != null) {
-                          final countWidget = SummaryCount(
-                            count: previousData.length,
-                          );
-                          if (previousData.isEmpty) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('No initiatives found.'),
-                                const SizedBox(height: 8),
-                                countWidget,
-                              ],
-                            );
-                          }
-                          return Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Scrollbar(
-                                    controller: _scrollController,
-                                    thickness: isMobile ? 4 : 6,
-                                    child: isMobile
-                                        ? ListView.separated(
-                                            controller: _scrollController,
-                                            scrollDirection: Axis.vertical,
-                                            itemCount: previousData.length,
-                                            separatorBuilder: (context, idx) =>
-                                                SizedBox(height: 12),
-                                            itemBuilder: (context, idx) {
-                                              final initiative =
-                                                  previousData[idx];
-                                              final cardColor =
-                                                  palette[idx % palette.length];
-                                              return InitiativeCard(
-                                                initiative: initiative,
-                                                cardColor: cardColor,
-                                                isMobile: isMobile,
-                                                showCreatedBy: false,
-                                                titleFontSize: titleFontSize,
-                                                descFontSize: descFontSize,
-                                                progressHeight: progressHeight,
-                                                progressFontSize:
-                                                    progressFontSize,
-                                                spacing: spacing,
-                                                containerPadding:
-                                                    containerPadding,
-                                                containerPaddingTop:
-                                                    containerPaddingTop,
-                                              );
-                                            },
-                                          )
-                                        : GridView.builder(
-                                            controller: _scrollController,
-                                            gridDelegate:
-                                                SliverGridDelegateWithFixedCrossAxisCount(
-                                                  crossAxisCount: 2,
-                                                  crossAxisSpacing: 12,
-                                                  mainAxisSpacing: 12,
-                                                  childAspectRatio:
-                                                      (constraints.maxWidth /
-                                                          2) /
-                                                      ((constraints.maxHeight -
-                                                              60) /
-                                                          2),
-                                                ),
-                                            itemCount: previousData.length,
-                                            itemBuilder: (context, idx) {
-                                              final initiative =
-                                                  previousData[idx];
-                                              final cardColor =
-                                                  palette[idx % palette.length];
-                                              return InitiativeCard(
-                                                initiative: initiative,
-                                                cardColor: cardColor,
-                                                isMobile: isMobile,
-                                                showCreatedBy: false,
-                                                titleFontSize: titleFontSize,
-                                                descFontSize: descFontSize,
-                                                progressHeight: progressHeight,
-                                                progressFontSize:
-                                                    progressFontSize,
-                                                spacing: spacing,
-                                                containerPadding:
-                                                    containerPadding,
-                                                containerPaddingTop:
-                                                    containerPaddingTop,
-                                              );
-                                            },
-                                          ),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                countWidget,
-                              ],
-                            ),
-                          );
-                        }
-                        return const Expanded(
-                          child: Center(child: CircularProgressIndicator()),
-                        );
-                      },
-                      error: (err, stack) => const Expanded(
-                        child: Center(
-                          child: Text(
-                            'Failed to load initiatives',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
-                      ),
-                      data: (initiatives) {
-                        final countWidget = SummaryCount(
-                          count: initiatives.length,
-                        );
-                        if (initiatives.isEmpty) {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('No initiatives found.'),
-                              const SizedBox(height: 8),
-                              countWidget,
-                            ],
-                          );
-                        }
-                        return Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Scrollbar(
-                                  controller: _scrollController,
-                                  thickness: isMobile ? 4 : 6,
-                                  child: isMobile
-                                      ? ListView.separated(
-                                          controller: _scrollController,
-                                          scrollDirection: Axis.vertical,
-                                          itemCount: initiatives.length,
-                                          separatorBuilder: (context, idx) =>
-                                              SizedBox(height: 12),
-                                          itemBuilder: (context, idx) {
-                                            final initiative = initiatives[idx];
-                                            final cardColor =
-                                                palette[idx % palette.length];
-                                            return InitiativeCard(
-                                              initiative: initiative,
-                                              cardColor: cardColor,
-                                              isMobile: isMobile,
-                                              showCreatedBy: false,
-                                              titleFontSize: titleFontSize,
-                                              descFontSize: descFontSize,
-                                              progressHeight: progressHeight,
-                                              progressFontSize:
-                                                  progressFontSize,
-                                              spacing: spacing,
-                                              containerPadding:
-                                                  containerPadding,
-                                              containerPaddingTop:
-                                                  containerPaddingTop,
-                                            );
-                                          },
-                                        )
-                                      : GridView.builder(
-                                          controller: _scrollController,
-                                          gridDelegate:
-                                              SliverGridDelegateWithFixedCrossAxisCount(
-                                                crossAxisCount: 2,
-                                                crossAxisSpacing: 12,
-                                                mainAxisSpacing: 12,
-                                                childAspectRatio:
-                                                    (constraints.maxWidth / 2) /
-                                                    ((constraints.maxHeight -
-                                                            60) /
-                                                        2),
-                                              ),
-                                          itemCount: initiatives.length,
-                                          itemBuilder: (context, idx) {
-                                            final initiative = initiatives[idx];
-                                            final cardColor =
-                                                palette[idx % palette.length];
-                                            return InitiativeCard(
-                                              initiative: initiative,
-                                              cardColor: cardColor,
-                                              isMobile: isMobile,
-                                              showCreatedBy: false,
-                                              titleFontSize: titleFontSize,
-                                              descFontSize: descFontSize,
-                                              progressHeight: progressHeight,
-                                              progressFontSize:
-                                                  progressFontSize,
-                                              spacing: spacing,
-                                              containerPadding:
-                                                  containerPadding,
-                                              containerPaddingTop:
-                                                  containerPaddingTop,
-                                            );
-                                          },
-                                        ),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              countWidget,
-                            ],
-                          ),
-                        );
-                      },
-                    );
+                    final count = initiatives.length;
+                    return SummaryCount(count: count);
                   },
                 ),
               ],
             ),
+          );
+        }
+
+        return Card(
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            children: [
+              _buildGradientHeader(context, isMobile),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    isMobile ? 8 : 12,
+                    isMobile ? 6 : 8,
+                    isMobile ? 8 : 12,
+                    isMobile ? 4 : 6,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Builder(
+                        builder: (context) {
+                          final initiativesAsync =
+                              ref.watch(featuredInitiativeProvider);
+                          final previousData = initiativesAsync.asData?.value;
+                          return initiativesAsync.when(
+                            loading: () {
+                              if (previousData != null) {
+                                return buildList(previousData);
+                              }
+                              return const Expanded(
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            },
+                            error: (err, stack) => const Expanded(
+                              child: Center(
+                                child: Text(
+                                  'Failed to load initiatives',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ),
+                            data: (initiatives) => buildList(initiatives),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },

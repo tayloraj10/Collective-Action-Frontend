@@ -60,6 +60,15 @@ final entityConnectionsProvider =
           );
     });
 
+final userConnectionsProvider =
+    FutureProvider.family<List<ConnectionWithUserSchema>, String>((
+      ref,
+      userId,
+    ) async {
+      if (userId.isEmpty) return [];
+      return ref.read(_connectionServiceProvider).getConnectionsForUser(userId);
+    });
+
 // ── Current user's connections ────────────────────────────────────────────
 
 class MyConnectionsNotifier

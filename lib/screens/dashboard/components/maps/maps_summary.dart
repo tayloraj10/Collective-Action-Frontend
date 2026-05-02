@@ -133,230 +133,207 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
     );
   }
 
+  Widget _buildGradientHeader(BuildContext context, bool isMobile) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final gradStart = isDark
+        ? Color.lerp(widget.color, Colors.black, 0.45)!
+        : const Color(0xFF14532D);
+    final gradEnd = isDark
+        ? Color.lerp(widget.color, Colors.black, 0.15)!
+        : widget.color;
+
+    return InkWell(
+      onTap: () => safeGo(context, '/maps/cleanup'),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.fromLTRB(14, isMobile ? 9 : 12, 14, isMobile ? 9 : 12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [gradStart, gradEnd],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(isMobile ? 5 : 7),
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(38),
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: Icon(
+                widget.icon,
+                color: Colors.white,
+                size: isMobile ? 17 : 20,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Maps',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: isMobile ? 14 : 16,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  if (!isMobile)
+                    Text(
+                      'Where action is happening',
+                      style: TextStyle(
+                        color: Colors.white.withAlpha(210),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        height: 1.3,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Colors.white.withAlpha(200),
+              size: 18,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isMobile = AppConstants.isMobile(context);
     final actionsAsync = ref.watch(activeActionProvider);
 
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: isMobile ? () => safeGo(context, '/maps/cleanup') : null,
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 6 : 10,
-            vertical: isMobile ? 4 : 6,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  InkWell(
-                    borderRadius: BorderRadius.circular(8),
-                    onTap: () => safeGo(context, '/maps/cleanup'),
-                    child: Container(
-                      padding: EdgeInsets.all(isMobile ? 10 : 12),
-                      decoration: BoxDecoration(
-                        color: widget.color.withAlpha(26),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        widget.icon,
-                        color: widget.color,
-                        size: isMobile ? 20 : 28,
-                      ),
-                    ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          _buildGradientHeader(context, isMobile),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                isMobile ? 8 : 12,
+                isMobile ? 6 : 8,
+                isMobile ? 8 : 12,
+                isMobile ? 4 : 6,
+              ),
+              child: actionsAsync.when(
+                loading: () =>
+                    const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(
+                  child: Text(
+                    'Failed to load map',
+                    style: TextStyle(color: Colors.red),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(6),
-                      onTap: isMobile
-                          ? () => safeGo(context, '/maps/cleanup')
-                          : null,
-                      splashColor: isMobile
-                          ? Theme.of(context).colorScheme.primary.withAlpha(30)
-                          : null,
-                      highlightColor: isMobile
-                          ? Theme.of(context).colorScheme.primary.withAlpha(20)
-                          : null,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Flexible(
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                alignment: Alignment.centerLeft,
-                                child: Tooltip(
-                                  message:
-                                      'Maps of where people are doing good — see where the action is happening',
-                                  child: Text(
-                                    'Maps',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.copyWith(fontWeight: FontWeight.w600),
-                                  ),
-                                ),
-                              ),
+                ),
+                data: (actions) {
+                  final submissions = _mapSubmissionsWithLocation(actions);
+                  if (!_showMap) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Expanded(
+                          child: Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2),
                             ),
-                            if (isMobile) ...[
-                              const SizedBox(width: 6),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4),
-                                child: Container(
-                                  width: 20,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface.withAlpha(18),
-                                    border: Border.all(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface.withAlpha(38),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: SummaryCount(
+                            count: submissions.length,
+                            title: 'recent map submissions',
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                  final heatmaps = _buildHeatmaps(submissions);
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              GoogleMap(
+                                initialCameraPosition: const CameraPosition(
+                                  target: _defaultCenter,
+                                  zoom: _defaultZoom,
+                                ),
+                                style: _mapDarkMode ? kDarkMapStyle : null,
+                                onMapCreated: (GoogleMapController c) async {
+                                  _mapController = c;
+                                  if (!mounted) return;
+                                  _fitBoundsIfNeeded(submissions);
+                                },
+                                heatmaps: heatmaps,
+                                mapType: MapType.normal,
+                                zoomControlsEnabled: false,
+                                myLocationButtonEnabled: false,
+                                myLocationEnabled: false,
+                                liteModeEnabled: false,
+                              ),
+                              Positioned(
+                                top: 6,
+                                right: 6,
+                                child: Material(
+                                  color: Theme.of(context).colorScheme.surface
+                                      .withValues(alpha: 0.9),
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: IconButton(
+                                    iconSize: 20,
+                                    icon: Icon(
+                                      _mapDarkMode
+                                          ? Icons.light_mode
+                                          : Icons.dark_mode,
+                                      size: 20,
                                     ),
-                                  ),
-                                  child: Icon(
-                                    Icons.open_in_new,
-                                    size: 14,
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.color
-                                        ?.withAlpha(210),
+                                    tooltip: _mapDarkMode
+                                        ? 'Map style: dark (tap for light)'
+                                        : 'Map style: light (tap for dark)',
+                                    onPressed: () async {
+                                      setState(
+                                        () => _mapDarkMode = !_mapDarkMode,
+                                      );
+                                      // ignore: deprecated_member_use
+                                      await _mapController?.setMapStyle(
+                                        _mapDarkMode ? kDarkMapStyle : null,
+                                      );
+                                    },
                                   ),
                                 ),
                               ),
                             ],
-                          ],
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ],
+                      const SizedBox(height: 6),
+                      SummaryCount(
+                        count: submissions.length,
+                        title: 'recent map submissions',
+                      ),
+                    ],
+                  );
+                },
               ),
-              const SizedBox(height: 6),
-              Expanded(
-                child: actionsAsync.when(
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Center(
-                    child: Text(
-                      'Failed to load map',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                  data: (actions) {
-                    final submissions = _mapSubmissionsWithLocation(actions);
-                    if (!_showMap) {
-                      // Placeholder while map build is deferred (web / mobile Chrome).
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Expanded(
-                            child: Center(
-                              child: SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: SummaryCount(
-                              count: submissions.length,
-                              title: 'recent map submissions',
-                            ),
-                          ),
-                        ],
-                      );
-                    }
-                    final heatmaps = _buildHeatmaps(submissions);
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                GoogleMap(
-                                  initialCameraPosition: const CameraPosition(
-                                    target: _defaultCenter,
-                                    zoom: _defaultZoom,
-                                  ),
-                                  style: _mapDarkMode ? kDarkMapStyle : null,
-                                  onMapCreated: (GoogleMapController c) async {
-                                    _mapController = c;
-                                    if (!mounted) return;
-                                    _fitBoundsIfNeeded(submissions);
-                                  },
-                                  heatmaps: heatmaps,
-                                  mapType: MapType.normal,
-                                  zoomControlsEnabled: false,
-                                  myLocationButtonEnabled: false,
-                                  myLocationEnabled: false,
-                                  liteModeEnabled: false,
-                                ),
-                                Positioned(
-                                  top: 6,
-                                  right: 6,
-                                  child: Material(
-                                    color: Theme.of(context).colorScheme.surface
-                                        .withValues(alpha: 0.9),
-                                    borderRadius: BorderRadius.circular(6),
-                                    child: IconButton(
-                                      iconSize: 20,
-                                      icon: Icon(
-                                        _mapDarkMode
-                                            ? Icons.light_mode
-                                            : Icons.dark_mode,
-                                        size: 20,
-                                      ),
-                                      tooltip: _mapDarkMode
-                                          ? 'Map style: dark (tap for light)'
-                                          : 'Map style: light (tap for dark)',
-                                      onPressed: () async {
-                                        setState(
-                                          () => _mapDarkMode = !_mapDarkMode,
-                                        );
-                                        // ignore: deprecated_member_use
-                                        await _mapController?.setMapStyle(
-                                          _mapDarkMode ? kDarkMapStyle : null,
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        SummaryCount(
-                          count: submissions.length,
-                          title: 'recent map submissions',
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

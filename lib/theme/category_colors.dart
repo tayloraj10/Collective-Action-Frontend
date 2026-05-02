@@ -11,6 +11,7 @@ class CategoryColors {
 
   static const List<MapEntry<String, Color>> _topicColors = [
     MapEntry('environment', Color(0xFF16A34A)),
+    MapEntry('nature', Color(0xFF65A30D)),
     MapEntry('water', Color(0xFF0284C7)),
     MapEntry('trash', Color(0xFF64748B)),
     MapEntry('animals', Color(0xFFEA580C)),
@@ -32,10 +33,7 @@ class CategoryColors {
     Color(0xFFA855F7),
   ];
 
-  static Color resolve({
-    String? categoryName,
-    String? stableKey,
-  }) {
+  static Color resolve({String? categoryName, String? stableKey}) {
     final name = (categoryName ?? '').trim();
     final lower = name.toLowerCase();
     for (final entry in _topicColors) {
