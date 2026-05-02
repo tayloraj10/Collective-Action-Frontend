@@ -31,16 +31,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
     return AppBar(
       elevation: 3,
-      backgroundColor: Colors.transparent,
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.darkBlue, AppColors.lightBlue],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-      ),
+      backgroundColor: AppColors.lightBlue,
       centerTitle: isMobile ? false : true,
       leadingWidth: !isHomeRoute ? 66 : null,
       leading: !isHomeRoute
