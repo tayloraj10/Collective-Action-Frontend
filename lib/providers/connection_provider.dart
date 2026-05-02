@@ -20,6 +20,7 @@ final connectionSummaryProvider =
       ref,
       toType,
     ) async {
+      ref.keepAlive();
       return ref.read(_connectionServiceProvider).getSummaries(toType);
     });
 
@@ -75,9 +76,10 @@ class MyConnectionsNotifier
     extends AsyncNotifier<List<ConnectionWithUserSchema>> {
   @override
   Future<List<ConnectionWithUserSchema>> build() async {
-    final userId = ref.watch(currentUserProvider).value?.id;
-    if (userId == null) return [];
-    return ref.read(_connectionServiceProvider).getConnectionsForUser(userId);
+    ref.keepAlive();
+    final user = await ref.watch(currentUserProvider.future);
+    if (user?.id == null) return [];
+    return ref.read(_connectionServiceProvider).getConnectionsForUser(user!.id!);
   }
 
   Future<void> connect({

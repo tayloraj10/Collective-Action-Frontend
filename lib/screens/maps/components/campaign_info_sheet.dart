@@ -5,6 +5,7 @@ import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/providers/map_events_provider.dart';
 import 'package:collective_action_frontend/providers/map_zoom_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
+import 'package:collective_action_frontend/services/actions_service.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -107,14 +108,14 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
       ),
     );
     if (confirm != true) return;
-    final notifier = ref.read(activeActionProvider.notifier);
     try {
       await PhotosService().deleteAllSubmissionPhotos(action.id);
-      await notifier.deleteAction(action);
+      await ActionsService().deleteAction(action);
       if (mounted) {
         for (final c in widget.campaigns) {
           ref.invalidate(mapEventsForCampaignProvider(c.id));
         }
+        ref.invalidate(activeActionProvider);
         setState(() => _selectedAction = null);
         ScaffoldMessenger.of(
           context,
@@ -234,7 +235,10 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
   Widget _buildList(BuildContext context) {
     final theme = Theme.of(context);
     final currentUser = ref.watch(currentUserProvider).value;
-    final actionsAsync = ref.watch(activeActionProvider);
+    final campaign = widget.campaigns.isNotEmpty ? widget.campaigns.first : null;
+    final eventsAsync = campaign != null
+        ? ref.watch(mapEventsForCampaignProvider(campaign.id))
+        : const AsyncValue<List<ActionSchema>>.data([]);
 
     if (currentUser == null) {
       return Center(
@@ -258,7 +262,7 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
       );
     }
 
-    return actionsAsync.when(
+    return eventsAsync.when(
       data: (all) {
         final mine =
             all

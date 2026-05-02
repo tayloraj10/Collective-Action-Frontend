@@ -159,8 +159,8 @@ class MapSubmissionActionCard extends ConsumerWidget {
 
     if (isOwner) {
       card = Badge(
-        alignment: feedMode ? Alignment.topRight : Alignment.topLeft,
-        offset: feedMode ? const Offset(5, 1) : const Offset(-5, 1),
+        alignment: Alignment.topLeft,
+        offset: const Offset(-2, 1),
         backgroundColor: Colors.transparent,
         label: GestureDetector(
           onTap: () async {

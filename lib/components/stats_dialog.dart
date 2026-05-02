@@ -25,19 +25,21 @@ const Color _kYourCardDark = Color(0xFF1A2D3D);
 
 /// Dialog showing overall stats and your stats (when logged in).
 class StatsDialog extends ConsumerWidget {
-  const StatsDialog({super.key});
+  const StatsDialog({super.key, required this.campaignId});
 
-  static Future<void> show(BuildContext context) {
+  final String campaignId;
+
+  static Future<void> show(BuildContext context, String campaignId) {
     return showDialog<void>(
       context: context,
-      builder: (context) => const StatsDialog(),
+      builder: (context) => StatsDialog(campaignId: campaignId),
     );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final overall = ref.watch(overallMapStatsProvider);
-    final your = ref.watch(yourMapStatsProvider);
+    final overall = ref.watch(overallMapStatsProvider(campaignId));
+    final your = ref.watch(yourMapStatsProvider(campaignId));
     final isLoggedIn = ref.watch(currentUserProvider).value != null;
     final (overallTitle, overallCard, yourTitle, yourCard) = _statsColors(context);
 

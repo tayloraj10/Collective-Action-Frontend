@@ -63,11 +63,9 @@ class MapCampaignsByCreatorNotifier
     extends AsyncNotifier<List<MapCampaignSchema>> {
   @override
   Future<List<MapCampaignSchema>> build() async {
-    final currentUser = ref.watch(currentUserProvider).value;
+    final currentUser = await ref.watch(currentUserProvider.future);
     final userId = currentUser?.id;
-    if (userId == null) {
-      return [];
-    }
+    if (userId == null) return [];
     return ref.read(mapServiceProvider).listMapCampaignsByCreator(userId);
   }
 

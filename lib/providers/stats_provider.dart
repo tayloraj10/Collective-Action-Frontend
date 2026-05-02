@@ -1,6 +1,6 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:collective_action_frontend/providers/action_provider.dart';
+import 'package:collective_action_frontend/providers/map_events_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 
 /// Aggregated counts for cleanups and trash reports (overall or for a user).
@@ -81,23 +81,25 @@ MapSubmissionStats computeMapSubmissionStats(
   );
 }
 
-/// Overall stats (all map submissions in the current actions list).
-final overallMapStatsProvider = Provider<MapSubmissionStats>((ref) {
-  final actionsAsync = ref.watch(activeActionProvider);
-  return actionsAsync.when(
+/// Overall stats (all map submissions for a campaign).
+final overallMapStatsProvider =
+    Provider.family<MapSubmissionStats, String>((ref, campaignId) {
+  final eventsAsync = ref.watch(mapEventsForCampaignProvider(campaignId));
+  return eventsAsync.when(
     data: (actions) => computeMapSubmissionStats(actions),
     loading: () => MapSubmissionStats.empty,
     error: (_, _) => MapSubmissionStats.empty,
   );
 });
 
-/// Your stats (map submissions by the current user). Empty when not logged in.
-final yourMapStatsProvider = Provider<MapSubmissionStats>((ref) {
-  final actionsAsync = ref.watch(activeActionProvider);
+/// Your stats (map submissions by the current user for a campaign). Empty when not logged in.
+final yourMapStatsProvider =
+    Provider.family<MapSubmissionStats, String>((ref, campaignId) {
+  final eventsAsync = ref.watch(mapEventsForCampaignProvider(campaignId));
   final userAsync = ref.watch(currentUserProvider);
   final userId = userAsync.value?.id;
   if (userId == null) return MapSubmissionStats.empty;
-  return actionsAsync.when(
+  return eventsAsync.when(
     data: (actions) => computeMapSubmissionStats(actions, userId: userId),
     loading: () => MapSubmissionStats.empty,
     error: (_, _) => MapSubmissionStats.empty,
@@ -117,9 +119,10 @@ List<LeaderboardEntry> _top10(List<LeaderboardEntry> entries) =>
     entries.take(kLeaderboardTopCount).toList();
 
 /// Leaderboard by number of cleanups per user (top 10).
-final leaderboardCleanupsProvider = Provider<List<LeaderboardEntry>>((ref) {
-  final actionsAsync = ref.watch(activeActionProvider);
-  return actionsAsync.when(
+final leaderboardCleanupsProvider =
+    Provider.family<List<LeaderboardEntry>, String>((ref, campaignId) {
+  final eventsAsync = ref.watch(mapEventsForCampaignProvider(campaignId));
+  return eventsAsync.when(
     data: (actions) {
       final countByUser = <String, int>{};
       for (final a in actions) {
@@ -145,9 +148,10 @@ final leaderboardCleanupsProvider = Provider<List<LeaderboardEntry>>((ref) {
 });
 
 /// Leaderboard by total bags (small + large) per user (top 10).
-final leaderboardBagsProvider = Provider<List<LeaderboardEntry>>((ref) {
-  final actionsAsync = ref.watch(activeActionProvider);
-  return actionsAsync.when(
+final leaderboardBagsProvider =
+    Provider.family<List<LeaderboardEntry>, String>((ref, campaignId) {
+  final eventsAsync = ref.watch(mapEventsForCampaignProvider(campaignId));
+  return eventsAsync.when(
     data: (actions) {
       final bagsByUser = <String, int>{};
       for (final a in actions) {
@@ -181,9 +185,10 @@ final leaderboardBagsProvider = Provider<List<LeaderboardEntry>>((ref) {
 });
 
 /// Leaderboard by pounds cleaned per user (top 10).
-final leaderboardPoundsProvider = Provider<List<LeaderboardEntry>>((ref) {
-  final actionsAsync = ref.watch(activeActionProvider);
-  return actionsAsync.when(
+final leaderboardPoundsProvider =
+    Provider.family<List<LeaderboardEntry>, String>((ref, campaignId) {
+  final eventsAsync = ref.watch(mapEventsForCampaignProvider(campaignId));
+  return eventsAsync.when(
     data: (actions) {
       final poundsByUser = <String, int>{};
       for (final a in actions) {

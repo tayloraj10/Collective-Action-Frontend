@@ -41,6 +41,12 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
   void initState() {
     super.initState();
     if (!_showMap) {
+      // Skip delay if action data is already cached — navigating back, not first load.
+      final alreadyCached = ref.read(activeActionProvider).hasValue;
+      if (alreadyCached) {
+        _showMap = true;
+        return;
+      }
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         Future.delayed(_kDeferMapBuildOnWeb, () {
