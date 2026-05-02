@@ -14,7 +14,7 @@ final actionsByLinkedProvider =
     FutureProvider.family<List<ActionSchema>, (String, int?)>(
       (ref, params) async {
         final (linkedId, days) = params;
-        final user = ref.watch(currentUserProvider).value;
+        final user = await ref.watch(currentUserProvider.future);
         return await ActionsService().fetchActionsByLinked(
           linkedId,
           days: days,
@@ -29,7 +29,8 @@ class ActiveActionNotifier extends AsyncNotifier<List<ActionSchema>> {
 
   @override
   Future<List<ActionSchema>> build() async {
-    final user = ref.watch(currentUserProvider).value;
+    ref.keepAlive();
+    final user = await ref.watch(currentUserProvider.future);
     return await ActionsService().fetchLatestActions(
           days: days,
           actionType: actionType,

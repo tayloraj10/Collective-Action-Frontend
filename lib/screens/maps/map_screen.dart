@@ -265,7 +265,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 icon: const Icon(Icons.bar_chart_rounded),
                                 onPressed: () => scheduleAfterTap(
                                   context,
-                                  () => StatsDialog.show(context),
+                                  () => StatsDialog.show(context, selectedCampaign.id),
                                 ),
                                 tooltip: 'Cleanup & trash stats',
                                 padding: const EdgeInsets.all(8),
@@ -281,7 +281,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 icon: const Icon(Icons.emoji_events_outlined),
                                 onPressed: () => scheduleAfterTap(
                                   context,
-                                  () => LeaderboardDialog.show(context),
+                                  () => LeaderboardDialog.show(context, selectedCampaign.id),
                                 ),
                                 tooltip: 'Leaderboard (bags cleaned)',
                                 padding: const EdgeInsets.all(8),

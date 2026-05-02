@@ -35,6 +35,9 @@ class _InitiativesSummaryState extends ConsumerState<InitiativesSummary> {
     if (_didScheduleDelay) return;
     if (kIsWeb && AppConstants.isMobile(context)) {
       _didScheduleDelay = true;
+      // Skip delay if data is already cached (navigating back, not first load).
+      final alreadyCached = ref.read(featuredInitiativeProvider).hasValue;
+      if (alreadyCached) return;
       _canLoadData = false;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
