@@ -40,12 +40,9 @@ class ActiveProjectsNotifier extends AsyncNotifier<List<ProjectSchema>> {
 class ProjectsByCreatorNotifier extends AsyncNotifier<List<ProjectSchema>> {
   @override
   Future<List<ProjectSchema>> build() async {
-    // Get the current user from the user provider
-    final currentUser = ref.watch(currentUserProvider).value;
+    final currentUser = await ref.watch(currentUserProvider.future);
     final userId = currentUser?.id;
-    if (userId == null) {
-      return [];
-    }
+    if (userId == null) return [];
     return ref.read(projectsServiceProvider).listProjectsByCreator(userId);
   }
 

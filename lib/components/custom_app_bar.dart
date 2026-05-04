@@ -30,7 +30,8 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final user = ref.watch(currentUserProvider).value;
 
     return AppBar(
-      elevation: 2,
+      elevation: 3,
+      backgroundColor: AppColors.lightBlue,
       centerTitle: isMobile ? false : true,
       leadingWidth: !isHomeRoute ? 66 : null,
       leading: !isHomeRoute
@@ -91,20 +92,6 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                 ),
               ),
               PopupMenuItem<String>(
-                value: '/projects',
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.assignment_outlined,
-                      color: AppColors.errorRed,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 12),
-                    const Text('Projects'),
-                  ],
-                ),
-              ),
-              PopupMenuItem<String>(
                 value: '/maps/cleanup',
                 child: Row(
                   children: [
@@ -119,6 +106,20 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                 ),
               ),
               PopupMenuItem<String>(
+                value: '/network',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.dynamic_feed_outlined,
+                      color: AppColors.errorRed,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('Community'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
                 value: '/social',
                 child: Row(
                   children: [
@@ -128,7 +129,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                       size: 22,
                     ),
                     const SizedBox(width: 12),
-                    const Text('Social'),
+                    const Text('Action'),
                   ],
                 ),
               ),

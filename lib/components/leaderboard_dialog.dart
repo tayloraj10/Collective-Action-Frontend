@@ -28,12 +28,14 @@ enum LeaderboardMetric {
 
 /// Dialog showing leaderboard with switchable metric (cleanups, bags, pounds). Top 10 only.
 class LeaderboardDialog extends ConsumerStatefulWidget {
-  const LeaderboardDialog({super.key});
+  const LeaderboardDialog({super.key, required this.campaignId});
 
-  static Future<void> show(BuildContext context) {
+  final String campaignId;
+
+  static Future<void> show(BuildContext context, String campaignId) {
     return showDialog<void>(
       context: context,
-      builder: (context) => const LeaderboardDialog(),
+      builder: (context) => LeaderboardDialog(campaignId: campaignId),
     );
   }
 
@@ -48,9 +50,12 @@ class _LeaderboardDialogState extends ConsumerState<LeaderboardDialog> {
   Widget build(BuildContext context) {
     final (titleColor, cardColor) = _leaderboardColors(context);
     final entries = switch (_metric) {
-      LeaderboardMetric.cleanups => ref.watch(leaderboardCleanupsProvider),
-      LeaderboardMetric.bags => ref.watch(leaderboardBagsProvider),
-      LeaderboardMetric.pounds => ref.watch(leaderboardPoundsProvider),
+      LeaderboardMetric.cleanups =>
+        ref.watch(leaderboardCleanupsProvider(widget.campaignId)),
+      LeaderboardMetric.bags =>
+        ref.watch(leaderboardBagsProvider(widget.campaignId)),
+      LeaderboardMetric.pounds =>
+        ref.watch(leaderboardPoundsProvider(widget.campaignId)),
     };
 
     return AlertDialog(

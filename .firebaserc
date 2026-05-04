@@ -1,5 +1,17 @@
 {
     "projects": {
         "default": "collective-action-fd893"
+    },
+    "targets": {
+        "collective-action-fd893": {
+            "hosting": {
+                "production": [
+                    "collective-action-fd893"
+                ],
+                "staging": [
+                    "collective-action-fd893-staging"
+                ]
+            }
+        }
     }
 }

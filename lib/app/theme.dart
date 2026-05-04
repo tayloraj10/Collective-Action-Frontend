@@ -59,11 +59,11 @@ class AppTheme {
     ),
 
     // Scaffold
-    scaffoldBackgroundColor: AppColors.silverLight,
+    scaffoldBackgroundColor: const Color(0xFFF0F4FF),
 
     // AppBar
     appBarTheme: const AppBarTheme(
-      backgroundColor: AppColors.lightBlue,
+      backgroundColor: AppColors.primaryBlue,
       foregroundColor: AppColors.white,
       elevation: 0,
       centerTitle: true,
@@ -188,9 +188,10 @@ class AppTheme {
 
     // Card
     cardTheme: CardThemeData(
-      color: AppColors.cardBackground,
+      color: Colors.white,
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shadowColor: Colors.black.withAlpha(50),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       margin: const EdgeInsets.all(0),
     ),
 
@@ -365,7 +366,8 @@ class AppTheme {
     cardTheme: CardThemeData(
       color: AppColors.darkSurface,
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shadowColor: Colors.black.withAlpha(100),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       margin: const EdgeInsets.all(0),
     ),
 

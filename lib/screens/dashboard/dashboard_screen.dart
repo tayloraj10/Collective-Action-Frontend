@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
+import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/providers/auth_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/services/user_service.dart';
@@ -49,6 +50,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     if (!mounted) return;
     final authUser = ref.read(authStateProvider).value;
     if (authUser != null) {
+      // Skip the Firebase fetch if a user is already loaded — navigating back
+      // to the dashboard remounts this widget and would otherwise re-set
+      // currentUserProvider, causing every dependent provider to re-fetch.
+      final alreadyLoaded = ref.read(currentUserProvider).value;
+      if (alreadyLoaded != null) return;
       UserService().fetchUserByFirebaseID(userId: authUser.uid).then((appUser) {
         if (mounted && appUser != null) {
           ref.read(currentUserProvider.notifier).setUser(appUser);
@@ -122,13 +128,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
       gap,
       nav(
-        icon: Icons.assignment_outlined,
-        label: 'Projects',
-        color: AppColors.errorRed,
-        route: '/projects',
-      ),
-      gap,
-      nav(
         icon: Icons.map_outlined,
         label: 'Maps',
         color: AppColors.successGreen,
@@ -136,17 +135,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
       gap,
       nav(
-        icon: Icons.people_outline,
-        label: 'Social',
-        color: AppColors.warningOrange,
-        route: '/social',
+        icon: Icons.dynamic_feed_outlined,
+        label: 'Community',
+        color: AppColors.errorRed,
+        route: '/network',
       ),
       gap,
       nav(
-        icon: Icons.hub_outlined,
-        label: 'Network',
-        color: AppColors.statusInReview,
-        route: '/network',
+        icon: Icons.people_outline,
+        label: 'Action',
+        color: AppColors.warningOrange,
+        route: '/social',
       ),
     ];
   }
@@ -164,25 +163,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         children: [
           Column(
             children: [
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 8 : 16,
-                  vertical: isMobile ? 0 : 12,
+              if (!isMobile)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(children: _dashboardNavRowChildren(context)),
+                  ),
                 ),
-                child: isMobile
-                    ? null
-                    : SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: _dashboardNavRowChildren(context),
-                        ),
-                      ),
-              ),
-              if (!isMobile) Divider(height: 1),
               // 4-Pane Layout
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.all(isMobile ? 8 : 10),
+                  padding: EdgeInsets.fromLTRB(
+                    isMobile ? 6 : 12,
+                    isMobile ? 6 : 4,
+                    isMobile ? 6 : 12,
+                    isMobile ? 6 : 10,
+                  ),
                   child: const PaneLayout(),
                 ),
               ),
@@ -344,14 +341,14 @@ class _BreathCycleIndicatorState extends State<_BreathCycleIndicator>
 /// Builds the 4-pane dashboard. On mobile, the second row (Maps, Social) is
 /// built after a short delay so the first row can paint first and reduce
 /// peak load when navigating back to home (mobile Chrome).
-class PaneLayout extends StatefulWidget {
+class PaneLayout extends ConsumerStatefulWidget {
   const PaneLayout({super.key});
 
   @override
-  State<PaneLayout> createState() => _PaneLayoutState();
+  ConsumerState<PaneLayout> createState() => _PaneLayoutState();
 }
 
-class _PaneLayoutState extends State<PaneLayout> {
+class _PaneLayoutState extends ConsumerState<PaneLayout> {
   /// On mobile we defer building the second row so first row can load first.
   /// Slower delay improves stability on mobile Chrome (less concurrent load).
   static const Duration _kMobileSecondRowDelay = Duration(milliseconds: 280);
@@ -366,6 +363,10 @@ class _PaneLayoutState extends State<PaneLayout> {
     if (_didScheduleDefer) return;
     _didScheduleDefer = true;
     if (AppConstants.isMobile(context)) {
+      // Skip stagger delay if the action data is already cached — this means
+      // the user is navigating back to the dashboard, not loading it fresh.
+      final alreadyCached = ref.read(activeActionProvider).hasValue;
+      if (alreadyCached) return;
       _showSecondRow = false;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -392,18 +393,18 @@ class _PaneLayoutState extends State<PaneLayout> {
                   color: AppColors.lightBlue,
                 ),
               ),
-              SizedBox(width: 6),
+              SizedBox(width: 10),
               Expanded(
                 child: SummaryPane(
-                  title: 'Projects',
-                  icon: Icons.assignment_outlined,
+                  title: 'Community',
+                  icon: Icons.dynamic_feed_outlined,
                   color: AppColors.errorRed,
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 10),
         Expanded(
           child: _showSecondRow
               ? Row(
@@ -415,10 +416,10 @@ class _PaneLayoutState extends State<PaneLayout> {
                         color: AppColors.successGreen,
                       ),
                     ),
-                    SizedBox(width: 6),
+                    SizedBox(width: 10),
                     Expanded(
                       child: SummaryPane(
-                        title: 'Social',
+                        title: 'Action',
                         icon: Icons.people_outline,
                         color: AppColors.warningOrange,
                       ),
@@ -442,10 +443,10 @@ class _PaneLayoutState extends State<PaneLayout> {
                               color: AppColors.successGreen,
                             ),
                           ),
-                          SizedBox(width: 6),
+                          SizedBox(width: 10),
                           Expanded(
                             child: SummaryPane(
-                              title: 'Social',
+                              title: 'Action',
                               icon: Icons.people_outline,
                               color: AppColors.warningOrange,
                             ),

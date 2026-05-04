@@ -23,6 +23,7 @@ final initiativesByIdsProvider =
 class ActiveInitiativeNotifier extends AsyncNotifier<List<InitiativeSchema>> {
   @override
   Future<List<InitiativeSchema>> build() async {
+    ref.keepAlive();
     return await InitiativesService().fetchActiveInitiatives() ?? [];
   }
 
@@ -37,6 +38,7 @@ class ActiveInitiativeNotifier extends AsyncNotifier<List<InitiativeSchema>> {
 class FeaturedInitiativeNotifier extends AsyncNotifier<List<InitiativeSchema>> {
   @override
   Future<List<InitiativeSchema>> build() async {
+    ref.keepAlive();
     return await InitiativesService().fetchFeaturedInitiatives() ?? [];
   }
 

@@ -39,6 +39,7 @@ class DirectoryOfGoodEntriesNotifier
     extends AsyncNotifier<List<DirectoryOfGoodSchema>> {
   @override
   Future<List<DirectoryOfGoodSchema>> build() async {
+    ref.keepAlive();
     return ref.read(directoryOfGoodServiceProvider).listEntries();
   }
 
@@ -54,11 +55,9 @@ class DirectoryOfGoodEntriesByUserNotifier
     extends AsyncNotifier<List<DirectoryOfGoodSchema>> {
   @override
   Future<List<DirectoryOfGoodSchema>> build() async {
-    final currentUser = ref.watch(currentUserProvider).value;
+    final currentUser = await ref.watch(currentUserProvider.future);
     final userId = currentUser?.id;
-    if (userId == null) {
-      return [];
-    }
+    if (userId == null) return [];
     return ref
         .read(directoryOfGoodServiceProvider)
         .listEntriesByUser(userId);

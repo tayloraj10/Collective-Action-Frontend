@@ -73,15 +73,14 @@ class InitiativeCard extends ConsumerWidget {
           final compact = !showCreatedBy;
           final hasLink =
               initiative.link != null && initiative.link!.isNotEmpty;
-          // In grid with link, use larger gap so link never overlaps progress bar on small screens.
           final progressBarGapBase = (hasBoundedHeight && compact)
               ? (isMobile ? 6.0 : 6.0)
               : compact
               ? (isMobile ? 10.0 : 8.0)
               : (isMobile ? 12.0 : 14.0);
-          final progressBarGap = (hasBoundedHeight && compact && hasLink)
-              ? (isMobile ? 10.0 : 10.0)
-              : progressBarGapBase;
+          // Link is pinned outside the scroll area in bounded-height cards,
+          // so no extra gap needed here.
+          final progressBarGap = progressBarGapBase;
           // Less padding below progress bar on desktop to free space for content.
           final bottomPadProgress = isMobile
               ? containerPadding
@@ -134,7 +133,12 @@ class InitiativeCard extends ConsumerWidget {
                 )
               : null;
 
-          Widget contentAboveProgress({required double bottomPad}) => Column(
+          // includeLink: false is used in bounded-height (grid) cards where the
+          // link is pinned as a separate Positioned widget so it never scrolls away.
+          Widget contentAboveProgress({
+            required double bottomPad,
+            bool includeLink = true,
+          }) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -170,7 +174,7 @@ class InitiativeCard extends ConsumerWidget {
                 maxLines: null,
                 overflow: TextOverflow.visible,
               ),
-              if (linkWidget != null)
+              if (includeLink && linkWidget != null)
                 Padding(
                   padding: EdgeInsets.only(
                     top: (hasBoundedHeight && compact)
@@ -208,7 +212,15 @@ class InitiativeCard extends ConsumerWidget {
               : compact
               ? (isMobile ? 5.0 : 6.0)
               : (isMobile ? 6.0 : 8.0);
-          final scrollContent = contentAboveProgress(bottomPad: bottomPad);
+          // In bounded-height (grid) cards the link is pinned as a Positioned
+          // widget, so the scroll area contains title only.
+          final pinnedLinkHeight = (hasBoundedHeight && hasLink)
+              ? (isMobile ? 26.0 : 29.0)
+              : 0.0;
+          final titleScrollContent = contentAboveProgress(
+            bottomPad: bottomPad,
+            includeLink: false,
+          );
           final fullContent = contentAboveProgress(bottomPad: bottomPad);
 
           final progressBarWidget = Padding(
@@ -237,11 +249,12 @@ class InitiativeCard extends ConsumerWidget {
               height: constraints.maxHeight,
               child: Stack(
                 children: [
+                  // Scrollable title area — link is excluded so it never scrolls away.
                   Positioned(
                     left: 0,
                     right: 0,
                     top: 0,
-                    bottom: progressBarBlockHeight,
+                    bottom: progressBarBlockHeight + pinnedLinkHeight,
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
@@ -250,7 +263,7 @@ class InitiativeCard extends ConsumerWidget {
                           child: SingleChildScrollView(
                             clipBehavior: Clip.hardEdge,
                             physics: const ClampingScrollPhysics(),
-                            child: scrollContent,
+                            child: titleScrollContent,
                           ),
                         ),
                         Positioned(
@@ -269,6 +282,14 @@ class InitiativeCard extends ConsumerWidget {
                       ],
                     ),
                   ),
+                  // Pinned link — always visible above the progress bar.
+                  if (linkWidget != null)
+                    Positioned(
+                      left: containerPadding,
+                      right: containerPadding,
+                      bottom: progressBarBlockHeight + 4,
+                      child: linkWidget,
+                    ),
                   Positioned(
                     left: 0,
                     right: 0,

@@ -64,6 +64,127 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
     super.dispose();
   }
 
+  Widget _buildGradientHeader(BuildContext context, bool isMobile) {
+    final cardColor = widget.color ?? Theme.of(context).colorScheme.primary;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final gradStart = isDark
+        ? Color.lerp(cardColor, Colors.black, 0.45)!
+        : const Color(0xFF7C2D12);
+    final gradEnd = isDark
+        ? Color.lerp(cardColor, Colors.black, 0.15)!
+        : cardColor;
+
+    return InkWell(
+      onTap: () => safeGo(context, '/social'),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.fromLTRB(14, isMobile ? 9 : 12, 14, isMobile ? 9 : 12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [gradStart, gradEnd],
+            begin: Alignment.bottomLeft,
+            end: Alignment.topRight,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(isMobile ? 5 : 7),
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(38),
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: Icon(
+                widget.icon ?? Icons.people_alt_rounded,
+                color: Colors.white,
+                size: isMobile ? 17 : 20,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Action',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: isMobile ? 14 : 16,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  if (!isMobile)
+                    Text(
+                      'Recent activity feed',
+                      style: TextStyle(
+                        color: Colors.white.withAlpha(210),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        height: 1.3,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            if (!isMobile) ...[
+              InkWell(
+                onTap: () => AppConstants.openUrl(AppConstants.discordLink),
+                borderRadius: BorderRadius.circular(20),
+                child: Tooltip(
+                  message: 'Join our Discord community',
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withAlpha(35),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.white.withAlpha(80)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.discord, color: Colors.white, size: 13),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Discord',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+            ] else ...[
+              InkWell(
+                onTap: () => AppConstants.openUrl(AppConstants.discordLink),
+                borderRadius: BorderRadius.circular(16),
+                child: Tooltip(
+                  message: 'Join our Discord community',
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(Icons.discord, color: Colors.white, size: 18),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
+            ],
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Colors.white.withAlpha(200),
+              size: 18,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ref = this.ref;
@@ -80,165 +201,19 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
     final cardColor = widget.color ?? Theme.of(context).colorScheme.primary;
 
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 6 : 10,
-          vertical: isMobile ? 4 : 6,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Always show icon and title
-            Row(
-              children: [
-                InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: () => safeGo(context, '/social'),
-                  child: Container(
-                    padding: EdgeInsets.all(isMobile ? 10 : 12),
-                    decoration: BoxDecoration(
-                      color: cardColor.withAlpha(26),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.only(top: isMobile ? 2 : 0),
-                      child: Icon(
-                        widget.icon ?? Icons.people_alt_rounded,
-                        color: cardColor,
-                        size: isMobile ? 20 : 28,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(6),
-                          onTap: isMobile
-                              ? () => safeGo(context, '/social')
-                              : null,
-                          splashColor: isMobile
-                              ? Theme.of(
-                                  context,
-                                ).colorScheme.primary.withAlpha(30)
-                              : null,
-                          highlightColor: isMobile
-                              ? Theme.of(
-                                  context,
-                                ).colorScheme.primary.withAlpha(20)
-                              : null,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 2),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Flexible(
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    alignment: Alignment.centerLeft,
-                                    child: Tooltip(
-                                      message:
-                                          'Recent activity from the collective community',
-                                      child: Text(
-                                        'Social',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                if (!isMobile) ...[
-                                  const SizedBox(width: 8),
-                                  InkWell(
-                                    onTap: () => AppConstants.openUrl(
-                                      AppConstants.discordLink,
-                                    ),
-                                    borderRadius: BorderRadius.circular(16),
-                                    child: Tooltip(
-                                      message: 'Join our Discord community',
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(6),
-                                        child: Icon(
-                                          Icons.discord,
-                                          color: Colors.indigo,
-                                          size: 22,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                                if (isMobile) ...[
-                                  const SizedBox(width: 6),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 4),
-                                    child: Container(
-                                      width: 20,
-                                      height: 20,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurface.withAlpha(18),
-                                        border: Border.all(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurface.withAlpha(38),
-                                        ),
-                                      ),
-                                      child: Icon(
-                                        Icons.open_in_new,
-                                        size: 14,
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge
-                                            ?.color
-                                            ?.withAlpha(210),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      if (isMobile) ...[
-                        const SizedBox(width: 2),
-                        InkWell(
-                          onTap: () =>
-                              AppConstants.openUrl(AppConstants.discordLink),
-                          borderRadius: BorderRadius.circular(16),
-                          child: Tooltip(
-                            message: 'Join our Discord community',
-                            child: Padding(
-                              padding: EdgeInsets.all(4),
-                              child: Icon(
-                                Icons.discord,
-                                color: Colors.indigo,
-                                size: 24,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            // Show loading/error/data below
-            Expanded(
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildGradientHeader(context, isMobile),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                isMobile ? 8 : 10,
+                isMobile ? 6 : 8,
+                isMobile ? 8 : 10,
+                isMobile ? 4 : 6,
+              ),
               child: actionsAsync.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (err, stack) => Center(
@@ -307,8 +282,8 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
                 },
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -339,16 +314,17 @@ class _SocialSummaryState extends ConsumerState<SocialSummary> {
 Widget _buildSocialActivityCard(
   ActionSchema action,
   Map<String, InitiativeSchema> initiativesMap,
-  Map<String, DirectoryOfGoodSchema> directoryEntriesMap,
-) {
+  Map<String, DirectoryOfGoodSchema> directoryEntriesMap, {
+  bool feedMode = false,
+}) {
   if (action.actionType == ActionTypeValuesEnum.mapSubmission.value) {
-    return MapSubmissionActionCard(action: action);
+    return MapSubmissionActionCard(action: action, feedMode: feedMode);
   }
   if (action.actionType == ActionTypeValuesEnum.directoryOfGoodAddition.value) {
     final entry = action.linkedId != null
         ? directoryEntriesMap[action.linkedId!]
         : null;
-    return DirectoryOfGoodActionCard(action: action, entry: entry);
+    return DirectoryOfGoodActionCard(action: action, entry: entry, feedMode: feedMode);
   }
   InitiativeSchema? initiative;
   if (action.actionType == ActionTypeValuesEnum.initiative.value &&
@@ -356,13 +332,14 @@ Widget _buildSocialActivityCard(
       action.linkedId!.isNotEmpty) {
     initiative = initiativesMap[action.linkedId!];
   }
-  return InitiativeActionCard(action: action, initiative: initiative);
+  return InitiativeActionCard(action: action, initiative: initiative, feedMode: feedMode);
 }
 
 /// Reusable feed of action cards (map submissions, initiatives, directory of good).
 /// Used in [SocialSummary] and on the Social screen.
-/// Desktop: Wrap layout so cards flow and take less vertical space.
-/// Mobile: ListView.builder so only visible items are built (avoids scroll crashes).
+/// feedMode: vertical list with full-width timeline cards (used on the /social page).
+/// !feedMode desktop: multi-column grid with compact cards (used in dashboard summary).
+/// Mobile always uses a vertical list.
 Widget buildSocialActivityList(
   BuildContext context,
   Color cardColor,
@@ -370,15 +347,17 @@ Widget buildSocialActivityList(
   List<ActionSchema> actions,
   Map<String, InitiativeSchema> initiativesMap,
   Map<String, DirectoryOfGoodSchema> directoryEntriesMap,
-  ScrollController scrollController,
-) {
-  if (isMobile) {
+  ScrollController scrollController, {
+  bool feedMode = false,
+}) {
+  if (isMobile || feedMode) {
     return Scrollbar(
       thumbVisibility: true,
       controller: scrollController,
       child: ListView.builder(
         controller: scrollController,
         itemCount: actions.length,
+        padding: feedMode ? const EdgeInsets.only(bottom: 8) : EdgeInsets.zero,
         addAutomaticKeepAlives: true,
         addRepaintBoundaries: true,
         itemBuilder: (context, index) {
@@ -389,13 +368,14 @@ Widget buildSocialActivityList(
               action,
               initiativesMap,
               directoryEntriesMap,
+              feedMode: feedMode,
             ),
           );
         },
       ),
     );
   }
-  // Desktop: multi-column rows, built lazily (Wrap + List.generate built everything at once).
+  // Dashboard desktop: multi-column compact grid.
   return LayoutBuilder(
     builder: (context, constraints) {
       const double cardWidth = 180;
@@ -550,6 +530,7 @@ class _SocialActivityFeedState extends ConsumerState<SocialActivityFeed> {
                       initiativesMap,
                       directoryEntriesMap,
                       _scrollController,
+                      feedMode: true,
                     ),
                   );
                 },

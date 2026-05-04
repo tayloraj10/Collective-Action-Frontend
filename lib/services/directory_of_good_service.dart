@@ -41,17 +41,30 @@ class DirectoryOfGoodService {
       List<String> ids) async {
     if (ids.isEmpty) return {};
     try {
-      final results = await Future.wait(
-        ids.map((id) => _api.getEntryDirectoryOfGoodEntryIdGet(id)),
+      final queryParams = [QueryParam('ids', ids.join(','))];
+      final response = await _api.apiClient.invokeAPI(
+        '/directory-of-good/bulk',
+        'GET',
+        queryParams,
+        null,
+        <String, String>{},
+        <String, String>{},
+        null,
       );
-      final map = <String, DirectoryOfGoodSchema>{};
-      for (var i = 0; i < ids.length; i++) {
-        final entry = results[i];
-        if (entry != null && entry.id != null) {
-          map[entry.id!] = entry;
-        }
+      if (response.statusCode >= 400) {
+        throw Exception('HTTP ${response.statusCode}');
       }
-      return map;
+      if (response.body.isEmpty) return {};
+      final entries =
+          (await _api.apiClient.deserializeAsync(
+                response.body,
+                'List<DirectoryOfGoodSchema>',
+              ) as List)
+              .cast<DirectoryOfGoodSchema>();
+      return {
+        for (final e in entries)
+          if (e.id != null) e.id!: e,
+      };
     } catch (e) {
       throw Exception('Failed to fetch directory of good entries: $e');
     }
