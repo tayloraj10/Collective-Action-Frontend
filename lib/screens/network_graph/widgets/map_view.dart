@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/screens/maps/map_styles.dart';
 import 'package:collective_action_frontend/theme/category_colors.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
@@ -47,15 +47,19 @@ class _NetworkMapViewState extends State<NetworkMapView> {
   int _markerBuildToken = 0;
   bool _mapDarkMode = false;
   bool _satelliteMode = false;
-  double _currentZoom = 3.5;
   static const double _kAlwaysLabelZoomLevel = 7.0;
   static const double _kLabelAreaHeight = 16.0;
+
+  static const LatLng _kUsaTarget = LatLng(39.8283, -98.5795);
+  /// Wider viewports: closer zoom (original default) so the US doesn’t look tiny.
+  static const double _kUsaZoomDesktop = 3.5;
+  /// Narrow / mobile: slightly wider field of view so the full US is visible.
+  static const double _kUsaZoomMobile = 3.0;
+
   bool _showLabels = false;
   Map<String, Offset> _labelOffsets = const {};
-  static const CameraPosition _kUsaCamera = CameraPosition(
-    target: LatLng(39.8283, -98.5795),
-    zoom: 3.5,
-  );
+  bool _syncedInitialZoomFromContext = false;
+  double _currentZoom = _kUsaZoomDesktop;
 
   @override
   void initState() {
@@ -68,6 +72,21 @@ class _NetworkMapViewState extends State<NetworkMapView> {
     super.didChangeDependencies();
     // Keep network map defaulting to light mode for now.
     _mapDarkMode = false;
+    if (!_syncedInitialZoomFromContext) {
+      _syncedInitialZoomFromContext = true;
+      _currentZoom = _usaZoomForContext(context);
+    }
+  }
+
+  double _usaZoomForContext(BuildContext context) {
+    return AppConstants.isMobile(context) ? _kUsaZoomMobile : _kUsaZoomDesktop;
+  }
+
+  CameraPosition _usaCameraFor(BuildContext context) {
+    return CameraPosition(
+      target: _kUsaTarget,
+      zoom: _usaZoomForContext(context),
+    );
   }
 
   @override
@@ -332,10 +351,18 @@ class _NetworkMapViewState extends State<NetworkMapView> {
       canvasH.round(),
     );
     final pngBytes = await image.toByteData(format: ui.ImageByteFormat.png);
-    final bytes = pngBytes?.buffer.asUint8List() ?? Uint8List(0);
-    final descriptor = BitmapDescriptor.fromBytes(
+    final bytes = pngBytes?.buffer.asUint8List();
+    if (bytes == null || bytes.isEmpty) {
+      final fallback = BitmapDescriptor.defaultMarkerWithHue(
+        BitmapDescriptor.hueAzure,
+      );
+      _fallbackPinCache[cacheKey] = fallback;
+      return fallback;
+    }
+    final descriptor = BitmapDescriptor.bytes(
       bytes,
-      size: Size(canvasW, canvasH),
+      width: canvasW,
+      height: canvasH,
     );
     _fallbackPinCache[cacheKey] = descriptor;
     return descriptor;
@@ -427,9 +454,10 @@ class _NetworkMapViewState extends State<NetworkMapView> {
         );
         final png2 = outBytes2?.buffer.asUint8List();
         if (png2 == null || png2.isEmpty) return null;
-        final descriptor2 = BitmapDescriptor.fromBytes(
+        final descriptor2 = BitmapDescriptor.bytes(
           png2,
-          size: Size(canvasW, canvasH),
+          width: canvasW,
+          height: canvasH,
         );
         _iconCache[cacheKey] = descriptor2;
         return descriptor2;
@@ -500,9 +528,10 @@ class _NetworkMapViewState extends State<NetworkMapView> {
       final png = outBytes?.buffer.asUint8List();
       if (png == null || png.isEmpty) return null;
 
-      final descriptor = BitmapDescriptor.fromBytes(
+      final descriptor = BitmapDescriptor.bytes(
         png,
-        size: Size(canvasW, canvasH),
+        width: canvasW,
+        height: canvasH,
       );
       _iconCache[cacheKey] = descriptor;
       return descriptor;
@@ -583,10 +612,29 @@ class _NetworkMapViewState extends State<NetworkMapView> {
     await _recomputeOverlayLabels();
   }
 
-  Future<void> _zoomToUSAExtent() async {
+  Future<void> _animateToUsaCamera() async {
     final c = _mapController;
-    if (c == null) return;
-    await c.animateCamera(CameraUpdate.newCameraPosition(_kUsaCamera));
+    if (c == null || !mounted) return;
+    await c.animateCamera(
+      CameraUpdate.newCameraPosition(_usaCameraFor(context)),
+    );
+  }
+
+  Future<void> _zoomToUSAExtent() async {
+    await _animateToUsaCamera();
+  }
+
+  void _scheduleInitialUsaFit() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      // Mobile web often ignores the first camera update until tiles/layout settle.
+      final delayMs = (kIsWeb && AppConstants.isMobile(context)) ? 280 : 80;
+      await Future<void>.delayed(Duration(milliseconds: delayMs));
+      if (!mounted) return;
+      await _animateToUsaCamera();
+      await _showSelectedInfoWindow();
+      await _recomputeOverlayLabels();
+    });
   }
 
   Future<void> _zoomToFullExtent() async {
@@ -596,7 +644,7 @@ class _NetworkMapViewState extends State<NetworkMapView> {
         .where((d) => d.latitude != null && d.longitude != null)
         .toList();
     if (geocoded.isEmpty) {
-      await _zoomToUSAExtent();
+      await _animateToUsaCamera();
       return;
     }
     if (geocoded.length == 1) {
@@ -646,7 +694,9 @@ class _NetworkMapViewState extends State<NetworkMapView> {
       return;
     }
     final pos = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.best,
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.best,
+      ),
     );
     await c.animateCamera(
       CameraUpdate.newLatLngZoom(LatLng(pos.latitude, pos.longitude), 11),
@@ -683,7 +733,7 @@ class _NetworkMapViewState extends State<NetworkMapView> {
     return Stack(
       children: [
         GoogleMap(
-          initialCameraPosition: _kUsaCamera,
+          initialCameraPosition: _usaCameraFor(context),
           style: _mapDarkMode ? kDarkMapStyle : null,
           mapType: _satelliteMode ? MapType.satellite : MapType.normal,
           markers: _markers,
@@ -692,9 +742,7 @@ class _NetworkMapViewState extends State<NetworkMapView> {
             if (!_ctrl.isCompleted) _ctrl.complete(c);
             // ignore: deprecated_member_use
             c.setMapStyle(_mapDarkMode ? kDarkMapStyle : null);
-            c.moveCamera(CameraUpdate.newCameraPosition(_kUsaCamera));
-            _showSelectedInfoWindow();
-            _recomputeOverlayLabels();
+            _scheduleInitialUsaFit();
           },
           onCameraMove: (position) {
             final nextShowLabels = position.zoom >= _kAlwaysLabelZoomLevel;
