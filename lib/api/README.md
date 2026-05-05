@@ -65,6 +65,7 @@ Class | Method | HTTP request | Description
 *ActionTypesApi* | [**listActionTypesActionTypesGet**](doc//ActionTypesApi.md#listactiontypesactiontypesget) | **GET** /action_types/ | List Action Types
 *ActionTypesApi* | [**updateActionTypeActionTypesActionTypeIdPut**](doc//ActionTypesApi.md#updateactiontypeactiontypesactiontypeidput) | **PUT** /action_types/{action_type_id} | Update Action Type
 *ActionsApi* | [**addActionLikeActionsActionIdLikePost**](doc//ActionsApi.md#addactionlikeactionsactionidlikepost) | **POST** /actions/{action_id}/like | Add Action Like
+*ActionsApi* | [**claimTrashReportCleanedActionsTrashReportIdClaimCleanedPost**](doc//ActionsApi.md#claimtrashreportcleanedactionstrashreportidclaimcleanedpost) | **POST** /actions/{trash_report_id}/claim-cleaned | Claim Trash Report Cleaned
 *ActionsApi* | [**createActionActionsPost**](doc//ActionsApi.md#createactionactionspost) | **POST** /actions/ | Create Action
 *ActionsApi* | [**deleteActionActionsActionIdDelete**](doc//ActionsApi.md#deleteactionactionsactioniddelete) | **DELETE** /actions/{action_id} | Delete Action
 *ActionsApi* | [**getActionActionsActionIdGet**](doc//ActionsApi.md#getactionactionsactionidget) | **GET** /actions/{action_id} | Get Action
@@ -73,6 +74,7 @@ Class | Method | HTTP request | Description
 *ActionsApi* | [**getLatestActionsActionsRecentGet**](doc//ActionsApi.md#getlatestactionsactionsrecentget) | **GET** /actions/recent | Get Latest Actions
 *ActionsApi* | [**listActionsActionsGet**](doc//ActionsApi.md#listactionsactionsget) | **GET** /actions/ | List Actions
 *ActionsApi* | [**removeActionLikeActionsActionIdLikeDelete**](doc//ActionsApi.md#removeactionlikeactionsactionidlikedelete) | **DELETE** /actions/{action_id}/like | Remove Action Like
+*ActionsApi* | [**updateActionActionsActionIdPatch**](doc//ActionsApi.md#updateactionactionsactionidpatch) | **PATCH** /actions/{action_id} | Update Action
 *ActionsApi* | [**updateActionPhotosActionsActionIdPhotosPatch**](doc//ActionsApi.md#updateactionphotosactionsactionidphotospatch) | **PATCH** /actions/{action_id}/photos | Update Action Photos
 *CategoriesApi* | [**createCategoryCategoriesPost**](doc//CategoriesApi.md#createcategorycategoriespost) | **POST** /categories/ | Create Category
 *CategoriesApi* | [**deleteCategoryCategoriesCategoryIdDelete**](doc//CategoriesApi.md#deletecategorycategoriescategoryiddelete) | **DELETE** /categories/{category_id} | Delete Category
@@ -87,6 +89,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**healthHealthGet**](doc//DefaultApi.md#healthhealthget) | **GET** /health | Health
 *DirectoryOfGoodApi* | [**createEntryDirectoryOfGoodPost**](doc//DirectoryOfGoodApi.md#createentrydirectoryofgoodpost) | **POST** /directory-of-good/ | Create Entry
 *DirectoryOfGoodApi* | [**deleteEntryDirectoryOfGoodEntryIdDelete**](doc//DirectoryOfGoodApi.md#deleteentrydirectoryofgoodentryiddelete) | **DELETE** /directory-of-good/{entry_id} | Delete Entry
+*DirectoryOfGoodApi* | [**getEntriesBulkDirectoryOfGoodBulkGet**](doc//DirectoryOfGoodApi.md#getentriesbulkdirectoryofgoodbulkget) | **GET** /directory-of-good/bulk | Get Entries Bulk
 *DirectoryOfGoodApi* | [**getEntryDirectoryOfGoodEntryIdGet**](doc//DirectoryOfGoodApi.md#getentrydirectoryofgoodentryidget) | **GET** /directory-of-good/{entry_id} | Get Entry
 *DirectoryOfGoodApi* | [**listEntriesByUserDirectoryOfGoodByUserUserIdGet**](doc//DirectoryOfGoodApi.md#listentriesbyuserdirectoryofgoodbyuseruseridget) | **GET** /directory-of-good/by-user/{user_id} | List Entries By User
 *DirectoryOfGoodApi* | [**listEntriesDirectoryOfGoodGet**](doc//DirectoryOfGoodApi.md#listentriesdirectoryofgoodget) | **GET** /directory-of-good/ | List Entries
@@ -168,6 +171,7 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [ActionClaimCleanedSchema](doc//ActionClaimCleanedSchema.md)
  - [ActionCreateSchema](doc//ActionCreateSchema.md)
  - [ActionLikeBody](doc//ActionLikeBody.md)
  - [ActionPhotosUpdate](doc//ActionPhotosUpdate.md)
@@ -175,6 +179,7 @@ Class | Method | HTTP request | Description
  - [ActionTypeCreate](doc//ActionTypeCreate.md)
  - [ActionTypeSchema](doc//ActionTypeSchema.md)
  - [ActionTypeValuesEnum](doc//ActionTypeValuesEnum.md)
+ - [ActionUpdateSchema](doc//ActionUpdateSchema.md)
  - [AddProjectMemberSchema](doc//AddProjectMemberSchema.md)
  - [CategoryCreate](doc//CategoryCreate.md)
  - [CategorySchema](doc//CategorySchema.md)

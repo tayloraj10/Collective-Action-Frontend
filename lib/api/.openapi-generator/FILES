@@ -2,6 +2,7 @@
 .travis.yml
 README.md
 analysis_options.yaml
+doc/ActionClaimCleanedSchema.md
 doc/ActionCreateSchema.md
 doc/ActionLikeBody.md
 doc/ActionPhotosUpdate.md
@@ -10,6 +11,7 @@ doc/ActionTypeCreate.md
 doc/ActionTypeSchema.md
 doc/ActionTypeValuesEnum.md
 doc/ActionTypesApi.md
+doc/ActionUpdateSchema.md
 doc/ActionsApi.md
 doc/AddProjectMemberSchema.md
 doc/CategoriesApi.md
@@ -107,6 +109,7 @@ lib/auth/authentication.dart
 lib/auth/http_basic_auth.dart
 lib/auth/http_bearer_auth.dart
 lib/auth/oauth.dart
+lib/model/action_claim_cleaned_schema.dart
 lib/model/action_create_schema.dart
 lib/model/action_like_body.dart
 lib/model/action_photos_update.dart
@@ -114,6 +117,7 @@ lib/model/action_schema.dart
 lib/model/action_type_create.dart
 lib/model/action_type_schema.dart
 lib/model/action_type_values_enum.dart
+lib/model/action_update_schema.dart
 lib/model/add_project_member_schema.dart
 lib/model/category_create.dart
 lib/model/category_schema.dart
@@ -169,5 +173,5 @@ lib/model/user_type.dart
 lib/model/user_update.dart
 lib/model/zip_code_submission_event_data.dart
 pubspec.yaml
-test/map_campaign_stats_schema_test.dart
-test/user_stats_schema_test.dart
+test/action_claim_cleaned_schema_test.dart
+test/action_update_schema_test.dart

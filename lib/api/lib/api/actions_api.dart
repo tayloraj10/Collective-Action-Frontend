@@ -73,6 +73,67 @@ class ActionsApi {
     return null;
   }
 
+  /// Claim Trash Report Cleaned
+  ///
+  /// Create a cleanup from an active trash report and resolve the original report.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] trashReportId (required):
+  ///
+  /// * [ActionClaimCleanedSchema] actionClaimCleanedSchema (required):
+  Future<Response> claimTrashReportCleanedActionsTrashReportIdClaimCleanedPostWithHttpInfo(String trashReportId, ActionClaimCleanedSchema actionClaimCleanedSchema,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/actions/{trash_report_id}/claim-cleaned'
+      .replaceAll('{trash_report_id}', trashReportId);
+
+    // ignore: prefer_final_locals
+    Object? postBody = actionClaimCleanedSchema;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Claim Trash Report Cleaned
+  ///
+  /// Create a cleanup from an active trash report and resolve the original report.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] trashReportId (required):
+  ///
+  /// * [ActionClaimCleanedSchema] actionClaimCleanedSchema (required):
+  Future<ActionSchema?> claimTrashReportCleanedActionsTrashReportIdClaimCleanedPost(String trashReportId, ActionClaimCleanedSchema actionClaimCleanedSchema,) async {
+    final response = await claimTrashReportCleanedActionsTrashReportIdClaimCleanedPostWithHttpInfo(trashReportId, actionClaimCleanedSchema,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ActionSchema',) as ActionSchema;
+    
+    }
+    return null;
+  }
+
   /// Create Action
   ///
   /// Note: This method returns the HTTP [Response].
@@ -252,9 +313,12 @@ class ActionsApi {
   /// * [int] days:
   ///   Only return actions from the last N days
   ///
+  /// * [bool] includeInactive:
+  ///   Include resolved/inactive actions.
+  ///
   /// * [String] forUserId:
   ///   If set, each action includes whether this user liked it.
-  Future<Response> getActionsByLinkedActionsByLinkedLinkedIdGetWithHttpInfo(String linkedId, { int? days, String? forUserId, }) async {
+  Future<Response> getActionsByLinkedActionsByLinkedLinkedIdGetWithHttpInfo(String linkedId, { int? days, bool? includeInactive, String? forUserId, }) async {
     // ignore: prefer_const_declarations
     final path = r'/actions/by_linked/{linked_id}'
       .replaceAll('{linked_id}', linkedId);
@@ -268,6 +332,9 @@ class ActionsApi {
 
     if (days != null) {
       queryParams.addAll(_queryParams('', 'days', days));
+    }
+    if (includeInactive != null) {
+      queryParams.addAll(_queryParams('', 'include_inactive', includeInactive));
     }
     if (forUserId != null) {
       queryParams.addAll(_queryParams('', 'for_user_id', forUserId));
@@ -296,10 +363,13 @@ class ActionsApi {
   /// * [int] days:
   ///   Only return actions from the last N days
   ///
+  /// * [bool] includeInactive:
+  ///   Include resolved/inactive actions.
+  ///
   /// * [String] forUserId:
   ///   If set, each action includes whether this user liked it.
-  Future<List<ActionSchema>?> getActionsByLinkedActionsByLinkedLinkedIdGet(String linkedId, { int? days, String? forUserId, }) async {
-    final response = await getActionsByLinkedActionsByLinkedLinkedIdGetWithHttpInfo(linkedId,  days: days, forUserId: forUserId, );
+  Future<List<ActionSchema>?> getActionsByLinkedActionsByLinkedLinkedIdGet(String linkedId, { int? days, bool? includeInactive, String? forUserId, }) async {
+    final response = await getActionsByLinkedActionsByLinkedLinkedIdGetWithHttpInfo(linkedId,  days: days, includeInactive: includeInactive, forUserId: forUserId, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -330,7 +400,10 @@ class ActionsApi {
   ///   Maximum number of actions to return
   ///
   /// * [ActionTypeValuesEnum] actionType:
-  Future<Response> getActionsByUserActionsUserUserIdGetWithHttpInfo(String userId, { int? limit, ActionTypeValuesEnum? actionType, }) async {
+  ///
+  /// * [bool] includeInactive:
+  ///   Include resolved/inactive actions.
+  Future<Response> getActionsByUserActionsUserUserIdGetWithHttpInfo(String userId, { int? limit, ActionTypeValuesEnum? actionType, bool? includeInactive, }) async {
     // ignore: prefer_const_declarations
     final path = r'/actions/user/{user_id}'
       .replaceAll('{user_id}', userId);
@@ -348,6 +421,9 @@ class ActionsApi {
     if (actionType != null) {
       queryParams.addAll(_queryParams('', 'action_type', actionType));
     }
+    if (includeInactive != null) {
+      queryParams.addAll(_queryParams('', 'include_inactive', includeInactive));
+    }
 
     const contentTypes = <String>[];
 
@@ -375,8 +451,11 @@ class ActionsApi {
   ///   Maximum number of actions to return
   ///
   /// * [ActionTypeValuesEnum] actionType:
-  Future<List<ActionSchema>?> getActionsByUserActionsUserUserIdGet(String userId, { int? limit, ActionTypeValuesEnum? actionType, }) async {
-    final response = await getActionsByUserActionsUserUserIdGetWithHttpInfo(userId,  limit: limit, actionType: actionType, );
+  ///
+  /// * [bool] includeInactive:
+  ///   Include resolved/inactive actions.
+  Future<List<ActionSchema>?> getActionsByUserActionsUserUserIdGet(String userId, { int? limit, ActionTypeValuesEnum? actionType, bool? includeInactive, }) async {
+    final response = await getActionsByUserActionsUserUserIdGetWithHttpInfo(userId,  limit: limit, actionType: actionType, includeInactive: includeInactive, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -403,9 +482,12 @@ class ActionsApi {
   ///
   /// * [ActionTypeValuesEnum] actionType:
   ///
+  /// * [bool] includeInactive:
+  ///   Include resolved/inactive actions.
+  ///
   /// * [String] forUserId:
   ///   If set, each action includes whether this user liked it.
-  Future<Response> getLatestActionsActionsRecentGetWithHttpInfo({ int? days, ActionTypeValuesEnum? actionType, String? forUserId, }) async {
+  Future<Response> getLatestActionsActionsRecentGetWithHttpInfo({ int? days, ActionTypeValuesEnum? actionType, bool? includeInactive, String? forUserId, }) async {
     // ignore: prefer_const_declarations
     final path = r'/actions/recent';
 
@@ -422,6 +504,9 @@ class ActionsApi {
     if (actionType != null) {
       queryParams.addAll(_queryParams('', 'action_type', actionType));
     }
+    if (includeInactive != null) {
+      queryParams.addAll(_queryParams('', 'include_inactive', includeInactive));
+    }
     if (forUserId != null) {
       queryParams.addAll(_queryParams('', 'for_user_id', forUserId));
     }
@@ -448,10 +533,13 @@ class ActionsApi {
   ///
   /// * [ActionTypeValuesEnum] actionType:
   ///
+  /// * [bool] includeInactive:
+  ///   Include resolved/inactive actions.
+  ///
   /// * [String] forUserId:
   ///   If set, each action includes whether this user liked it.
-  Future<List<ActionSchema>?> getLatestActionsActionsRecentGet({ int? days, ActionTypeValuesEnum? actionType, String? forUserId, }) async {
-    final response = await getLatestActionsActionsRecentGetWithHttpInfo( days: days, actionType: actionType, forUserId: forUserId, );
+  Future<List<ActionSchema>?> getLatestActionsActionsRecentGet({ int? days, ActionTypeValuesEnum? actionType, bool? includeInactive, String? forUserId, }) async {
+    final response = await getLatestActionsActionsRecentGetWithHttpInfo( days: days, actionType: actionType, includeInactive: includeInactive, forUserId: forUserId, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -476,9 +564,12 @@ class ActionsApi {
   ///
   /// * [int] limit:
   ///
+  /// * [bool] includeInactive:
+  ///   Include resolved/inactive actions.
+  ///
   /// * [String] forUserId:
   ///   If set, each action includes whether this user liked it.
-  Future<Response> listActionsActionsGetWithHttpInfo({ int? limit, String? forUserId, }) async {
+  Future<Response> listActionsActionsGetWithHttpInfo({ int? limit, bool? includeInactive, String? forUserId, }) async {
     // ignore: prefer_const_declarations
     final path = r'/actions/';
 
@@ -491,6 +582,9 @@ class ActionsApi {
 
     if (limit != null) {
       queryParams.addAll(_queryParams('', 'limit', limit));
+    }
+    if (includeInactive != null) {
+      queryParams.addAll(_queryParams('', 'include_inactive', includeInactive));
     }
     if (forUserId != null) {
       queryParams.addAll(_queryParams('', 'for_user_id', forUserId));
@@ -516,10 +610,13 @@ class ActionsApi {
   ///
   /// * [int] limit:
   ///
+  /// * [bool] includeInactive:
+  ///   Include resolved/inactive actions.
+  ///
   /// * [String] forUserId:
   ///   If set, each action includes whether this user liked it.
-  Future<List<ActionSchema>?> listActionsActionsGet({ int? limit, String? forUserId, }) async {
-    final response = await listActionsActionsGetWithHttpInfo( limit: limit, forUserId: forUserId, );
+  Future<List<ActionSchema>?> listActionsActionsGet({ int? limit, bool? includeInactive, String? forUserId, }) async {
+    final response = await listActionsActionsGetWithHttpInfo( limit: limit, includeInactive: includeInactive, forUserId: forUserId, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -584,6 +681,67 @@ class ActionsApi {
   ///   Database id of the user unliking the action
   Future<ActionSchema?> removeActionLikeActionsActionIdLikeDelete(String actionId, String userId,) async {
     final response = await removeActionLikeActionsActionIdLikeDeleteWithHttpInfo(actionId, userId,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ActionSchema',) as ActionSchema;
+    
+    }
+    return null;
+  }
+
+  /// Update Action
+  ///
+  /// Update a cleanup map submission owned by the requesting user.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] actionId (required):
+  ///
+  /// * [ActionUpdateSchema] actionUpdateSchema (required):
+  Future<Response> updateActionActionsActionIdPatchWithHttpInfo(String actionId, ActionUpdateSchema actionUpdateSchema,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/actions/{action_id}'
+      .replaceAll('{action_id}', actionId);
+
+    // ignore: prefer_final_locals
+    Object? postBody = actionUpdateSchema;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'PATCH',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Update Action
+  ///
+  /// Update a cleanup map submission owned by the requesting user.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] actionId (required):
+  ///
+  /// * [ActionUpdateSchema] actionUpdateSchema (required):
+  Future<ActionSchema?> updateActionActionsActionIdPatch(String actionId, ActionUpdateSchema actionUpdateSchema,) async {
+    final response = await updateActionActionsActionIdPatchWithHttpInfo(actionId, actionUpdateSchema,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

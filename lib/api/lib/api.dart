@@ -46,6 +46,7 @@ part 'api/schemas_api.dart';
 part 'api/statuses_api.dart';
 part 'api/users_api.dart';
 
+part 'model/action_claim_cleaned_schema.dart';
 part 'model/action_create_schema.dart';
 part 'model/action_like_body.dart';
 part 'model/action_photos_update.dart';
@@ -53,6 +54,7 @@ part 'model/action_schema.dart';
 part 'model/action_type_create.dart';
 part 'model/action_type_schema.dart';
 part 'model/action_type_values_enum.dart';
+part 'model/action_update_schema.dart';
 part 'model/add_project_member_schema.dart';
 part 'model/category_create.dart';
 part 'model/category_schema.dart';

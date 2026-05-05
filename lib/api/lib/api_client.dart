@@ -182,6 +182,8 @@ class ApiClient {
           return valueString == 'true' || valueString == '1';
         case 'DateTime':
           return value is DateTime ? value : DateTime.tryParse(value);
+        case 'ActionClaimCleanedSchema':
+          return ActionClaimCleanedSchema.fromJson(value);
         case 'ActionCreateSchema':
           return ActionCreateSchema.fromJson(value);
         case 'ActionLikeBody':
@@ -196,6 +198,8 @@ class ApiClient {
           return ActionTypeSchema.fromJson(value);
         case 'ActionTypeValuesEnum':
           return ActionTypeValuesEnumTypeTransformer().decode(value);
+        case 'ActionUpdateSchema':
+          return ActionUpdateSchema.fromJson(value);
         case 'AddProjectMemberSchema':
           return AddProjectMemberSchema.fromJson(value);
         case 'CategoryCreate':

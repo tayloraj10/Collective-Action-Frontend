@@ -121,6 +121,67 @@ class DirectoryOfGoodApi {
     }
   }
 
+  /// Get Entries Bulk
+  ///
+  /// Get multiple directory of good entries by comma-separated IDs.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] ids (required):
+  Future<Response> getEntriesBulkDirectoryOfGoodBulkGetWithHttpInfo(String ids,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/directory-of-good/bulk';
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+      queryParams.addAll(_queryParams('', 'ids', ids));
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get Entries Bulk
+  ///
+  /// Get multiple directory of good entries by comma-separated IDs.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] ids (required):
+  Future<List<DirectoryOfGoodSchema>?> getEntriesBulkDirectoryOfGoodBulkGet(String ids,) async {
+    final response = await getEntriesBulkDirectoryOfGoodBulkGetWithHttpInfo(ids,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final responseBody = await _decodeBodyBytes(response);
+      return (await apiClient.deserializeAsync(responseBody, 'List<DirectoryOfGoodSchema>') as List)
+        .cast<DirectoryOfGoodSchema>()
+        .toList(growable: false);
+
+    }
+    return null;
+  }
+
   /// Get Entry
   ///
   /// Get a single directory of good entry by ID.

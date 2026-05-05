@@ -11,6 +11,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**createEntryDirectoryOfGoodPost**](DirectoryOfGoodApi.md#createentrydirectoryofgoodpost) | **POST** /directory-of-good/ | Create Entry
 [**deleteEntryDirectoryOfGoodEntryIdDelete**](DirectoryOfGoodApi.md#deleteentrydirectoryofgoodentryiddelete) | **DELETE** /directory-of-good/{entry_id} | Delete Entry
+[**getEntriesBulkDirectoryOfGoodBulkGet**](DirectoryOfGoodApi.md#getentriesbulkdirectoryofgoodbulkget) | **GET** /directory-of-good/bulk | Get Entries Bulk
 [**getEntryDirectoryOfGoodEntryIdGet**](DirectoryOfGoodApi.md#getentrydirectoryofgoodentryidget) | **GET** /directory-of-good/{entry_id} | Get Entry
 [**listEntriesByUserDirectoryOfGoodByUserUserIdGet**](DirectoryOfGoodApi.md#listentriesbyuserdirectoryofgoodbyuseruseridget) | **GET** /directory-of-good/by-user/{user_id} | List Entries By User
 [**listEntriesDirectoryOfGoodGet**](DirectoryOfGoodApi.md#listentriesdirectoryofgoodget) | **GET** /directory-of-good/ | List Entries
@@ -101,6 +102,49 @@ No authorization required
 
  - **Content-Type**: Not defined
  - **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getEntriesBulkDirectoryOfGoodBulkGet**
+> List<DirectoryOfGoodSchema> getEntriesBulkDirectoryOfGoodBulkGet(ids)
+
+Get Entries Bulk
+
+Get multiple directory of good entries by comma-separated IDs.
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = DirectoryOfGoodApi();
+final ids = ids_example; // String | 
+
+try {
+    final result = api_instance.getEntriesBulkDirectoryOfGoodBulkGet(ids);
+    print(result);
+} catch (e) {
+    print('Exception when calling DirectoryOfGoodApi->getEntriesBulkDirectoryOfGoodBulkGet: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **ids** | **String**|  | 
+
+### Return type
+
+[**List<DirectoryOfGoodSchema>**](DirectoryOfGoodSchema.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
