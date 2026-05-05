@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
+import 'package:collective_action_frontend/theme/category_colors.dart';
 import 'package:collective_action_frontend/utils/external_network_image.dart';
 import 'package:flutter/material.dart';
 
@@ -33,33 +34,15 @@ const _kCatColors = [
   Color(0xFFF97316), Color(0xFF84CC16), Color(0xFFEF4444),
 ];
 
-int _stableColorIndex(String seed, int mod) {
-  var hash = 0;
-  for (final c in seed.codeUnits) {
-    hash = ((hash * 31) + c) & 0x7fffffff;
-  }
-  return mod == 0 ? 0 : hash % mod;
-}
-
-const _kInitiativeColors = [
-  Color(0xFF3B82F6), // blue
-  Color(0xFF10B981), // emerald
-  Color(0xFFF59E0B), // amber
-  Color(0xFFEC4899), // pink
-  Color(0xFF8B5CF6), // violet
-  Color(0xFF06B6D4), // cyan
-  Color(0xFFEF4444), // red
-  Color(0xFF84CC16), // lime
-  Color(0xFFF97316), // orange
-  Color(0xFF14B8A6), // teal
-  Color(0xFF22C55E), // green
-  Color(0xFFA855F7), // purple
-];
-
-Color _initiativeColorForId(String id) {
-  return _kInitiativeColors[
-    _stableColorIndex(id, _kInitiativeColors.length)
-  ];
+Color _initiativeColorFor(
+  InitiativeSchema init,
+  Map<String?, CategorySchema> catById,
+) {
+  final cat = catById[init.categoryId];
+  return CategoryColors.resolve(
+    categoryName: cat?.name,
+    stableKey: init.categoryId ?? init.id,
+  );
 }
 
 // ── Main widget ────────────────────────────────────────────────────────────
@@ -205,7 +188,8 @@ class _CircuitDirectoryViewState extends State<CircuitDirectoryView>
 
                 // Stable per-initiative colors used by cards + trace lines.
                 final Map<String, Color> initColorById = {
-                  for (final init in sortedInits) init.id: _initiativeColorForId(init.id),
+                  for (final init in sortedInits)
+                    init.id: _initiativeColorFor(init, catById),
                 };
 
                 // For each organization, keep a primary linked initiative color
