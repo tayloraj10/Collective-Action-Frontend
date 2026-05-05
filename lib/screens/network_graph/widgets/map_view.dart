@@ -100,16 +100,6 @@ class _NetworkMapViewState extends State<NetworkMapView> {
     }
   }
 
-  Future<void> _showSelectedInfoWindow() async {
-    final selectedId = widget.selectedId;
-    if (selectedId == null || selectedId.isEmpty) return;
-    final c = _mapController;
-    if (c == null) return;
-    try {
-      await c.showMarkerInfoWindow(MarkerId(selectedId));
-    } catch (_) {}
-  }
-
   Future<void> _recomputeOverlayLabels() async {
     if (!_showLabels) {
       if (_labelOffsets.isNotEmpty && mounted) {
@@ -542,7 +532,6 @@ class _NetworkMapViewState extends State<NetworkMapView> {
 
   Future<void> _buildMarkers() async {
     final buildToken = ++_markerBuildToken;
-    final catById = {for (final c in widget.categories) c.id: c};
     final markers = <Marker>{};
     for (final d in widget.dogs) {
       final lat = d.latitude?.toDouble();
@@ -553,9 +542,6 @@ class _NetworkMapViewState extends State<NetworkMapView> {
       final summary = widget.dogSummaries[id];
       final totalConns = summary?.totalCount ?? 0;
       final isSelected = widget.selectedId == id;
-      final categoryName = d.categoryIds.isNotEmpty
-          ? (catById[d.categoryIds.first]?.name ?? 'Uncategorized')
-          : 'Uncategorized';
 
       // Match the same color logic used by category chips.
       final categoryColor = _colorForCategoryId(d.categoryIds.firstOrNull);
@@ -593,13 +579,7 @@ class _NetworkMapViewState extends State<NetworkMapView> {
           position: LatLng(lat, lng),
           icon: icon,
           anchor: anchor,
-          infoWindow: InfoWindow(
-            title: d.name,
-            snippet: totalConns > 0
-                ? '$categoryName • $totalConns connection${totalConns == 1 ? '' : 's'}'
-                : '$categoryName • ${d.location?.city ?? ''}',
-            onTap: () => widget.onSelect(id, 'directory_of_good'),
-          ),
+          infoWindow: InfoWindow.noText,
           onTap: () => widget.onSelect(id, 'directory_of_good'),
           zIndexInt: isSelected ? 2 : (1 + (totalConns * 0.1).round()),
         ),
@@ -608,7 +588,6 @@ class _NetworkMapViewState extends State<NetworkMapView> {
 
     if (!mounted || buildToken != _markerBuildToken) return;
     setState(() => _markers = markers);
-    await _showSelectedInfoWindow();
     await _recomputeOverlayLabels();
   }
 
@@ -632,7 +611,6 @@ class _NetworkMapViewState extends State<NetworkMapView> {
       await Future<void>.delayed(Duration(milliseconds: delayMs));
       if (!mounted) return;
       await _animateToUsaCamera();
-      await _showSelectedInfoWindow();
       await _recomputeOverlayLabels();
     });
   }
