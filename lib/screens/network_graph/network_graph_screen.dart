@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphify/graphify.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'dart:math' as math;
 
 // ── View modes ─────────────────────────────────────────────────────────────
@@ -117,11 +118,13 @@ class _NetworkGraphScreenState extends ConsumerState<NetworkGraphScreen> {
 
     await showDialog<void>(
       context: context,
-      builder: (dialogContext) => Dialog(
-        insetPadding: const EdgeInsets.all(24),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 440, maxHeight: 760),
-          child: panel,
+      builder: (dialogContext) => PointerInterceptor(
+        child: Dialog(
+          insetPadding: const EdgeInsets.all(24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440, maxHeight: 760),
+            child: panel,
+          ),
         ),
       ),
     );
@@ -624,7 +627,10 @@ class _GraphViewState extends State<_GraphView> {
     super.initState();
     _controller = GraphifyController();
     Future.delayed(const Duration(milliseconds: 800), () {
-      if (mounted) setState(() => _chartReady = true);
+      if (!mounted) return;
+      setState(() => _chartReady = true);
+      // Ensure first fully-ready render uses current toggles/data.
+      _controller.update(_buildOptions(context));
     });
   }
 
@@ -673,8 +679,6 @@ class _GraphViewState extends State<_GraphView> {
       'tiktokcdn.com',
       'byteoversea.com',
       'ibytedtos.com',
-      'wp.com',
-      'wordpress.com',
       'instagram.com',
       'facebook.com',
       'youtube.com',
@@ -1289,14 +1293,16 @@ class _GraphViewState extends State<_GraphView> {
         context: context,
         barrierDismissible: true,
         builder: (dialogContext) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-            insetPadding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 500),
-              child: UserProfileView(userId: userId, embedded: true),
+          return PointerInterceptor(
+            child: Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              insetPadding: const EdgeInsets.all(24),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: UserProfileView(userId: userId, embedded: true),
+              ),
             ),
           );
         },
@@ -1318,19 +1324,21 @@ class _GraphViewState extends State<_GraphView> {
     try {
       await showDialog<void>(
         context: context,
-        builder: (dialogContext) => Dialog(
-          insetPadding: const EdgeInsets.all(24),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 440, maxHeight: 760),
-            child: EntityDetailPanel(
-              entityId: entityId,
-              entityType: entityType,
-              dogSummaries: widget.dogSummaries,
-              initSummaries: widget.initSummaries,
-              allDogs: widget.dogs,
-              allInits: widget.inits,
-              onClose: () => Navigator.of(dialogContext).pop(),
-              borderRadius: const BorderRadius.all(Radius.circular(18)),
+        builder: (dialogContext) => PointerInterceptor(
+          child: Dialog(
+            insetPadding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440, maxHeight: 760),
+              child: EntityDetailPanel(
+                entityId: entityId,
+                entityType: entityType,
+                dogSummaries: widget.dogSummaries,
+                initSummaries: widget.initSummaries,
+                allDogs: widget.dogs,
+                allInits: widget.inits,
+                onClose: () => Navigator.of(dialogContext).pop(),
+                borderRadius: const BorderRadius.all(Radius.circular(18)),
+              ),
             ),
           ),
         ),

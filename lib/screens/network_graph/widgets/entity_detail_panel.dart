@@ -10,7 +10,7 @@ import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-const _kMapColor  = Color(0xFF16A34A);
+const _kMapColor = Color(0xFF16A34A);
 const _kInitColor = Color(0xFF3B82F6);
 
 /// Shared detail panel used by all three network views.
@@ -44,17 +44,28 @@ class EntityDetailPanel extends ConsumerWidget {
     final bodyMaxHeight = (screenHeight * 0.62).clamp(260.0, 560.0).toDouble();
     final myConns = ref.watch(myConnectionsProvider).value ?? [];
     final currentUser = ref.watch(currentUserProvider).value;
-    final myDog = ref.watch(directoryOfGoodEntriesByUserProvider).value?.firstOrNull;
+    final myDog = ref
+        .watch(directoryOfGoodEntriesByUserProvider)
+        .value
+        ?.firstOrNull;
 
     final isDog = entityType == 'directory_of_good';
     final dog = isDog
-        ? allDogs.firstWhere((d) => (d.id ?? d.name) == entityId,
-            orElse: () => DirectoryOfGoodSchema(name: ''))
+        ? allDogs.firstWhere(
+            (d) => (d.id ?? d.name) == entityId,
+            orElse: () => DirectoryOfGoodSchema(name: ''),
+          )
         : null;
     final init = !isDog
-        ? allInits.firstWhere((i) => i.id == entityId,
+        ? allInits.firstWhere(
+            (i) => i.id == entityId,
             orElse: () => InitiativeSchema(
-                id: entityId, title: '', action: '', createdBy: ''))
+              id: entityId,
+              title: '',
+              action: '',
+              createdBy: '',
+            ),
+          )
         : null;
 
     if (dog?.name.isEmpty == true && init?.title.isEmpty == true) {
@@ -71,9 +82,10 @@ class EntityDetailPanel extends ConsumerWidget {
         border: Border.all(color: theme.dividerColor.withAlpha(70)),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withAlpha(20),
-              blurRadius: 16,
-              offset: const Offset(-4, 0)),
+            color: Colors.black.withAlpha(20),
+            blurRadius: 16,
+            offset: const Offset(-4, 0),
+          ),
         ],
       ),
       child: Column(
@@ -95,16 +107,20 @@ class EntityDetailPanel extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(16, 14, 10, 14),
             child: Row(
               children: [
-                Icon(isDog ? Icons.people_outline : Icons.trending_up,
-                    size: 15, color: accentColor),
+                Icon(
+                  isDog ? Icons.people_outline : Icons.trending_up,
+                  size: 15,
+                  color: accentColor,
+                ),
                 const SizedBox(width: 7),
                 Text(
                   isDog ? 'Organization' : 'Initiative',
                   style: TextStyle(
-                      color: accentColor,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5),
+                    color: accentColor,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
                 ),
                 const Spacer(),
                 IconButton(
@@ -173,10 +189,12 @@ class _DogDetail extends ConsumerWidget {
 
   String get _entityId => dog.id ?? dog.name;
 
-  bool get _isFollowing => myConns.any((c) =>
-      c.toType == 'directory_of_good' &&
-      c.toId == _entityId &&
-      c.fromType == 'user');
+  bool get _isFollowing => myConns.any(
+    (c) =>
+        c.toType == 'directory_of_good' &&
+        c.toId == _entityId &&
+        c.fromType == 'user',
+  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -184,10 +202,11 @@ class _DogDetail extends ConsumerWidget {
     final imageUrl = dog.imageUrl?.trim();
     final hasImage = imageUrl != null && imageUrl.isNotEmpty;
     final loc = dog.location;
-    final locStr = [loc?.city, loc?.state, loc?.country]
-        .whereType<String>()
-        .where((s) => s.isNotEmpty)
-        .join(', ');
+    final locStr = [
+      loc?.city,
+      loc?.state,
+      loc?.country,
+    ].whereType<String>().where((s) => s.isNotEmpty).join(', ');
 
     // Initiatives this org has connected to.
     final connectedInits = allInits
@@ -195,10 +214,7 @@ class _DogDetail extends ConsumerWidget {
         .toList();
     final userConnectionsAsync = ref.watch(
       entityConnectionsProvider(
-        EntityConnectionsQuery(
-          toType: 'directory_of_good',
-          toId: _entityId,
-        ),
+        EntityConnectionsQuery(toType: 'directory_of_good', toId: _entityId),
       ),
     );
 
@@ -224,7 +240,9 @@ class _DogDetail extends ConsumerWidget {
                         preferHtmlElementOnWeb: false,
                         errorBuilder: (context, error, stackTrace) => Center(
                           child: Text(
-                            dog.name.isNotEmpty ? dog.name[0].toUpperCase() : '?',
+                            dog.name.isNotEmpty
+                                ? dog.name[0].toUpperCase()
+                                : '?',
                             style: TextStyle(
                               color: accentColor,
                               fontSize: 22,
@@ -252,8 +270,9 @@ class _DogDetail extends ConsumerWidget {
                 children: [
                   Text(
                     dog.name,
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   if (locStr.isNotEmpty)
                     Text(
@@ -301,8 +320,9 @@ class _DogDetail extends ConsumerWidget {
             icon: const Icon(Icons.login, size: 15),
             label: const Text('Sign in to connect'),
             onPressed: () => safeGo(context, '/login'),
-            style:
-                OutlinedButton.styleFrom(minimumSize: const Size(double.infinity, 40)),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 40),
+            ),
           ),
         if (dog.userId != null && dog.userId!.isNotEmpty) ...[
           const SizedBox(height: 8),
@@ -335,7 +355,10 @@ class _DogDetail extends ConsumerWidget {
             ),
           ),
         if (dog.socialLinks != null)
-          _PanelSection(title: 'Links', child: _SocialIconRow(links: dog.socialLinks!)),
+          _PanelSection(
+            title: 'Links',
+            child: _SocialIconRow(links: dog.socialLinks!),
+          ),
         if (connectedInits.isNotEmpty)
           _PanelSection(
             title: 'Connected Initiatives',
@@ -346,7 +369,11 @@ class _DogDetail extends ConsumerWidget {
                       padding: const EdgeInsets.only(bottom: 6),
                       child: Row(
                         children: [
-                          const Icon(Icons.trending_up, size: 13, color: _kInitColor),
+                          const Icon(
+                            Icons.trending_up,
+                            size: 13,
+                            color: _kInitColor,
+                          ),
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
@@ -385,9 +412,9 @@ class _DogDetail extends ConsumerWidget {
       ref.invalidate(connectionSummaryProvider('directory_of_good'));
     } catch (_) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to update')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Failed to update')));
       }
     }
   }
@@ -414,17 +441,19 @@ class _InitDetail extends ConsumerWidget {
   final List<DirectoryOfGoodSchema> allDogs;
   final Color accentColor;
 
-  bool get _isContributing => myConns.any((c) =>
-      c.toType == 'initiative' &&
-      c.toId == init.id &&
-      c.fromType == 'user');
+  bool get _isContributing => myConns.any(
+    (c) =>
+        c.toType == 'initiative' && c.toId == init.id && c.fromType == 'user',
+  );
 
   bool get _isOrgContributing =>
       myDog != null &&
-      myConns.any((c) =>
-          c.toType == 'initiative' &&
-          c.toId == init.id &&
-          c.fromType == 'directory_of_good');
+      myConns.any(
+        (c) =>
+            c.toType == 'initiative' &&
+            c.toId == init.id &&
+            c.fromType == 'directory_of_good',
+      );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -441,10 +470,7 @@ class _InitDetail extends ConsumerWidget {
         .toList();
     final userConnectionsAsync = ref.watch(
       entityConnectionsProvider(
-        EntityConnectionsQuery(
-          toType: 'initiative',
-          toId: init.id,
-        ),
+        EntityConnectionsQuery(toType: 'initiative', toId: init.id),
       ),
     );
 
@@ -467,7 +493,9 @@ class _InitDetail extends ConsumerWidget {
             Expanded(
               child: Text(
                 init.title,
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ],
@@ -520,8 +548,12 @@ class _InitDetail extends ConsumerWidget {
             label: _isContributing ? 'Taking part' : 'Take part',
             activeLabel: 'Taking part',
             icon: Icons.trending_up,
-            onTap: () =>
-                _toggleContribute(context, ref, fromType: 'user', fromId: currentUser!.id!),
+            onTap: () => _toggleContribute(
+              context,
+              ref,
+              fromType: 'user',
+              fromId: currentUser!.id!,
+            ),
           ),
           if (myDog != null && isAdmin) ...[
             const SizedBox(height: 8),
@@ -544,8 +576,7 @@ class _InitDetail extends ConsumerWidget {
             OutlinedButton.icon(
               icon: const Icon(Icons.add_link, size: 15),
               label: const Text('Admin: Link organization'),
-              onPressed: () =>
-                  _showAdminOrgPicker(context, ref, connectedOrgs),
+              onPressed: () => _showAdminOrgPicker(context, ref, connectedOrgs),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 38),
               ),
@@ -556,8 +587,9 @@ class _InitDetail extends ConsumerWidget {
             icon: const Icon(Icons.login, size: 15),
             label: const Text('Sign in to contribute'),
             onPressed: () => safeGo(context, '/login'),
-            style:
-                OutlinedButton.styleFrom(minimumSize: const Size(double.infinity, 40)),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 40),
+            ),
           ),
         ],
         if (connectedOrgs.isNotEmpty)
@@ -584,10 +616,11 @@ class _InitDetail extends ConsumerWidget {
     List<DirectoryOfGoodSchema> connectedOrgs,
   ) async {
     final connectedIds = connectedOrgs.map((d) => d.id ?? d.name).toSet();
-    final availableOrgs = allDogs
-        .where((d) => !connectedIds.contains(d.id ?? d.name))
-        .toList()
-      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    final availableOrgs =
+        allDogs.where((d) => !connectedIds.contains(d.id ?? d.name)).toList()
+          ..sort(
+            (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+          );
 
     if (availableOrgs.isEmpty) {
       if (context.mounted) {
@@ -651,20 +684,23 @@ class _InitDetail extends ConsumerWidget {
     required String fromId,
   }) async {
     final notifier = ref.read(myConnectionsProvider.notifier);
-    final isConnected = ref
-        .read(myConnectionsProvider)
-        .value
-        ?.any((c) =>
-            c.toType == 'initiative' &&
-            c.toId == init.id &&
-            c.fromType == fromType &&
-            c.fromId == fromId) ??
+    final isConnected =
+        ref
+            .read(myConnectionsProvider)
+            .value
+            ?.any(
+              (c) =>
+                  c.toType == 'initiative' &&
+                  c.toId == init.id &&
+                  c.fromType == fromType &&
+                  c.fromId == fromId,
+            ) ??
         false;
     try {
       if (isConnected) {
         await notifier.disconnect(
           'initiative',
-          init.id, 
+          init.id,
           fromType: fromType,
           fromId: fromId,
         );
@@ -679,9 +715,9 @@ class _InitDetail extends ConsumerWidget {
       ref.invalidate(connectionSummaryProvider('initiative'));
     } catch (_) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to update')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Failed to update')));
       }
     }
   }
@@ -702,36 +738,36 @@ class _MiniStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.fromLTRB(10, 7, 10, 7),
-        decoration: BoxDecoration(
-          color: color.withAlpha(14),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withAlpha(45)),
+    padding: const EdgeInsets.fromLTRB(10, 7, 10, 7),
+    decoration: BoxDecoration(
+      color: color.withAlpha(14),
+      borderRadius: BorderRadius.circular(10),
+      border: Border.all(color: color.withAlpha(45)),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            color: color,
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+            height: 1,
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              value,
-              style: TextStyle(
-                color: color,
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-                height: 1,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                color: Theme.of(context).textTheme.bodySmall?.color?.withAlpha(160),
-                fontSize: 10.5,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(
+            color: Theme.of(context).textTheme.bodySmall?.color?.withAlpha(160),
+            fontSize: 10.5,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-      );
+      ],
+    ),
+  );
 }
 
 class _ConnectedPeopleSection extends StatelessWidget {
@@ -798,7 +834,8 @@ class _ConnectedPeopleSection extends StatelessWidget {
                   itemBuilder: (context, index) {
                     if (index < preview.length) {
                       final userId =
-                          (preview[index].user?.id ?? preview[index].fromId).trim();
+                          (preview[index].user?.id ?? preview[index].fromId)
+                              .trim();
                       return UserAvatar(
                         userId: userId.isNotEmpty ? userId : null,
                         radius: 16,
@@ -812,17 +849,21 @@ class _ConnectedPeopleSection extends StatelessWidget {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Theme.of(context).colorScheme.primary.withAlpha(25),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withAlpha(25),
                         border: Border.all(
-                          color: Theme.of(context).colorScheme.primary.withAlpha(140),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withAlpha(140),
                         ),
                       ),
                       child: Text(
                         '+$overflow',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
+                          fontWeight: FontWeight.w700,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                       ),
                     );
                   },
@@ -893,11 +934,7 @@ class _ConnectedUserRow extends StatelessWidget {
         showProfileOnTap: userId.isNotEmpty,
         enableHero: false,
       ),
-      title: Text(
-        displayName,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
+      title: Text(displayName, maxLines: 1, overflow: TextOverflow.ellipsis),
     );
   }
 }
@@ -957,9 +994,9 @@ class _ConnectedOrgsSection extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: _kMapColor,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          color: _kMapColor,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                     if (isAdmin) ...[
@@ -990,9 +1027,9 @@ class _ConnectedOrgsSection extends StatelessWidget {
                 child: Text(
                   '+$overflow more',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
               ),
           ],
@@ -1003,8 +1040,8 @@ class _ConnectedOrgsSection extends StatelessWidget {
             child: Text(
               'Showing ${preview.length} of ${organizations.length}',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withAlpha(150),
-                  ),
+                color: Theme.of(context).colorScheme.onSurface.withAlpha(150),
+              ),
             ),
           ),
       ],
@@ -1013,31 +1050,28 @@ class _ConnectedOrgsSection extends StatelessWidget {
 }
 
 class _PanelSection extends StatelessWidget {
-  const _PanelSection({
-    required this.title,
-    required this.child,
-  });
+  const _PanelSection({required this.title, required this.child});
 
   final String title;
   final Widget child;
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(top: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-            ),
-            const SizedBox(height: 8),
-            child,
-          ],
+    padding: const EdgeInsets.only(top: 12),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: Theme.of(
+            context,
+          ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
         ),
-      );
+        const SizedBox(height: 8),
+        child,
+      ],
+    ),
+  );
 }
 
 class _FollowButton extends StatelessWidget {
@@ -1059,78 +1093,108 @@ class _FollowButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 160),
-          padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: isFollowing ? accentColor : accentColor.withAlpha(15),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-                color: isFollowing
-                    ? accentColor
-                    : accentColor.withAlpha(60)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(isFollowing ? Icons.check : icon,
-                  size: 15,
-                  color: isFollowing ? Colors.white : accentColor),
-              const SizedBox(width: 6),
-              Text(
-                isFollowing ? activeLabel : label,
-                style: TextStyle(
-                    color: isFollowing ? Colors.white : accentColor,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13),
-              ),
-            ],
-          ),
+    onTap: onTap,
+    child: AnimatedContainer(
+      duration: const Duration(milliseconds: 160),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: isFollowing ? accentColor : accentColor.withAlpha(15),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isFollowing ? accentColor : accentColor.withAlpha(60),
         ),
-      );
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            isFollowing ? Icons.check : icon,
+            size: 15,
+            color: isFollowing ? Colors.white : accentColor,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            isFollowing ? activeLabel : label,
+            style: TextStyle(
+              color: isFollowing ? Colors.white : accentColor,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _SocialIconRow extends StatelessWidget {
   const _SocialIconRow({required this.links});
   final SocialLinksSchema links;
 
+  static String _normalizeToHttpsUrl(String raw) {
+    final trimmed = raw.trim();
+    if (trimmed.isEmpty) return '';
+    final uri = Uri.tryParse(trimmed);
+    if (uri != null && uri.hasScheme) return trimmed;
+    if (trimmed.startsWith('//')) return 'https:$trimmed';
+    return 'https://$trimmed';
+  }
+
+  static String _profileUrl(String basePath, String handle) {
+    final normalizedHandle = handle.trim().replaceFirst(RegExp(r'^@+'), '');
+    if (normalizedHandle.isEmpty) return '';
+    final normalizedBase = basePath.trim().replaceAll(RegExp(r'/+$'), '');
+    final separator = normalizedBase.endsWith('@') ? '' : '/';
+    return 'https://$normalizedBase$separator$normalizedHandle';
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final items = <(IconData, String, String, Color)>[];
     if (links.instagram?.isNotEmpty == true) {
-      items.add((
-        Icons.camera_alt_outlined,
-        'Instagram',
-        'instagram.com/${links.instagram}',
-        const Color(0xFFE1306C),
-      ));
+      final instagramUrl = _profileUrl('instagram.com', links.instagram!);
+      if (instagramUrl.isNotEmpty) {
+        items.add((
+          Icons.camera_alt_outlined,
+          'Instagram',
+          instagramUrl,
+          const Color(0xFFE1306C),
+        ));
+      }
     }
     if (links.tiktok?.isNotEmpty == true) {
-      items.add((
-        Icons.music_note_outlined,
-        'TikTok',
-        'tiktok.com/@${links.tiktok}',
-        isDark ? Colors.white : Colors.black87,
-      ));
+      final tiktokUrl = _profileUrl('tiktok.com/@', links.tiktok!);
+      if (tiktokUrl.isNotEmpty) {
+        items.add((
+          Icons.music_note_outlined,
+          'TikTok',
+          tiktokUrl,
+          isDark ? Colors.white : Colors.black87,
+        ));
+      }
     }
     if (links.youtube?.isNotEmpty == true) {
-      items.add((
-        Icons.smart_display_outlined,
-        'YouTube',
-        'youtube.com/@${links.youtube}',
-        const Color(0xFFFF0000),
-      ));
+      final youtubeUrl = _profileUrl('youtube.com/@', links.youtube!);
+      if (youtubeUrl.isNotEmpty) {
+        items.add((
+          Icons.smart_display_outlined,
+          'YouTube',
+          youtubeUrl,
+          const Color(0xFFFF0000),
+        ));
+      }
     }
     if (links.website?.isNotEmpty == true) {
-      items.add((
-        Icons.language_outlined,
-        'Website',
-        links.website!,
-        const Color(0xFF3B82F6),
-      ));
+      final websiteUrl = _normalizeToHttpsUrl(links.website!);
+      if (websiteUrl.isNotEmpty) {
+        items.add((
+          Icons.language_outlined,
+          'Website',
+          websiteUrl,
+          const Color(0xFF3B82F6),
+        ));
+      }
     }
     if (items.isEmpty) {
       return Text(
@@ -1149,11 +1213,16 @@ class _SocialIconRow extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 onTap: () => AppConstants.openUrl(item.$3),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: item.$4.withAlpha(isDark ? 36 : 24),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: item.$4.withAlpha(isDark ? 120 : 90)),
+                    border: Border.all(
+                      color: item.$4.withAlpha(isDark ? 120 : 90),
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: item.$4.withAlpha(isDark ? 40 : 24),
