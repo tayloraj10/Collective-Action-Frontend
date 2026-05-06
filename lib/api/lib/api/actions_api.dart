@@ -239,6 +239,67 @@ class ActionsApi {
     return null;
   }
 
+  /// Delete Cleanup Rsvp
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] cleanupId (required):
+  ///
+  /// * [String] userId (required):
+  ///   Database id of the user removing their RSVP
+  Future<Response> deleteCleanupRsvpActionsCleanupIdRsvpDeleteWithHttpInfo(String cleanupId, String userId,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/actions/{cleanup_id}/rsvp'
+      .replaceAll('{cleanup_id}', cleanupId);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+      queryParams.addAll(_queryParams('', 'user_id', userId));
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'DELETE',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Delete Cleanup Rsvp
+  ///
+  /// Parameters:
+  ///
+  /// * [String] cleanupId (required):
+  ///
+  /// * [String] userId (required):
+  ///   Database id of the user removing their RSVP
+  Future<ActionSchema?> deleteCleanupRsvpActionsCleanupIdRsvpDelete(String cleanupId, String userId,) async {
+    final response = await deleteCleanupRsvpActionsCleanupIdRsvpDeleteWithHttpInfo(cleanupId, userId,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ActionSchema',) as ActionSchema;
+    
+    }
+    return null;
+  }
+
   /// Get Action
   ///
   /// Note: This method returns the HTTP [Response].
@@ -633,6 +694,175 @@ class ActionsApi {
     return null;
   }
 
+  /// List Cleanup Attendance
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] cleanupId (required):
+  Future<Response> listCleanupAttendanceActionsCleanupIdAttendanceGetWithHttpInfo(String cleanupId,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/actions/{cleanup_id}/attendance'
+      .replaceAll('{cleanup_id}', cleanupId);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// List Cleanup Attendance
+  ///
+  /// Parameters:
+  ///
+  /// * [String] cleanupId (required):
+  Future<List<String>?> listCleanupAttendanceActionsCleanupIdAttendanceGet(String cleanupId,) async {
+    final response = await listCleanupAttendanceActionsCleanupIdAttendanceGetWithHttpInfo(cleanupId,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final responseBody = await _decodeBodyBytes(response);
+      return (await apiClient.deserializeAsync(responseBody, 'List<String>') as List)
+        .cast<String>()
+        .toList(growable: false);
+
+    }
+    return null;
+  }
+
+  /// List Cleanup Rsvps
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] cleanupId (required):
+  Future<Response> listCleanupRsvpsActionsCleanupIdRsvpsGetWithHttpInfo(String cleanupId,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/actions/{cleanup_id}/rsvps'
+      .replaceAll('{cleanup_id}', cleanupId);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// List Cleanup Rsvps
+  ///
+  /// Parameters:
+  ///
+  /// * [String] cleanupId (required):
+  Future<List<String>?> listCleanupRsvpsActionsCleanupIdRsvpsGet(String cleanupId,) async {
+    final response = await listCleanupRsvpsActionsCleanupIdRsvpsGetWithHttpInfo(cleanupId,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final responseBody = await _decodeBodyBytes(response);
+      return (await apiClient.deserializeAsync(responseBody, 'List<String>') as List)
+        .cast<String>()
+        .toList(growable: false);
+
+    }
+    return null;
+  }
+
+  /// Mark Cleanup Attendance
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] cleanupId (required):
+  ///
+  /// * [CleanupParticipationBody] cleanupParticipationBody (required):
+  Future<Response> markCleanupAttendanceActionsCleanupIdAttendancePostWithHttpInfo(String cleanupId, CleanupParticipationBody cleanupParticipationBody,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/actions/{cleanup_id}/attendance'
+      .replaceAll('{cleanup_id}', cleanupId);
+
+    // ignore: prefer_final_locals
+    Object? postBody = cleanupParticipationBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Mark Cleanup Attendance
+  ///
+  /// Parameters:
+  ///
+  /// * [String] cleanupId (required):
+  ///
+  /// * [CleanupParticipationBody] cleanupParticipationBody (required):
+  Future<ActionSchema?> markCleanupAttendanceActionsCleanupIdAttendancePost(String cleanupId, CleanupParticipationBody cleanupParticipationBody,) async {
+    final response = await markCleanupAttendanceActionsCleanupIdAttendancePostWithHttpInfo(cleanupId, cleanupParticipationBody,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ActionSchema',) as ActionSchema;
+    
+    }
+    return null;
+  }
+
   /// Remove Action Like
   ///
   /// Note: This method returns the HTTP [Response].
@@ -803,6 +1033,63 @@ class ActionsApi {
   /// * [ActionPhotosUpdate] actionPhotosUpdate (required):
   Future<ActionSchema?> updateActionPhotosActionsActionIdPhotosPatch(String actionId, ActionPhotosUpdate actionPhotosUpdate,) async {
     final response = await updateActionPhotosActionsActionIdPhotosPatchWithHttpInfo(actionId, actionPhotosUpdate,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ActionSchema',) as ActionSchema;
+    
+    }
+    return null;
+  }
+
+  /// Upsert Cleanup Rsvp
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] cleanupId (required):
+  ///
+  /// * [CleanupParticipationBody] cleanupParticipationBody (required):
+  Future<Response> upsertCleanupRsvpActionsCleanupIdRsvpPostWithHttpInfo(String cleanupId, CleanupParticipationBody cleanupParticipationBody,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/actions/{cleanup_id}/rsvp'
+      .replaceAll('{cleanup_id}', cleanupId);
+
+    // ignore: prefer_final_locals
+    Object? postBody = cleanupParticipationBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Upsert Cleanup Rsvp
+  ///
+  /// Parameters:
+  ///
+  /// * [String] cleanupId (required):
+  ///
+  /// * [CleanupParticipationBody] cleanupParticipationBody (required):
+  Future<ActionSchema?> upsertCleanupRsvpActionsCleanupIdRsvpPost(String cleanupId, CleanupParticipationBody cleanupParticipationBody,) async {
+    final response = await upsertCleanupRsvpActionsCleanupIdRsvpPostWithHttpInfo(cleanupId, cleanupParticipationBody,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

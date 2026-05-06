@@ -2115,6 +2115,209 @@
                 }
             }
         },
+        "/actions/{cleanup_id}/rsvps": {
+            "get": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "List Cleanup Rsvps",
+                "operationId": "list_cleanup_rsvps_actions__cleanup_id__rsvps_get",
+                "parameters": [
+                    {
+                        "name": "cleanup_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Cleanup Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "title": "Response List Cleanup Rsvps Actions  Cleanup Id  Rsvps Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/actions/{cleanup_id}/rsvp": {
+            "post": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Upsert Cleanup Rsvp",
+                "operationId": "upsert_cleanup_rsvp_actions__cleanup_id__rsvp_post",
+                "parameters": [
+                    {
+                        "name": "cleanup_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Cleanup Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CleanupParticipationBody"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Delete Cleanup Rsvp",
+                "operationId": "delete_cleanup_rsvp_actions__cleanup_id__rsvp_delete",
+                "parameters": [
+                    {
+                        "name": "cleanup_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Cleanup Id"
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "description": "Database id of the user removing their RSVP",
+                            "title": "User Id"
+                        },
+                        "description": "Database id of the user removing their RSVP"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/actions/{cleanup_id}/attendance": {
+            "get": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "List Cleanup Attendance",
+                "operationId": "list_cleanup_attendance_actions__cleanup_id__attendance_get",
+                "parameters": [
+                    {
+                        "name": "cleanup_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Cleanup Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "title": "Response List Cleanup Attendance Actions  Cleanup Id  Attendance Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Mark Cleanup Attendance",
+                "operationId": "mark_cleanup_attendance_actions__cleanup_id__attendance_post",
+                "parameters": [
+                    {
+                        "name": "cleanup_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Cleanup Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CleanupParticipationBody"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/actions/by_linked/{linked_id}": {
             "get": {
                 "tags": [
@@ -4471,10 +4674,87 @@
                         "type": "string",
                         "title": "Location",
                         "default": ""
+                    },
+                    "scheduled_start": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Scheduled Start"
+                    },
+                    "scheduled_end": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Scheduled End"
+                    },
+                    "organizer_user_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Organizer User Id"
+                    },
+                    "status": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Status"
+                    },
+                    "rsvp_user_ids": {
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "type": "array",
+                        "title": "Rsvp User Ids"
+                    },
+                    "attended_user_ids": {
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "type": "array",
+                        "title": "Attended User Ids"
                     }
                 },
                 "type": "object",
                 "title": "CleanupEventData"
+            },
+            "CleanupParticipationBody": {
+                "properties": {
+                    "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "User Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "user_id"
+                ],
+                "title": "CleanupParticipationBody"
             },
             "CleanupRouteEventData": {
                 "properties": {
@@ -4552,12 +4832,12 @@
                     "lat": {
                         "type": "number",
                         "title": "Lat",
-                        "default": 0.0
+                        "default": 0
                     },
                     "lng": {
                         "type": "number",
                         "title": "Lng",
-                        "default": 0.0
+                        "default": 0
                     },
                     "number": {
                         "type": "integer",
@@ -5683,7 +5963,7 @@
                     "total_pounds": {
                         "type": "number",
                         "title": "Total Pounds",
-                        "default": 0.0
+                        "default": 0
                     }
                 },
                 "type": "object",
@@ -6822,7 +7102,7 @@
                     "total_pounds": {
                         "type": "number",
                         "title": "Total Pounds",
-                        "default": 0.0
+                        "default": 0
                     },
                     "initiative_action_count": {
                         "type": "integer",

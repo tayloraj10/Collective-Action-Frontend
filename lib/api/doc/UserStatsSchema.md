@@ -15,7 +15,7 @@ Name | Type | Description | Notes
 **totalSmallBags** | **int** |  | [optional] [default to 0]
 **totalLargeBags** | **int** |  | [optional] [default to 0]
 **totalBags** | **int** |  | [optional] [default to 0]
-**totalPounds** | **num** |  | [optional] [default to 0.0]
+**totalPounds** | **num** |  | [optional] [default to 0]
 **initiativeActionCount** | **int** |  | [optional] [default to 0]
 **initiativesParticipated** | **int** |  | [optional] [default to 0]
 **mapCampaignBreakdown** | [**List<MapCampaignStatsSchema>**](MapCampaignStatsSchema.md) |  | [optional] [default to const []]

@@ -59,6 +59,7 @@ part 'model/add_project_member_schema.dart';
 part 'model/category_create.dart';
 part 'model/category_schema.dart';
 part 'model/cleanup_event_data.dart';
+part 'model/cleanup_participation_body.dart';
 part 'model/cleanup_route_event_data.dart';
 part 'model/cleanup_waypoint.dart';
 part 'model/connection_create_schema.dart';

@@ -208,6 +208,8 @@ class ApiClient {
           return CategorySchema.fromJson(value);
         case 'CleanupEventData':
           return CleanupEventData.fromJson(value);
+        case 'CleanupParticipationBody':
+          return CleanupParticipationBody.fromJson(value);
         case 'CleanupRouteEventData':
           return CleanupRouteEventData.fromJson(value);
         case 'CleanupWaypoint':

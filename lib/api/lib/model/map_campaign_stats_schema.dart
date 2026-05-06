@@ -19,7 +19,7 @@ class MapCampaignStatsSchema {
     this.cleanupCount = 0,
     this.trashReportCount = 0,
     this.totalBags = 0,
-    this.totalPounds = 0.0,
+    this.totalPounds = 0,
   });
 
   String? campaignId;

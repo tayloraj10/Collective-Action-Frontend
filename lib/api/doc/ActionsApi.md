@@ -13,14 +13,19 @@ Method | HTTP request | Description
 [**claimTrashReportCleanedActionsTrashReportIdClaimCleanedPost**](ActionsApi.md#claimtrashreportcleanedactionstrashreportidclaimcleanedpost) | **POST** /actions/{trash_report_id}/claim-cleaned | Claim Trash Report Cleaned
 [**createActionActionsPost**](ActionsApi.md#createactionactionspost) | **POST** /actions/ | Create Action
 [**deleteActionActionsActionIdDelete**](ActionsApi.md#deleteactionactionsactioniddelete) | **DELETE** /actions/{action_id} | Delete Action
+[**deleteCleanupRsvpActionsCleanupIdRsvpDelete**](ActionsApi.md#deletecleanuprsvpactionscleanupidrsvpdelete) | **DELETE** /actions/{cleanup_id}/rsvp | Delete Cleanup Rsvp
 [**getActionActionsActionIdGet**](ActionsApi.md#getactionactionsactionidget) | **GET** /actions/{action_id} | Get Action
 [**getActionsByLinkedActionsByLinkedLinkedIdGet**](ActionsApi.md#getactionsbylinkedactionsbylinkedlinkedidget) | **GET** /actions/by_linked/{linked_id} | Get Actions By Linked
 [**getActionsByUserActionsUserUserIdGet**](ActionsApi.md#getactionsbyuseractionsuseruseridget) | **GET** /actions/user/{user_id} | Get Actions By User
 [**getLatestActionsActionsRecentGet**](ActionsApi.md#getlatestactionsactionsrecentget) | **GET** /actions/recent | Get Latest Actions
 [**listActionsActionsGet**](ActionsApi.md#listactionsactionsget) | **GET** /actions/ | List Actions
+[**listCleanupAttendanceActionsCleanupIdAttendanceGet**](ActionsApi.md#listcleanupattendanceactionscleanupidattendanceget) | **GET** /actions/{cleanup_id}/attendance | List Cleanup Attendance
+[**listCleanupRsvpsActionsCleanupIdRsvpsGet**](ActionsApi.md#listcleanuprsvpsactionscleanupidrsvpsget) | **GET** /actions/{cleanup_id}/rsvps | List Cleanup Rsvps
+[**markCleanupAttendanceActionsCleanupIdAttendancePost**](ActionsApi.md#markcleanupattendanceactionscleanupidattendancepost) | **POST** /actions/{cleanup_id}/attendance | Mark Cleanup Attendance
 [**removeActionLikeActionsActionIdLikeDelete**](ActionsApi.md#removeactionlikeactionsactionidlikedelete) | **DELETE** /actions/{action_id}/like | Remove Action Like
 [**updateActionActionsActionIdPatch**](ActionsApi.md#updateactionactionsactionidpatch) | **PATCH** /actions/{action_id} | Update Action
 [**updateActionPhotosActionsActionIdPhotosPatch**](ActionsApi.md#updateactionphotosactionsactionidphotospatch) | **PATCH** /actions/{action_id}/photos | Update Action Photos
+[**upsertCleanupRsvpActionsCleanupIdRsvpPost**](ActionsApi.md#upsertcleanuprsvpactionscleanupidrsvppost) | **POST** /actions/{cleanup_id}/rsvp | Upsert Cleanup Rsvp
 
 
 # **addActionLikeActionsActionIdLikePost**
@@ -177,6 +182,49 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **actionId** | **String**|  | 
+
+### Return type
+
+[**ActionSchema**](ActionSchema.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteCleanupRsvpActionsCleanupIdRsvpDelete**
+> ActionSchema deleteCleanupRsvpActionsCleanupIdRsvpDelete(cleanupId, userId)
+
+Delete Cleanup Rsvp
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = ActionsApi();
+final cleanupId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final userId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | Database id of the user removing their RSVP
+
+try {
+    final result = api_instance.deleteCleanupRsvpActionsCleanupIdRsvpDelete(cleanupId, userId);
+    print(result);
+} catch (e) {
+    print('Exception when calling ActionsApi->deleteCleanupRsvpActionsCleanupIdRsvpDelete: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **cleanupId** | **String**|  | 
+ **userId** | **String**| Database id of the user removing their RSVP | 
 
 ### Return type
 
@@ -424,6 +472,131 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **listCleanupAttendanceActionsCleanupIdAttendanceGet**
+> List<String> listCleanupAttendanceActionsCleanupIdAttendanceGet(cleanupId)
+
+List Cleanup Attendance
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = ActionsApi();
+final cleanupId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+
+try {
+    final result = api_instance.listCleanupAttendanceActionsCleanupIdAttendanceGet(cleanupId);
+    print(result);
+} catch (e) {
+    print('Exception when calling ActionsApi->listCleanupAttendanceActionsCleanupIdAttendanceGet: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **cleanupId** | **String**|  | 
+
+### Return type
+
+**List<String>**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listCleanupRsvpsActionsCleanupIdRsvpsGet**
+> List<String> listCleanupRsvpsActionsCleanupIdRsvpsGet(cleanupId)
+
+List Cleanup Rsvps
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = ActionsApi();
+final cleanupId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+
+try {
+    final result = api_instance.listCleanupRsvpsActionsCleanupIdRsvpsGet(cleanupId);
+    print(result);
+} catch (e) {
+    print('Exception when calling ActionsApi->listCleanupRsvpsActionsCleanupIdRsvpsGet: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **cleanupId** | **String**|  | 
+
+### Return type
+
+**List<String>**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **markCleanupAttendanceActionsCleanupIdAttendancePost**
+> ActionSchema markCleanupAttendanceActionsCleanupIdAttendancePost(cleanupId, cleanupParticipationBody)
+
+Mark Cleanup Attendance
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = ActionsApi();
+final cleanupId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final cleanupParticipationBody = CleanupParticipationBody(); // CleanupParticipationBody | 
+
+try {
+    final result = api_instance.markCleanupAttendanceActionsCleanupIdAttendancePost(cleanupId, cleanupParticipationBody);
+    print(result);
+} catch (e) {
+    print('Exception when calling ActionsApi->markCleanupAttendanceActionsCleanupIdAttendancePost: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **cleanupId** | **String**|  | 
+ **cleanupParticipationBody** | [**CleanupParticipationBody**](CleanupParticipationBody.md)|  | 
+
+### Return type
+
+[**ActionSchema**](ActionSchema.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **removeActionLikeActionsActionIdLikeDelete**
 > ActionSchema removeActionLikeActionsActionIdLikeDelete(actionId, userId)
 
@@ -541,6 +714,49 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **actionId** | **String**|  | 
  **actionPhotosUpdate** | [**ActionPhotosUpdate**](ActionPhotosUpdate.md)|  | 
+
+### Return type
+
+[**ActionSchema**](ActionSchema.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **upsertCleanupRsvpActionsCleanupIdRsvpPost**
+> ActionSchema upsertCleanupRsvpActionsCleanupIdRsvpPost(cleanupId, cleanupParticipationBody)
+
+Upsert Cleanup Rsvp
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = ActionsApi();
+final cleanupId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final cleanupParticipationBody = CleanupParticipationBody(); // CleanupParticipationBody | 
+
+try {
+    final result = api_instance.upsertCleanupRsvpActionsCleanupIdRsvpPost(cleanupId, cleanupParticipationBody);
+    print(result);
+} catch (e) {
+    print('Exception when calling ActionsApi->upsertCleanupRsvpActionsCleanupIdRsvpPost: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **cleanupId** | **String**|  | 
+ **cleanupParticipationBody** | [**CleanupParticipationBody**](CleanupParticipationBody.md)|  | 
 
 ### Return type
 

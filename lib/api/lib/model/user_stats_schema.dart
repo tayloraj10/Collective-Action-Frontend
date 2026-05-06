@@ -20,7 +20,7 @@ class UserStatsSchema {
     this.totalSmallBags = 0,
     this.totalLargeBags = 0,
     this.totalBags = 0,
-    this.totalPounds = 0.0,
+    this.totalPounds = 0,
     this.initiativeActionCount = 0,
     this.initiativesParticipated = 0,
     this.mapCampaignBreakdown = const [],

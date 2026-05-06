@@ -15,6 +15,12 @@ Name | Type | Description | Notes
 **largeBags** | **int** |  | [optional] 
 **pounds** | **num** |  | [optional] 
 **location** | **String** |  | [optional] [default to '']
+**scheduledStart** | [**DateTime**](DateTime.md) |  | [optional] 
+**scheduledEnd** | [**DateTime**](DateTime.md) |  | [optional] 
+**organizerUserId** | **String** |  | [optional] 
+**status** | **String** |  | [optional] 
+**rsvpUserIds** | **List<String>** |  | [optional] [default to const []]
+**attendedUserIds** | **List<String>** |  | [optional] [default to const []]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 
