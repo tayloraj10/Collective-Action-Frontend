@@ -16,7 +16,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 class MapScreen extends ConsumerStatefulWidget {
-  const MapScreen({super.key});
+  const MapScreen({
+    super.key,
+    this.initialCampaignType = MapCampaignTypeEnum.cleanupMap,
+  });
+
+  final MapCampaignTypeEnum initialCampaignType;
 
   @override
   ConsumerState<MapScreen> createState() => _MapScreenState();
@@ -24,7 +29,7 @@ class MapScreen extends ConsumerStatefulWidget {
 
 class _MapScreenState extends ConsumerState<MapScreen> {
   GoogleMapController? _controller;
-  MapCampaignTypeEnum _selectedCampaignType = MapCampaignTypeEnum.cleanupMap;
+  late MapCampaignTypeEnum _selectedCampaignType;
   // String? _selectedPurpose; // For zip code maps - uncomment when re-enabling
 
   bool _showCampaignDrawer = false;
@@ -33,6 +38,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   void initState() {
     super.initState();
+    _selectedCampaignType = widget.initialCampaignType;
     _campaignDrawerScrollController = ScrollController();
   }
 
@@ -58,10 +64,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       error: (e, _) => e.toString(),
     );
     final filteredCampaigns = activeCampaignsAsync.when(
-      data: (campaigns) => campaigns.where((campaign) {
-        // Compare campaign type string with enum value
-        return campaign.mapCampaignType == _selectedCampaignType.value;
-      }).toList(),
+      data: (campaigns) => campaigns
+          .where(
+            (campaign) =>
+                campaign.mapCampaignType == _selectedCampaignType.value,
+          )
+          .toList(),
       loading: () => <MapCampaignSchema>[],
       error: (_, _) => <MapCampaignSchema>[],
     );
@@ -142,7 +150,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         fit: StackFit.expand,
         children: [
           // Map widget: zip code branch commented out until we re-enable
-          if (_selectedCampaignType == MapCampaignTypeEnum.cleanupMap)
+          if (_selectedCampaignType == MapCampaignTypeEnum.cleanupMap ||
+              _selectedCampaignType == MapCampaignTypeEnum.plantingMap)
             CleanupMapWidget(
               campaign: selectedCampaign,
               mapController: _controller,
@@ -197,10 +206,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                   _selectedCampaignType = value;
                                   // _selectedPurpose = null; // uncomment when re-enabling zip code map
                                 });
-                                // Update URL; always use /maps/cleanup to avoid
-                                // router redirect (/maps -> /maps/cleanup) which
-                                // can trigger double navigation and refresh on mobile web.
-                                safeGo(context, '/maps/cleanup');
+                                final targetPath =
+                                    value == MapCampaignTypeEnum.plantingMap
+                                    ? '/maps/planting'
+                                    : '/maps/cleanup';
+                                safeGo(context, targetPath);
                               }
                             },
                           ),
@@ -265,9 +275,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 icon: const Icon(Icons.bar_chart_rounded),
                                 onPressed: () => scheduleAfterTap(
                                   context,
-                                  () => StatsDialog.show(context, selectedCampaign.id),
+                                  () => StatsDialog.show(
+                                    context,
+                                    selectedCampaign.id,
+                                    campaignType: _selectedCampaignType,
+                                  ),
                                 ),
-                                tooltip: 'Cleanup & trash stats',
+                                tooltip:
+                                    _selectedCampaignType ==
+                                        MapCampaignTypeEnum.plantingMap
+                                    ? 'Planting stats'
+                                    : 'Cleanup & trash stats',
                                 padding: const EdgeInsets.all(8),
                                 constraints: const BoxConstraints(),
                               ),
@@ -281,9 +299,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 icon: const Icon(Icons.emoji_events_outlined),
                                 onPressed: () => scheduleAfterTap(
                                   context,
-                                  () => LeaderboardDialog.show(context, selectedCampaign.id),
+                                  () => LeaderboardDialog.show(
+                                    context,
+                                    selectedCampaign.id,
+                                    campaignType: _selectedCampaignType,
+                                  ),
                                 ),
-                                tooltip: 'Leaderboard (bags cleaned)',
+                                tooltip:
+                                    _selectedCampaignType ==
+                                        MapCampaignTypeEnum.plantingMap
+                                    ? 'Leaderboard (plantings)'
+                                    : 'Leaderboard (bags cleaned)',
                                 padding: const EdgeInsets.all(8),
                                 constraints: const BoxConstraints(),
                               ),
@@ -299,6 +325,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             message:
                                 ref.watch(mapFilterMySubmissionsOnlyProvider)
                                 ? 'Show all pins on the map'
+                                : _selectedCampaignType ==
+                                      MapCampaignTypeEnum.plantingMap
+                                ? 'Show only my planting pins'
                                 : 'Show only my cleanup & trash report pins',
                             child: Material(
                               elevation: 2,
