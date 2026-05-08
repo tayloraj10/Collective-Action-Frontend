@@ -14,7 +14,10 @@ Name | Type | Description | Notes
 **cleanupCount** | **int** |  | [optional] [default to 0]
 **trashReportCount** | **int** |  | [optional] [default to 0]
 **totalBags** | **int** |  | [optional] [default to 0]
-**totalPounds** | **num** |  | [optional] [default to 0.0]
+**totalPounds** | **num** |  | [optional] [default to 0]
+**treePlantingCount** | **int** |  | [optional] [default to 0]
+**wildflowerPlantingCount** | **int** |  | [optional] [default to 0]
+**totalPlantings** | **int** |  | [optional] [default to 0]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

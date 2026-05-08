@@ -20,7 +20,10 @@ class UserStatsSchema {
     this.totalSmallBags = 0,
     this.totalLargeBags = 0,
     this.totalBags = 0,
-    this.totalPounds = 0.0,
+    this.totalPounds = 0,
+    this.treePlantingCount = 0,
+    this.wildflowerPlantingCount = 0,
+    this.totalPlantings = 0,
     this.initiativeActionCount = 0,
     this.initiativesParticipated = 0,
     this.mapCampaignBreakdown = const [],
@@ -52,6 +55,12 @@ class UserStatsSchema {
   int totalBags;
 
   num totalPounds;
+
+  int treePlantingCount;
+
+  int wildflowerPlantingCount;
+
+  int totalPlantings;
 
   int initiativeActionCount;
 
@@ -91,6 +100,9 @@ class UserStatsSchema {
     other.totalLargeBags == totalLargeBags &&
     other.totalBags == totalBags &&
     other.totalPounds == totalPounds &&
+    other.treePlantingCount == treePlantingCount &&
+    other.wildflowerPlantingCount == wildflowerPlantingCount &&
+    other.totalPlantings == totalPlantings &&
     other.initiativeActionCount == initiativeActionCount &&
     other.initiativesParticipated == initiativesParticipated &&
     _deepEquality.equals(other.mapCampaignBreakdown, mapCampaignBreakdown) &&
@@ -117,6 +129,9 @@ class UserStatsSchema {
     (totalLargeBags.hashCode) +
     (totalBags.hashCode) +
     (totalPounds.hashCode) +
+    (treePlantingCount.hashCode) +
+    (wildflowerPlantingCount.hashCode) +
+    (totalPlantings.hashCode) +
     (initiativeActionCount.hashCode) +
     (initiativesParticipated.hashCode) +
     (mapCampaignBreakdown.hashCode) +
@@ -133,7 +148,7 @@ class UserStatsSchema {
     (lastActionDate == null ? 0 : lastActionDate!.hashCode);
 
   @override
-  String toString() => 'UserStatsSchema[userId=$userId, mapSubmissionCount=$mapSubmissionCount, cleanupCount=$cleanupCount, trashReportCount=$trashReportCount, totalSmallBags=$totalSmallBags, totalLargeBags=$totalLargeBags, totalBags=$totalBags, totalPounds=$totalPounds, initiativeActionCount=$initiativeActionCount, initiativesParticipated=$initiativesParticipated, mapCampaignBreakdown=$mapCampaignBreakdown, actionTypeCounts=$actionTypeCounts, followsCount=$followsCount, contributionsCount=$contributionsCount, orgId=$orgId, orgName=$orgName, orgFollowersCount=$orgFollowersCount, orgPartnershipsCount=$orgPartnershipsCount, orgInitiativeConnections=$orgInitiativeConnections, totalActions=$totalActions, firstActionDate=$firstActionDate, lastActionDate=$lastActionDate]';
+  String toString() => 'UserStatsSchema[userId=$userId, mapSubmissionCount=$mapSubmissionCount, cleanupCount=$cleanupCount, trashReportCount=$trashReportCount, totalSmallBags=$totalSmallBags, totalLargeBags=$totalLargeBags, totalBags=$totalBags, totalPounds=$totalPounds, treePlantingCount=$treePlantingCount, wildflowerPlantingCount=$wildflowerPlantingCount, totalPlantings=$totalPlantings, initiativeActionCount=$initiativeActionCount, initiativesParticipated=$initiativesParticipated, mapCampaignBreakdown=$mapCampaignBreakdown, actionTypeCounts=$actionTypeCounts, followsCount=$followsCount, contributionsCount=$contributionsCount, orgId=$orgId, orgName=$orgName, orgFollowersCount=$orgFollowersCount, orgPartnershipsCount=$orgPartnershipsCount, orgInitiativeConnections=$orgInitiativeConnections, totalActions=$totalActions, firstActionDate=$firstActionDate, lastActionDate=$lastActionDate]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -145,6 +160,9 @@ class UserStatsSchema {
       json[r'total_large_bags'] = this.totalLargeBags;
       json[r'total_bags'] = this.totalBags;
       json[r'total_pounds'] = this.totalPounds;
+      json[r'tree_planting_count'] = this.treePlantingCount;
+      json[r'wildflower_planting_count'] = this.wildflowerPlantingCount;
+      json[r'total_plantings'] = this.totalPlantings;
       json[r'initiative_action_count'] = this.initiativeActionCount;
       json[r'initiatives_participated'] = this.initiativesParticipated;
       json[r'map_campaign_breakdown'] = this.mapCampaignBreakdown;
@@ -205,6 +223,9 @@ class UserStatsSchema {
         totalLargeBags: mapValueOfType<int>(json, r'total_large_bags') ?? 0,
         totalBags: mapValueOfType<int>(json, r'total_bags') ?? 0,
         totalPounds: num.parse('${json[r'total_pounds']}'),
+        treePlantingCount: mapValueOfType<int>(json, r'tree_planting_count') ?? 0,
+        wildflowerPlantingCount: mapValueOfType<int>(json, r'wildflower_planting_count') ?? 0,
+        totalPlantings: mapValueOfType<int>(json, r'total_plantings') ?? 0,
         initiativeActionCount: mapValueOfType<int>(json, r'initiative_action_count') ?? 0,
         initiativesParticipated: mapValueOfType<int>(json, r'initiatives_participated') ?? 0,
         mapCampaignBreakdown: MapCampaignStatsSchema.listFromJson(json[r'map_campaign_breakdown']),

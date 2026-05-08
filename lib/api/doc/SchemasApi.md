@@ -13,6 +13,8 @@ Method | HTTP request | Description
 [**getCleanupRouteEventDataSchemaSchemasEventDataCleanupRouteGet**](SchemasApi.md#getcleanuprouteeventdataschemaschemaseventdatacleanuprouteget) | **GET** /schemas/event-data/cleanup_route | CleanupRouteEventData schema
 [**getEventDataBaseSchemaSchemasEventDataBaseGet**](SchemasApi.md#geteventdatabaseschemaschemaseventdatabaseget) | **GET** /schemas/event-data/base | EventDataBase schema
 [**getTrashReportEventDataSchemaSchemasEventDataTrashReportGet**](SchemasApi.md#gettrashreporteventdataschemaschemaseventdatatrashreportget) | **GET** /schemas/event-data/trash_report | TrashReportEventData schema
+[**getTreePlantingEventDataSchemaSchemasEventDataTreePlantingGet**](SchemasApi.md#gettreeplantingeventdataschemaschemaseventdatatreeplantingget) | **GET** /schemas/event-data/tree_planting | TreePlantingEventData schema
+[**getWildflowerPlantingEventDataSchemaSchemasEventDataWildflowerPlantingGet**](SchemasApi.md#getwildflowerplantingeventdataschemaschemaseventdatawildflowerplantingget) | **GET** /schemas/event-data/wildflower_planting | WildflowerPlantingEventData schema
 [**getZipCodeSubmissionEventDataSchemaSchemasEventDataZipCodeSubmissionGet**](SchemasApi.md#getzipcodesubmissioneventdataschemaschemaseventdatazipcodesubmissionget) | **GET** /schemas/event-data/zip_code_submission | ZipCodeSubmissionEventData schema
 
 
@@ -160,6 +162,84 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**TrashReportEventData**](TrashReportEventData.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getTreePlantingEventDataSchemaSchemasEventDataTreePlantingGet**
+> TreePlantingEventData getTreePlantingEventDataSchemaSchemasEventDataTreePlantingGet()
+
+TreePlantingEventData schema
+
+Schema for event_data when action_type is 'tree_planting'. Exposed for OpenAPI/codegen.
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = SchemasApi();
+
+try {
+    final result = api_instance.getTreePlantingEventDataSchemaSchemasEventDataTreePlantingGet();
+    print(result);
+} catch (e) {
+    print('Exception when calling SchemasApi->getTreePlantingEventDataSchemaSchemasEventDataTreePlantingGet: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**TreePlantingEventData**](TreePlantingEventData.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getWildflowerPlantingEventDataSchemaSchemasEventDataWildflowerPlantingGet**
+> WildflowerPlantingEventData getWildflowerPlantingEventDataSchemaSchemasEventDataWildflowerPlantingGet()
+
+WildflowerPlantingEventData schema
+
+Schema for event_data when action_type is 'wildflower_planting'. Exposed for OpenAPI/codegen.
+
+### Example
+```dart
+import 'package:collective_action_api/api.dart';
+
+final api_instance = SchemasApi();
+
+try {
+    final result = api_instance.getWildflowerPlantingEventDataSchemaSchemasEventDataWildflowerPlantingGet();
+    print(result);
+} catch (e) {
+    print('Exception when calling SchemasApi->getWildflowerPlantingEventDataSchemaSchemasEventDataWildflowerPlantingGet: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**WildflowerPlantingEventData**](WildflowerPlantingEventData.md)
 
 ### Authorization
 

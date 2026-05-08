@@ -19,7 +19,10 @@ class MapCampaignStatsSchema {
     this.cleanupCount = 0,
     this.trashReportCount = 0,
     this.totalBags = 0,
-    this.totalPounds = 0.0,
+    this.totalPounds = 0,
+    this.treePlantingCount = 0,
+    this.wildflowerPlantingCount = 0,
+    this.totalPlantings = 0,
   });
 
   String? campaignId;
@@ -36,6 +39,12 @@ class MapCampaignStatsSchema {
 
   num totalPounds;
 
+  int treePlantingCount;
+
+  int wildflowerPlantingCount;
+
+  int totalPlantings;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is MapCampaignStatsSchema &&
     other.campaignId == campaignId &&
@@ -44,7 +53,10 @@ class MapCampaignStatsSchema {
     other.cleanupCount == cleanupCount &&
     other.trashReportCount == trashReportCount &&
     other.totalBags == totalBags &&
-    other.totalPounds == totalPounds;
+    other.totalPounds == totalPounds &&
+    other.treePlantingCount == treePlantingCount &&
+    other.wildflowerPlantingCount == wildflowerPlantingCount &&
+    other.totalPlantings == totalPlantings;
 
   @override
   int get hashCode =>
@@ -55,10 +67,13 @@ class MapCampaignStatsSchema {
     (cleanupCount.hashCode) +
     (trashReportCount.hashCode) +
     (totalBags.hashCode) +
-    (totalPounds.hashCode);
+    (totalPounds.hashCode) +
+    (treePlantingCount.hashCode) +
+    (wildflowerPlantingCount.hashCode) +
+    (totalPlantings.hashCode);
 
   @override
-  String toString() => 'MapCampaignStatsSchema[campaignId=$campaignId, campaignName=$campaignName, submissionCount=$submissionCount, cleanupCount=$cleanupCount, trashReportCount=$trashReportCount, totalBags=$totalBags, totalPounds=$totalPounds]';
+  String toString() => 'MapCampaignStatsSchema[campaignId=$campaignId, campaignName=$campaignName, submissionCount=$submissionCount, cleanupCount=$cleanupCount, trashReportCount=$trashReportCount, totalBags=$totalBags, totalPounds=$totalPounds, treePlantingCount=$treePlantingCount, wildflowerPlantingCount=$wildflowerPlantingCount, totalPlantings=$totalPlantings]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -73,6 +88,9 @@ class MapCampaignStatsSchema {
       json[r'trash_report_count'] = this.trashReportCount;
       json[r'total_bags'] = this.totalBags;
       json[r'total_pounds'] = this.totalPounds;
+      json[r'tree_planting_count'] = this.treePlantingCount;
+      json[r'wildflower_planting_count'] = this.wildflowerPlantingCount;
+      json[r'total_plantings'] = this.totalPlantings;
     return json;
   }
 
@@ -102,6 +120,9 @@ class MapCampaignStatsSchema {
         trashReportCount: mapValueOfType<int>(json, r'trash_report_count') ?? 0,
         totalBags: mapValueOfType<int>(json, r'total_bags') ?? 0,
         totalPounds: num.parse('${json[r'total_pounds']}'),
+        treePlantingCount: mapValueOfType<int>(json, r'tree_planting_count') ?? 0,
+        wildflowerPlantingCount: mapValueOfType<int>(json, r'wildflower_planting_count') ?? 0,
+        totalPlantings: mapValueOfType<int>(json, r'total_plantings') ?? 0,
       );
     }
     return null;

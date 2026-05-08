@@ -208,6 +208,102 @@ class SchemasApi {
     return null;
   }
 
+  /// TreePlantingEventData schema
+  ///
+  /// Schema for event_data when action_type is 'tree_planting'. Exposed for OpenAPI/codegen.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  Future<Response> getTreePlantingEventDataSchemaSchemasEventDataTreePlantingGetWithHttpInfo() async {
+    // ignore: prefer_const_declarations
+    final path = r'/schemas/event-data/tree_planting';
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// TreePlantingEventData schema
+  ///
+  /// Schema for event_data when action_type is 'tree_planting'. Exposed for OpenAPI/codegen.
+  Future<TreePlantingEventData?> getTreePlantingEventDataSchemaSchemasEventDataTreePlantingGet() async {
+    final response = await getTreePlantingEventDataSchemaSchemasEventDataTreePlantingGetWithHttpInfo();
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'TreePlantingEventData',) as TreePlantingEventData;
+    
+    }
+    return null;
+  }
+
+  /// WildflowerPlantingEventData schema
+  ///
+  /// Schema for event_data when action_type is 'wildflower_planting'. Exposed for OpenAPI/codegen.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  Future<Response> getWildflowerPlantingEventDataSchemaSchemasEventDataWildflowerPlantingGetWithHttpInfo() async {
+    // ignore: prefer_const_declarations
+    final path = r'/schemas/event-data/wildflower_planting';
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// WildflowerPlantingEventData schema
+  ///
+  /// Schema for event_data when action_type is 'wildflower_planting'. Exposed for OpenAPI/codegen.
+  Future<WildflowerPlantingEventData?> getWildflowerPlantingEventDataSchemaSchemasEventDataWildflowerPlantingGet() async {
+    final response = await getWildflowerPlantingEventDataSchemaSchemasEventDataWildflowerPlantingGetWithHttpInfo();
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'WildflowerPlantingEventData',) as WildflowerPlantingEventData;
+    
+    }
+    return null;
+  }
+
   /// ZipCodeSubmissionEventData schema
   ///
   /// Schema for event_data when action_type is 'zip_code_submission'. Exposed for OpenAPI/codegen.
