@@ -12,6 +12,8 @@ import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_info_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/pin_confirmation_bar.dart';
+import 'package:collective_action_frontend/screens/maps/components/planting_event_dialog.dart';
+import 'package:collective_action_frontend/screens/maps/components/planting_event_info_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/trash_report_event_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/trash_report_event_info_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/map_styles.dart';
@@ -27,10 +29,14 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 const EventDataType _kActionTypeCleanup = EventDataType.cleanup;
 const EventDataType _kActionTypeTrashReport = EventDataType.trashReport;
 const EventDataType _kActionTypeCleanupRoute = EventDataType.cleanupRoute;
+const EventDataType _kActionTypeTreePlanting = EventDataType.treePlanting;
+const EventDataType _kActionTypeWildflowerPlanting =
+    EventDataType.wildflowerPlanting;
 
 /// Asset paths for map pins and mode buttons.
 const String _kAssetClean = 'assets/images/clean.png';
 const String _kAssetTrash = 'assets/images/trash.png';
+const String _kAssetPlanting = 'assets/images/planting.png';
 // const String _kAssetDraw = 'assets/images/draw.png';
 const String _kAssetCurrentLocation = 'assets/images/current-location.png';
 
@@ -81,6 +87,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
 
   BitmapDescriptor? _cleanupMarkerIcon;
   BitmapDescriptor? _trashMarkerIcon;
+  BitmapDescriptor? _plantingMarkerIcon;
   BitmapDescriptor? _currentLocationMarkerIcon;
 
   GoogleMapController? _mapController;
@@ -133,6 +140,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     if (!mounted) return;
     final trash = await BitmapDescriptor.asset(config, _kAssetTrash);
     if (!mounted) return;
+    final planting = await BitmapDescriptor.asset(config, _kAssetPlanting);
+    if (!mounted) return;
     const currentLocationConfig = ImageConfiguration(size: Size(30, 30));
     final currentLocation = await BitmapDescriptor.asset(
       currentLocationConfig,
@@ -142,6 +151,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       setState(() {
         _cleanupMarkerIcon = clean;
         _trashMarkerIcon = trash;
+        _plantingMarkerIcon = planting;
         _currentLocationMarkerIcon = currentLocation;
       });
     }
@@ -153,9 +163,15 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   BitmapDescriptor _iconForTrash() =>
       _trashMarkerIcon ??
       BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+  BitmapDescriptor _iconForPlanting() =>
+      _plantingMarkerIcon ??
+      BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
   BitmapDescriptor _iconForCurrentLocation() =>
       _currentLocationMarkerIcon ??
       BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
+
+  bool get _isPlantingCampaign =>
+      widget.campaign.mapCampaignType == MapCampaignTypeEnum.plantingMap.value;
 
   /// Fetches current position, updates state, shows on map, and zooms to it.
   Future<bool> _loadUserLocation() async {
@@ -438,20 +454,31 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _MapModeButton(
-                    imageAsset: _kAssetClean,
-                    label: 'Cleanup',
-                    tooltip: 'Add a cleanup',
-                    isActive: _mode == 'cleanup',
-                    onTap: () => _setMode('cleanup'),
-                  ),
-                  _MapModeButton(
-                    imageAsset: _kAssetTrash,
-                    label: 'Report',
-                    tooltip: 'Report trash',
-                    isActive: _mode == 'trash_report',
-                    onTap: () => _setMode('trash_report'),
-                  ),
+                  if (_isPlantingCampaign)
+                    _MapModeButton(
+                      imageAsset: _kAssetPlanting,
+                      label: 'Planting',
+                      tooltip: 'Add a tree or wildflower planting',
+                      isActive: _mode == 'planting',
+                      onTap: () => _setMode('planting'),
+                    )
+                  else ...[
+                    _MapModeButton(
+                      imageAsset: _kAssetClean,
+                      label: 'Cleanup',
+                      tooltip: 'Add a cleanup',
+                      isActive: _mode == 'cleanup',
+                      onTap: () => _setMode('cleanup'),
+                    ),
+                    const SizedBox(height: 14),
+                    _MapModeButton(
+                      imageAsset: _kAssetTrash,
+                      label: 'Report',
+                      tooltip: 'Report trash',
+                      isActive: _mode == 'trash_report',
+                      onTap: () => _setMode('trash_report'),
+                    ),
+                  ],
                   // _MapModeButton(
                   //   imageAsset: _kAssetDraw,
                   //   label: 'Route',
@@ -484,6 +511,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
                     child: Text(
                       _mode == 'route'
                           ? 'Tap map to add route points. Add at least 2, then submit.'
+                          : _mode == 'planting'
+                          ? 'Tap map to add a tree or wildflower planting'
                           : _mode == 'cleanup'
                           ? 'Tap map to add a cleanup location'
                           : 'Tap map to report trash',
@@ -652,7 +681,10 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         final eventType = a.eventData!['type'] as String?;
         final isCleanup = eventType == _kActionTypeCleanup.value;
         final isTrash = eventType == _kActionTypeTrashReport.value;
-        if (!isCleanup && !isTrash) continue;
+        final isPlanting =
+            eventType == _kActionTypeTreePlanting.value ||
+            eventType == _kActionTypeWildflowerPlanting.value;
+        if (!isCleanup && !isTrash && !isPlanting) continue;
         final position =
             _createdActionPositionOverride[a.id] ??
             LatLng(a.latitude!.toDouble(), a.longitude!.toDouble());
@@ -660,8 +692,14 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
           Marker(
             markerId: MarkerId(a.id),
             position: position,
-            icon: isCleanup ? _iconForCleanup() : _iconForTrash(),
-            onTap: () => _showEventInfoDialog(context, a, isCleanup),
+            icon: isPlanting
+                ? _iconForPlanting()
+                : isCleanup
+                ? _iconForCleanup()
+                : _iconForTrash(),
+            onTap: () => isPlanting
+                ? _showPlantingInfoDialog(context, a)
+                : _showEventInfoDialog(context, a, isCleanup),
           ),
         );
       }
@@ -689,49 +727,73 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   ) async {
     if (action.eventData == null) return;
     if (mounted) setState(() => _isInfoDialogOpen = true);
-    if (isCleanup) {
-      // Parse CleanupEventData from eventData map
-      final eventDataMap = Map<String, dynamic>.from(action.eventData!);
-      final eventData = CleanupEventData(
-        type:
-            EventDataType.fromJson(eventDataMap['type']) ??
-            EventDataType.cleanup,
-        name: eventDataMap['name'] as String? ?? '',
-        location: eventDataMap['location'] as String? ?? '',
-        smallBags: eventDataMap['small_bags'] as int?,
-        largeBags: eventDataMap['large_bags'] as int?,
-        pounds: eventDataMap['pounds'] != null
-            ? num.parse('${eventDataMap['pounds']}')
-            : null,
-        imageUrl: eventDataMap['image_url'] as String?,
-      );
-      await showDialog(
-        context: context,
-        builder: (c) => CleanupEventInfoDialog(
-          action: action,
-          eventData: eventData,
-          campaignId: widget.campaign.id,
-        ),
-      );
-    } else {
-      // Parse TrashReportEventData from eventData map
-      final eventDataMap = Map<String, dynamic>.from(action.eventData!);
-      final eventData = TrashReportEventData(
-        type:
-            EventDataType.fromJson(eventDataMap['type']) ??
-            EventDataType.trashReport,
-        location: eventDataMap['location'] as String? ?? '',
-        imageUrl: eventDataMap['image_url'] as String?,
-      );
-      await showDialog(
-        context: context,
-        builder: (c) => TrashReportEventInfoDialog(
-          action: action,
-          eventData: eventData,
-          campaignId: widget.campaign.id,
-        ),
-      );
+    final rawEventData = (action as dynamic).eventData;
+    dynamic readValue(String key) {
+      if (rawEventData is! Map) return null;
+      try {
+        return rawEventData[key];
+      } catch (_) {
+        return null;
+      }
     }
+
+    try {
+      if (isCleanup) {
+        final eventData = CleanupEventData(
+          type: EventDataType.fromJson(readValue('type')) ?? EventDataType.cleanup,
+          name: readValue('name')?.toString() ?? '',
+          location: readValue('location')?.toString() ?? '',
+          smallBags: readValue('small_bags') is int
+              ? readValue('small_bags') as int
+              : int.tryParse('${readValue('small_bags') ?? ''}'),
+          largeBags: readValue('large_bags') is int
+              ? readValue('large_bags') as int
+              : int.tryParse('${readValue('large_bags') ?? ''}'),
+          pounds: readValue('pounds') != null
+              ? num.tryParse('${readValue('pounds')}')
+              : null,
+          imageUrl: readValue('image_url')?.toString(),
+        );
+        await showDialog(
+          context: context,
+          builder: (c) => CleanupEventInfoDialog(
+            action: action,
+            eventData: eventData,
+            campaignId: widget.campaign.id,
+          ),
+        );
+      } else {
+        final eventData = TrashReportEventData(
+          type:
+              EventDataType.fromJson(readValue('type')) ??
+              EventDataType.trashReport,
+          location: readValue('location')?.toString() ?? '',
+          imageUrl: readValue('image_url')?.toString(),
+        );
+        await showDialog(
+          context: context,
+          builder: (c) => TrashReportEventInfoDialog(
+            action: action,
+            eventData: eventData,
+            campaignId: widget.campaign.id,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isInfoDialogOpen = false);
+    }
+  }
+
+  Future<void> _showPlantingInfoDialog(
+    BuildContext context,
+    ActionSchema action,
+  ) async {
+    if (action.eventData == null) return;
+    if (mounted) setState(() => _isInfoDialogOpen = true);
+    await showDialog<void>(
+      context: context,
+      builder: (_) => PlantingEventInfoDialog(action: action),
+    );
     if (mounted) setState(() => _isInfoDialogOpen = false);
   }
 
@@ -802,7 +864,11 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
           Marker(
             markerId: MarkerId('new_${_mode}_pin'),
             position: position,
-            icon: _mode == 'cleanup' ? _iconForCleanup() : _iconForTrash(),
+            icon: _mode == 'cleanup'
+                ? _iconForCleanup()
+                : _mode == 'planting'
+                ? _iconForPlanting()
+                : _iconForTrash(),
           ),
         );
         _pinDropped = true;
@@ -873,6 +939,47 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         lat: droppedPosition.latitude,
         lng: droppedPosition.longitude,
         eventData: result.eventData.toJson(),
+        date: DateTime.now(),
+      );
+      if (created != null && result.photos.isNotEmpty && mounted) {
+        try {
+          final photosService = PhotosService();
+          final actionsService = ActionsService();
+          final uploaded = await photosService.uploadSubmissionPhotosBatch(
+            created.id,
+            result.photos,
+          );
+          if (uploaded != null && uploaded.isNotEmpty) {
+            await actionsService.updateActionPhotos(created.id, uploaded);
+          }
+        } catch (_) {
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(CustomSnackBar.error('Photo upload failed'));
+          }
+        }
+      }
+      if (created != null) {
+        _createdActionPositionOverride[created.id] = droppedPosition;
+      }
+    } else if (_droppedType == 'planting') {
+      final userName = ref.read(currentUserProvider).value?.name;
+      if (mounted) setState(() => _isAddEventDialogOpen = true);
+      final result = await showDialog<PlantingEventDialogResult>(
+        context: context,
+        builder: (c) => PlantingEventDialog(
+          position: droppedPosition,
+          initialName: userName,
+        ),
+      );
+      if (mounted) setState(() => _isAddEventDialogOpen = false);
+      if (result == null || !mounted) return;
+      final created = await _createAction(
+        actionType: ActionTypeValuesEnum.mapSubmission.value,
+        lat: droppedPosition.latitude,
+        lng: droppedPosition.longitude,
+        eventData: result.eventData,
         date: DateTime.now(),
       );
       if (created != null && result.photos.isNotEmpty && mounted) {
@@ -1030,19 +1137,20 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
 
 /// Mode button using Container + DecorationImage so asset images show on web.
 class _MapModeButton extends StatelessWidget {
-  final String imageAsset;
-  final String label;
-  final String tooltip;
-  final bool isActive;
-  final VoidCallback onTap;
-
   const _MapModeButton({
-    required this.imageAsset,
+    this.imageAsset,
     required this.label,
     required this.tooltip,
     required this.isActive,
     required this.onTap,
   });
+
+  final String? imageAsset;
+
+  final String label;
+  final String tooltip;
+  final bool isActive;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1060,10 +1168,15 @@ class _MapModeButton extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(imageAsset),
-                    fit: BoxFit.cover,
-                  ),
+                  color: imageAsset == null
+                      ? theme.colorScheme.surfaceContainerHighest
+                      : null,
+                  image: imageAsset == null
+                      ? null
+                      : DecorationImage(
+                          image: AssetImage(imageAsset!),
+                          fit: BoxFit.cover,
+                        ),
                   borderRadius: const BorderRadius.all(Radius.circular(24)),
                   border: isLight
                       ? (isActive
@@ -1092,6 +1205,14 @@ class _MapModeButton extends StatelessWidget {
                         ]
                       : null,
                 ),
+                child: imageAsset == null
+                    ? Icon(
+                        Icons.add_location_alt,
+                        color: isActive
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.onSurfaceVariant,
+                      )
+                    : null,
               ),
               const SizedBox(height: 4),
               Text(

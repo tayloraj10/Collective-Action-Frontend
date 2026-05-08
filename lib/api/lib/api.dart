@@ -103,12 +103,14 @@ part 'model/status_schema.dart';
 part 'model/status_type_enum.dart';
 part 'model/status_values_enum.dart';
 part 'model/trash_report_event_data.dart';
+part 'model/tree_planting_event_data.dart';
 part 'model/user_create.dart';
 part 'model/user_photo_update.dart';
 part 'model/user_schema.dart';
 part 'model/user_stats_schema.dart';
 part 'model/user_type.dart';
 part 'model/user_update.dart';
+part 'model/wildflower_planting_event_data.dart';
 part 'model/zip_code_submission_event_data.dart';
 
 

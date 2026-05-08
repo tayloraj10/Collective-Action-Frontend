@@ -1,3 +1,4 @@
+import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/components/stat.dart';
 import 'package:collective_action_frontend/providers/stats_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
@@ -20,19 +21,38 @@ const Color _kYourCardDark = Color(0xFF1A2D3D);
   final isDark = Theme.of(context).brightness == Brightness.dark;
   return isDark
       ? (_kOverallTitleDark, _kOverallCardDark, _kYourTitleDark, _kYourCardDark)
-      : (_kOverallTitleLight, _kOverallCardLight, _kYourTitleLight, _kYourCardLight);
+      : (
+          _kOverallTitleLight,
+          _kOverallCardLight,
+          _kYourTitleLight,
+          _kYourCardLight,
+        );
 }
 
 /// Dialog showing overall stats and your stats (when logged in).
 class StatsDialog extends ConsumerWidget {
-  const StatsDialog({super.key, required this.campaignId});
+  const StatsDialog({super.key, required this.campaignId, this.campaignType});
 
   final String campaignId;
+  final MapCampaignTypeEnum? campaignType;
 
-  static Future<void> show(BuildContext context, String campaignId) {
+  const StatsDialog.forCampaign({
+    super.key,
+    required this.campaignId,
+    this.campaignType,
+  });
+
+  static Future<void> show(
+    BuildContext context,
+    String campaignId, {
+    MapCampaignTypeEnum? campaignType,
+  }) {
     return showDialog<void>(
       context: context,
-      builder: (context) => StatsDialog(campaignId: campaignId),
+      builder: (context) => StatsDialog.forCampaign(
+        campaignId: campaignId,
+        campaignType: campaignType,
+      ),
     );
   }
 
@@ -41,11 +61,16 @@ class StatsDialog extends ConsumerWidget {
     final overall = ref.watch(overallMapStatsProvider(campaignId));
     final your = ref.watch(yourMapStatsProvider(campaignId));
     final isLoggedIn = ref.watch(currentUserProvider).value != null;
-    final (overallTitle, overallCard, yourTitle, yourCard) = _statsColors(context);
+    final isPlanting = campaignType == MapCampaignTypeEnum.plantingMap;
+    final (overallTitle, overallCard, yourTitle, yourCard) = _statsColors(
+      context,
+    );
 
     return AlertDialog(
       insetPadding: const EdgeInsets.fromLTRB(40, 56, 40, 24),
-      title: const Text('Stats for Cleanups & Trash Reports'),
+      title: Text(
+        isPlanting ? 'Planting Stats' : 'Stats for Cleanups & Trash Reports',
+      ),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -53,34 +78,56 @@ class StatsDialog extends ConsumerWidget {
           children: [
             _SectionTitle(title: 'Overall Stats', color: overallTitle),
             const SizedBox(height: 6),
-            _StatsCard(
-              stats: overall,
-              cardColor: overallCard,
-              iconColor: overallTitle,
-              labels: const (
-                cleanups: 'Total Cleanups:',
-                trashReports: 'Total Trash Reports:',
-                smallBags: 'Small Bags:',
-                largeBags: 'Large Bags:',
-                weight: 'Total Weight:',
-              ),
-            ),
+            isPlanting
+                ? _PlantingStatsCard(
+                    stats: overall,
+                    cardColor: overallCard,
+                    iconColor: overallTitle,
+                    labels: const (
+                      trees: 'Trees:',
+                      wildflowers: 'Wildflowers:',
+                      total: 'Total Plantings:',
+                    ),
+                  )
+                : _StatsCard(
+                    stats: overall,
+                    cardColor: overallCard,
+                    iconColor: overallTitle,
+                    labels: const (
+                      cleanups: 'Total Cleanups:',
+                      trashReports: 'Total Trash Reports:',
+                      smallBags: 'Small Bags:',
+                      largeBags: 'Large Bags:',
+                      weight: 'Total Weight:',
+                    ),
+                  ),
             if (isLoggedIn) ...[
               const SizedBox(height: 20),
               _SectionTitle(title: 'Your Stats', color: yourTitle),
               const SizedBox(height: 6),
-              _StatsCard(
-                stats: your,
-                cardColor: yourCard,
-                iconColor: yourTitle,
-                labels: const (
-                  cleanups: 'Your Cleanups:',
-                  trashReports: 'Your Trash Reports:',
-                  smallBags: 'Your Small Bags:',
-                  largeBags: 'Your Large Bags:',
-                  weight: 'Your Weight:',
-                ),
-              ),
+              isPlanting
+                  ? _PlantingStatsCard(
+                      stats: your,
+                      cardColor: yourCard,
+                      iconColor: yourTitle,
+                      labels: const (
+                        trees: 'Your Trees:',
+                        wildflowers: 'Your Wildflowers:',
+                        total: 'Your Plantings:',
+                      ),
+                    )
+                  : _StatsCard(
+                      stats: your,
+                      cardColor: yourCard,
+                      iconColor: yourTitle,
+                      labels: const (
+                        cleanups: 'Your Cleanups:',
+                        trashReports: 'Your Trash Reports:',
+                        smallBags: 'Your Small Bags:',
+                        largeBags: 'Your Large Bags:',
+                        weight: 'Your Weight:',
+                      ),
+                    ),
             ],
           ],
         ),
@@ -106,9 +153,9 @@ class _SectionTitle extends StatelessWidget {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
+        fontWeight: FontWeight.bold,
+        color: color,
+      ),
     );
   }
 }
@@ -130,7 +177,8 @@ class _StatsCard extends StatelessWidget {
     String smallBags,
     String largeBags,
     String weight,
-  }) labels;
+  })
+  labels;
 
   @override
   Widget build(BuildContext context) {
@@ -175,6 +223,57 @@ class _StatsCard extends StatelessWidget {
             icon: Icons.scale_outlined,
             label: labels.weight,
             value: '${stats.totalPounds}',
+            color: iconColor,
+            showDivider: false,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PlantingStatsCard extends StatelessWidget {
+  const _PlantingStatsCard({
+    required this.stats,
+    required this.cardColor,
+    required this.iconColor,
+    required this.labels,
+  });
+
+  final MapSubmissionStats stats;
+  final Color cardColor;
+  final Color iconColor;
+  final ({String trees, String wildflowers, String total}) labels;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Stat(
+            icon: Icons.park,
+            label: labels.trees,
+            value: '${stats.treePlantingCount}',
+            color: iconColor,
+            showDivider: true,
+          ),
+          Stat(
+            icon: Icons.local_florist,
+            label: labels.wildflowers,
+            value: '${stats.wildflowerPlantingCount}',
+            color: iconColor,
+            showDivider: true,
+          ),
+          Stat(
+            icon: Icons.eco_outlined,
+            label: labels.total,
+            value: '${stats.totalPlantings}',
             color: iconColor,
             showDivider: false,
           ),

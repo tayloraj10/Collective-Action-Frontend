@@ -3506,6 +3506,50 @@
                 }
             }
         },
+        "/schemas/event-data/tree_planting": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "TreePlantingEventData schema",
+                "description": "Schema for event_data when action_type is 'tree_planting'. Exposed for OpenAPI/codegen.",
+                "operationId": "get_tree_planting_event_data_schema_schemas_event_data_tree_planting_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TreePlantingEventData"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/schemas/event-data/wildflower_planting": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "WildflowerPlantingEventData schema",
+                "description": "Schema for event_data when action_type is 'wildflower_planting'. Exposed for OpenAPI/codegen.",
+                "operationId": "get_wildflower_planting_event_data_schema_schemas_event_data_wildflower_planting_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WildflowerPlantingEventData"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/schemas/event-data/base": {
             "get": {
                 "tags": [
@@ -5408,7 +5452,9 @@
                     "Cleanup",
                     "Trash Report",
                     "Cleanup Route",
-                    "Zip Code Submission"
+                    "Zip Code Submission",
+                    "Tree Planting",
+                    "Wildflower Planting"
                 ],
                 "title": "EventDataType",
                 "description": "Type discriminator for event_data payloads."
@@ -5964,6 +6010,21 @@
                         "type": "number",
                         "title": "Total Pounds",
                         "default": 0
+                    },
+                    "tree_planting_count": {
+                        "type": "integer",
+                        "title": "Tree Planting Count",
+                        "default": 0
+                    },
+                    "wildflower_planting_count": {
+                        "type": "integer",
+                        "title": "Wildflower Planting Count",
+                        "default": 0
+                    },
+                    "total_plantings": {
+                        "type": "integer",
+                        "title": "Total Plantings",
+                        "default": 0
                     }
                 },
                 "type": "object",
@@ -5974,7 +6035,8 @@
                 "type": "string",
                 "enum": [
                     "Cleanup Map",
-                    "Zip Code Map"
+                    "Zip Code Map",
+                    "Planting Map"
                 ],
                 "title": "MapCampaignTypeEnum"
             },
@@ -6811,6 +6873,57 @@
                 "type": "object",
                 "title": "TrashReportEventData"
             },
+            "TreePlantingEventData": {
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/EventDataType",
+                        "default": "Tree Planting"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "default": ""
+                    },
+                    "location": {
+                        "type": "string",
+                        "title": "Location",
+                        "default": ""
+                    },
+                    "planting_type": {
+                        "type": "string",
+                        "title": "Planting Type",
+                        "default": "tree"
+                    },
+                    "species": {
+                        "type": "string",
+                        "title": "Species",
+                        "default": ""
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "title": "Quantity",
+                        "default": 1
+                    },
+                    "notes": {
+                        "type": "string",
+                        "title": "Notes",
+                        "default": ""
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    }
+                },
+                "type": "object",
+                "title": "TreePlantingEventData"
+            },
             "UserCreate": {
                 "properties": {
                     "email": {
@@ -7104,6 +7217,21 @@
                         "title": "Total Pounds",
                         "default": 0
                     },
+                    "tree_planting_count": {
+                        "type": "integer",
+                        "title": "Tree Planting Count",
+                        "default": 0
+                    },
+                    "wildflower_planting_count": {
+                        "type": "integer",
+                        "title": "Wildflower Planting Count",
+                        "default": 0
+                    },
+                    "total_plantings": {
+                        "type": "integer",
+                        "title": "Total Plantings",
+                        "default": 0
+                    },
                     "initiative_action_count": {
                         "type": "integer",
                         "title": "Initiative Action Count",
@@ -7292,6 +7420,57 @@
                 "type": "object",
                 "title": "UserUpdate",
                 "description": "Schema for PATCH updates. Excludes photo_url, firebase_user_id, is_active."
+            },
+            "WildflowerPlantingEventData": {
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/EventDataType",
+                        "default": "Wildflower Planting"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "default": ""
+                    },
+                    "location": {
+                        "type": "string",
+                        "title": "Location",
+                        "default": ""
+                    },
+                    "planting_type": {
+                        "type": "string",
+                        "title": "Planting Type",
+                        "default": "wildflower"
+                    },
+                    "species": {
+                        "type": "string",
+                        "title": "Species",
+                        "default": ""
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "title": "Quantity",
+                        "default": 1
+                    },
+                    "notes": {
+                        "type": "string",
+                        "title": "Notes",
+                        "default": ""
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    }
+                },
+                "type": "object",
+                "title": "WildflowerPlantingEventData"
             },
             "ZipCodeSubmissionEventData": {
                 "properties": {

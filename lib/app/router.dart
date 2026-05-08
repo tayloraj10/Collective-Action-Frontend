@@ -11,6 +11,7 @@ import 'package:collective_action_frontend/screens/login/login_screen.dart';
 import 'package:collective_action_frontend/screens/health_check_screen.dart';
 import 'package:collective_action_frontend/screens/user/settings_page.dart';
 import 'package:collective_action_frontend/screens/user/profile_page.dart';
+import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -54,7 +55,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: 'cleanup',
-            builder: (context, state) => const MapScreen(),
+            builder: (context, state) => const MapScreen(
+              initialCampaignType: MapCampaignTypeEnum.cleanupMap,
+            ),
+          ),
+          GoRoute(
+            path: 'planting',
+            builder: (context, state) => const MapScreen(
+              initialCampaignType: MapCampaignTypeEnum.plantingMap,
+            ),
           ),
         ],
       ),

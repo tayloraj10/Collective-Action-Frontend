@@ -16,7 +16,7 @@ import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'photo_viewer_dialog.dart';
 
 /// Filter for the submissions list.
-enum _SubmissionFilter { all, cleanups, trashReports }
+enum _SubmissionFilter { all, cleanups, trashReports, plantings }
 
 /// Campaign info panel: campaign details + your submissions with
 /// filter (All / Cleanups / Trash reports), view full event data, delete, and locate on map.
@@ -79,6 +79,16 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
       if (location != null && location.isNotEmpty) return location;
       return 'Trash Report';
     }
+    if (type == EventDataType.treePlanting.value ||
+        type == EventDataType.wildflowerPlanting.value) {
+      final species = eventData['species']?.toString().trim();
+      final location = eventData['location']?.toString().trim();
+      if (species != null && species.isNotEmpty) return species;
+      if (location != null && location.isNotEmpty) return location;
+      return type == EventDataType.treePlanting.value
+          ? 'Tree Planting'
+          : 'Wildflower Planting';
+    }
     return type ?? 'Map Submission';
   }
 
@@ -86,6 +96,11 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
       a.eventData?['type']?.toString() == EventDataType.cleanup.value;
   static bool _isTrashReport(ActionSchema a) =>
       a.eventData?['type']?.toString() == EventDataType.trashReport.value;
+  static bool _isPlanting(ActionSchema a) {
+    final type = a.eventData?['type']?.toString();
+    return type == EventDataType.treePlanting.value ||
+        type == EventDataType.wildflowerPlanting.value;
+  }
 
   void _locateOnMap(ActionSchema action) {
     final lat = action.latitude;
@@ -136,6 +151,8 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
         return mine.where(_isCleanup).toList();
       case _SubmissionFilter.trashReports:
         return mine.where(_isTrashReport).toList();
+      case _SubmissionFilter.plantings:
+        return mine.where(_isPlanting).toList();
       case _SubmissionFilter.all:
         return mine;
     }
@@ -235,7 +252,11 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
   Widget _buildList(BuildContext context) {
     final theme = Theme.of(context);
     final currentUser = ref.watch(currentUserProvider).value;
-    final campaign = widget.campaigns.isNotEmpty ? widget.campaigns.first : null;
+    final campaign = widget.campaigns.isNotEmpty
+        ? widget.campaigns.first
+        : null;
+    final isPlantingCampaign =
+        campaign?.mapCampaignType == MapCampaignTypeEnum.plantingMap.value;
     final eventsAsync = campaign != null
         ? ref.watch(mapEventsForCampaignProvider(campaign.id))
         : const AsyncValue<List<ActionSchema>>.data([]);
@@ -274,31 +295,45 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
                 )
                 .toList()
               ..sort((a, b) => b.date.compareTo(a.date));
-        final list = _filtered(mine);
+        final selectedFilter =
+            isPlantingCampaign &&
+                _filter != _SubmissionFilter.all &&
+                _filter != _SubmissionFilter.plantings
+            ? _SubmissionFilter.all
+            : _filter;
+        final list = selectedFilter == _filter ? _filtered(mine) : mine;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
               child: SegmentedButton<_SubmissionFilter>(
-                segments: const [
-                  ButtonSegment(
+                segments: [
+                  const ButtonSegment(
                     value: _SubmissionFilter.all,
                     label: Text('All'),
                     icon: Icon(Icons.list, size: 18),
                   ),
-                  ButtonSegment(
-                    value: _SubmissionFilter.cleanups,
-                    label: Text('Cleanups'),
-                    icon: Icon(Icons.cleaning_services, size: 18),
-                  ),
-                  ButtonSegment(
-                    value: _SubmissionFilter.trashReports,
-                    label: Text('Trash Reports'),
-                    icon: Icon(Icons.delete_outline, size: 18),
-                  ),
+                  if (isPlantingCampaign)
+                    const ButtonSegment(
+                      value: _SubmissionFilter.plantings,
+                      label: Text('Plantings'),
+                      icon: Icon(Icons.eco_outlined, size: 18),
+                    )
+                  else ...[
+                    const ButtonSegment(
+                      value: _SubmissionFilter.cleanups,
+                      label: Text('Cleanups'),
+                      icon: Icon(Icons.cleaning_services, size: 18),
+                    ),
+                    const ButtonSegment(
+                      value: _SubmissionFilter.trashReports,
+                      label: Text('Trash Reports'),
+                      icon: Icon(Icons.delete_outline, size: 18),
+                    ),
+                  ],
                 ],
-                selected: {_filter},
+                selected: {selectedFilter},
                 onSelectionChanged: (s) => setState(() => _filter = s.first),
                 style: ButtonStyle(
                   padding: WidgetStateProperty.all(
@@ -328,6 +363,7 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
                   itemBuilder: (context, index) {
                     final action = list[index];
                     final isCleanup = _isCleanup(action);
+                    final isPlanting = _isPlanting(action);
                     return Card(
                       margin: const EdgeInsets.only(bottom: 10),
                       clipBehavior: Clip.antiAlias,
@@ -338,14 +374,20 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
                           child: Row(
                             children: [
                               CircleAvatar(
-                                backgroundColor: isCleanup
+                                backgroundColor: isPlanting
+                                    ? Colors.green.shade100
+                                    : isCleanup
                                     ? Colors.green.shade100
                                     : Colors.orange.shade100,
                                 child: Icon(
-                                  isCleanup
+                                  isPlanting
+                                      ? Icons.eco_outlined
+                                      : isCleanup
                                       ? Icons.cleaning_services
                                       : Icons.delete_outline,
-                                  color: isCleanup
+                                  color: isPlanting
+                                      ? Colors.green.shade800
+                                      : isCleanup
                                       ? Colors.green.shade800
                                       : Colors.orange.shade800,
                                   size: 22,
@@ -409,6 +451,9 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
     final eventData = action.eventData ?? {};
     final type = eventData['type']?.toString();
     final isCleanup = type == EventDataType.cleanup.value;
+    final isPlanting =
+        type == EventDataType.treePlanting.value ||
+        type == EventDataType.wildflowerPlanting.value;
 
     return SingleChildScrollView(
       controller: widget.scrollController,
@@ -427,7 +472,11 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  isCleanup ? 'Cleanup details' : 'Trash report details',
+                  isPlanting
+                      ? 'Planting details'
+                      : isCleanup
+                      ? 'Cleanup details'
+                      : 'Trash report details',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -477,6 +526,26 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
                 value: _formatDate(action.date),
                 icon: Icons.calendar_today_outlined,
               ),
+              if (isPlanting && eventData['species'] != null)
+                _DetailRow(
+                  label: 'Species',
+                  value: eventData['species'].toString(),
+                  icon: Icons.eco_outlined,
+                ),
+              if (isPlanting)
+                _DetailRow(
+                  label: 'Quantity',
+                  value: '${eventData['quantity'] ?? 1}',
+                  icon: Icons.format_list_numbered,
+                ),
+              if (isPlanting &&
+                  eventData['notes'] != null &&
+                  eventData['notes'].toString().trim().isNotEmpty)
+                _DetailRow(
+                  label: 'Notes',
+                  value: eventData['notes'].toString(),
+                  icon: Icons.notes_outlined,
+                ),
             ],
           ),
           if (isCleanup &&

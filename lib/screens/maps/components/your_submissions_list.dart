@@ -54,6 +54,17 @@ class YourSubmissionsList extends ConsumerWidget {
       return 'Trash Report';
     }
     if (type == EventDataType.cleanupRoute.value) return 'Cleanup Route';
+    if (type == EventDataType.treePlanting.value ||
+        type == EventDataType.wildflowerPlanting.value) {
+      final species = eventData['species']?.toString().trim();
+      final location = eventData['location']?.toString().trim();
+      final prefix = type == EventDataType.treePlanting.value
+          ? 'Tree Planting'
+          : 'Wildflower Planting';
+      if (species != null && species.isNotEmpty) return '$prefix: $species';
+      if (location != null && location.isNotEmpty) return '$prefix: $location';
+      return prefix;
+    }
     return type ?? 'Map Submission';
   }
 
@@ -63,6 +74,10 @@ class YourSubmissionsList extends ConsumerWidget {
     final type = eventData['type']?.toString();
     if (type == EventDataType.cleanup.value) return Icons.cleaning_services;
     if (type == EventDataType.trashReport.value) return Icons.delete_outline;
+    if (type == EventDataType.treePlanting.value) return Icons.park;
+    if (type == EventDataType.wildflowerPlanting.value) {
+      return Icons.local_florist;
+    }
     return Icons.place;
   }
 

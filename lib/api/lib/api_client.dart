@@ -296,6 +296,8 @@ class ApiClient {
           return StatusValuesEnumTypeTransformer().decode(value);
         case 'TrashReportEventData':
           return TrashReportEventData.fromJson(value);
+        case 'TreePlantingEventData':
+          return TreePlantingEventData.fromJson(value);
         case 'UserCreate':
           return UserCreate.fromJson(value);
         case 'UserPhotoUpdate':
@@ -308,6 +310,8 @@ class ApiClient {
           return UserTypeTypeTransformer().decode(value);
         case 'UserUpdate':
           return UserUpdate.fromJson(value);
+        case 'WildflowerPlantingEventData':
+          return WildflowerPlantingEventData.fromJson(value);
         case 'ZipCodeSubmissionEventData':
           return ZipCodeSubmissionEventData.fromJson(value);
         default:

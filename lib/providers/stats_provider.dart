@@ -12,6 +12,9 @@ class MapSubmissionStats {
     required this.totalLargeBags,
     required this.totalBags,
     required this.totalPounds,
+    required this.treePlantingCount,
+    required this.wildflowerPlantingCount,
+    required this.totalPlantings,
   });
 
   final int cleanupCount;
@@ -20,6 +23,9 @@ class MapSubmissionStats {
   final int totalLargeBags;
   final int totalBags;
   final int totalPounds;
+  final int treePlantingCount;
+  final int wildflowerPlantingCount;
+  final int totalPlantings;
 
   static const MapSubmissionStats empty = MapSubmissionStats(
     cleanupCount: 0,
@@ -28,6 +34,9 @@ class MapSubmissionStats {
     totalLargeBags: 0,
     totalBags: 0,
     totalPounds: 0,
+    treePlantingCount: 0,
+    wildflowerPlantingCount: 0,
+    totalPlantings: 0,
   );
 }
 
@@ -41,6 +50,8 @@ MapSubmissionStats computeMapSubmissionStats(
   int totalSmallBags = 0;
   int totalLargeBags = 0;
   int totalPounds = 0;
+  int treePlantingCount = 0;
+  int wildflowerPlantingCount = 0;
 
   for (final a in actions) {
     if (a.actionType != ActionTypeValuesEnum.mapSubmission.value) continue;
@@ -68,6 +79,10 @@ MapSubmissionStats computeMapSubmissionStats(
       if (p != null) totalPounds += num.tryParse('$p')?.round() ?? 0;
     } else if (type == EventDataType.trashReport.value) {
       trashReportCount++;
+    } else if (type == EventDataType.treePlanting.value) {
+      treePlantingCount += _quantityFromEventData(eventData);
+    } else if (type == EventDataType.wildflowerPlanting.value) {
+      wildflowerPlantingCount += _quantityFromEventData(eventData);
     }
   }
 
@@ -78,12 +93,24 @@ MapSubmissionStats computeMapSubmissionStats(
     totalLargeBags: totalLargeBags,
     totalBags: totalSmallBags + totalLargeBags,
     totalPounds: totalPounds,
+    treePlantingCount: treePlantingCount,
+    wildflowerPlantingCount: wildflowerPlantingCount,
+    totalPlantings: treePlantingCount + wildflowerPlantingCount,
   );
 }
 
+int _quantityFromEventData(Map<String, Object> eventData) {
+  final quantity = eventData['quantity'];
+  if (quantity is int) return quantity;
+  if (quantity != null) return num.tryParse('$quantity')?.toInt() ?? 1;
+  return 1;
+}
+
 /// Overall stats (all map submissions for a campaign).
-final overallMapStatsProvider =
-    Provider.family<MapSubmissionStats, String>((ref, campaignId) {
+final overallMapStatsProvider = Provider.family<MapSubmissionStats, String>((
+  ref,
+  campaignId,
+) {
   final eventsAsync = ref.watch(mapEventsForCampaignProvider(campaignId));
   return eventsAsync.when(
     data: (actions) => computeMapSubmissionStats(actions),
@@ -93,8 +120,10 @@ final overallMapStatsProvider =
 });
 
 /// Your stats (map submissions by the current user for a campaign). Empty when not logged in.
-final yourMapStatsProvider =
-    Provider.family<MapSubmissionStats, String>((ref, campaignId) {
+final yourMapStatsProvider = Provider.family<MapSubmissionStats, String>((
+  ref,
+  campaignId,
+) {
   final eventsAsync = ref.watch(mapEventsForCampaignProvider(campaignId));
   final userAsync = ref.watch(currentUserProvider);
   final userId = userAsync.value?.id;
@@ -121,97 +150,169 @@ List<LeaderboardEntry> _top10(List<LeaderboardEntry> entries) =>
 /// Leaderboard by number of cleanups per user (top 10).
 final leaderboardCleanupsProvider =
     Provider.family<List<LeaderboardEntry>, String>((ref, campaignId) {
-  final eventsAsync = ref.watch(mapEventsForCampaignProvider(campaignId));
-  return eventsAsync.when(
-    data: (actions) {
-      final countByUser = <String, int>{};
-      for (final a in actions) {
-        if (a.actionType != ActionTypeValuesEnum.mapSubmission.value) continue;
-        final eventData = a.eventData;
-        if (eventData == null || eventData.isEmpty) continue;
-        if (eventData['type'] != EventDataType.cleanup.value) continue;
-        final userId = a.userId ?? '';
-        if (userId.isEmpty) continue;
-        countByUser[userId] = (countByUser[userId] ?? 0) + 1;
-      }
-      final list =
-          countByUser.entries
-              .map((e) => LeaderboardEntry(userId: e.key, value: e.value))
-              .where((e) => e.value > 0)
-              .toList()
-            ..sort((a, b) => b.value.compareTo(a.value));
-      return _top10(list);
-    },
-    loading: () => [],
-    error: (_, _) => [],
-  );
-});
+      final eventsAsync = ref.watch(mapEventsForCampaignProvider(campaignId));
+      return eventsAsync.when(
+        data: (actions) {
+          final countByUser = <String, int>{};
+          for (final a in actions) {
+            if (a.actionType != ActionTypeValuesEnum.mapSubmission.value) {
+              continue;
+            }
+            final eventData = a.eventData;
+            if (eventData == null || eventData.isEmpty) continue;
+            if (eventData['type'] != EventDataType.cleanup.value) continue;
+            final userId = a.userId ?? '';
+            if (userId.isEmpty) continue;
+            countByUser[userId] = (countByUser[userId] ?? 0) + 1;
+          }
+          final list =
+              countByUser.entries
+                  .map((e) => LeaderboardEntry(userId: e.key, value: e.value))
+                  .where((e) => e.value > 0)
+                  .toList()
+                ..sort((a, b) => b.value.compareTo(a.value));
+          return _top10(list);
+        },
+        loading: () => [],
+        error: (_, _) => [],
+      );
+    });
 
 /// Leaderboard by total bags (small + large) per user (top 10).
-final leaderboardBagsProvider =
-    Provider.family<List<LeaderboardEntry>, String>((ref, campaignId) {
-  final eventsAsync = ref.watch(mapEventsForCampaignProvider(campaignId));
-  return eventsAsync.when(
-    data: (actions) {
-      final bagsByUser = <String, int>{};
-      for (final a in actions) {
-        if (a.actionType != ActionTypeValuesEnum.mapSubmission.value) continue;
-        final eventData = a.eventData;
-        if (eventData == null || eventData.isEmpty) continue;
-        if (eventData['type'] != EventDataType.cleanup.value) continue;
-        final userId = a.userId ?? '';
-        if (userId.isEmpty) continue;
-        final small = eventData['small_bags'];
-        final large = eventData['large_bags'];
-        final s = small is int
-            ? small
-            : (small != null ? num.tryParse('$small')?.toInt() ?? 0 : 0);
-        final l = large is int
-            ? large
-            : (large != null ? num.tryParse('$large')?.toInt() ?? 0 : 0);
-        bagsByUser[userId] = (bagsByUser[userId] ?? 0) + s + l;
-      }
-      final list =
-          bagsByUser.entries
-              .map((e) => LeaderboardEntry(userId: e.key, value: e.value))
-              .where((e) => e.value > 0)
-              .toList()
-            ..sort((a, b) => b.value.compareTo(a.value));
-      return _top10(list);
-    },
-    loading: () => [],
-    error: (_, _) => [],
-  );
-});
+final leaderboardBagsProvider = Provider.family<List<LeaderboardEntry>, String>(
+  (ref, campaignId) {
+    final eventsAsync = ref.watch(mapEventsForCampaignProvider(campaignId));
+    return eventsAsync.when(
+      data: (actions) {
+        final bagsByUser = <String, int>{};
+        for (final a in actions) {
+          if (a.actionType != ActionTypeValuesEnum.mapSubmission.value) {
+            continue;
+          }
+          final eventData = a.eventData;
+          if (eventData == null || eventData.isEmpty) continue;
+          if (eventData['type'] != EventDataType.cleanup.value) continue;
+          final userId = a.userId ?? '';
+          if (userId.isEmpty) continue;
+          final small = eventData['small_bags'];
+          final large = eventData['large_bags'];
+          final s = small is int
+              ? small
+              : (small != null ? num.tryParse('$small')?.toInt() ?? 0 : 0);
+          final l = large is int
+              ? large
+              : (large != null ? num.tryParse('$large')?.toInt() ?? 0 : 0);
+          bagsByUser[userId] = (bagsByUser[userId] ?? 0) + s + l;
+        }
+        final list =
+            bagsByUser.entries
+                .map((e) => LeaderboardEntry(userId: e.key, value: e.value))
+                .where((e) => e.value > 0)
+                .toList()
+              ..sort((a, b) => b.value.compareTo(a.value));
+        return _top10(list);
+      },
+      loading: () => [],
+      error: (_, _) => [],
+    );
+  },
+);
 
 /// Leaderboard by pounds cleaned per user (top 10).
 final leaderboardPoundsProvider =
     Provider.family<List<LeaderboardEntry>, String>((ref, campaignId) {
-  final eventsAsync = ref.watch(mapEventsForCampaignProvider(campaignId));
-  return eventsAsync.when(
-    data: (actions) {
-      final poundsByUser = <String, int>{};
-      for (final a in actions) {
-        if (a.actionType != ActionTypeValuesEnum.mapSubmission.value) continue;
-        final eventData = a.eventData;
-        if (eventData == null || eventData.isEmpty) continue;
-        if (eventData['type'] != EventDataType.cleanup.value) continue;
-        final userId = a.userId ?? '';
-        if (userId.isEmpty) continue;
-        final p = eventData['pounds'];
-        if (p == null) continue;
-        final pounds = num.tryParse('$p')?.round() ?? 0;
-        if (pounds <= 0) continue;
-        poundsByUser[userId] = (poundsByUser[userId] ?? 0) + pounds;
-      }
-      final list =
-          poundsByUser.entries
-              .map((e) => LeaderboardEntry(userId: e.key, value: e.value))
-              .toList()
-            ..sort((a, b) => b.value.compareTo(a.value));
-      return _top10(list);
-    },
-    loading: () => [],
-    error: (_, _) => [],
-  );
-});
+      final eventsAsync = ref.watch(mapEventsForCampaignProvider(campaignId));
+      return eventsAsync.when(
+        data: (actions) {
+          final poundsByUser = <String, int>{};
+          for (final a in actions) {
+            if (a.actionType != ActionTypeValuesEnum.mapSubmission.value) {
+              continue;
+            }
+            final eventData = a.eventData;
+            if (eventData == null || eventData.isEmpty) continue;
+            if (eventData['type'] != EventDataType.cleanup.value) continue;
+            final userId = a.userId ?? '';
+            if (userId.isEmpty) continue;
+            final p = eventData['pounds'];
+            if (p == null) continue;
+            final pounds = num.tryParse('$p')?.round() ?? 0;
+            if (pounds <= 0) continue;
+            poundsByUser[userId] = (poundsByUser[userId] ?? 0) + pounds;
+          }
+          final list =
+              poundsByUser.entries
+                  .map((e) => LeaderboardEntry(userId: e.key, value: e.value))
+                  .toList()
+                ..sort((a, b) => b.value.compareTo(a.value));
+          return _top10(list);
+        },
+        loading: () => [],
+        error: (_, _) => [],
+      );
+    });
+
+List<LeaderboardEntry> _leaderboardByPlantingType(
+  List<ActionSchema> actions,
+  bool Function(String? type) includeType,
+) {
+  final countByUser = <String, int>{};
+  for (final a in actions) {
+    if (a.actionType != ActionTypeValuesEnum.mapSubmission.value) continue;
+    final eventData = a.eventData;
+    if (eventData == null || eventData.isEmpty) continue;
+    if (!includeType(eventData['type']?.toString())) continue;
+    final userId = a.userId ?? '';
+    if (userId.isEmpty) continue;
+    countByUser[userId] =
+        (countByUser[userId] ?? 0) + _quantityFromEventData(eventData);
+  }
+  final list =
+      countByUser.entries
+          .map((e) => LeaderboardEntry(userId: e.key, value: e.value))
+          .where((e) => e.value > 0)
+          .toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
+  return _top10(list);
+}
+
+final leaderboardPlantingsProvider =
+    Provider.family<List<LeaderboardEntry>, String>((ref, campaignId) {
+      final eventsAsync = ref.watch(mapEventsForCampaignProvider(campaignId));
+      return eventsAsync.when(
+        data: (actions) => _leaderboardByPlantingType(
+          actions,
+          (type) =>
+              type == EventDataType.treePlanting.value ||
+              type == EventDataType.wildflowerPlanting.value,
+        ),
+        loading: () => [],
+        error: (_, _) => [],
+      );
+    });
+
+final leaderboardTreePlantingsProvider =
+    Provider.family<List<LeaderboardEntry>, String>((ref, campaignId) {
+      final eventsAsync = ref.watch(mapEventsForCampaignProvider(campaignId));
+      return eventsAsync.when(
+        data: (actions) => _leaderboardByPlantingType(
+          actions,
+          (type) => type == EventDataType.treePlanting.value,
+        ),
+        loading: () => [],
+        error: (_, _) => [],
+      );
+    });
+
+final leaderboardWildflowerPlantingsProvider =
+    Provider.family<List<LeaderboardEntry>, String>((ref, campaignId) {
+      final eventsAsync = ref.watch(mapEventsForCampaignProvider(campaignId));
+      return eventsAsync.when(
+        data: (actions) => _leaderboardByPlantingType(
+          actions,
+          (type) => type == EventDataType.wildflowerPlanting.value,
+        ),
+        loading: () => [],
+        error: (_, _) => [],
+      );
+    });

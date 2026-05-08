@@ -157,6 +157,8 @@ Class | Method | HTTP request | Description
 *SchemasApi* | [**getCleanupRouteEventDataSchemaSchemasEventDataCleanupRouteGet**](doc//SchemasApi.md#getcleanuprouteeventdataschemaschemaseventdatacleanuprouteget) | **GET** /schemas/event-data/cleanup_route | CleanupRouteEventData schema
 *SchemasApi* | [**getEventDataBaseSchemaSchemasEventDataBaseGet**](doc//SchemasApi.md#geteventdatabaseschemaschemaseventdatabaseget) | **GET** /schemas/event-data/base | EventDataBase schema
 *SchemasApi* | [**getTrashReportEventDataSchemaSchemasEventDataTrashReportGet**](doc//SchemasApi.md#gettrashreporteventdataschemaschemaseventdatatrashreportget) | **GET** /schemas/event-data/trash_report | TrashReportEventData schema
+*SchemasApi* | [**getTreePlantingEventDataSchemaSchemasEventDataTreePlantingGet**](doc//SchemasApi.md#gettreeplantingeventdataschemaschemaseventdatatreeplantingget) | **GET** /schemas/event-data/tree_planting | TreePlantingEventData schema
+*SchemasApi* | [**getWildflowerPlantingEventDataSchemaSchemasEventDataWildflowerPlantingGet**](doc//SchemasApi.md#getwildflowerplantingeventdataschemaschemaseventdatawildflowerplantingget) | **GET** /schemas/event-data/wildflower_planting | WildflowerPlantingEventData schema
 *SchemasApi* | [**getZipCodeSubmissionEventDataSchemaSchemasEventDataZipCodeSubmissionGet**](doc//SchemasApi.md#getzipcodesubmissioneventdataschemaschemaseventdatazipcodesubmissionget) | **GET** /schemas/event-data/zip_code_submission | ZipCodeSubmissionEventData schema
 *StatusesApi* | [**createStatusStatusesPost**](doc//StatusesApi.md#createstatusstatusespost) | **POST** /statuses/ | Create Status
 *StatusesApi* | [**deleteStatusStatusesStatusIdDelete**](doc//StatusesApi.md#deletestatusstatusesstatusiddelete) | **DELETE** /statuses/{status_id} | Delete Status
@@ -233,12 +235,14 @@ Class | Method | HTTP request | Description
  - [StatusTypeEnum](doc//StatusTypeEnum.md)
  - [StatusValuesEnum](doc//StatusValuesEnum.md)
  - [TrashReportEventData](doc//TrashReportEventData.md)
+ - [TreePlantingEventData](doc//TreePlantingEventData.md)
  - [UserCreate](doc//UserCreate.md)
  - [UserPhotoUpdate](doc//UserPhotoUpdate.md)
  - [UserSchema](doc//UserSchema.md)
  - [UserStatsSchema](doc//UserStatsSchema.md)
  - [UserType](doc//UserType.md)
  - [UserUpdate](doc//UserUpdate.md)
+ - [WildflowerPlantingEventData](doc//WildflowerPlantingEventData.md)
  - [ZipCodeSubmissionEventData](doc//ZipCodeSubmissionEventData.md)
 
 

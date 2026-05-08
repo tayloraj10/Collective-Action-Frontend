@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 
@@ -25,6 +26,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _showPassword = false;
   bool _isSignUp = false;
   String? _errorMessage;
+
+  String _postLoginRoute() {
+    final from = GoRouterState.of(context).uri.queryParameters['from'];
+    if (from == null || from.isEmpty) return '/';
+
+    final parsed = Uri.tryParse(from);
+    if (parsed == null) return '/';
+
+    final isInternalRoute = !parsed.hasScheme && parsed.host.isEmpty;
+    final normalized = parsed.toString();
+    if (!isInternalRoute || !normalized.startsWith('/')) return '/';
+    if (normalized == '/login' || normalized.startsWith('/login?')) return '/';
+
+    return normalized;
+  }
 
   @override
   void initState() {
@@ -123,7 +139,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           }
         }
         if (mounted) {
-          safeGo(context, '/');
+          safeGo(context, _postLoginRoute());
         }
       }
     } on FirebaseAuthException catch (e) {
@@ -170,7 +186,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         }
       }
       if (mounted) {
-        safeGo(context, '/');
+        safeGo(context, _postLoginRoute());
       }
     } on FirebaseAuthException catch (e) {
       setState(() => _errorMessage = _getFriendlyErrorMessage(e));
