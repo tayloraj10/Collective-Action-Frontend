@@ -1,3 +1,4 @@
+import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/providers/stats_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
@@ -19,7 +20,10 @@ const Color _kLeaderboardCardDark = Color(0xFF3D2E1A);
 enum LeaderboardMetric {
   cleanups('Cleanups', Icons.cleaning_services),
   bags('Total Bags', Icons.local_mall),
-  pounds('Pounds', Icons.scale_outlined);
+  pounds('Pounds', Icons.scale_outlined),
+  plantings('Plantings', Icons.eco_outlined),
+  trees('Trees', Icons.park),
+  wildflowers('Wildflowers', Icons.local_florist);
 
   const LeaderboardMetric(this.label, this.icon);
   final String label;
@@ -28,14 +32,24 @@ enum LeaderboardMetric {
 
 /// Dialog showing leaderboard with switchable metric (cleanups, bags, pounds). Top 10 only.
 class LeaderboardDialog extends ConsumerStatefulWidget {
-  const LeaderboardDialog({super.key, required this.campaignId});
+  const LeaderboardDialog({
+    super.key,
+    required this.campaignId,
+    this.campaignType,
+  });
 
   final String campaignId;
+  final MapCampaignTypeEnum? campaignType;
 
-  static Future<void> show(BuildContext context, String campaignId) {
+  static Future<void> show(
+    BuildContext context,
+    String campaignId, {
+    MapCampaignTypeEnum? campaignType,
+  }) {
     return showDialog<void>(
       context: context,
-      builder: (context) => LeaderboardDialog(campaignId: campaignId),
+      builder: (context) =>
+          LeaderboardDialog(campaignId: campaignId, campaignType: campaignType),
     );
   }
 
@@ -49,13 +63,40 @@ class _LeaderboardDialogState extends ConsumerState<LeaderboardDialog> {
   @override
   Widget build(BuildContext context) {
     final (titleColor, cardColor) = _leaderboardColors(context);
+    final isPlanting = widget.campaignType == MapCampaignTypeEnum.plantingMap;
+    final metrics = isPlanting
+        ? const [
+            LeaderboardMetric.plantings,
+            LeaderboardMetric.trees,
+            LeaderboardMetric.wildflowers,
+          ]
+        : const [
+            LeaderboardMetric.cleanups,
+            LeaderboardMetric.bags,
+            LeaderboardMetric.pounds,
+          ];
+    if (!metrics.contains(_metric)) {
+      _metric = metrics.first;
+    }
     final entries = switch (_metric) {
-      LeaderboardMetric.cleanups =>
-        ref.watch(leaderboardCleanupsProvider(widget.campaignId)),
-      LeaderboardMetric.bags =>
-        ref.watch(leaderboardBagsProvider(widget.campaignId)),
-      LeaderboardMetric.pounds =>
-        ref.watch(leaderboardPoundsProvider(widget.campaignId)),
+      LeaderboardMetric.cleanups => ref.watch(
+        leaderboardCleanupsProvider(widget.campaignId),
+      ),
+      LeaderboardMetric.bags => ref.watch(
+        leaderboardBagsProvider(widget.campaignId),
+      ),
+      LeaderboardMetric.pounds => ref.watch(
+        leaderboardPoundsProvider(widget.campaignId),
+      ),
+      LeaderboardMetric.plantings => ref.watch(
+        leaderboardPlantingsProvider(widget.campaignId),
+      ),
+      LeaderboardMetric.trees => ref.watch(
+        leaderboardTreePlantingsProvider(widget.campaignId),
+      ),
+      LeaderboardMetric.wildflowers => ref.watch(
+        leaderboardWildflowerPlantingsProvider(widget.campaignId),
+      ),
     };
 
     return AlertDialog(
@@ -72,6 +113,7 @@ class _LeaderboardDialogState extends ConsumerState<LeaderboardDialog> {
             padding: const EdgeInsets.only(bottom: 12),
             child: SegmentedButton<LeaderboardMetric>(
               segments: LeaderboardMetric.values
+                  .where(metrics.contains)
                   .map(
                     (m) => ButtonSegment<LeaderboardMetric>(
                       value: m,
@@ -91,6 +133,9 @@ class _LeaderboardDialogState extends ConsumerState<LeaderboardDialog> {
             entries: entries,
             cardColor: cardColor,
             metric: _metric,
+            emptyText: isPlanting
+                ? 'No planting data yet.'
+                : 'No cleanup data yet.',
           ),
         ],
       ),
@@ -109,17 +154,22 @@ class _LeaderboardCard extends ConsumerWidget {
     required this.entries,
     required this.cardColor,
     required this.metric,
+    required this.emptyText,
   });
 
   final List<LeaderboardEntry> entries;
   final Color cardColor;
   final LeaderboardMetric metric;
+  final String emptyText;
 
   String _formatValue(int value) {
     return switch (metric) {
       LeaderboardMetric.cleanups => '$value',
       LeaderboardMetric.bags => '$value',
       LeaderboardMetric.pounds => '$value lbs',
+      LeaderboardMetric.plantings => '$value',
+      LeaderboardMetric.trees => '$value',
+      LeaderboardMetric.wildflowers => '$value',
     };
   }
 
@@ -133,7 +183,7 @@ class _LeaderboardCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
-          'No cleanup data yet.',
+          emptyText,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),

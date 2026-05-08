@@ -27,6 +27,8 @@ class EventDataType {
   static const trashReport = EventDataType._(r'Trash Report');
   static const cleanupRoute = EventDataType._(r'Cleanup Route');
   static const zipCodeSubmission = EventDataType._(r'Zip Code Submission');
+  static const treePlanting = EventDataType._(r'Tree Planting');
+  static const wildflowerPlanting = EventDataType._(r'Wildflower Planting');
 
   /// List of all possible values in this [enum][EventDataType].
   static const values = <EventDataType>[
@@ -34,6 +36,8 @@ class EventDataType {
     trashReport,
     cleanupRoute,
     zipCodeSubmission,
+    treePlanting,
+    wildflowerPlanting,
   ];
 
   static EventDataType? fromJson(dynamic value) => EventDataTypeTypeTransformer().decode(value);
@@ -76,6 +80,8 @@ class EventDataTypeTypeTransformer {
         case r'Trash Report': return EventDataType.trashReport;
         case r'Cleanup Route': return EventDataType.cleanupRoute;
         case r'Zip Code Submission': return EventDataType.zipCodeSubmission;
+        case r'Tree Planting': return EventDataType.treePlanting;
+        case r'Wildflower Planting': return EventDataType.wildflowerPlanting;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');

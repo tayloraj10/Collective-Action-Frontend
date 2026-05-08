@@ -10,6 +10,7 @@ import 'package:collective_action_frontend/screens/dashboard/components/social/u
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_info_dialog.dart';
 import 'package:collective_action_frontend/components/photo_thumbnail_strip.dart';
 import 'package:collective_action_frontend/screens/maps/components/photo_viewer_dialog.dart';
+import 'package:collective_action_frontend/screens/maps/components/planting_event_info_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/trash_report_event_info_dialog.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
 import 'package:flutter/material.dart';
@@ -30,26 +31,37 @@ class MapSubmissionActionCard extends ConsumerWidget {
     this.feedMode = false,
   });
 
+  static dynamic _eventValue(ActionSchema action, String key) {
+    final rawEventData = (action as dynamic).eventData;
+    if (rawEventData is! Map) return null;
+    try {
+      return rawEventData[key];
+    } catch (_) {
+      return null;
+    }
+  }
+
   static String _titleFromEventData(ActionSchema action) {
-    final eventType = action.eventData?['type'];
+    final eventType = _eventValue(action, 'type');
     if (eventType == null) return 'Map Submission';
     final s = eventType.toString();
     if (s == EventDataType.cleanup.value) return 'Cleanup';
     if (s == EventDataType.trashReport.value) return 'Trash Report';
     if (s == EventDataType.cleanupRoute.value) return 'Cleanup Route';
     if (s == EventDataType.zipCodeSubmission.value) return 'Zip Code';
+    if (s == EventDataType.treePlanting.value) return 'Tree Planting';
+    if (s == EventDataType.wildflowerPlanting.value) {
+      return 'Wildflower Planting';
+    }
     return s;
   }
 
   static List<String> _imageUrls(ActionSchema action) {
     final urls = <String>[];
-    final eventData = action.eventData;
-    if (eventData != null) {
-      final imageUrl = eventData['image_url'];
-      if (imageUrl != null && imageUrl.toString().isNotEmpty) {
-        final u = PhotosService.normalizePhotoUrl(imageUrl.toString());
-        if (u.isNotEmpty && !urls.contains(u)) urls.add(u);
-      }
+    final imageUrl = _eventValue(action, 'image_url');
+    if (imageUrl != null && imageUrl.toString().isNotEmpty) {
+      final u = PhotosService.normalizePhotoUrl(imageUrl.toString());
+      if (u.isNotEmpty && !urls.contains(u)) urls.add(u);
     }
     for (final url in action.imageUrls) {
       if (url.isEmpty) continue;
@@ -65,29 +77,39 @@ class MapSubmissionActionCard extends ConsumerWidget {
     if (diff.inSeconds < 60) return 'Just now';
     if (diff.inMinutes < 60) return '${diff.inMinutes} min ago';
     if (diff.inHours < 24) return '${diff.inHours} hr ago';
-    if (diff.inDays < 7) return '${diff.inDays} day${diff.inDays == 1 ? '' : 's'} ago';
+    if (diff.inDays < 7) {
+      return '${diff.inDays} day${diff.inDays == 1 ? '' : 's'} ago';
+    }
     return '${date.month}/${date.day}/${date.year}';
   }
 
-  static List<(IconData, String, String)> _eventStatsFromAction(ActionSchema action) {
-    final eventData = action.eventData;
-    if (eventData == null) return [];
+  static List<(IconData, String, String)> _eventStatsFromAction(
+    ActionSchema action,
+  ) {
     final parts = <(IconData, String, String)>[];
-    final smallBags = eventData['small_bags'];
+    final smallBags = _eventValue(action, 'small_bags');
     if (smallBags != null) {
       final n = smallBags is int ? smallBags : int.tryParse('$smallBags');
       if (n != null && n > 0) {
-        parts.add((Icons.shopping_bag_outlined, '$n', '$n small bag${n == 1 ? '' : 's'} (about a shopping bag)'));
+        parts.add((
+          Icons.shopping_bag_outlined,
+          '$n',
+          '$n small bag${n == 1 ? '' : 's'} (about a shopping bag)',
+        ));
       }
     }
-    final largeBags = eventData['large_bags'];
+    final largeBags = _eventValue(action, 'large_bags');
     if (largeBags != null) {
       final n = largeBags is int ? largeBags : int.tryParse('$largeBags');
       if (n != null && n > 0) {
-        parts.add((Icons.delete_outline, '$n', '$n large bag${n == 1 ? '' : 's'} (about a garbage bag)'));
+        parts.add((
+          Icons.delete_outline,
+          '$n',
+          '$n large bag${n == 1 ? '' : 's'} (about a garbage bag)',
+        ));
       }
     }
-    final pounds = eventData['pounds'];
+    final pounds = _eventValue(action, 'pounds');
     if (pounds != null) {
       final n = pounds is num ? pounds : num.tryParse('$pounds');
       if (n != null && n > 0) {
@@ -95,44 +117,75 @@ class MapSubmissionActionCard extends ConsumerWidget {
         parts.add((Icons.scale_outlined, s, '$s lb${n == 1 ? '' : 's'}'));
       }
     }
+    final type = _eventValue(action, 'type')?.toString();
+    if (type == EventDataType.treePlanting.value ||
+        type == EventDataType.wildflowerPlanting.value) {
+      final rawQuantity = _eventValue(action, 'quantity');
+      final quantity = rawQuantity is int
+          ? rawQuantity
+          : int.tryParse('${rawQuantity ?? 1}') ?? 1;
+      parts.add((
+        type == EventDataType.treePlanting.value
+            ? Icons.park
+            : Icons.local_florist,
+        '$quantity',
+        '$quantity planting${quantity == 1 ? '' : 's'}',
+      ));
+    }
     return parts;
   }
 
   Future<void> _showInfoDialog(BuildContext context) async {
-    final eventData = action.eventData;
-    if (eventData == null) return;
-    final eventDataMap = Map<String, dynamic>.from(eventData);
-    final eventType = EventDataType.fromJson(eventDataMap['type']);
+    final eventType = EventDataType.fromJson(_eventValue(action, 'type'));
+    if (eventType == null) return;
 
     if (eventType == EventDataType.cleanup) {
       final data = CleanupEventData(
-        type: eventType ?? EventDataType.cleanup,
-        name: eventDataMap['name'] as String? ?? '',
-        location: eventDataMap['location'] as String? ?? '',
-        smallBags: eventDataMap['small_bags'] as int?,
-        largeBags: eventDataMap['large_bags'] as int?,
-        pounds: eventDataMap['pounds'] != null ? num.parse('${eventDataMap['pounds']}') : null,
-        imageUrl: eventDataMap['image_url'] as String?,
+        type: eventType,
+        name: _eventValue(action, 'name')?.toString() ?? '',
+        location: _eventValue(action, 'location')?.toString() ?? '',
+        smallBags: (_eventValue(action, 'small_bags') is int)
+            ? _eventValue(action, 'small_bags') as int
+            : int.tryParse('${_eventValue(action, 'small_bags') ?? ''}'),
+        largeBags: (_eventValue(action, 'large_bags') is int)
+            ? _eventValue(action, 'large_bags') as int
+            : int.tryParse('${_eventValue(action, 'large_bags') ?? ''}'),
+        pounds: _eventValue(action, 'pounds') != null
+            ? num.tryParse('${_eventValue(action, 'pounds')}')
+            : null,
+        imageUrl: _eventValue(action, 'image_url')?.toString(),
       );
       if (context.mounted) {
         await showDialog(
           context: context,
-          builder: (c) => CleanupEventInfoDialog(action: action, eventData: data),
+          builder: (c) =>
+              CleanupEventInfoDialog(action: action, eventData: data),
         );
       }
     } else if (eventType == EventDataType.trashReport) {
       final data = TrashReportEventData(
-        type: eventType ?? EventDataType.trashReport,
-        location: eventDataMap['location'] as String? ?? '',
-        imageUrl: eventDataMap['image_url'] as String?,
+        type: eventType,
+        location: _eventValue(action, 'location')?.toString() ?? '',
+        imageUrl: _eventValue(action, 'image_url')?.toString(),
       );
       if (context.mounted) {
         await showDialog(
           context: context,
-          builder: (c) => TrashReportEventInfoDialog(action: action, eventData: data),
+          builder: (c) =>
+              TrashReportEventInfoDialog(action: action, eventData: data),
         );
       }
+    } else if (eventType == EventDataType.treePlanting ||
+        eventType == EventDataType.wildflowerPlanting) {
+      await _showPlantingInfoDialog(context);
     }
+  }
+
+  Future<void> _showPlantingInfoDialog(BuildContext context) async {
+    await showDialog<void>(
+      context: context,
+      builder: (_) => PlantingEventInfoDialog(action: action),
+    );
   }
 
   @override
@@ -149,13 +202,40 @@ class MapSubmissionActionCard extends ConsumerWidget {
     const accentColor = AppColors.successGreen;
 
     final canShowInfoDialog =
-        action.eventData != null &&
-        (EventDataType.fromJson(action.eventData!['type']) == EventDataType.cleanup ||
-            EventDataType.fromJson(action.eventData!['type']) == EventDataType.trashReport);
+        (EventDataType.fromJson(_eventValue(action, 'type')) ==
+                EventDataType.cleanup ||
+            EventDataType.fromJson(_eventValue(action, 'type')) ==
+                EventDataType.trashReport ||
+            EventDataType.fromJson(_eventValue(action, 'type')) ==
+                EventDataType.treePlanting ||
+            EventDataType.fromJson(_eventValue(action, 'type')) ==
+                EventDataType.wildflowerPlanting);
 
     Widget card = feedMode
-        ? _buildFeedCard(context, theme, isDark, timeString, title, imageUrls, eventStats, accentColor, isMobile, canShowInfoDialog)
-        : _buildCompactCard(context, theme, isDark, timeString, title, imageUrls, eventStats, accentColor, isMobile, canShowInfoDialog);
+        ? _buildFeedCard(
+            context,
+            theme,
+            isDark,
+            timeString,
+            title,
+            imageUrls,
+            eventStats,
+            accentColor,
+            isMobile,
+            canShowInfoDialog,
+          )
+        : _buildCompactCard(
+            context,
+            theme,
+            isDark,
+            timeString,
+            title,
+            imageUrls,
+            eventStats,
+            accentColor,
+            isMobile,
+            canShowInfoDialog,
+          );
 
     if (isOwner) {
       card = Badge(
@@ -179,11 +259,15 @@ class MapSubmissionActionCard extends ConsumerWidget {
                 await PhotosService().deleteAllSubmissionPhotos(action.id);
                 await actionNotifier.deleteAction(action);
                 if (context.mounted) {
-                  scaffoldMessenger.showSnackBar(CustomSnackBar.info('Map submission deleted!'));
+                  scaffoldMessenger.showSnackBar(
+                    CustomSnackBar.info('Map submission deleted!'),
+                  );
                 }
               } catch (e) {
                 if (context.mounted) {
-                  scaffoldMessenger.showSnackBar(CustomSnackBar.error('Error deleting map submission'));
+                  scaffoldMessenger.showSnackBar(
+                    CustomSnackBar.error('Error deleting map submission'),
+                  );
                 }
               }
             }
@@ -193,7 +277,10 @@ class MapSubmissionActionCard extends ConsumerWidget {
             child: Container(
               width: 18,
               height: 18,
-              decoration: const BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle),
+              decoration: const BoxDecoration(
+                color: Colors.redAccent,
+                shape: BoxShape.circle,
+              ),
               alignment: Alignment.center,
               child: const Icon(Icons.delete, color: Colors.white, size: 12),
             ),
@@ -226,7 +313,9 @@ class MapSubmissionActionCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: isDark ? AppColors.black.withAlpha(100) : AppColors.black.withAlpha(22),
+            color: isDark
+                ? AppColors.black.withAlpha(100)
+                : AppColors.black.withAlpha(22),
             blurRadius: 12,
             offset: const Offset(0, 3),
           ),
@@ -252,7 +341,9 @@ class MapSubmissionActionCard extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         MouseRegion(
-                          cursor: canShowInfoDialog ? SystemMouseCursors.click : SystemMouseCursors.basic,
+                          cursor: canShowInfoDialog
+                              ? SystemMouseCursors.click
+                              : SystemMouseCursors.basic,
                           child: UserAvatar(
                             userId: action.userId,
                             showTooltip: true,
@@ -279,7 +370,11 @@ class MapSubmissionActionCard extends ConsumerWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 5),
-                              _buildTypeBadge(Icons.map_outlined, 'Map Submission', accentColor),
+                              _buildTypeBadge(
+                                Icons.map_outlined,
+                                'Map Submission',
+                                accentColor,
+                              ),
                             ],
                           ),
                         ),
@@ -304,7 +399,8 @@ class MapSubmissionActionCard extends ConsumerWidget {
                                   Text(
                                     stat.$2,
                                     style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.colorScheme.onSurface.withAlpha(200),
+                                      color: theme.colorScheme.onSurface
+                                          .withAlpha(200),
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -319,12 +415,20 @@ class MapSubmissionActionCard extends ConsumerWidget {
                       const SizedBox(height: 10),
                       PhotoThumbnailStrip(
                         urls: imageUrls,
-                        onTap: (i) => PhotoViewerDialog.show(context, urls: imageUrls, initialIndex: i),
+                        onTap: (i) => PhotoViewerDialog.show(
+                          context,
+                          urls: imageUrls,
+                          initialIndex: i,
+                        ),
                         theme: theme,
                       ),
                     ],
                     const SizedBox(height: 10),
-                    ActionLikeRow(action: action, isMobile: isMobile, iconColor: accentColor),
+                    ActionLikeRow(
+                      action: action,
+                      isMobile: isMobile,
+                      iconColor: accentColor,
+                    ),
                   ],
                 ),
               ),
@@ -350,7 +454,10 @@ class MapSubmissionActionCard extends ConsumerWidget {
     final cardColor = isDark ? AppColors.darkSurface : AppColors.white;
     final headerGradient = LinearGradient(
       colors: isDark
-          ? [const Color(0xFF14532D).withAlpha(220), AppColors.successGreen.withAlpha(180)]
+          ? [
+              const Color(0xFF14532D).withAlpha(220),
+              AppColors.successGreen.withAlpha(180),
+            ]
           : [const Color(0xFF14532D), AppColors.successGreen],
       begin: Alignment.centerLeft,
       end: Alignment.centerRight,
@@ -364,7 +471,9 @@ class MapSubmissionActionCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: isDark ? AppColors.black.withAlpha(110) : AppColors.black.withAlpha(40),
+            color: isDark
+                ? AppColors.black.withAlpha(110)
+                : AppColors.black.withAlpha(40),
             blurRadius: 7,
             offset: const Offset(0, 2),
             spreadRadius: 0,
@@ -384,14 +493,18 @@ class MapSubmissionActionCard extends ConsumerWidget {
               children: [
                 Container(
                   padding: EdgeInsets.fromLTRB(
-                    isMobile ? 8 : 10, isMobile ? 9 : 11,
-                    isMobile ? 8 : 10, isMobile ? 9 : 11,
+                    isMobile ? 8 : 10,
+                    isMobile ? 9 : 11,
+                    isMobile ? 8 : 10,
+                    isMobile ? 9 : 11,
                   ),
                   decoration: BoxDecoration(gradient: headerGradient),
                   child: Row(
                     children: [
                       MouseRegion(
-                        cursor: canShowInfoDialog ? SystemMouseCursors.click : SystemMouseCursors.basic,
+                        cursor: canShowInfoDialog
+                            ? SystemMouseCursors.click
+                            : SystemMouseCursors.basic,
                         child: UserAvatar(
                           userId: action.userId,
                           showTooltip: true,
@@ -422,8 +535,10 @@ class MapSubmissionActionCard extends ConsumerWidget {
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(
-                    isMobile ? 8 : 10, isMobile ? 7 : 9,
-                    isMobile ? 8 : 10, isMobile ? 8 : 10,
+                    isMobile ? 8 : 10,
+                    isMobile ? 7 : 9,
+                    isMobile ? 8 : 10,
+                    isMobile ? 8 : 10,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -434,9 +549,18 @@ class MapSubmissionActionCard extends ConsumerWidget {
                         children: [
                           Tooltip(
                             message: 'Map Submission',
-                            child: Icon(Icons.map_outlined, color: accentColor, size: isMobile ? 16 : 18),
+                            child: Icon(
+                              Icons.map_outlined,
+                              color: accentColor,
+                              size: isMobile ? 16 : 18,
+                            ),
                           ),
-                          _buildCompactTimeChip(theme, isDark, timeString, isMobile),
+                          _buildCompactTimeChip(
+                            theme,
+                            isDark,
+                            timeString,
+                            isMobile,
+                          ),
                         ],
                       ),
                       if (eventStats.isNotEmpty) ...[
@@ -445,21 +569,28 @@ class MapSubmissionActionCard extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             for (final stat in eventStats) ...[
-                              if (stat != eventStats.first) SizedBox(width: isMobile ? 8 : 10),
+                              if (stat != eventStats.first)
+                                SizedBox(width: isMobile ? 8 : 10),
                               Tooltip(
                                 message: stat.$3,
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(stat.$1, size: isMobile ? 14 : 16, color: accentColor),
+                                    Icon(
+                                      stat.$1,
+                                      size: isMobile ? 14 : 16,
+                                      color: accentColor,
+                                    ),
                                     SizedBox(width: isMobile ? 2 : 3),
                                     Text(
                                       stat.$2,
-                                      style: theme.textTheme.bodySmall?.copyWith(
-                                        color: theme.colorScheme.onSurface.withAlpha(200),
-                                        fontSize: isMobile ? 10 : 11,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: theme.colorScheme.onSurface
+                                                .withAlpha(200),
+                                            fontSize: isMobile ? 10 : 11,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -472,11 +603,19 @@ class MapSubmissionActionCard extends ConsumerWidget {
                         const SizedBox(height: 6),
                         PhotoThumbnailStrip(
                           urls: imageUrls,
-                          onTap: (i) => PhotoViewerDialog.show(context, urls: imageUrls, initialIndex: i),
+                          onTap: (i) => PhotoViewerDialog.show(
+                            context,
+                            urls: imageUrls,
+                            initialIndex: i,
+                          ),
                           theme: theme,
                         ),
                       ],
-                      ActionLikeRow(action: action, isMobile: isMobile, iconColor: accentColor),
+                      ActionLikeRow(
+                        action: action,
+                        isMobile: isMobile,
+                        iconColor: accentColor,
+                      ),
                     ],
                   ),
                 ),
@@ -525,7 +664,11 @@ Widget _buildFeedTimeChip(ThemeData theme, bool isDark, String timeString) {
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.schedule_rounded, size: 12, color: theme.colorScheme.onSurface.withAlpha(120)),
+        Icon(
+          Icons.schedule_rounded,
+          size: 12,
+          color: theme.colorScheme.onSurface.withAlpha(120),
+        ),
         const SizedBox(width: 4),
         Text(
           timeString,
@@ -540,7 +683,12 @@ Widget _buildFeedTimeChip(ThemeData theme, bool isDark, String timeString) {
   );
 }
 
-Widget _buildCompactTimeChip(ThemeData theme, bool isDark, String timeString, bool isMobile) {
+Widget _buildCompactTimeChip(
+  ThemeData theme,
+  bool isDark,
+  String timeString,
+  bool isMobile,
+) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
     decoration: BoxDecoration(

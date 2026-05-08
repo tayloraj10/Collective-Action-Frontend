@@ -153,6 +153,13 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
               child: Icon(Icons.apps_outlined),
             ),
           ),
+        ValueListenableBuilder<bool>(
+          valueListenable: AppConstants.successSoundPlaying,
+          builder: (context, isPlaying, _) {
+            if (!isPlaying) return const SizedBox.shrink();
+            return const _AppBarSoundIndicator();
+          },
+        ),
 
         // Info Button
         Padding(
@@ -520,7 +527,14 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
         else
           AppBarIconButton(
             icon: Icons.person_add_rounded,
-            onPressed: () => safeGo(context, '/login'),
+            onPressed: () {
+              final currentUri = GoRouterState.of(context).uri;
+              final loginUri = Uri(
+                path: '/login',
+                queryParameters: {'from': currentUri.toString()},
+              );
+              safeGo(context, loginUri.toString());
+            },
             tooltip: 'Login',
             backgroundColor: Colors.white.withAlpha(38),
           ),
@@ -565,5 +579,103 @@ class _VersionText extends StatelessWidget {
         ? 'v${AppConstants.appVersionFallback}'
         : '${AppConstants.appReleaseLabel} v${AppConstants.appVersionFallback}';
     return Text(label, style: const TextStyle(fontSize: 13));
+  }
+}
+
+class _AppBarSoundIndicator extends StatelessWidget {
+  const _AppBarSoundIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.only(right: 4),
+      child: Tooltip(
+        message: 'Music playing',
+        child: SizedBox(
+          width: 22,
+          height: 20,
+          child: _EqualizerBars(
+            colors: [
+              Color(0xFFB2FF59),
+              Color(0xFF18FFFF),
+              Color(0xFFFF4081),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EqualizerBars extends StatefulWidget {
+  const _EqualizerBars({required this.colors});
+
+  final List<Color> colors;
+
+  @override
+  State<_EqualizerBars> createState() => _EqualizerBarsState();
+}
+
+class _EqualizerBarsState extends State<_EqualizerBars>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 700),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        final t = _controller.value;
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _EqualizerBar(
+              heightFactor: Curves.easeInOut.transform((t + 0.00) % 1.0),
+              color: widget.colors[0],
+            ),
+            _EqualizerBar(
+              heightFactor: Curves.easeInOut.transform((t + 0.33) % 1.0),
+              color: widget.colors[1],
+            ),
+            _EqualizerBar(
+              heightFactor: Curves.easeInOut.transform((t + 0.66) % 1.0),
+              color: widget.colors[2],
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _EqualizerBar extends StatelessWidget {
+  const _EqualizerBar({required this.heightFactor, required this.color});
+
+  final double heightFactor;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final barHeight = 6 + (heightFactor * 10);
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 90),
+      curve: Curves.easeOut,
+      width: 4,
+      height: barHeight,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(2),
+      ),
+    );
   }
 }

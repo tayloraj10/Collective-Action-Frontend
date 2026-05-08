@@ -72,6 +72,7 @@ doc/StatusTypeEnum.md
 doc/StatusValuesEnum.md
 doc/StatusesApi.md
 doc/TrashReportEventData.md
+doc/TreePlantingEventData.md
 doc/UserCreate.md
 doc/UserPhotoUpdate.md
 doc/UserSchema.md
@@ -79,6 +80,7 @@ doc/UserStatsSchema.md
 doc/UserType.md
 doc/UserUpdate.md
 doc/UsersApi.md
+doc/WildflowerPlantingEventData.md
 doc/ZipCodeSubmissionEventData.md
 git_push.sh
 lib/api.dart
@@ -161,13 +163,15 @@ lib/model/status_schema.dart
 lib/model/status_type_enum.dart
 lib/model/status_values_enum.dart
 lib/model/trash_report_event_data.dart
+lib/model/tree_planting_event_data.dart
 lib/model/user_create.dart
 lib/model/user_photo_update.dart
 lib/model/user_schema.dart
 lib/model/user_stats_schema.dart
 lib/model/user_type.dart
 lib/model/user_update.dart
+lib/model/wildflower_planting_event_data.dart
 lib/model/zip_code_submission_event_data.dart
 pubspec.yaml
-test/map_campaign_stats_schema_test.dart
-test/user_stats_schema_test.dart
+test/tree_planting_event_data_test.dart
+test/wildflower_planting_event_data_test.dart
