@@ -527,7 +527,14 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
         else
           AppBarIconButton(
             icon: Icons.person_add_rounded,
-            onPressed: () => safeGo(context, '/login'),
+            onPressed: () {
+              final currentUri = GoRouterState.of(context).uri;
+              final loginUri = Uri(
+                path: '/login',
+                queryParameters: {'from': currentUri.toString()},
+              );
+              safeGo(context, loginUri.toString());
+            },
             tooltip: 'Login',
             backgroundColor: Colors.white.withAlpha(38),
           ),
