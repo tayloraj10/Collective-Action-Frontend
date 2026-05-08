@@ -151,6 +151,10 @@ class AppConstants {
 
   static AudioPlayer? _currentSuccessPlayer;
   static Timer? _successSoundStopTimer;
+  static StreamSubscription<PlayerState>? _successPlayerStateSubscription;
+  static final ValueNotifier<bool> successSoundPlaying = ValueNotifier<bool>(
+    false,
+  );
 
   /// Convenience helper to play a random success sound once.
   /// Stops any currently playing success sound first. Stops after [maxDuration] (default 13s).
@@ -165,13 +169,36 @@ class AppConstants {
       // Stop previous success sound if still playing
       if (_currentSuccessPlayer != null) {
         try {
+          await _successPlayerStateSubscription?.cancel();
+          _successPlayerStateSubscription = null;
           await _currentSuccessPlayer!.stop();
           await _currentSuccessPlayer!.dispose();
         } catch (_) {}
         _currentSuccessPlayer = null;
+        successSoundPlaying.value = false;
       }
       final player = AudioPlayer();
       _currentSuccessPlayer = player;
+      successSoundPlaying.value = true;
+      _successPlayerStateSubscription = player.playerStateStream.listen((
+        playerState,
+      ) async {
+        if (_currentSuccessPlayer != player) return;
+        final isPlaying = playerState.playing;
+        successSoundPlaying.value = isPlaying;
+        if (playerState.processingState == ProcessingState.completed) {
+          try {
+            await _successPlayerStateSubscription?.cancel();
+            _successPlayerStateSubscription = null;
+            await player.stop();
+            await player.dispose();
+          } catch (_) {}
+          if (_currentSuccessPlayer == player) _currentSuccessPlayer = null;
+          _successSoundStopTimer?.cancel();
+          _successSoundStopTimer = null;
+          successSoundPlaying.value = false;
+        }
+      });
       final (:path, :maxDuration) = randomSuccessSoundSource();
       await player.setAsset(path);
       player.setVolume(1.0);
@@ -180,14 +207,22 @@ class AppConstants {
         _successSoundStopTimer = null;
         if (_currentSuccessPlayer != player) return;
         try {
+          await _successPlayerStateSubscription?.cancel();
+          _successPlayerStateSubscription = null;
           await player.stop();
           await player.dispose();
         } catch (_) {}
         if (_currentSuccessPlayer == player) _currentSuccessPlayer = null;
+        successSoundPlaying.value = false;
       });
     } catch (_) {
+      try {
+        await _successPlayerStateSubscription?.cancel();
+      } catch (_) {}
+      _successPlayerStateSubscription = null;
       _currentSuccessPlayer = null;
       _successSoundStopTimer = null;
+      successSoundPlaying.value = false;
     }
   }
 
