@@ -4882,12 +4882,12 @@
                     "lat": {
                         "type": "number",
                         "title": "Lat",
-                        "default": 0
+                        "default": 0.0
                     },
                     "lng": {
                         "type": "number",
                         "title": "Lng",
-                        "default": 0
+                        "default": 0.0
                     },
                     "number": {
                         "type": "integer",
@@ -6015,7 +6015,7 @@
                     "total_pounds": {
                         "type": "number",
                         "title": "Total Pounds",
-                        "default": 0
+                        "default": 0.0
                     },
                     "tree_planting_count": {
                         "type": "integer",
@@ -7221,7 +7221,7 @@
                     "total_pounds": {
                         "type": "number",
                         "title": "Total Pounds",
-                        "default": 0
+                        "default": 0.0
                     },
                     "tree_planting_count": {
                         "type": "integer",

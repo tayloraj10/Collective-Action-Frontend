@@ -8,7 +8,7 @@ import 'package:collective_action_api/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**userId** | **String** |  | 
+**userId** | **String** |  | [optional] 
 **amount** | **num** |  | [optional] [default to 1]
 **imageUrls** | **List<String>** |  | [optional] [default to const []]
 **date** | [**DateTime**](DateTime.md) |  | [optional] 

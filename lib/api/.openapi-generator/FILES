@@ -179,6 +179,3 @@ lib/model/user_update.dart
 lib/model/wildflower_planting_event_data.dart
 lib/model/zip_code_submission_event_data.dart
 pubspec.yaml
-test/cleanup_participation_body_test.dart
-test/tree_planting_event_data_test.dart
-test/wildflower_planting_event_data_test.dart
