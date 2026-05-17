@@ -65,15 +65,22 @@ Class | Method | HTTP request | Description
 *ActionTypesApi* | [**listActionTypesActionTypesGet**](doc//ActionTypesApi.md#listactiontypesactiontypesget) | **GET** /action_types/ | List Action Types
 *ActionTypesApi* | [**updateActionTypeActionTypesActionTypeIdPut**](doc//ActionTypesApi.md#updateactiontypeactiontypesactiontypeidput) | **PUT** /action_types/{action_type_id} | Update Action Type
 *ActionsApi* | [**addActionLikeActionsActionIdLikePost**](doc//ActionsApi.md#addactionlikeactionsactionidlikepost) | **POST** /actions/{action_id}/like | Add Action Like
+*ActionsApi* | [**claimTrashReportCleanedActionsTrashReportIdClaimCleanedPost**](doc//ActionsApi.md#claimtrashreportcleanedactionstrashreportidclaimcleanedpost) | **POST** /actions/{trash_report_id}/claim-cleaned | Claim Trash Report Cleaned
 *ActionsApi* | [**createActionActionsPost**](doc//ActionsApi.md#createactionactionspost) | **POST** /actions/ | Create Action
 *ActionsApi* | [**deleteActionActionsActionIdDelete**](doc//ActionsApi.md#deleteactionactionsactioniddelete) | **DELETE** /actions/{action_id} | Delete Action
+*ActionsApi* | [**deleteCleanupRsvpActionsCleanupIdRsvpDelete**](doc//ActionsApi.md#deletecleanuprsvpactionscleanupidrsvpdelete) | **DELETE** /actions/{cleanup_id}/rsvp | Delete Cleanup Rsvp
 *ActionsApi* | [**getActionActionsActionIdGet**](doc//ActionsApi.md#getactionactionsactionidget) | **GET** /actions/{action_id} | Get Action
 *ActionsApi* | [**getActionsByLinkedActionsByLinkedLinkedIdGet**](doc//ActionsApi.md#getactionsbylinkedactionsbylinkedlinkedidget) | **GET** /actions/by_linked/{linked_id} | Get Actions By Linked
 *ActionsApi* | [**getActionsByUserActionsUserUserIdGet**](doc//ActionsApi.md#getactionsbyuseractionsuseruseridget) | **GET** /actions/user/{user_id} | Get Actions By User
 *ActionsApi* | [**getLatestActionsActionsRecentGet**](doc//ActionsApi.md#getlatestactionsactionsrecentget) | **GET** /actions/recent | Get Latest Actions
 *ActionsApi* | [**listActionsActionsGet**](doc//ActionsApi.md#listactionsactionsget) | **GET** /actions/ | List Actions
+*ActionsApi* | [**listCleanupAttendanceActionsCleanupIdAttendanceGet**](doc//ActionsApi.md#listcleanupattendanceactionscleanupidattendanceget) | **GET** /actions/{cleanup_id}/attendance | List Cleanup Attendance
+*ActionsApi* | [**listCleanupRsvpsActionsCleanupIdRsvpsGet**](doc//ActionsApi.md#listcleanuprsvpsactionscleanupidrsvpsget) | **GET** /actions/{cleanup_id}/rsvps | List Cleanup Rsvps
+*ActionsApi* | [**markCleanupAttendanceActionsCleanupIdAttendancePost**](doc//ActionsApi.md#markcleanupattendanceactionscleanupidattendancepost) | **POST** /actions/{cleanup_id}/attendance | Mark Cleanup Attendance
 *ActionsApi* | [**removeActionLikeActionsActionIdLikeDelete**](doc//ActionsApi.md#removeactionlikeactionsactionidlikedelete) | **DELETE** /actions/{action_id}/like | Remove Action Like
+*ActionsApi* | [**updateActionActionsActionIdPatch**](doc//ActionsApi.md#updateactionactionsactionidpatch) | **PATCH** /actions/{action_id} | Update Action
 *ActionsApi* | [**updateActionPhotosActionsActionIdPhotosPatch**](doc//ActionsApi.md#updateactionphotosactionsactionidphotospatch) | **PATCH** /actions/{action_id}/photos | Update Action Photos
+*ActionsApi* | [**upsertCleanupRsvpActionsCleanupIdRsvpPost**](doc//ActionsApi.md#upsertcleanuprsvpactionscleanupidrsvppost) | **POST** /actions/{cleanup_id}/rsvp | Upsert Cleanup Rsvp
 *CategoriesApi* | [**createCategoryCategoriesPost**](doc//CategoriesApi.md#createcategorycategoriespost) | **POST** /categories/ | Create Category
 *CategoriesApi* | [**deleteCategoryCategoriesCategoryIdDelete**](doc//CategoriesApi.md#deletecategorycategoriescategoryiddelete) | **DELETE** /categories/{category_id} | Delete Category
 *CategoriesApi* | [**getCategoryCategoriesCategoryIdGet**](doc//CategoriesApi.md#getcategorycategoriescategoryidget) | **GET** /categories/{category_id} | Get Category
@@ -171,6 +178,7 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [ActionClaimCleanedSchema](doc//ActionClaimCleanedSchema.md)
  - [ActionCreateSchema](doc//ActionCreateSchema.md)
  - [ActionLikeBody](doc//ActionLikeBody.md)
  - [ActionPhotosUpdate](doc//ActionPhotosUpdate.md)
@@ -178,10 +186,12 @@ Class | Method | HTTP request | Description
  - [ActionTypeCreate](doc//ActionTypeCreate.md)
  - [ActionTypeSchema](doc//ActionTypeSchema.md)
  - [ActionTypeValuesEnum](doc//ActionTypeValuesEnum.md)
+ - [ActionUpdateSchema](doc//ActionUpdateSchema.md)
  - [AddProjectMemberSchema](doc//AddProjectMemberSchema.md)
  - [CategoryCreate](doc//CategoryCreate.md)
  - [CategorySchema](doc//CategorySchema.md)
  - [CleanupEventData](doc//CleanupEventData.md)
+ - [CleanupParticipationBody](doc//CleanupParticipationBody.md)
  - [CleanupRouteEventData](doc//CleanupRouteEventData.md)
  - [CleanupWaypoint](doc//CleanupWaypoint.md)
  - [ConnectionCreateSchema](doc//ConnectionCreateSchema.md)

@@ -10,48 +10,36 @@
 
 part of collective_action_api;
 
-class CleanupWaypoint {
-  /// Returns a new [CleanupWaypoint] instance.
-  CleanupWaypoint({
-    this.lat = 0.0,
-    this.lng = 0.0,
-    this.number = 0,
+class CleanupParticipationBody {
+  /// Returns a new [CleanupParticipationBody] instance.
+  CleanupParticipationBody({
+    required this.userId,
   });
 
-  num lat;
-
-  num lng;
-
-  int number;
+  String userId;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is CleanupWaypoint &&
-    other.lat == lat &&
-    other.lng == lng &&
-    other.number == number;
+  bool operator ==(Object other) => identical(this, other) || other is CleanupParticipationBody &&
+    other.userId == userId;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (lat.hashCode) +
-    (lng.hashCode) +
-    (number.hashCode);
+    (userId.hashCode);
 
   @override
-  String toString() => 'CleanupWaypoint[lat=$lat, lng=$lng, number=$number]';
+  String toString() => 'CleanupParticipationBody[userId=$userId]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'lat'] = this.lat;
-      json[r'lng'] = this.lng;
-      json[r'number'] = this.number;
+      json[r'user_id'] = this.userId;
     return json;
   }
 
-  /// Returns a new [CleanupWaypoint] instance and imports its values from
+  /// Returns a new [CleanupParticipationBody] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static CleanupWaypoint? fromJson(dynamic value) {
+  static CleanupParticipationBody? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -60,26 +48,24 @@ class CleanupWaypoint {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "CleanupWaypoint[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "CleanupWaypoint[$key]" has a null value in JSON.');
+          assert(json.containsKey(key), 'Required key "CleanupParticipationBody[$key]" is missing from JSON.');
+          assert(json[key] != null, 'Required key "CleanupParticipationBody[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return CleanupWaypoint(
-        lat: num.parse('${json[r'lat']}'),
-        lng: num.parse('${json[r'lng']}'),
-        number: mapValueOfType<int>(json, r'number') ?? 0,
+      return CleanupParticipationBody(
+        userId: mapValueOfType<String>(json, r'user_id')!,
       );
     }
     return null;
   }
 
-  static List<CleanupWaypoint> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <CleanupWaypoint>[];
+  static List<CleanupParticipationBody> listFromJson(dynamic json, {bool growable = false,}) {
+    final result = <CleanupParticipationBody>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = CleanupWaypoint.fromJson(row);
+        final value = CleanupParticipationBody.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -88,12 +74,12 @@ class CleanupWaypoint {
     return result.toList(growable: growable);
   }
 
-  static Map<String, CleanupWaypoint> mapFromJson(dynamic json) {
-    final map = <String, CleanupWaypoint>{};
+  static Map<String, CleanupParticipationBody> mapFromJson(dynamic json) {
+    final map = <String, CleanupParticipationBody>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = CleanupWaypoint.fromJson(entry.value);
+        final value = CleanupParticipationBody.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -102,14 +88,14 @@ class CleanupWaypoint {
     return map;
   }
 
-  // maps a json object with a list of CleanupWaypoint-objects as value to a dart map
-  static Map<String, List<CleanupWaypoint>> mapListFromJson(dynamic json, {bool growable = false,}) {
-    final map = <String, List<CleanupWaypoint>>{};
+  // maps a json object with a list of CleanupParticipationBody-objects as value to a dart map
+  static Map<String, List<CleanupParticipationBody>> mapListFromJson(dynamic json, {bool growable = false,}) {
+    final map = <String, List<CleanupParticipationBody>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = CleanupWaypoint.listFromJson(entry.value, growable: growable,);
+        map[entry.key] = CleanupParticipationBody.listFromJson(entry.value, growable: growable,);
       }
     }
     return map;
@@ -117,6 +103,7 @@ class CleanupWaypoint {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
+    'user_id',
   };
 }
 

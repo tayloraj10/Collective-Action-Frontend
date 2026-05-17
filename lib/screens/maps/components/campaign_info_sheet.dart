@@ -13,6 +13,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:collective_action_frontend/components/photo_thumbnail_strip.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
+import 'cleanup_event_info_dialog.dart';
 import 'photo_viewer_dialog.dart';
 
 /// Filter for the submissions list.
@@ -27,11 +28,15 @@ class CampaignInfoSheet extends ConsumerStatefulWidget {
     super.key,
     required this.campaigns,
     required this.scrollController,
+    required this.hostContext,
     this.onClose,
   });
 
   final List<MapCampaignSchema> campaigns;
   final ScrollController scrollController;
+
+  /// Map screen scaffold context — use for overlays/snackbars (not the drawer subtree).
+  final BuildContext hostContext;
 
   /// If set, panel is in "drawer" mode: Close calls this, Locate does not dismiss.
   final VoidCallback? onClose;
@@ -61,6 +66,14 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
 
   static String _formatDate(DateTime d) {
     return '${_monthNames[d.month - 1]} ${d.day}, ${d.year}';
+  }
+
+  static String _formatDateTime(DateTime d) {
+    final local = d.toLocal();
+    final hour = local.hour % 12 == 0 ? 12 : local.hour % 12;
+    final minute = local.minute.toString().padLeft(2, '0');
+    final suffix = local.hour >= 12 ? 'PM' : 'AM';
+    return '${_formatDate(local)} $hour:$minute $suffix';
   }
 
   static String _titleForAction(ActionSchema action) {
@@ -448,12 +461,17 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
 
   Widget _buildDetailView(BuildContext context, ActionSchema action) {
     final theme = Theme.of(context);
+    final currentUser = ref.watch(currentUserProvider).value;
     final eventData = action.eventData ?? {};
     final type = eventData['type']?.toString();
     final isCleanup = type == EventDataType.cleanup.value;
     final isPlanting =
         type == EventDataType.treePlanting.value ||
         type == EventDataType.wildflowerPlanting.value;
+    final isOwner = currentUser != null && currentUser.id == action.userId;
+    final cleanupData = isCleanup
+        ? CleanupEventInfoDialog.eventDataFromAction(action)
+        : null;
 
     return SingleChildScrollView(
       controller: widget.scrollController,
@@ -489,8 +507,28 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
               ),
               IconButton(
                 icon: const Icon(Icons.edit_outlined),
-                tooltip: 'Edit (coming soon)',
-                onPressed: null,
+                tooltip: isCleanup && isOwner
+                    ? 'Edit cleanup'
+                    : 'Only cleanup owners can edit',
+                onPressed: isCleanup && isOwner
+                    ? () {
+                        final campaignId = widget.campaigns.isNotEmpty
+                            ? widget.campaigns.first.id
+                            : action.linkedId;
+                        CleanupEventInfoDialog.editCleanup(
+                          context,
+                          ref,
+                          action,
+                          hostContext: widget.hostContext,
+                          campaignId: campaignId,
+                          onSuccess: (updated) {
+                            if (mounted) {
+                              setState(() => _selectedAction = updated);
+                            }
+                          },
+                        );
+                      }
+                    : null,
               ),
               IconButton(
                 icon: Icon(
@@ -548,6 +586,31 @@ class _CampaignInfoSheetState extends ConsumerState<CampaignInfoSheet> {
                 ),
             ],
           ),
+          if (cleanupData?.scheduledStart != null) ...[
+            const SizedBox(height: 20),
+            _DetailSection(
+              title: 'Schedule',
+              icon: Icons.event_outlined,
+              children: [
+                _DetailRow(
+                  label: 'Starts',
+                  value: _formatDateTime(cleanupData!.scheduledStart!),
+                  icon: Icons.schedule_outlined,
+                ),
+                if (cleanupData.scheduledEnd != null)
+                  _DetailRow(
+                    label: 'Ends',
+                    value: _formatDateTime(cleanupData.scheduledEnd!),
+                    icon: Icons.event_available_outlined,
+                  ),
+                _DetailRow(
+                  label: 'Interested',
+                  value: '${cleanupData.rsvpUserIds.length}',
+                  icon: Icons.how_to_reg_outlined,
+                ),
+              ],
+            ),
+          ],
           if (isCleanup &&
               (eventData['small_bags'] != null ||
                   eventData['large_bags'] != null ||

@@ -20,7 +20,7 @@ class UserStatsSchema {
     this.totalSmallBags = 0,
     this.totalLargeBags = 0,
     this.totalBags = 0,
-    this.totalPounds = 0,
+    this.totalPounds = 0.0,
     this.treePlantingCount = 0,
     this.wildflowerPlantingCount = 0,
     this.totalPlantings = 0,

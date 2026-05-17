@@ -22,11 +22,25 @@ class CleanupEventDialog extends StatefulWidget {
 
   /// Default value for the name field (e.g. current user's name when logged in).
   final String? initialName;
+  final CleanupEventData? initialEventData;
+  final String? organizerUserId;
+  final bool enableScheduling;
+  final String title;
+  final String submitLabel;
+
+  /// Pass [showDialog]'s builder context so Save/Cancel pop the dialog route.
+  final BuildContext? routeContext;
 
   const CleanupEventDialog({
     super.key,
     required this.position,
     this.initialName,
+    this.initialEventData,
+    this.organizerUserId,
+    this.enableScheduling = true,
+    this.title = 'Add Cleanup',
+    this.submitLabel = 'Submit',
+    this.routeContext,
   });
 
   @override
@@ -40,6 +54,9 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
   final _smallBagsController = TextEditingController();
   final _largeBagsController = TextEditingController();
   final _poundsController = TextEditingController();
+  bool _isScheduled = false;
+  DateTime? _scheduledStart;
+  DateTime? _scheduledEnd;
 
   static const int _maxPhotos = 5;
   final List<XFile> _selectedPhotos = [];
@@ -47,7 +64,19 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
   @override
   void initState() {
     super.initState();
-    if (widget.initialName != null && widget.initialName!.isNotEmpty) {
+    final initialEventData = widget.initialEventData;
+    if (initialEventData != null) {
+      _locationController.text = initialEventData.location;
+      _nameController.text = initialEventData.name;
+      _smallBagsController.text = initialEventData.smallBags?.toString() ?? '';
+      _largeBagsController.text = initialEventData.largeBags?.toString() ?? '';
+      _poundsController.text = initialEventData.pounds?.toString() ?? '';
+      if (widget.enableScheduling) {
+        _scheduledStart = initialEventData.scheduledStart;
+        _scheduledEnd = initialEventData.scheduledEnd;
+        _isScheduled = _scheduledStart != null;
+      }
+    } else if (widget.initialName != null && widget.initialName!.isNotEmpty) {
       _nameController.text = widget.initialName!;
     }
   }
@@ -60,6 +89,32 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
     _largeBagsController.dispose();
     _poundsController.dispose();
     super.dispose();
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    final local = dateTime.toLocal();
+    final hour = local.hour % 12 == 0 ? 12 : local.hour % 12;
+    final minute = local.minute.toString().padLeft(2, '0');
+    final suffix = local.hour >= 12 ? 'PM' : 'AM';
+    return '${local.month}/${local.day}/${local.year} $hour:$minute $suffix';
+  }
+
+  Future<DateTime?> _pickDateTime(DateTime? initial) async {
+    final now = DateTime.now();
+    final initialLocal = initial?.toLocal() ?? now;
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initialLocal,
+      firstDate: DateTime(now.year - 1),
+      lastDate: DateTime(now.year + 5),
+    );
+    if (date == null || !mounted) return null;
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initialLocal),
+    );
+    if (time == null) return null;
+    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
   }
 
   Future<void> _pickPhotos() async {
@@ -80,11 +135,32 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
     });
   }
 
+  void _close([CleanupEventDialogResult? result]) {
+    final navContext = widget.routeContext ?? context;
+    Navigator.of(navContext).pop(result);
+  }
+
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
+    if (_isScheduled && _scheduledStart == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Choose a scheduled start time.')),
+      );
+      return;
+    }
+    if (_isScheduled &&
+        _scheduledStart != null &&
+        _scheduledEnd != null &&
+        _scheduledEnd!.isBefore(_scheduledStart!)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('End time must be after start time.')),
+      );
+      return;
+    }
     final smallBags = int.tryParse(_smallBagsController.text) ?? 0;
     final largeBags = int.tryParse(_largeBagsController.text) ?? 0;
     final pounds = num.tryParse(_poundsController.text);
+    final initialEventData = widget.initialEventData;
     final eventData = CleanupEventData(
       name: _nameController.text.trim().isEmpty
           ? ''
@@ -95,8 +171,20 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
       smallBags: smallBags == 0 ? null : smallBags,
       largeBags: largeBags == 0 ? null : largeBags,
       pounds: pounds,
+      scheduledStart: widget.enableScheduling && _isScheduled
+          ? _scheduledStart
+          : null,
+      scheduledEnd: widget.enableScheduling && _isScheduled
+          ? _scheduledEnd
+          : null,
+      organizerUserId: widget.enableScheduling && _isScheduled
+          ? (initialEventData?.organizerUserId ?? widget.organizerUserId)
+          : null,
+      status: widget.enableScheduling && _isScheduled ? 'scheduled' : null,
+      rsvpUserIds: initialEventData?.rsvpUserIds ?? const [],
+      attendedUserIds: initialEventData?.attendedUserIds ?? const [],
     );
-    Navigator.of(context).pop(
+    _close(
       CleanupEventDialogResult(
         eventData: eventData,
         photos: List.from(_selectedPhotos),
@@ -127,7 +215,7 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Add Cleanup',
+                    widget.title,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
@@ -168,6 +256,64 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
                         const SizedBox(height: 20),
                         const Divider(height: 1),
                         const SizedBox(height: 16),
+                        if (widget.enableScheduling) ...[
+                          SwitchListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: const Text('Schedule this cleanup'),
+                            subtitle: const Text(
+                              "Let people show they're interested in going.",
+                            ),
+                            value: _isScheduled,
+                            onChanged: (value) {
+                              setState(() {
+                                _isScheduled = value;
+                                if (!value) {
+                                  _scheduledStart = null;
+                                  _scheduledEnd = null;
+                                }
+                              });
+                            },
+                          ),
+                          if (_isScheduled) ...[
+                            const SizedBox(height: 8),
+                            OutlinedButton.icon(
+                              onPressed: () async {
+                                final picked = await _pickDateTime(
+                                  _scheduledStart,
+                                );
+                                if (picked != null && mounted) {
+                                  setState(() => _scheduledStart = picked);
+                                }
+                              },
+                              icon: const Icon(Icons.event_outlined),
+                              label: Text(
+                                _scheduledStart == null
+                                    ? 'Choose start time'
+                                    : 'Starts ${_formatDateTime(_scheduledStart!)}',
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            OutlinedButton.icon(
+                              onPressed: () async {
+                                final picked = await _pickDateTime(
+                                  _scheduledEnd ?? _scheduledStart,
+                                );
+                                if (picked != null && mounted) {
+                                  setState(() => _scheduledEnd = picked);
+                                }
+                              },
+                              icon: const Icon(Icons.event_available_outlined),
+                              label: Text(
+                                _scheduledEnd == null
+                                    ? 'Choose optional end time'
+                                    : 'Ends ${_formatDateTime(_scheduledEnd!)}',
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 20),
+                          const Divider(height: 1),
+                          const SizedBox(height: 16),
+                        ],
                         Text(
                           'Cleanup amounts',
                           style: Theme.of(context).textTheme.titleSmall
@@ -368,13 +514,13 @@ class _CleanupEventDialogState extends State<CleanupEventDialog> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () => _close(),
                       child: const Text('Cancel'),
                     ),
                     const SizedBox(width: 8),
                     FilledButton(
                       onPressed: _submit,
-                      child: const Text('Submit'),
+                      child: Text(widget.submitLabel),
                     ),
                   ],
                 ),

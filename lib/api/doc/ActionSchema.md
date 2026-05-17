@@ -21,6 +21,11 @@ Name | Type | Description | Notes
 **likeUserIds** | **List<String>** | Database user ids who liked this action (newest first). | [optional] [default to const []]
 **likeCount** | **int** |  | [optional] [default to 0]
 **likedByMe** | **bool** |  | [optional] [default to false]
+**isActive** | **bool** |  | [optional] [default to true]
+**resolvedAt** | [**DateTime**](DateTime.md) |  | [optional] 
+**resolvedByUserId** | **String** |  | [optional] 
+**resolvedByActionId** | **String** |  | [optional] 
+**sourceTrashReportId** | **String** |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

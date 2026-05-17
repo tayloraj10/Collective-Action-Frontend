@@ -35,6 +35,7 @@ const EventDataType _kActionTypeWildflowerPlanting =
 
 /// Asset paths for map pins and mode buttons.
 const String _kAssetClean = 'assets/images/clean.png';
+const String _kAssetCleanScheduled = 'assets/images/clean-scheduled.png';
 const String _kAssetTrash = 'assets/images/trash.png';
 const String _kAssetPlanting = 'assets/images/planting.png';
 // const String _kAssetDraw = 'assets/images/draw.png';
@@ -86,6 +87,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   final Map<String, LatLng> _createdActionPositionOverride = {};
 
   BitmapDescriptor? _cleanupMarkerIcon;
+  BitmapDescriptor? _scheduledCleanupMarkerIcon;
   BitmapDescriptor? _trashMarkerIcon;
   BitmapDescriptor? _plantingMarkerIcon;
   BitmapDescriptor? _currentLocationMarkerIcon;
@@ -138,6 +140,11 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     const config = ImageConfiguration(size: Size(40, 40));
     final clean = await BitmapDescriptor.asset(config, _kAssetClean);
     if (!mounted) return;
+    final cleanScheduled = await BitmapDescriptor.asset(
+      config,
+      _kAssetCleanScheduled,
+    );
+    if (!mounted) return;
     final trash = await BitmapDescriptor.asset(config, _kAssetTrash);
     if (!mounted) return;
     final planting = await BitmapDescriptor.asset(config, _kAssetPlanting);
@@ -150,6 +157,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     if (mounted) {
       setState(() {
         _cleanupMarkerIcon = clean;
+        _scheduledCleanupMarkerIcon = cleanScheduled;
         _trashMarkerIcon = trash;
         _plantingMarkerIcon = planting;
         _currentLocationMarkerIcon = currentLocation;
@@ -157,9 +165,25 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     }
   }
 
-  BitmapDescriptor _iconForCleanup() =>
-      _cleanupMarkerIcon ??
-      BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
+  /// Purple pin only while the cleanup is still upcoming (same cutoff as RSVP).
+  static bool _isScheduledCleanup(ActionSchema action) {
+    final data = CleanupEventInfoDialog.eventDataFromAction(action);
+    final scheduledStart = data?.scheduledStart;
+    if (scheduledStart == null) return false;
+    final cutoff = data?.scheduledEnd ?? scheduledStart;
+    return !DateTime.now().isAfter(cutoff.toLocal());
+  }
+
+  BitmapDescriptor _iconForCleanup({bool scheduled = false}) {
+    if (scheduled) {
+      return _scheduledCleanupMarkerIcon ??
+          _cleanupMarkerIcon ??
+          BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan);
+    }
+    return _cleanupMarkerIcon ??
+        BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
+  }
+
   BitmapDescriptor _iconForTrash() =>
       _trashMarkerIcon ??
       BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
@@ -681,10 +705,12 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         final eventType = a.eventData!['type'] as String?;
         final isCleanup = eventType == _kActionTypeCleanup.value;
         final isTrash = eventType == _kActionTypeTrashReport.value;
+        if (isTrash && a.resolvedAt != null) continue;
         final isPlanting =
             eventType == _kActionTypeTreePlanting.value ||
             eventType == _kActionTypeWildflowerPlanting.value;
         if (!isCleanup && !isTrash && !isPlanting) continue;
+        final isScheduledCleanup = isCleanup && _isScheduledCleanup(a);
         final position =
             _createdActionPositionOverride[a.id] ??
             LatLng(a.latitude!.toDouble(), a.longitude!.toDouble());
@@ -695,7 +721,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
             icon: isPlanting
                 ? _iconForPlanting()
                 : isCleanup
-                ? _iconForCleanup()
+                ? _iconForCleanup(scheduled: isScheduledCleanup)
                 : _iconForTrash(),
             onTap: () => isPlanting
                 ? _showPlantingInfoDialog(context, a)
@@ -739,26 +765,11 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
 
     try {
       if (isCleanup) {
-        final eventData = CleanupEventData(
-          type: EventDataType.fromJson(readValue('type')) ?? EventDataType.cleanup,
-          name: readValue('name')?.toString() ?? '',
-          location: readValue('location')?.toString() ?? '',
-          smallBags: readValue('small_bags') is int
-              ? readValue('small_bags') as int
-              : int.tryParse('${readValue('small_bags') ?? ''}'),
-          largeBags: readValue('large_bags') is int
-              ? readValue('large_bags') as int
-              : int.tryParse('${readValue('large_bags') ?? ''}'),
-          pounds: readValue('pounds') != null
-              ? num.tryParse('${readValue('pounds')}')
-              : null,
-          imageUrl: readValue('image_url')?.toString(),
-        );
         await showDialog(
           context: context,
           builder: (c) => CleanupEventInfoDialog(
             action: action,
-            eventData: eventData,
+            eventData: CleanupEventInfoDialog.eventDataFromAction(action),
             campaignId: widget.campaign.id,
           ),
         );
@@ -923,13 +934,17 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     final LatLng droppedPosition = _droppedPosition!;
 
     if (_droppedType == 'cleanup') {
-      final userName = ref.read(currentUserProvider).value?.name;
+      final currentUser = ref.read(currentUserProvider).value;
+      final userName = currentUser?.name;
       if (mounted) setState(() => _isAddEventDialogOpen = true);
       final result = await showDialog<CleanupEventDialogResult>(
         context: context,
-        builder: (c) => CleanupEventDialog(
+        builder: (dialogContext) => CleanupEventDialog(
+          routeContext: dialogContext,
           position: droppedPosition,
           initialName: userName,
+          organizerUserId: currentUser?.id,
+          enableScheduling: currentUser != null,
         ),
       );
       if (mounted) setState(() => _isAddEventDialogOpen = false);
@@ -938,7 +953,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         actionType: ActionTypeValuesEnum.mapSubmission.value,
         lat: droppedPosition.latitude,
         lng: droppedPosition.longitude,
-        eventData: result.eventData.toJson(),
+        eventData: ActionsService.cleanupEventDataToJson(result.eventData),
         date: DateTime.now(),
       );
       if (created != null && result.photos.isNotEmpty && mounted) {
@@ -1016,7 +1031,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         actionType: ActionTypeValuesEnum.mapSubmission.value,
         lat: droppedPosition.latitude,
         lng: droppedPosition.longitude,
-        eventData: result.eventData.toJson(),
+        eventData: ActionsService.trashReportEventDataToJson(result.eventData),
         date: DateTime.now(),
       );
       if (created != null && result.photos.isNotEmpty && mounted) {
@@ -1087,15 +1102,6 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   //   ref.invalidate(actionsByLinkedProvider((widget.campaign.id, 7)));
   // }
 
-  /// Removes null values from event_data. Date is only at action level, not in event_data.
-  static Map<String, Object> _eventDataWithoutNulls(Map<String, dynamic> data) {
-    final result = <String, Object>{};
-    for (final e in data.entries) {
-      if (e.value != null) result[e.key] = e.value as Object;
-    }
-    return result;
-  }
-
   Future<ActionSchema?> _createAction({
     required String actionType,
     required double lat,
@@ -1114,7 +1120,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
           date: date,
           latitude: lat,
           longitude: lng,
-          eventData: _eventDataWithoutNulls(eventData),
+          eventData: ActionsService.encodeEventDataForApi(eventData),
         ),
       );
       if (mounted) {

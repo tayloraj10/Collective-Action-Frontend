@@ -1691,6 +1691,18 @@
                         }
                     },
                     {
+                        "name": "include_inactive",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "description": "Include resolved/inactive actions.",
+                            "default": false,
+                            "title": "Include Inactive"
+                        },
+                        "description": "Include resolved/inactive actions."
+                    },
+                    {
                         "name": "for_user_id",
                         "in": "query",
                         "required": false,
@@ -1753,6 +1765,18 @@
                         "schema": {
                             "$ref": "#/components/schemas/ActionTypeValuesEnum"
                         }
+                    },
+                    {
+                        "name": "include_inactive",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "description": "Include resolved/inactive actions.",
+                            "default": false,
+                            "title": "Include Inactive"
+                        },
+                        "description": "Include resolved/inactive actions."
                     },
                     {
                         "name": "for_user_id",
@@ -1923,6 +1947,48 @@
             }
         },
         "/actions/{action_id}": {
+            "patch": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Update Action",
+                "description": "Update a cleanup map submission owned by the requesting user.",
+                "operationId": "update_action_actions__action_id__patch",
+                "parameters": [
+                    {
+                        "name": "action_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Action Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ActionUpdateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "get": {
                 "tags": [
                     "actions"
@@ -2005,6 +2071,253 @@
                 }
             }
         },
+        "/actions/{trash_report_id}/claim-cleaned": {
+            "post": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Claim Trash Report Cleaned",
+                "description": "Create a cleanup from an active trash report and resolve the original report.",
+                "operationId": "claim_trash_report_cleaned_actions__trash_report_id__claim_cleaned_post",
+                "parameters": [
+                    {
+                        "name": "trash_report_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Trash Report Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ActionClaimCleanedSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/actions/{cleanup_id}/rsvps": {
+            "get": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "List Cleanup Rsvps",
+                "operationId": "list_cleanup_rsvps_actions__cleanup_id__rsvps_get",
+                "parameters": [
+                    {
+                        "name": "cleanup_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Cleanup Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "title": "Response List Cleanup Rsvps Actions  Cleanup Id  Rsvps Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/actions/{cleanup_id}/rsvp": {
+            "post": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Upsert Cleanup Rsvp",
+                "operationId": "upsert_cleanup_rsvp_actions__cleanup_id__rsvp_post",
+                "parameters": [
+                    {
+                        "name": "cleanup_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Cleanup Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CleanupParticipationBody"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Delete Cleanup Rsvp",
+                "operationId": "delete_cleanup_rsvp_actions__cleanup_id__rsvp_delete",
+                "parameters": [
+                    {
+                        "name": "cleanup_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Cleanup Id"
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "description": "Database id of the user removing their RSVP",
+                            "title": "User Id"
+                        },
+                        "description": "Database id of the user removing their RSVP"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/actions/{cleanup_id}/attendance": {
+            "get": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "List Cleanup Attendance",
+                "operationId": "list_cleanup_attendance_actions__cleanup_id__attendance_get",
+                "parameters": [
+                    {
+                        "name": "cleanup_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Cleanup Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "title": "Response List Cleanup Attendance Actions  Cleanup Id  Attendance Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "actions"
+                ],
+                "summary": "Mark Cleanup Attendance",
+                "operationId": "mark_cleanup_attendance_actions__cleanup_id__attendance_post",
+                "parameters": [
+                    {
+                        "name": "cleanup_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Cleanup Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CleanupParticipationBody"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActionSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/actions/by_linked/{linked_id}": {
             "get": {
                 "tags": [
@@ -2041,6 +2354,18 @@
                             "title": "Days"
                         },
                         "description": "Only return actions from the last N days"
+                    },
+                    {
+                        "name": "include_inactive",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "description": "Include resolved/inactive actions.",
+                            "default": false,
+                            "title": "Include Inactive"
+                        },
+                        "description": "Include resolved/inactive actions."
                     },
                     {
                         "name": "for_user_id",
@@ -2133,6 +2458,18 @@
                             ],
                             "title": "Action Type"
                         }
+                    },
+                    {
+                        "name": "include_inactive",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "description": "Include resolved/inactive actions.",
+                            "default": false,
+                            "title": "Include Inactive"
+                        },
+                        "description": "Include resolved/inactive actions."
                     }
                 ],
                 "responses": {
@@ -3716,6 +4053,86 @@
     },
     "components": {
         "schemas": {
+            "ActionClaimCleanedSchema": {
+                "properties": {
+                    "user_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "User Id"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "title": "Amount",
+                        "default": 1
+                    },
+                    "image_urls": {
+                        "anyOf": [
+                            {
+                                "items": {
+                                    "type": "string"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Urls",
+                        "description": "Optional list of image URLs"
+                    },
+                    "date": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Date"
+                    },
+                    "latitude": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Latitude"
+                    },
+                    "longitude": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Longitude"
+                    },
+                    "event_data": {
+                        "additionalProperties": true,
+                        "type": "object",
+                        "title": "Event Data"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "event_data"
+                ],
+                "title": "ActionClaimCleanedSchema"
+            },
             "ActionCreateSchema": {
                 "properties": {
                     "action_type": {
@@ -3959,6 +4376,59 @@
                         "type": "boolean",
                         "title": "Liked By Me",
                         "default": false
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "title": "Is Active",
+                        "default": true
+                    },
+                    "resolved_at": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Resolved At"
+                    },
+                    "resolved_by_user_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Resolved By User Id"
+                    },
+                    "resolved_by_action_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Resolved By Action Id"
+                    },
+                    "source_trash_report_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Source Trash Report Id"
                     }
                 },
                 "type": "object",
@@ -4013,6 +4483,92 @@
                     "Directory of Good Addition"
                 ],
                 "title": "ActionTypeValuesEnum"
+            },
+            "ActionUpdateSchema": {
+                "properties": {
+                    "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "User Id"
+                    },
+                    "amount": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Amount"
+                    },
+                    "image_urls": {
+                        "anyOf": [
+                            {
+                                "items": {
+                                    "type": "string"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Urls",
+                        "description": "Optional list of image URLs"
+                    },
+                    "date": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Date"
+                    },
+                    "latitude": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Latitude"
+                    },
+                    "longitude": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Longitude"
+                    },
+                    "event_data": {
+                        "anyOf": [
+                            {
+                                "additionalProperties": true,
+                                "type": "object"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Event Data"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "user_id"
+                ],
+                "title": "ActionUpdateSchema"
             },
             "AddProjectMemberSchema": {
                 "properties": {
@@ -4168,10 +4724,87 @@
                         "type": "string",
                         "title": "Location",
                         "default": ""
+                    },
+                    "scheduled_start": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Scheduled Start"
+                    },
+                    "scheduled_end": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Scheduled End"
+                    },
+                    "organizer_user_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Organizer User Id"
+                    },
+                    "status": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Status"
+                    },
+                    "rsvp_user_ids": {
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "type": "array",
+                        "title": "Rsvp User Ids"
+                    },
+                    "attended_user_ids": {
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "type": "array",
+                        "title": "Attended User Ids"
                     }
                 },
                 "type": "object",
                 "title": "CleanupEventData"
+            },
+            "CleanupParticipationBody": {
+                "properties": {
+                    "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "User Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "user_id"
+                ],
+                "title": "CleanupParticipationBody"
             },
             "CleanupRouteEventData": {
                 "properties": {
@@ -4249,12 +4882,12 @@
                     "lat": {
                         "type": "number",
                         "title": "Lat",
-                        "default": 0
+                        "default": 0.0
                     },
                     "lng": {
                         "type": "number",
                         "title": "Lng",
-                        "default": 0
+                        "default": 0.0
                     },
                     "number": {
                         "type": "integer",
@@ -5382,7 +6015,7 @@
                     "total_pounds": {
                         "type": "number",
                         "title": "Total Pounds",
-                        "default": 0
+                        "default": 0.0
                     },
                     "tree_planting_count": {
                         "type": "integer",
@@ -6588,7 +7221,7 @@
                     "total_pounds": {
                         "type": "number",
                         "title": "Total Pounds",
-                        "default": 0
+                        "default": 0.0
                     },
                     "tree_planting_count": {
                         "type": "integer",

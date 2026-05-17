@@ -20,6 +20,12 @@ class CleanupEventData {
     this.largeBags,
     this.pounds,
     this.location = '',
+    this.scheduledStart,
+    this.scheduledEnd,
+    this.organizerUserId,
+    this.status,
+    this.rsvpUserIds = const [],
+    this.attendedUserIds = const [],
   });
 
   EventDataType type;
@@ -36,6 +42,18 @@ class CleanupEventData {
 
   String location;
 
+  DateTime? scheduledStart;
+
+  DateTime? scheduledEnd;
+
+  String? organizerUserId;
+
+  String? status;
+
+  List<String> rsvpUserIds;
+
+  List<String> attendedUserIds;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is CleanupEventData &&
     other.type == type &&
@@ -44,7 +62,13 @@ class CleanupEventData {
     other.smallBags == smallBags &&
     other.largeBags == largeBags &&
     other.pounds == pounds &&
-    other.location == location;
+    other.location == location &&
+    other.scheduledStart == scheduledStart &&
+    other.scheduledEnd == scheduledEnd &&
+    other.organizerUserId == organizerUserId &&
+    other.status == status &&
+    _deepEquality.equals(other.rsvpUserIds, rsvpUserIds) &&
+    _deepEquality.equals(other.attendedUserIds, attendedUserIds);
 
   @override
   int get hashCode =>
@@ -55,10 +79,16 @@ class CleanupEventData {
     (smallBags == null ? 0 : smallBags!.hashCode) +
     (largeBags == null ? 0 : largeBags!.hashCode) +
     (pounds == null ? 0 : pounds!.hashCode) +
-    (location.hashCode);
+    (location.hashCode) +
+    (scheduledStart == null ? 0 : scheduledStart!.hashCode) +
+    (scheduledEnd == null ? 0 : scheduledEnd!.hashCode) +
+    (organizerUserId == null ? 0 : organizerUserId!.hashCode) +
+    (status == null ? 0 : status!.hashCode) +
+    (rsvpUserIds.hashCode) +
+    (attendedUserIds.hashCode);
 
   @override
-  String toString() => 'CleanupEventData[type=$type, name=$name, imageUrl=$imageUrl, smallBags=$smallBags, largeBags=$largeBags, pounds=$pounds, location=$location]';
+  String toString() => 'CleanupEventData[type=$type, name=$name, imageUrl=$imageUrl, smallBags=$smallBags, largeBags=$largeBags, pounds=$pounds, location=$location, scheduledStart=$scheduledStart, scheduledEnd=$scheduledEnd, organizerUserId=$organizerUserId, status=$status, rsvpUserIds=$rsvpUserIds, attendedUserIds=$attendedUserIds]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -85,6 +115,28 @@ class CleanupEventData {
       json[r'pounds'] = null;
     }
       json[r'location'] = this.location;
+    if (this.scheduledStart != null) {
+      json[r'scheduled_start'] = this.scheduledStart!.toUtc().toIso8601String();
+    } else {
+      json[r'scheduled_start'] = null;
+    }
+    if (this.scheduledEnd != null) {
+      json[r'scheduled_end'] = this.scheduledEnd!.toUtc().toIso8601String();
+    } else {
+      json[r'scheduled_end'] = null;
+    }
+    if (this.organizerUserId != null) {
+      json[r'organizer_user_id'] = this.organizerUserId;
+    } else {
+      json[r'organizer_user_id'] = null;
+    }
+    if (this.status != null) {
+      json[r'status'] = this.status;
+    } else {
+      json[r'status'] = null;
+    }
+      json[r'rsvp_user_ids'] = this.rsvpUserIds;
+      json[r'attended_user_ids'] = this.attendedUserIds;
     return json;
   }
 
@@ -116,6 +168,16 @@ class CleanupEventData {
             ? null
             : num.parse('${json[r'pounds']}'),
         location: mapValueOfType<String>(json, r'location') ?? '',
+        scheduledStart: mapDateTime(json, r'scheduled_start', r''),
+        scheduledEnd: mapDateTime(json, r'scheduled_end', r''),
+        organizerUserId: mapValueOfType<String>(json, r'organizer_user_id'),
+        status: mapValueOfType<String>(json, r'status'),
+        rsvpUserIds: json[r'rsvp_user_ids'] is Iterable
+            ? (json[r'rsvp_user_ids'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
+        attendedUserIds: json[r'attended_user_ids'] is Iterable
+            ? (json[r'attended_user_ids'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
       );
     }
     return null;

@@ -4,6 +4,7 @@ import 'package:collective_action_frontend/components/photo_thumbnail_strip.dart
 import 'package:collective_action_frontend/services/photos_service.dart';
 import 'package:flutter/material.dart';
 
+import 'map_action_id_badge.dart';
 import 'photo_viewer_dialog.dart';
 
 class PlantingEventInfoDialog extends StatelessWidget {
@@ -106,16 +107,19 @@ class PlantingEventInfoDialog extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Text(
-                        eventType == EventDataType.wildflowerPlanting
-                            ? 'Wildflower Planting'
-                            : 'Tree Planting',
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.2,
+                      Expanded(
+                        child: Text(
+                          eventType == EventDataType.wildflowerPlanting
+                              ? 'Wildflower Planting'
+                              : 'Tree Planting',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.2,
+                          ),
                         ),
                       ),
+                      MapActionIdBadge(actionId: action.id),
                     ],
                   ),
                 ),

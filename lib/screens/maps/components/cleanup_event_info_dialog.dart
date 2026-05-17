@@ -1,4 +1,5 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
+import 'package:collective_action_frontend/app/router.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/confirmation_dialog.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
@@ -6,11 +7,17 @@ import 'package:collective_action_frontend/components/photo_thumbnail_strip.dart
 import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/providers/map_events_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
+import 'package:collective_action_frontend/screens/maps/components/cleanup_event_dialog.dart';
+import 'package:collective_action_frontend/services/actions_service.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 
+import 'map_action_id_badge.dart';
 import 'photo_viewer_dialog.dart';
 
 /// Dialog to display cleanup event information when a cleanup pin is clicked.
@@ -48,6 +55,21 @@ class CleanupEventInfoDialog extends ConsumerWidget {
     return '${_monthNames[d.month - 1]} ${d.day}, ${d.year}';
   }
 
+  String _formatDateTime(DateTime d) {
+    final local = d.toLocal();
+    final hour = local.hour % 12 == 0 ? 12 : local.hour % 12;
+    final minute = local.minute.toString().padLeft(2, '0');
+    final suffix = local.hour >= 12 ? 'PM' : 'AM';
+    return '${_formatDate(local)} $hour:$minute $suffix';
+  }
+
+  /// Full cleanup payload from [ActionSchema.eventData] (schedule, RSVPs, etc.).
+  static CleanupEventData? eventDataFromAction(ActionSchema action) {
+    final raw = action.eventData;
+    if (raw == null || raw.isEmpty) return null;
+    return CleanupEventData.fromJson(Map<String, dynamic>.from(raw));
+  }
+
   /// Prefer event_data image_url, then action.imageUrls. Normalize so relative or quoted URLs load.
   static List<String> _imageUrls(
     ActionSchema action,
@@ -70,6 +92,7 @@ class CleanupEventInfoDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cleanupEventData = eventDataFromAction(action) ?? eventData;
     final currentUser = ref.watch(currentUserProvider).value;
     final isOwner = currentUser != null && currentUser.id == action.userId;
     final size = MediaQuery.sizeOf(context);
@@ -77,11 +100,21 @@ class CleanupEventInfoDialog extends ConsumerWidget {
     final maxW = (size.width * 0.95).clamp(280.0, 400.0);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final imageUrls = _imageUrls(action, cleanupEventData);
+    final scheduledStart = cleanupEventData?.scheduledStart;
+    final scheduledEnd = cleanupEventData?.scheduledEnd;
+    final participationCutoff = scheduledEnd ?? scheduledStart;
+    final hasPassed =
+        participationCutoff != null &&
+        DateTime.now().isAfter(participationCutoff.toLocal());
+    final currentUserId = currentUser?.id;
+    final hasRsvped =
+        currentUserId != null &&
+        (cleanupEventData?.rsvpUserIds.contains(currentUserId) ?? false);
     final accentColor = AppColors.successGreen;
     final surfaceVariant = isDark
         ? theme.colorScheme.surfaceContainerHighest
         : theme.colorScheme.surfaceContainerLow;
-    final imageUrls = _imageUrls(action, eventData);
 
     return Dialog(
       elevation: 8,
@@ -129,14 +162,19 @@ class CleanupEventInfoDialog extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Text(
-                        'Cleanup Event',
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.2,
+                      Expanded(
+                        child: Text(
+                          scheduledStart == null
+                              ? 'Cleanup Event'
+                              : 'Scheduled Cleanup',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.2,
+                          ),
                         ),
                       ),
+                      MapActionIdBadge(actionId: action.id),
                     ],
                   ),
                 ),
@@ -190,11 +228,11 @@ class CleanupEventInfoDialog extends ConsumerWidget {
                           final cards = <Widget>[];
 
                           final hasName =
-                              eventData?.name != null &&
-                              eventData!.name.isNotEmpty;
+                              cleanupEventData?.name != null &&
+                              cleanupEventData!.name.isNotEmpty;
                           final hasLocation =
-                              eventData?.location != null &&
-                              eventData!.location.isNotEmpty;
+                              cleanupEventData?.location != null &&
+                              cleanupEventData!.location.isNotEmpty;
                           if (hasName || hasLocation) {
                             cards.add(
                               _SectionCard(
@@ -206,14 +244,14 @@ class CleanupEventInfoDialog extends ConsumerWidget {
                                   if (hasName)
                                     _InfoRow(
                                       label: 'Name',
-                                      value: eventData!.name,
+                                      value: cleanupEventData.name,
                                       icon: Icons.person_outline,
                                       accentColor: accentColor,
                                     ),
                                   if (hasLocation)
                                     _InfoRow(
                                       label: 'Location',
-                                      value: eventData!.location,
+                                      value: cleanupEventData.location,
                                       icon: Icons.location_on_outlined,
                                       accentColor: accentColor,
                                     ),
@@ -223,9 +261,9 @@ class CleanupEventInfoDialog extends ConsumerWidget {
                           }
 
                           final hasAmounts =
-                              eventData?.smallBags != null ||
-                              eventData?.largeBags != null ||
-                              eventData?.pounds != null;
+                              cleanupEventData?.smallBags != null ||
+                              cleanupEventData?.largeBags != null ||
+                              cleanupEventData?.pounds != null;
                           if (hasAmounts) {
                             cards.add(
                               _SectionCard(
@@ -234,33 +272,67 @@ class CleanupEventInfoDialog extends ConsumerWidget {
                                 icon: Icons.inventory_2_outlined,
                                 title: 'Cleanup amounts',
                                 children: [
-                                  if (eventData?.smallBags != null)
+                                  if (cleanupEventData?.smallBags != null)
                                     Tooltip(
                                       message: 'About a shopping bag',
                                       child: _InfoRow(
                                         label: 'Small bags',
-                                        value: '${eventData!.smallBags}',
+                                        value: '${cleanupEventData!.smallBags}',
                                         icon: Icons.shopping_bag_outlined,
                                         accentColor: accentColor,
                                       ),
                                     ),
-                                  if (eventData?.largeBags != null)
+                                  if (cleanupEventData?.largeBags != null)
                                     Tooltip(
                                       message: 'About a garbage bag',
                                       child: _InfoRow(
                                         label: 'Large bags',
-                                        value: '${eventData!.largeBags}',
+                                        value: '${cleanupEventData!.largeBags}',
                                         icon: Icons.delete_outline,
                                         accentColor: accentColor,
                                       ),
                                     ),
-                                  if (eventData?.pounds != null)
+                                  if (cleanupEventData?.pounds != null)
                                     _InfoRow(
                                       label: 'Pounds',
-                                      value: '${eventData!.pounds}',
+                                      value: '${cleanupEventData!.pounds}',
                                       icon: Icons.scale_outlined,
                                       accentColor: accentColor,
                                     ),
+                                ],
+                              ),
+                            );
+                          }
+
+                          if (scheduledStart != null) {
+                            cards.add(
+                              _SectionCard(
+                                surfaceVariant: surfaceVariant,
+                                accentColor: accentColor,
+                                icon: Icons.event_outlined,
+                                title: 'Schedule',
+                                children: [
+                                  _InfoRow(
+                                    label: 'Starts',
+                                    value: _formatDateTime(scheduledStart),
+                                    icon: Icons.schedule_outlined,
+                                    accentColor: accentColor,
+                                  ),
+                                  if (scheduledEnd != null)
+                                    _InfoRow(
+                                      label: 'Ends',
+                                      value: _formatDateTime(scheduledEnd),
+                                      icon: Icons.event_available_outlined,
+                                      accentColor: accentColor,
+                                    ),
+                                  _ParticipantAvatarRow(
+                                    label: 'Interested in going',
+                                    userIds:
+                                        cleanupEventData?.rsvpUserIds ??
+                                        const [],
+                                    icon: Icons.how_to_reg_outlined,
+                                    accentColor: accentColor,
+                                  ),
                                 ],
                               ),
                             );
@@ -298,39 +370,106 @@ class CleanupEventInfoDialog extends ConsumerWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (isOwner) ...[
+                      if (currentUserId == null &&
+                          scheduledStart != null &&
+                          !hasPassed) ...[
                         OutlinedButton.icon(
-                          onPressed: () => _confirmAndDelete(
-                            context,
-                            ref,
-                            action,
-                            campaignId,
-                          ),
-                          icon: const Icon(Icons.delete_outline, size: 18),
-                          label: const Text('Delete'),
+                          onPressed: () => _goToLoginForRsvp(context, ref),
+                          icon: const Icon(Icons.login, size: 18),
+                          label: const Text('Sign in to RSVP'),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: theme.colorScheme.error,
-                            side: BorderSide(color: theme.colorScheme.error),
+                            foregroundColor: accentColor,
+                            side: BorderSide(color: accentColor),
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
+                              horizontal: 20,
+                              vertical: 12,
                             ),
+                            minimumSize: const Size(double.infinity, 44),
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(height: 12),
                       ],
-                      FilledButton(
-                        onPressed: () => safePop(context),
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
+                      Wrap(
+                        alignment: WrapAlignment.end,
+                        spacing: 10,
+                        runSpacing: 8,
+                        children: [
+                          if (currentUserId != null &&
+                              scheduledStart != null &&
+                              !hasPassed)
+                            OutlinedButton.icon(
+                              onPressed: () => _toggleCleanupInterest(
+                                context,
+                                ref,
+                                action,
+                                currentUserId,
+                                hasRsvped,
+                                campaignId,
+                              ),
+                              icon: Icon(
+                                hasRsvped
+                                    ? Icons.event_busy_outlined
+                                    : Icons.how_to_reg_outlined,
+                                size: 18,
+                              ),
+                              label: Text(
+                                hasRsvped ? 'Not interested' : "I'm interested",
+                              ),
+                            ),
+                          if (isOwner) ...[
+                            OutlinedButton.icon(
+                              onPressed: () => editCleanup(
+                                context,
+                                ref,
+                                action,
+                                initialEventData: cleanupEventData,
+                                campaignId: campaignId,
+                                popInfoDialogOnSuccess: true,
+                              ),
+                              icon: const Icon(Icons.edit_outlined, size: 18),
+                              label: const Text('Edit'),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 10,
+                                ),
+                              ),
+                            ),
+                            OutlinedButton.icon(
+                              onPressed: () => _confirmAndDelete(
+                                context,
+                                ref,
+                                action,
+                                campaignId,
+                              ),
+                              icon: const Icon(Icons.delete_outline, size: 18),
+                              label: const Text('Delete'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: theme.colorScheme.error,
+                                side: BorderSide(
+                                  color: theme.colorScheme.error,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 10,
+                                ),
+                              ),
+                            ),
+                          ],
+                          FilledButton(
+                            onPressed: () => safePop(context),
+                            style: FilledButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 10,
+                              ),
+                            ),
+                            child: const Text('Close'),
                           ),
-                        ),
-                        child: const Text('Close'),
+                        ],
                       ),
                     ],
                   ),
@@ -341,6 +480,16 @@ class CleanupEventInfoDialog extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  static void _goToLoginForRsvp(BuildContext context, WidgetRef ref) {
+    final from = ref.read(goRouterProvider).state.uri.toString();
+    final loginRoute = Uri(
+      path: '/login',
+      queryParameters: {'from': from},
+    ).toString();
+    safePop(context);
+    ref.read(goRouterProvider).go(loginRoute);
   }
 
   static Future<void> _confirmAndDelete(
@@ -379,6 +528,159 @@ class CleanupEventInfoDialog extends ConsumerWidget {
         ).showSnackBar(CustomSnackBar.error('Error deleting map submission'));
       }
     }
+  }
+
+  /// Edit a cleanup submission. Used from the map pin dialog and campaign info pane.
+  ///
+  /// Pass [hostContext] from [MapScreen] when editing from the campaign info drawer
+  /// so the edit dialog and snackbars use the map scaffold navigator (not the drawer).
+  static Future<void> editCleanup(
+    BuildContext context,
+    WidgetRef ref,
+    ActionSchema action, {
+    CleanupEventData? initialEventData,
+    String? campaignId,
+    BuildContext? hostContext,
+    bool popInfoDialogOnSuccess = false,
+    void Function(ActionSchema updated)? onSuccess,
+  }) async {
+    final dialogHost = hostContext ?? context;
+    final currentUser = ref.read(currentUserProvider).value;
+    final userId = currentUser?.id;
+    if (userId == null || userId != action.userId) {
+      ScaffoldMessenger.of(dialogHost).showSnackBar(
+        CustomSnackBar.info('Only the submission owner can edit it.'),
+      );
+      return;
+    }
+    final lat = action.latitude?.toDouble();
+    final lng = action.longitude?.toDouble();
+    if (lat == null || lng == null) {
+      ScaffoldMessenger.of(dialogHost).showSnackBar(
+        CustomSnackBar.error('This cleanup is missing a location.'),
+      );
+      return;
+    }
+
+    final initialData = initialEventData ?? eventDataFromAction(action);
+    if (initialData == null) {
+      ScaffoldMessenger.of(dialogHost).showSnackBar(
+        CustomSnackBar.error('Could not load cleanup details for editing.'),
+      );
+      return;
+    }
+
+    final messenger = ScaffoldMessenger.of(dialogHost);
+    final result = await showDialog<CleanupEventDialogResult>(
+      context: dialogHost,
+      useRootNavigator: true,
+      barrierDismissible: false,
+      builder: (dialogContext) => PointerInterceptor(
+        child: CleanupEventDialog(
+          routeContext: dialogContext,
+          position: LatLng(lat, lng),
+          initialEventData: initialData,
+          organizerUserId: userId,
+          title: 'Edit Cleanup',
+          submitLabel: 'Save',
+        ),
+      ),
+    );
+    if (result == null) return;
+
+    try {
+      final actionsService = ActionsService();
+      var imageUrls = List<String>.from(action.imageUrls);
+      if (result.photos.isNotEmpty) {
+        final uploaded = await PhotosService().uploadSubmissionPhotosBatch(
+          action.id,
+          result.photos,
+        );
+        if (uploaded != null && uploaded.isNotEmpty) {
+          imageUrls = [...imageUrls, ...uploaded];
+        }
+      }
+      final updated = await actionsService.updateAction(
+        actionId: action.id,
+        userId: userId,
+        amount: action.amount,
+        imageUrls: imageUrls,
+        latitude: lat,
+        longitude: lng,
+        eventData: ActionsService.cleanupEventDataToJson(result.eventData),
+      );
+      if (updated == null) {
+        throw Exception('Update returned no data');
+      }
+
+      var resolved = updated;
+      if (campaignId != null) {
+        ref.invalidate(mapEventsForCampaignProvider(campaignId));
+        ref.invalidate(actionsByLinkedProvider((campaignId, null)));
+        ref.invalidate(actionsByLinkedProvider((campaignId, 7)));
+        final refreshed = await ref.read(
+          mapEventsForCampaignProvider(campaignId).future,
+        );
+        for (final a in refreshed) {
+          if (a.id == action.id) {
+            resolved = a;
+            break;
+          }
+        }
+      }
+      ref.read(activeActionProvider.notifier).refresh();
+
+      onSuccess?.call(resolved);
+      if (popInfoDialogOnSuccess && context.mounted) {
+        Navigator.of(context).pop();
+      }
+      messenger.showSnackBar(CustomSnackBar.success('Cleanup updated.'));
+    } catch (e) {
+      messenger.showSnackBar(
+        CustomSnackBar.error('Failed to update cleanup: $e'),
+      );
+    }
+  }
+
+  static Future<void> _toggleCleanupInterest(
+    BuildContext context,
+    WidgetRef ref,
+    ActionSchema action,
+    String userId,
+    bool hasRsvped, [
+    String? campaignId,
+  ]) async {
+    try {
+      final actionsService = ActionsService();
+      if (hasRsvped) {
+        await actionsService.removeCleanupRsvp(action.id, userId);
+      } else {
+        await actionsService.rsvpToCleanup(action.id, userId);
+      }
+      if (!context.mounted) return;
+      _refreshCleanupProviders(ref, campaignId);
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackBar.success(
+          hasRsvped ? 'Interest removed.' : 'Interest saved.',
+        ),
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(CustomSnackBar.error('Failed to update interest: $e'));
+      }
+    }
+  }
+
+  static void _refreshCleanupProviders(WidgetRef ref, String? campaignId) {
+    if (campaignId != null) {
+      ref.invalidate(mapEventsForCampaignProvider(campaignId));
+      ref.invalidate(actionsByLinkedProvider((campaignId, null)));
+      ref.invalidate(actionsByLinkedProvider((campaignId, 7)));
+    }
+    ref.read(activeActionProvider.notifier).refresh();
   }
 }
 
@@ -485,6 +787,89 @@ class _InfoRow extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ParticipantAvatarRow extends StatelessWidget {
+  final String label;
+  final List<String> userIds;
+  final IconData icon;
+  final Color accentColor;
+
+  const _ParticipantAvatarRow({
+    required this.label,
+    required this.userIds,
+    required this.icon,
+    required this.accentColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final muted = theme.colorScheme.onSurface.withValues(alpha: 0.62);
+    final ids = {
+      for (final id in userIds)
+        if (id.trim().isNotEmpty) id.trim(),
+    }.toList();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: accentColor.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 16, color: accentColor),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${label.toUpperCase()} (${ids.length})',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: muted,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.9,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                if (ids.isEmpty)
+                  Text(
+                    'No one yet',
+                    style: theme.textTheme.bodyMedium?.copyWith(color: muted),
+                  )
+                else
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      for (final id in ids)
+                        UserAvatar(
+                          userId: id,
+                          radius: 14,
+                          borderWidth: 1.5,
+                          accentColorOverride: accentColor,
+                          showTooltip: true,
+                          showProfileOnTap: true,
+                          heroTagSuffix: '$label-${id.hashCode}',
+                        ),
+                    ],
+                  ),
               ],
             ),
           ),

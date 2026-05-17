@@ -26,6 +26,11 @@ class ActionSchema {
     this.likeUserIds = const [],
     this.likeCount = 0,
     this.likedByMe = false,
+    this.isActive = true,
+    this.resolvedAt,
+    this.resolvedByUserId,
+    this.resolvedByActionId,
+    this.sourceTrashReportId,
   });
 
   String id;
@@ -56,6 +61,16 @@ class ActionSchema {
 
   bool likedByMe;
 
+  bool isActive;
+
+  DateTime? resolvedAt;
+
+  String? resolvedByUserId;
+
+  String? resolvedByActionId;
+
+  String? sourceTrashReportId;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is ActionSchema &&
     other.id == id &&
@@ -70,7 +85,12 @@ class ActionSchema {
     _deepEquality.equals(other.eventData, eventData) &&
     _deepEquality.equals(other.likeUserIds, likeUserIds) &&
     other.likeCount == likeCount &&
-    other.likedByMe == likedByMe;
+    other.likedByMe == likedByMe &&
+    other.isActive == isActive &&
+    other.resolvedAt == resolvedAt &&
+    other.resolvedByUserId == resolvedByUserId &&
+    other.resolvedByActionId == resolvedByActionId &&
+    other.sourceTrashReportId == sourceTrashReportId;
 
   @override
   int get hashCode =>
@@ -87,10 +107,15 @@ class ActionSchema {
     (eventData == null ? 0 : eventData!.hashCode) +
     (likeUserIds.hashCode) +
     (likeCount.hashCode) +
-    (likedByMe.hashCode);
+    (likedByMe.hashCode) +
+    (isActive.hashCode) +
+    (resolvedAt == null ? 0 : resolvedAt!.hashCode) +
+    (resolvedByUserId == null ? 0 : resolvedByUserId!.hashCode) +
+    (resolvedByActionId == null ? 0 : resolvedByActionId!.hashCode) +
+    (sourceTrashReportId == null ? 0 : sourceTrashReportId!.hashCode);
 
   @override
-  String toString() => 'ActionSchema[id=$id, actionType=$actionType, amount=$amount, date=$date, imageUrls=$imageUrls, linkedId=$linkedId, userId=$userId, latitude=$latitude, longitude=$longitude, eventData=$eventData, likeUserIds=$likeUserIds, likeCount=$likeCount, likedByMe=$likedByMe]';
+  String toString() => 'ActionSchema[id=$id, actionType=$actionType, amount=$amount, date=$date, imageUrls=$imageUrls, linkedId=$linkedId, userId=$userId, latitude=$latitude, longitude=$longitude, eventData=$eventData, likeUserIds=$likeUserIds, likeCount=$likeCount, likedByMe=$likedByMe, isActive=$isActive, resolvedAt=$resolvedAt, resolvedByUserId=$resolvedByUserId, resolvedByActionId=$resolvedByActionId, sourceTrashReportId=$sourceTrashReportId]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -131,6 +156,27 @@ class ActionSchema {
       json[r'like_user_ids'] = this.likeUserIds;
       json[r'like_count'] = this.likeCount;
       json[r'liked_by_me'] = this.likedByMe;
+      json[r'is_active'] = this.isActive;
+    if (this.resolvedAt != null) {
+      json[r'resolved_at'] = this.resolvedAt!.toUtc().toIso8601String();
+    } else {
+      json[r'resolved_at'] = null;
+    }
+    if (this.resolvedByUserId != null) {
+      json[r'resolved_by_user_id'] = this.resolvedByUserId;
+    } else {
+      json[r'resolved_by_user_id'] = null;
+    }
+    if (this.resolvedByActionId != null) {
+      json[r'resolved_by_action_id'] = this.resolvedByActionId;
+    } else {
+      json[r'resolved_by_action_id'] = null;
+    }
+    if (this.sourceTrashReportId != null) {
+      json[r'source_trash_report_id'] = this.sourceTrashReportId;
+    } else {
+      json[r'source_trash_report_id'] = null;
+    }
     return json;
   }
 
@@ -176,6 +222,11 @@ class ActionSchema {
             : const [],
         likeCount: mapValueOfType<int>(json, r'like_count') ?? 0,
         likedByMe: mapValueOfType<bool>(json, r'liked_by_me') ?? false,
+        isActive: mapValueOfType<bool>(json, r'is_active') ?? true,
+        resolvedAt: mapDateTime(json, r'resolved_at', r''),
+        resolvedByUserId: mapValueOfType<String>(json, r'resolved_by_user_id'),
+        resolvedByActionId: mapValueOfType<String>(json, r'resolved_by_action_id'),
+        sourceTrashReportId: mapValueOfType<String>(json, r'source_trash_report_id'),
       );
     }
     return null;
