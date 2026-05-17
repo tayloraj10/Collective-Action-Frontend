@@ -45,6 +45,9 @@ class InitiativeCard extends ConsumerWidget {
     final progress = (initiative.complete ?? 0.0) / goal;
 
     final isPriority = initiative.priority == true;
+    final hasDescription =
+        initiative.description != null &&
+        initiative.description!.trim().isNotEmpty;
     final borderColor = isPriority
         ? Color.lerp(cardColor, Colors.black, 0.5)!
         : null;
@@ -133,6 +136,17 @@ class InitiativeCard extends ConsumerWidget {
                 )
               : null;
 
+          final descriptionIcon = hasDescription
+              ? _InitiativeDescriptionIcon(
+                  onTap: () => _showInitiativeDescriptionDialog(
+                    context,
+                    initiative.title,
+                    initiative.description!.trim(),
+                  ),
+                  isMobile: isMobile,
+                )
+              : null;
+
           // includeLink: false is used in bounded-height (grid) cards where the
           // link is pinned as a separate Positioned widget so it never scrolls away.
           Widget contentAboveProgress({
@@ -189,12 +203,16 @@ class InitiativeCard extends ConsumerWidget {
 
           final progressBarTop = progressBarGap;
 
-          // Reserve right side for the plus button so title never overlaps it.
+          // Reserve right side for top action icons so title never overlaps them.
           const double plusButtonReserve = 44.0;
+          final descriptionIconSize = isMobile ? 24.0 : 26.0;
+          final topRightReserve =
+              plusButtonReserve +
+              (descriptionIcon != null ? descriptionIconSize + 6 : 0);
           final contentPadding = EdgeInsets.fromLTRB(
             containerPadding,
             containerPaddingTop,
-            containerPadding + plusButtonReserve,
+            containerPadding + topRightReserve,
             0,
           );
           final progressBarPadding = isMobile
@@ -266,18 +284,10 @@ class InitiativeCard extends ConsumerWidget {
                             child: titleScrollContent,
                           ),
                         ),
-                        Positioned(
-                          top: 0,
-                          right: 0,
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              top: isMobile ? 6.0 : 8.0,
-                              right: isMobile ? 6.0 : 8.0,
-                            ),
-                            child: InitiativeSubmissionButton(
-                              initiative: initiative,
-                            ),
-                          ),
+                        ..._cardTopRightActions(
+                          isMobile: isMobile,
+                          descriptionIcon: descriptionIcon,
+                          initiative: initiative,
                         ),
                       ],
                     ),
@@ -311,18 +321,10 @@ class InitiativeCard extends ConsumerWidget {
                   clipBehavior: Clip.none,
                   children: [
                     Padding(padding: contentPadding, child: fullContent),
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          top: isMobile ? 6.0 : 8.0,
-                          right: isMobile ? 6.0 : 8.0,
-                        ),
-                        child: InitiativeSubmissionButton(
-                          initiative: initiative,
-                        ),
-                      ),
+                    ..._cardTopRightActions(
+                      isMobile: isMobile,
+                      descriptionIcon: descriptionIcon,
+                      initiative: initiative,
                     ),
                   ],
                 ),
@@ -334,6 +336,131 @@ class InitiativeCard extends ConsumerWidget {
       ),
     );
   }
+}
+
+List<Widget> _cardTopRightActions({
+  required bool isMobile,
+  required Widget? descriptionIcon,
+  required InitiativeSchema initiative,
+}) {
+  final topPad = isMobile ? 6.0 : 8.0;
+  final sidePad = isMobile ? 6.0 : 8.0;
+  final iconGap = isMobile ? 4.0 : 6.0;
+
+  return [
+    if (descriptionIcon != null)
+      Positioned(
+        top: topPad,
+        right: sidePad + 44 + iconGap,
+        child: descriptionIcon,
+      ),
+    Positioned(
+      top: topPad,
+      right: sidePad,
+      child: InitiativeSubmissionButton(initiative: initiative),
+    ),
+  ];
+}
+
+class _InitiativeDescriptionIcon extends StatelessWidget {
+  const _InitiativeDescriptionIcon({
+    required this.onTap,
+    required this.isMobile,
+  });
+
+  final VoidCallback onTap;
+  final bool isMobile;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = isMobile ? 24.0 : 26.0;
+    final iconSize = isMobile ? 15.0 : 17.0;
+    return Tooltip(
+      message: 'View description',
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          width: size,
+          height: size,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Colors.white.withAlpha(48),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.info_outline_rounded,
+            size: iconSize,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+List<String> _descriptionParagraphs(String description) {
+  final normalized = description.replaceAll('\r\n', '\n').trim();
+  if (normalized.isEmpty) return const [];
+
+  var parts = normalized
+      .split(RegExp(r'\n\s*\n'))
+      .map((p) => p.trim())
+      .where((p) => p.isNotEmpty)
+      .toList();
+  if (parts.length > 1) return parts;
+
+  parts = normalized
+      .split(RegExp(r'\n(?=(?:HOW TO |STEP #\d))'))
+      .map((p) => p.trim())
+      .where((p) => p.isNotEmpty)
+      .toList();
+  if (parts.isNotEmpty) return parts;
+
+  return [normalized];
+}
+
+void _showInitiativeDescriptionDialog(
+  BuildContext context,
+  String title,
+  String description,
+) {
+  final paragraphs = _descriptionParagraphs(description);
+  if (paragraphs.isEmpty) return;
+
+  final screenWidth = MediaQuery.sizeOf(context).width;
+  final dialogWidth = (screenWidth * 0.88).clamp(280.0, 440.0);
+
+  showDialog<void>(
+    context: context,
+    builder: (dialogContext) {
+      final bodyStyle = Theme.of(dialogContext).textTheme.bodyMedium;
+      return AlertDialog(
+        title: Text(title),
+        content: SizedBox(
+          width: dialogWidth,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var i = 0; i < paragraphs.length; i++) ...[
+                  if (i > 0) const SizedBox(height: 16),
+                  Text(paragraphs[i], style: bodyStyle),
+                ],
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      );
+    },
+  );
 }
 
 /// Avatar only for inline use after "by" in title; tooltip shows "Created by [name]".

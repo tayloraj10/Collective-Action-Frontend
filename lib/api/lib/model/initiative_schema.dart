@@ -15,6 +15,7 @@ class InitiativeSchema {
   InitiativeSchema({
     required this.id,
     required this.title,
+    this.description,
     required this.action,
     this.categoryId,
     this.goal,
@@ -28,6 +29,8 @@ class InitiativeSchema {
   String id;
 
   String title;
+
+  String? description;
 
   String action;
 
@@ -49,6 +52,7 @@ class InitiativeSchema {
   bool operator ==(Object other) => identical(this, other) || other is InitiativeSchema &&
     other.id == id &&
     other.title == title &&
+    other.description == description &&
     other.action == action &&
     other.categoryId == categoryId &&
     other.goal == goal &&
@@ -63,6 +67,7 @@ class InitiativeSchema {
     // ignore: unnecessary_parenthesis
     (id.hashCode) +
     (title.hashCode) +
+    (description == null ? 0 : description!.hashCode) +
     (action.hashCode) +
     (categoryId == null ? 0 : categoryId!.hashCode) +
     (goal == null ? 0 : goal!.hashCode) +
@@ -73,12 +78,17 @@ class InitiativeSchema {
     (createdBy.hashCode);
 
   @override
-  String toString() => 'InitiativeSchema[id=$id, title=$title, action=$action, categoryId=$categoryId, goal=$goal, complete=$complete, link=$link, priority=$priority, statusId=$statusId, createdBy=$createdBy]';
+  String toString() => 'InitiativeSchema[id=$id, title=$title, description=$description, action=$action, categoryId=$categoryId, goal=$goal, complete=$complete, link=$link, priority=$priority, statusId=$statusId, createdBy=$createdBy]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'id'] = this.id;
       json[r'title'] = this.title;
+    if (this.description != null) {
+      json[r'description'] = this.description;
+    } else {
+      json[r'description'] = null;
+    }
       json[r'action'] = this.action;
     if (this.categoryId != null) {
       json[r'category_id'] = this.categoryId;
@@ -131,6 +141,7 @@ class InitiativeSchema {
       return InitiativeSchema(
         id: mapValueOfType<String>(json, r'id')!,
         title: mapValueOfType<String>(json, r'title')!,
+        description: mapValueOfType<String>(json, r'description'),
         action: mapValueOfType<String>(json, r'action')!,
         categoryId: mapValueOfType<String>(json, r'category_id'),
         goal: mapValueOfType<int>(json, r'goal'),

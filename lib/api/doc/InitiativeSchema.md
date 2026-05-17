@@ -10,6 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **String** |  | 
 **title** | **String** |  | 
+**description** | **String** |  | [optional] 
 **action** | **String** |  | 
 **categoryId** | **String** |  | [optional] 
 **goal** | **int** |  | [optional] 

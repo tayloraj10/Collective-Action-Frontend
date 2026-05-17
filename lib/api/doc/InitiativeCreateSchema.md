@@ -9,6 +9,7 @@ import 'package:collective_action_api/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **title** | **String** |  | 
+**description** | **String** |  | [optional] 
 **action** | **String** |  | 
 **createdBy** | **String** |  | 
 **categoryId** | **String** |  | [optional] 

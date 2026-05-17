@@ -14,6 +14,7 @@ class InitiativeCreateSchema {
   /// Returns a new [InitiativeCreateSchema] instance.
   InitiativeCreateSchema({
     required this.title,
+    this.description,
     required this.action,
     required this.createdBy,
     this.categoryId,
@@ -24,6 +25,8 @@ class InitiativeCreateSchema {
   });
 
   String title;
+
+  String? description;
 
   String action;
 
@@ -42,6 +45,7 @@ class InitiativeCreateSchema {
   @override
   bool operator ==(Object other) => identical(this, other) || other is InitiativeCreateSchema &&
     other.title == title &&
+    other.description == description &&
     other.action == action &&
     other.createdBy == createdBy &&
     other.categoryId == categoryId &&
@@ -54,6 +58,7 @@ class InitiativeCreateSchema {
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (title.hashCode) +
+    (description == null ? 0 : description!.hashCode) +
     (action.hashCode) +
     (createdBy.hashCode) +
     (categoryId == null ? 0 : categoryId!.hashCode) +
@@ -63,11 +68,16 @@ class InitiativeCreateSchema {
     (statusId == null ? 0 : statusId!.hashCode);
 
   @override
-  String toString() => 'InitiativeCreateSchema[title=$title, action=$action, createdBy=$createdBy, categoryId=$categoryId, goal=$goal, link=$link, priority=$priority, statusId=$statusId]';
+  String toString() => 'InitiativeCreateSchema[title=$title, description=$description, action=$action, createdBy=$createdBy, categoryId=$categoryId, goal=$goal, link=$link, priority=$priority, statusId=$statusId]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'title'] = this.title;
+    if (this.description != null) {
+      json[r'description'] = this.description;
+    } else {
+      json[r'description'] = null;
+    }
       json[r'action'] = this.action;
       json[r'created_by'] = this.createdBy;
     if (this.categoryId != null) {
@@ -114,6 +124,7 @@ class InitiativeCreateSchema {
 
       return InitiativeCreateSchema(
         title: mapValueOfType<String>(json, r'title')!,
+        description: mapValueOfType<String>(json, r'description'),
         action: mapValueOfType<String>(json, r'action')!,
         createdBy: mapValueOfType<String>(json, r'created_by')!,
         categoryId: mapValueOfType<String>(json, r'category_id'),
