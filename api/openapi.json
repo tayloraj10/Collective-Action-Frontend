@@ -4056,8 +4056,15 @@
             "ActionClaimCleanedSchema": {
                 "properties": {
                     "user_id": {
-                        "type": "string",
-                        "format": "uuid",
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
                         "title": "User Id"
                     },
                     "amount": {
@@ -4122,7 +4129,6 @@
                 },
                 "type": "object",
                 "required": [
-                    "user_id",
                     "event_data"
                 ],
                 "title": "ActionClaimCleanedSchema"

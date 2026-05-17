@@ -426,6 +426,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       child: CampaignInfoSheet(
                         campaigns: filteredCampaigns,
                         scrollController: _campaignDrawerScrollController,
+                        hostContext: context,
                         onClose: () {
                           ref
                               .read(campaignDrawerOpenProvider.notifier)

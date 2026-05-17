@@ -13,7 +13,7 @@ part of collective_action_api;
 class ActionClaimCleanedSchema {
   /// Returns a new [ActionClaimCleanedSchema] instance.
   ActionClaimCleanedSchema({
-    required this.userId,
+    this.userId,
     this.amount = 1,
     this.imageUrls = const [],
     this.date,
@@ -22,7 +22,7 @@ class ActionClaimCleanedSchema {
     this.eventData = const {},
   });
 
-  String userId;
+  String? userId;
 
   num amount;
 
@@ -49,7 +49,7 @@ class ActionClaimCleanedSchema {
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (userId.hashCode) +
+    (userId == null ? 0 : userId!.hashCode) +
     (amount.hashCode) +
     (imageUrls == null ? 0 : imageUrls!.hashCode) +
     (date == null ? 0 : date!.hashCode) +
@@ -62,7 +62,11 @@ class ActionClaimCleanedSchema {
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
+    if (this.userId != null) {
       json[r'user_id'] = this.userId;
+    } else {
+      json[r'user_id'] = null;
+    }
       json[r'amount'] = this.amount;
     if (this.imageUrls != null) {
       json[r'image_urls'] = this.imageUrls;
@@ -107,7 +111,7 @@ class ActionClaimCleanedSchema {
       }());
 
       return ActionClaimCleanedSchema(
-        userId: mapValueOfType<String>(json, r'user_id')!,
+        userId: mapValueOfType<String>(json, r'user_id'),
         amount: num.parse('${json[r'amount']}'),
         imageUrls: json[r'image_urls'] is Iterable
             ? (json[r'image_urls'] as Iterable).cast<String>().toList(growable: false)
@@ -167,7 +171,6 @@ class ActionClaimCleanedSchema {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'user_id',
     'event_data',
   };
 }

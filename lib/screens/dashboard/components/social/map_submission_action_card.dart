@@ -41,6 +41,11 @@ class MapSubmissionActionCard extends ConsumerWidget {
     }
   }
 
+  static bool _isResolvedTrashReport(ActionSchema action) {
+    final eventType = EventDataType.fromJson(_eventValue(action, 'type'));
+    return eventType == EventDataType.trashReport && action.resolvedAt != null;
+  }
+
   static String _titleFromEventData(ActionSchema action) {
     final eventType = _eventValue(action, 'type');
     if (eventType == null) return 'Map Submission';
@@ -140,26 +145,14 @@ class MapSubmissionActionCard extends ConsumerWidget {
     if (eventType == null) return;
 
     if (eventType == EventDataType.cleanup) {
-      final data = CleanupEventData(
-        type: eventType,
-        name: _eventValue(action, 'name')?.toString() ?? '',
-        location: _eventValue(action, 'location')?.toString() ?? '',
-        smallBags: (_eventValue(action, 'small_bags') is int)
-            ? _eventValue(action, 'small_bags') as int
-            : int.tryParse('${_eventValue(action, 'small_bags') ?? ''}'),
-        largeBags: (_eventValue(action, 'large_bags') is int)
-            ? _eventValue(action, 'large_bags') as int
-            : int.tryParse('${_eventValue(action, 'large_bags') ?? ''}'),
-        pounds: _eventValue(action, 'pounds') != null
-            ? num.tryParse('${_eventValue(action, 'pounds')}')
-            : null,
-        imageUrl: _eventValue(action, 'image_url')?.toString(),
-      );
       if (context.mounted) {
         await showDialog(
           context: context,
-          builder: (c) =>
-              CleanupEventInfoDialog(action: action, eventData: data),
+          builder: (c) => CleanupEventInfoDialog(
+            action: action,
+            eventData: CleanupEventInfoDialog.eventDataFromAction(action),
+            campaignId: action.linkedId,
+          ),
         );
       }
     } else if (eventType == EventDataType.trashReport) {
@@ -197,9 +190,12 @@ class MapSubmissionActionCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final title = _titleFromEventData(action);
+    final isResolvedTrash = _isResolvedTrashReport(action);
     final imageUrls = _imageUrls(action);
     final eventStats = _eventStatsFromAction(action);
-    const accentColor = AppColors.successGreen;
+    final accentColor = isResolvedTrash
+        ? AppColors.warningOrange
+        : AppColors.successGreen;
 
     final canShowInfoDialog =
         (EventDataType.fromJson(_eventValue(action, 'type')) ==
@@ -223,6 +219,7 @@ class MapSubmissionActionCard extends ConsumerWidget {
             accentColor,
             isMobile,
             canShowInfoDialog,
+            isResolvedTrash,
           )
         : _buildCompactCard(
             context,
@@ -235,6 +232,7 @@ class MapSubmissionActionCard extends ConsumerWidget {
             accentColor,
             isMobile,
             canShowInfoDialog,
+            isResolvedTrash,
           );
 
     if (isOwner) {
@@ -305,6 +303,7 @@ class MapSubmissionActionCard extends ConsumerWidget {
     Color accentColor,
     bool isMobile,
     bool canShowInfoDialog,
+    bool isResolvedTrash,
   ) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
@@ -370,10 +369,22 @@ class MapSubmissionActionCard extends ConsumerWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 5),
-                              _buildTypeBadge(
-                                Icons.map_outlined,
-                                'Map Submission',
-                                accentColor,
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 4,
+                                children: [
+                                  _buildTypeBadge(
+                                    Icons.map_outlined,
+                                    'Map Submission',
+                                    accentColor,
+                                  ),
+                                  if (isResolvedTrash)
+                                    _buildTypeBadge(
+                                      Icons.check_circle_outline,
+                                      'Cleaned',
+                                      AppColors.successGreen,
+                                    ),
+                                ],
                               ),
                             ],
                           ),
@@ -450,6 +461,7 @@ class MapSubmissionActionCard extends ConsumerWidget {
     Color accentColor,
     bool isMobile,
     bool canShowInfoDialog,
+    bool isResolvedTrash,
   ) {
     final cardColor = isDark ? AppColors.darkSurface : AppColors.white;
     final headerGradient = LinearGradient(
@@ -547,13 +559,29 @@ class MapSubmissionActionCard extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Tooltip(
-                            message: 'Map Submission',
-                            child: Icon(
-                              Icons.map_outlined,
-                              color: accentColor,
-                              size: isMobile ? 16 : 18,
-                            ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Tooltip(
+                                message: 'Map Submission',
+                                child: Icon(
+                                  Icons.map_outlined,
+                                  color: accentColor,
+                                  size: isMobile ? 16 : 18,
+                                ),
+                              ),
+                              if (isResolvedTrash) ...[
+                                const SizedBox(width: 6),
+                                Tooltip(
+                                  message: 'Marked cleaned',
+                                  child: Icon(
+                                    Icons.check_circle_outline,
+                                    color: AppColors.successGreen,
+                                    size: isMobile ? 16 : 18,
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                           _buildCompactTimeChip(
                             theme,

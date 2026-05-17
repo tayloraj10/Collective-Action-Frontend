@@ -28,6 +28,12 @@ enum LeaderboardMetric {
   const LeaderboardMetric(this.label, this.icon);
   final String label;
   final IconData icon;
+
+  /// Shorter label for narrow layouts (fits three segments without clipping).
+  String get compactLabel => switch (this) {
+        LeaderboardMetric.bags => 'Bags',
+        _ => label,
+      };
 }
 
 /// Dialog showing leaderboard with switchable metric (cleanups, bags, pounds). Top 10 only.
@@ -58,7 +64,15 @@ class LeaderboardDialog extends ConsumerStatefulWidget {
 }
 
 class _LeaderboardDialogState extends ConsumerState<LeaderboardDialog> {
-  LeaderboardMetric _metric = LeaderboardMetric.bags;
+  late LeaderboardMetric _metric;
+
+  @override
+  void initState() {
+    super.initState();
+    _metric = widget.campaignType == MapCampaignTypeEnum.plantingMap
+        ? LeaderboardMetric.plantings
+        : LeaderboardMetric.cleanups;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,8 +113,13 @@ class _LeaderboardDialogState extends ConsumerState<LeaderboardDialog> {
       ),
     };
 
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final useCompactMetrics = screenWidth < 500;
+
     return AlertDialog(
-      insetPadding: const EdgeInsets.fromLTRB(40, 56, 40, 24),
+      insetPadding: useCompactMetrics
+          ? const EdgeInsets.symmetric(horizontal: 16, vertical: 24)
+          : const EdgeInsets.fromLTRB(40, 56, 40, 24),
       title: Text(
         'Leaderboard',
         style: TextStyle(color: titleColor, fontWeight: FontWeight.bold),
@@ -111,23 +130,32 @@ class _LeaderboardDialogState extends ConsumerState<LeaderboardDialog> {
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: SegmentedButton<LeaderboardMetric>(
-              segments: LeaderboardMetric.values
-                  .where(metrics.contains)
-                  .map(
-                    (m) => ButtonSegment<LeaderboardMetric>(
-                      value: m,
-                      icon: Icon(m.icon, size: 18),
-                      label: Text(m.label),
-                    ),
+            child: useCompactMetrics
+                ? _CompactMetricSelector(
+                    metrics: metrics,
+                    selected: _metric,
+                    onSelected: (m) => setState(() => _metric = m),
                   )
-                  .toList(),
-              selected: {_metric},
-              onSelectionChanged: (Set<LeaderboardMetric> selected) {
-                setState(() => _metric = selected.first);
-              },
-              showSelectedIcon: false,
-            ),
+                : SegmentedButton<LeaderboardMetric>(
+                    segments: metrics
+                        .map(
+                          (m) => ButtonSegment<LeaderboardMetric>(
+                            value: m,
+                            icon: Icon(m.icon, size: 18),
+                            label: Text(
+                              m.label,
+                              softWrap: false,
+                              maxLines: 1,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    selected: {_metric},
+                    onSelectionChanged: (Set<LeaderboardMetric> selected) {
+                      setState(() => _metric = selected.first);
+                    },
+                    showSelectedIcon: false,
+                  ),
           ),
           _LeaderboardCard(
             entries: entries,
@@ -145,6 +173,152 @@ class _LeaderboardDialogState extends ConsumerState<LeaderboardDialog> {
           child: const Text('Close'),
         ),
       ],
+    );
+  }
+}
+
+/// Equal-width segments on narrow screens: icon above label, no horizontal overflow.
+class _CompactMetricSelector extends StatelessWidget {
+  const _CompactMetricSelector({
+    required this.metrics,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  static const double segmentHeight = 52;
+  static const double iconSize = 20;
+  static const double labelHeight = 14;
+  static const double labelFontSize = 11;
+
+  final List<LeaderboardMetric> metrics;
+  final LeaderboardMetric selected;
+  final ValueChanged<LeaderboardMetric> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final borderColor = theme.colorScheme.outline;
+    final selectedBg = theme.colorScheme.secondaryContainer;
+    final selectedFg = theme.colorScheme.onSecondaryContainer;
+
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: borderColor),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: SizedBox(
+          height: segmentHeight,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var i = 0; i < metrics.length; i++) ...[
+                if (i > 0)
+                  Container(width: 1, color: borderColor),
+                Expanded(
+                  child: _CompactMetricSegment(
+                    metric: metrics[i],
+                    selected: metrics[i] == selected,
+                    isFirst: i == 0,
+                    isLast: i == metrics.length - 1,
+                    selectedBg: selectedBg,
+                    selectedFg: selectedFg,
+                    onTap: () => onSelected(metrics[i]),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CompactMetricSegment extends StatelessWidget {
+  const _CompactMetricSegment({
+    required this.metric,
+    required this.selected,
+    required this.isFirst,
+    required this.isLast,
+    required this.selectedBg,
+    required this.selectedFg,
+    required this.onTap,
+  });
+
+  static const double _outerRadius = 20;
+
+  final LeaderboardMetric metric;
+  final bool selected;
+  final bool isFirst;
+  final bool isLast;
+  final Color selectedBg;
+  final Color selectedFg;
+  final VoidCallback onTap;
+
+  BorderRadius get _selectedRadius {
+    // Match parent pill corners when this end segment is selected.
+    const r = Radius.circular(_outerRadius - 1);
+    return BorderRadius.horizontal(
+      left: isFirst ? r : Radius.zero,
+      right: isLast ? r : Radius.zero,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final radius = selected ? _selectedRadius : BorderRadius.zero;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: radius,
+        splashColor: selectedFg.withValues(alpha: 0.12),
+        highlightColor: selectedFg.withValues(alpha: 0.08),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: selected ? selectedBg : Colors.transparent,
+            borderRadius: radius,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  metric.icon,
+                  size: _CompactMetricSelector.iconSize,
+                  color: selected ? selectedFg : theme.colorScheme.onSurface,
+                ),
+                const SizedBox(height: 4),
+                SizedBox(
+                  height: _CompactMetricSelector.labelHeight,
+                  child: Center(
+                    child: Text(
+                      metric.compactLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: _CompactMetricSelector.labelFontSize,
+                        height: 1,
+                        color: selected
+                            ? selectedFg
+                            : theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

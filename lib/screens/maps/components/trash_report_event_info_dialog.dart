@@ -6,11 +6,15 @@ import 'package:collective_action_frontend/components/photo_thumbnail_strip.dart
 import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/providers/map_events_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
+import 'package:collective_action_frontend/screens/maps/components/cleanup_event_dialog.dart';
+import 'package:collective_action_frontend/services/actions_service.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import 'map_action_id_badge.dart';
 import 'photo_viewer_dialog.dart';
 
 /// Dialog to display trash report event information when a trash report pin is clicked.
@@ -72,6 +76,7 @@ class TrashReportEventInfoDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.watch(currentUserProvider).value;
     final isOwner = currentUser != null && currentUser.id == action.userId;
+    final isResolved = action.resolvedAt != null;
     final size = MediaQuery.sizeOf(context);
     final maxH = (size.height * 0.7).clamp(200.0, 500.0);
     final maxW = (size.width * 0.95).clamp(280.0, 400.0);
@@ -129,14 +134,17 @@ class TrashReportEventInfoDialog extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Text(
-                        'Trash Report',
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.2,
+                      Expanded(
+                        child: Text(
+                          'Trash Report',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.2,
+                          ),
                         ),
                       ),
+                      MapActionIdBadge(actionId: action.id),
                     ],
                   ),
                 ),
@@ -243,39 +251,120 @@ class TrashReportEventInfoDialog extends ConsumerWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (isOwner) ...[
-                        OutlinedButton.icon(
-                          onPressed: () => _confirmAndDelete(
+                      if (isResolved)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.successGreen.withValues(
+                              alpha: 0.12,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.successGreen.withValues(
+                                alpha: 0.35,
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.check_circle_outline,
+                                color: AppColors.successGreen,
+                                size: 22,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'This area was marked cleaned.',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.successGreen,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        FilledButton.icon(
+                          onPressed: () => _claimCleaned(
                             context,
                             ref,
                             action,
+                            eventData,
                             campaignId,
                           ),
-                          icon: const Icon(Icons.delete_outline, size: 18),
-                          label: const Text('Delete'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: theme.colorScheme.error,
-                            side: BorderSide(color: theme.colorScheme.error),
+                          icon: const Icon(Icons.cleaning_services, size: 20),
+                          label: const Text(
+                            'Mark as Cleaned',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.successGreen,
+                            foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
+                              horizontal: 20,
+                              vertical: 14,
+                            ),
+                            minimumSize: const Size(double.infinity, 48),
+                            elevation: 2,
+                            shadowColor: AppColors.successGreen.withValues(
+                              alpha: 0.4,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 10),
-                      ],
-                      FilledButton(
-                        onPressed: () => safePop(context),
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          if (isOwner) ...[
+                            OutlinedButton.icon(
+                              onPressed: () => _confirmAndDelete(
+                                context,
+                                ref,
+                                action,
+                                campaignId,
+                              ),
+                              icon: const Icon(Icons.delete_outline, size: 18),
+                              label: const Text('Delete'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: theme.colorScheme.error,
+                                side: BorderSide(
+                                  color: theme.colorScheme.error,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 10,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                          ],
+                          FilledButton(
+                            onPressed: () => safePop(context),
+                            style: FilledButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 10,
+                              ),
+                            ),
+                            child: const Text('Close'),
                           ),
-                        ),
-                        child: const Text('Close'),
+                        ],
                       ),
                     ],
                   ),
@@ -322,6 +411,80 @@ class TrashReportEventInfoDialog extends ConsumerWidget {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(CustomSnackBar.error('Error deleting map submission'));
+      }
+    }
+  }
+
+  static Future<void> _claimCleaned(
+    BuildContext context,
+    WidgetRef ref,
+    ActionSchema action,
+    TrashReportEventData? trashReportData, [
+    String? campaignId,
+  ]) async {
+    final currentUser = ref.read(currentUserProvider).value;
+    final userId = currentUser?.id;
+    final lat = action.latitude?.toDouble();
+    final lng = action.longitude?.toDouble();
+    if (lat == null || lng == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackBar.error('This trash report is missing a location.'),
+      );
+      return;
+    }
+
+    final result = await showDialog<CleanupEventDialogResult>(
+      context: context,
+      builder: (dialogContext) => CleanupEventDialog(
+        routeContext: dialogContext,
+        position: LatLng(lat, lng),
+        initialName: currentUser?.name,
+        initialEventData: CleanupEventData(
+          location: trashReportData?.location ?? '',
+        ),
+        organizerUserId: userId,
+        enableScheduling: false,
+        title: 'Mark Area Cleaned',
+        submitLabel: 'Mark Cleaned',
+      ),
+    );
+    if (result == null || !context.mounted) return;
+
+    try {
+      final actionsService = ActionsService();
+      final created = await actionsService.claimTrashReportCleaned(
+        trashReportId: action.id,
+        userId: userId,
+        eventData: ActionsService.cleanupEventDataToJson(result.eventData),
+        latitude: lat,
+        longitude: lng,
+        date: DateTime.now(),
+      );
+      if (created != null && result.photos.isNotEmpty) {
+        final uploaded = await PhotosService().uploadSubmissionPhotosBatch(
+          created.id,
+          result.photos,
+        );
+        if (uploaded != null && uploaded.isNotEmpty) {
+          await actionsService.updateActionPhotos(created.id, uploaded);
+        }
+      }
+      if (!context.mounted) return;
+      if (campaignId != null) {
+        ref.invalidate(mapEventsForCampaignProvider(campaignId));
+        ref.invalidate(actionsByLinkedProvider((campaignId, null)));
+        ref.invalidate(actionsByLinkedProvider((campaignId, 7)));
+      }
+      ref.read(activeActionProvider.notifier).refresh();
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(CustomSnackBar.success('Trash report marked cleaned.'));
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(CustomSnackBar.error('Failed to mark cleaned: $e'));
       }
     }
   }
