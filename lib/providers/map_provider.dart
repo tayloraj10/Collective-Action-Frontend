@@ -1,6 +1,7 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/services/map_service.dart';
+import 'package:collective_action_frontend/utils/map_filter_utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final mapServiceProvider = Provider<MapService>((ref) {
@@ -20,6 +21,55 @@ class MapFilterMySubmissionsOnlyNotifier extends Notifier<bool> {
 final mapFilterMySubmissionsOnlyProvider =
     NotifierProvider<MapFilterMySubmissionsOnlyNotifier, bool>(
         MapFilterMySubmissionsOnlyNotifier.new);
+
+class MapNearbyFilterState {
+  const MapNearbyFilterState({
+    this.enabled = false,
+    this.radiusMiles = kMapNearbyFilterDefaultRadiusMiles,
+  });
+
+  final bool enabled;
+  final double radiusMiles;
+
+  MapNearbyFilterState copyWith({bool? enabled, double? radiusMiles}) {
+    return MapNearbyFilterState(
+      enabled: enabled ?? this.enabled,
+      radiusMiles: radiusMiles ?? this.radiusMiles,
+    );
+  }
+}
+
+class MapNearbyFilterNotifier extends Notifier<MapNearbyFilterState> {
+  @override
+  MapNearbyFilterState build() => const MapNearbyFilterState();
+
+  void setEnabled(bool value) {
+    state = state.copyWith(enabled: value);
+  }
+
+  void setRadiusMiles(double miles) {
+    state = state.copyWith(radiusMiles: miles);
+  }
+}
+
+final mapNearbyFilterProvider =
+    NotifierProvider<MapNearbyFilterNotifier, MapNearbyFilterState>(
+      MapNearbyFilterNotifier.new,
+    );
+
+class MapHeatmapEnabledNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void setEnabled(bool value) {
+    state = value;
+  }
+}
+
+final mapHeatmapEnabledProvider =
+    NotifierProvider<MapHeatmapEnabledNotifier, bool>(
+      MapHeatmapEnabledNotifier.new,
+    );
 
 final activeMapCampaignsProvider =
     AsyncNotifierProvider<ActiveMapCampaignsNotifier, List<MapCampaignSchema>>(

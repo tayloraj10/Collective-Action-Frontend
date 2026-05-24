@@ -23,8 +23,12 @@
     window.__onGoogleMapsReady = function () { };
   </script>
   <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8xmeEp_dbRnu5D_fkwbKEHtFJtp0EdRU&libraries=visualization&loading=async&callback=__onGoogleMapsReady"
+    src="https://maps.googleapis.com/maps/api/js?key=__GOOGLE_MAPS_API_KEY__&loading=async&callback=__onGoogleMapsReady"
     async defer></script>
+  <!-- deck.gl replaces the removed google.maps.visualization.HeatmapLayer on web. -->
+  <script src="https://unpkg.com/deck.gl@8.9.22/dist.min.js"></script>
+  <script src="https://unpkg.com/@deck.gl/google-maps@8.9.22/dist.min.js"></script>
+  <script src="dashboard_map.js"></script>
 </head>
 
 <body>

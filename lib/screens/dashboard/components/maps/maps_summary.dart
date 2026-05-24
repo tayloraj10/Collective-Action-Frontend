@@ -1,8 +1,8 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/maps/dashboard_heatmap_map.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/summary_count.dart';
-import 'package:collective_action_frontend/screens/maps/map_styles.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,7 +26,6 @@ class MapsSummary extends ConsumerStatefulWidget {
 }
 
 class _MapsSummaryState extends ConsumerState<MapsSummary> {
-  GoogleMapController? _mapController;
   static const LatLng _defaultCenter = LatLng(39.8283, -98.5795); // US center
   static const double _defaultZoom = 3.5;
   static const double _fitBoundsScreenPadding = 60.0;
@@ -56,14 +55,6 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
     }
   }
 
-  @override
-  void dispose() {
-    // Do not call _mapController.dispose() here. The GoogleMap widget owns the
-    // controller; on web, disposing before buildView completes causes an assertion.
-    _mapController = null;
-    super.dispose();
-  }
-
   /// Map submission actions that have latitude/longitude.
   List<ActionSchema> _mapSubmissionsWithLocation(List<ActionSchema>? actions) {
     if (actions == null) return [];
@@ -77,9 +68,8 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
         .toList();
   }
 
-  Set<Heatmap> _buildHeatmaps(List<ActionSchema> submissions) {
-    if (submissions.isEmpty) return {};
-    final points = submissions
+  List<WeightedLatLng> _heatmapPoints(List<ActionSchema> submissions) {
+    return submissions
         .map(
           (a) => WeightedLatLng(
             LatLng(a.latitude!.toDouble(), a.longitude!.toDouble()),
@@ -87,56 +77,6 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
           ),
         )
         .toList();
-    return {
-      Heatmap(
-        heatmapId: const HeatmapId('map_submissions'),
-        data: points,
-        radius: HeatmapRadius.fromPixels(30),
-        opacity: 0.7,
-        dissipating: true,
-      ),
-    };
-  }
-
-  Future<void> _fitBoundsIfNeeded(List<ActionSchema> submissions) async {
-    if (submissions.isEmpty || _mapController == null) return;
-
-    final points = submissions
-        .map((a) => LatLng(a.latitude!.toDouble(), a.longitude!.toDouble()))
-        .toList();
-
-    if (points.length == 1) {
-      await _mapController!.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(target: points.first, zoom: 10.0),
-        ),
-      );
-      return;
-    }
-
-    double minLat = points.first.latitude;
-    double maxLat = points.first.latitude;
-    double minLng = points.first.longitude;
-    double maxLng = points.first.longitude;
-    for (final p in points) {
-      if (p.latitude < minLat) minLat = p.latitude;
-      if (p.latitude > maxLat) maxLat = p.latitude;
-      if (p.longitude < minLng) minLng = p.longitude;
-      if (p.longitude > maxLng) maxLng = p.longitude;
-    }
-
-    // Keep bounds tight; rely on screen padding rather than inflating lat/lng span.
-    final latDiff = (maxLat - minLat).abs();
-    final lngDiff = (maxLng - minLng).abs();
-    final latPadding = latDiff < 0.002 ? 0.02 : 0.0;
-    final lngPadding = lngDiff < 0.002 ? 0.02 : 0.0;
-    final bounds = LatLngBounds(
-      southwest: LatLng(minLat - latPadding, minLng - lngPadding),
-      northeast: LatLng(maxLat + latPadding, maxLng + lngPadding),
-    );
-    await _mapController!.animateCamera(
-      CameraUpdate.newLatLngBounds(bounds, _fitBoundsScreenPadding),
-    );
   }
 
   Widget _buildGradientHeader(BuildContext context, bool isMobile) {
@@ -266,7 +206,7 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                       ],
                     );
                   }
-                  final heatmaps = _buildHeatmaps(submissions);
+                  final heatmapPoints = _heatmapPoints(submissions);
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -276,23 +216,12 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                           child: Stack(
                             fit: StackFit.expand,
                             children: [
-                              GoogleMap(
-                                initialCameraPosition: const CameraPosition(
-                                  target: _defaultCenter,
-                                  zoom: _defaultZoom,
-                                ),
-                                style: _mapDarkMode ? kDarkMapStyle : null,
-                                onMapCreated: (GoogleMapController c) async {
-                                  _mapController = c;
-                                  if (!mounted) return;
-                                  _fitBoundsIfNeeded(submissions);
-                                },
-                                heatmaps: heatmaps,
-                                mapType: MapType.normal,
-                                zoomControlsEnabled: false,
-                                myLocationButtonEnabled: false,
-                                myLocationEnabled: false,
-                                liteModeEnabled: false,
+                              DashboardHeatmapMap(
+                                points: heatmapPoints,
+                                darkMode: _mapDarkMode,
+                                initialCenter: _defaultCenter,
+                                initialZoom: _defaultZoom,
+                                fitBoundsPadding: _fitBoundsScreenPadding,
                               ),
                               Positioned(
                                 top: 6,
@@ -312,13 +241,9 @@ class _MapsSummaryState extends ConsumerState<MapsSummary> {
                                     tooltip: _mapDarkMode
                                         ? 'Map style: dark (tap for light)'
                                         : 'Map style: light (tap for dark)',
-                                    onPressed: () async {
+                                    onPressed: () {
                                       setState(
                                         () => _mapDarkMode = !_mapDarkMode,
-                                      );
-                                      // ignore: deprecated_member_use
-                                      await _mapController?.setMapStyle(
-                                        _mapDarkMode ? kDarkMapStyle : null,
                                       );
                                     },
                                   ),

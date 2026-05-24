@@ -11,6 +11,8 @@ import 'package:collective_action_frontend/providers/map_zoom_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_info_dialog.dart';
+import 'package:collective_action_frontend/screens/maps/components/map_heatmap_overlay.dart';
+import 'package:collective_action_frontend/screens/maps/components/nearby_filter_mask_overlay.dart';
 import 'package:collective_action_frontend/screens/maps/components/pin_confirmation_bar.dart';
 import 'package:collective_action_frontend/screens/maps/components/planting_event_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/planting_event_info_dialog.dart';
@@ -19,6 +21,9 @@ import 'package:collective_action_frontend/screens/maps/components/trash_report_
 import 'package:collective_action_frontend/screens/maps/map_styles.dart';
 import 'package:collective_action_frontend/services/actions_service.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
+import 'package:collective_action_frontend/utils/heatmap_utils.dart';
+import 'package:collective_action_frontend/utils/map_filter_utils.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -101,8 +106,13 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   bool _mapDarkMode = false;
 
   Timer? _inactivityTimer;
+  Timer? _nearbyMaskGeometryDebounce;
   bool _showInstruction = false;
   final bool _isDisposed = false;
+
+  /// Screen-space center and radius for the nearby-filter dim overlay.
+  Offset? _nearbyMaskCenterPx;
+  double? _nearbyMaskRadiusPx;
 
   void _resetInactivityTimer() {
     _inactivityTimer?.cancel();
@@ -131,8 +141,64 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   @override
   void dispose() {
     _inactivityTimer?.cancel();
+    _nearbyMaskGeometryDebounce?.cancel();
     _mapController = null;
     super.dispose();
+  }
+
+  void _scheduleNearbyMaskGeometryUpdate() {
+    final nearby = ref.read(mapNearbyFilterProvider);
+    if (!nearby.enabled || _userLocation == null || _mapController == null) {
+      return;
+    }
+    _nearbyMaskGeometryDebounce?.cancel();
+    _nearbyMaskGeometryDebounce = Timer(const Duration(milliseconds: 32), () {
+      if (mounted) unawaited(_updateNearbyMaskGeometry());
+    });
+  }
+
+  Future<void> _updateNearbyMaskGeometry() async {
+    final nearby = ref.read(mapNearbyFilterProvider);
+    if (!mounted ||
+        !nearby.enabled ||
+        _userLocation == null ||
+        _mapController == null) {
+      if (mounted &&
+          (_nearbyMaskCenterPx != null || _nearbyMaskRadiusPx != null)) {
+        setState(() {
+          _nearbyMaskCenterPx = null;
+          _nearbyMaskRadiusPx = null;
+        });
+      }
+      return;
+    }
+
+    final controller = _mapController!;
+    final center = _userLocation!;
+    final radiusMeters = nearby.radiusMiles * 1609.344;
+
+    try {
+      final centerSc = await controller.getScreenCoordinate(center);
+      final edgeSc = await controller.getScreenCoordinate(
+        offsetLatLngMeters(center, radiusMeters, 90),
+      );
+      if (!mounted) return;
+
+      final centerPx = Offset(centerSc.x.toDouble(), centerSc.y.toDouble());
+      final edgePx = Offset(edgeSc.x.toDouble(), edgeSc.y.toDouble());
+      final radiusPx = (edgePx - centerPx).distance;
+
+      if (_nearbyMaskCenterPx == centerPx &&
+          _nearbyMaskRadiusPx != null &&
+          (_nearbyMaskRadiusPx! - radiusPx).abs() < 0.5) {
+        return;
+      }
+
+      setState(() {
+        _nearbyMaskCenterPx = centerPx;
+        _nearbyMaskRadiusPx = radiusPx;
+      });
+    } catch (_) {}
   }
 
   Future<void> _loadMarkerIcons() async {
@@ -197,8 +263,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   bool get _isPlantingCampaign =>
       widget.campaign.mapCampaignType == MapCampaignTypeEnum.plantingMap.value;
 
-  /// Fetches current position, updates state, shows on map, and zooms to it.
-  Future<bool> _loadUserLocation() async {
+  /// Fetches current position, updates state, and optionally zooms the map.
+  Future<bool> _loadUserLocation({bool zoomToNearbyFilter = false}) async {
     if (!mounted) return false;
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!mounted) return false;
@@ -235,7 +301,15 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         setState(() => _userLocation = latLng);
       }
       if (mounted) {
-        await _goToUserLocation();
+        final nearby = ref.read(mapNearbyFilterProvider);
+        if (zoomToNearbyFilter && nearby.enabled) {
+          await _zoomToNearbyRadius(nearby.radiusMiles);
+        } else {
+          await _goToUserLocation();
+        }
+      }
+      if (mounted) {
+        _scheduleNearbyMaskGeometryUpdate();
       }
       return true;
     } catch (e) {
@@ -256,6 +330,18 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     );
   }
 
+  /// Zooms the map to fit the nearby-filter circle around the user.
+  Future<void> _zoomToNearbyRadius(double radiusMiles) async {
+    if (!mounted || _userLocation == null || _mapController == null) return;
+    final bounds = nearbyRadiusBounds(_userLocation!, radiusMiles);
+    await _mapController!.animateCamera(
+      CameraUpdate.newLatLngBounds(bounds, 80),
+    );
+    if (mounted) {
+      _scheduleNearbyMaskGeometryUpdate();
+    }
+  }
+
   /// Zooms to show all markers and polylines on the map.
   Future<bool> _zoomToFullExtent() async {
     if (!mounted || _mapController == null) return false;
@@ -264,15 +350,13 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       mapEventsForCampaignProvider(widget.campaign.id),
     );
     final currentUser = ref.read(currentUserProvider).value;
-    final filterMySubmissionsOnly = ref.read(
-      mapFilterMySubmissionsOnlyProvider,
-    );
     final rawEvents = eventsAsync.value;
-    final eventsToShow = rawEvents == null
-        ? null
-        : (filterMySubmissionsOnly && currentUser != null)
-        ? rawEvents.where((a) => a.userId == currentUser.id).toList()
-        : rawEvents;
+    final eventsToShow = _filterMapEvents(
+      rawEvents,
+      currentUser,
+      filterMySubmissionsOnly: ref.read(mapFilterMySubmissionsOnlyProvider),
+      nearbyFilter: ref.read(mapNearbyFilterProvider),
+    );
     final markers = _buildMarkers(eventsToShow, currentUser);
     final polylines = _buildPolylines(eventsToShow);
 
@@ -331,6 +415,67 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     return true;
   }
 
+  List<ActionSchema>? _filterMapEvents(
+    List<ActionSchema>? rawEvents,
+    UserSchema? currentUser, {
+    required bool filterMySubmissionsOnly,
+    required MapNearbyFilterState nearbyFilter,
+  }) {
+    if (rawEvents == null) return null;
+    var events = rawEvents;
+    if (filterMySubmissionsOnly && currentUser != null) {
+      events = events.where((a) => a.userId == currentUser.id).toList();
+    }
+    if (nearbyFilter.enabled && _userLocation != null) {
+      events = filterActionsByNearbyRadius(
+        events,
+        _userLocation!,
+        nearbyFilter.radiusMiles,
+      );
+    }
+    return events;
+  }
+
+  List<WeightedLatLng> _heatmapPointsFromEvents(List<ActionSchema>? events) {
+    if (events == null) return [];
+    final points = <WeightedLatLng>[];
+    for (final a in events) {
+      if (a.latitude == null || a.longitude == null) continue;
+      if (a.actionType != ActionTypeValuesEnum.mapSubmission.value ||
+          a.eventData == null) {
+        continue;
+      }
+      final eventType = a.eventData!['type'] as String?;
+      final isCleanup = eventType == _kActionTypeCleanup.value;
+      final isTrash = eventType == _kActionTypeTrashReport.value;
+      if (isTrash && a.resolvedAt != null) continue;
+      final isPlanting =
+          eventType == _kActionTypeTreePlanting.value ||
+          eventType == _kActionTypeWildflowerPlanting.value;
+      if (!isCleanup && !isTrash && !isPlanting) continue;
+      final position =
+          _createdActionPositionOverride[a.id] ??
+          LatLng(a.latitude!.toDouble(), a.longitude!.toDouble());
+      points.add(WeightedLatLng(position, weight: 1.0));
+    }
+    return points;
+  }
+
+  double _modeSelectorTopPadding(BuildContext context) {
+    const baseTop = 108.0;
+    var top = baseTop;
+    final nearby = ref.watch(mapNearbyFilterProvider);
+    top += 44;
+    if (nearby.enabled) {
+      top += 44;
+    }
+    if (ref.watch(currentUserProvider).value != null) {
+      top += 44;
+    }
+    top += 44; // Heatmap toggle row on map screen
+    return top;
+  }
+
   Future<void> _zoomToUSAExtent() async {
     if (!mounted || _mapController == null) return;
     final usaBounds = LatLngBounds(
@@ -357,22 +502,60 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         ref.read(mapZoomToLocationProvider.notifier).setLocation(null);
       }
     });
+    ref.listen<MapNearbyFilterState>(mapNearbyFilterProvider, (prev, next) {
+      if (!mounted || _isDisposed) return;
+
+      final turnedOn = next.enabled && prev?.enabled != true;
+      final radiusChanged =
+          next.enabled && prev?.radiusMiles != next.radiusMiles;
+      final shouldZoomToCircle = turnedOn || radiusChanged;
+
+      if (shouldZoomToCircle) {
+        if (_userLocation != null) {
+          unawaited(_zoomToNearbyRadius(next.radiusMiles));
+        } else {
+          unawaited(_loadUserLocation(zoomToNearbyFilter: true));
+        }
+      } else if (next.enabled && _userLocation == null) {
+        unawaited(_loadUserLocation());
+      }
+
+      if (!next.enabled) {
+        setState(() {
+          _nearbyMaskCenterPx = null;
+          _nearbyMaskRadiusPx = null;
+        });
+      } else {
+        _scheduleNearbyMaskGeometryUpdate();
+      }
+    });
+    ref.watch(mapFilterMySubmissionsOnlyProvider);
+    final heatmapEnabled = ref.watch(mapHeatmapEnabledProvider);
+    final nearbyFilter = ref.watch(mapNearbyFilterProvider);
     final eventsAsync = ref.watch(
       mapEventsForCampaignProvider(widget.campaign.id),
     );
     final currentUser = ref.watch(currentUserProvider).value;
-    final filterMySubmissionsOnly = ref.watch(
-      mapFilterMySubmissionsOnlyProvider,
-    );
     final rawEvents = eventsAsync.value;
-    final eventsToShow = rawEvents == null
-        ? null
-        : (filterMySubmissionsOnly && currentUser != null)
-        ? rawEvents.where((a) => a.userId == currentUser.id).toList()
-        : rawEvents;
+    final eventsToShow = _filterMapEvents(
+      rawEvents,
+      currentUser,
+      filterMySubmissionsOnly: ref.read(mapFilterMySubmissionsOnlyProvider),
+      nearbyFilter: nearbyFilter,
+    );
+    final heatmapPoints = _heatmapPointsFromEvents(eventsToShow);
     final campaignDrawerOpen = ref.watch(campaignDrawerOpenProvider);
     final gesturesEnabled =
         !_isAddEventDialogOpen && !_isInfoDialogOpen && !campaignDrawerOpen;
+
+    if (nearbyFilter.enabled &&
+        _userLocation != null &&
+        _mapController != null &&
+        _nearbyMaskCenterPx == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _scheduleNearbyMaskGeometryUpdate();
+      });
+    }
 
     // If we don't have user location (permission denied/unavailable), auto-zoom
     // to data extent once data arrives; if there's no data, keep USA extent.
@@ -419,13 +602,20 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
             if (mounted && !_isDisposed) {
               setState(() => _currentZoom = zoom);
             }
+            _scheduleNearbyMaskGeometryUpdate();
           },
           onCameraMove: (CameraPosition position) {
             if (mounted && !_isDisposed) {
               setState(() => _currentZoom = position.zoom);
             }
+            _scheduleNearbyMaskGeometryUpdate();
           },
-          markers: _buildMarkers(eventsToShow, currentUser),
+          onCameraIdle: () => _scheduleNearbyMaskGeometryUpdate(),
+          markers: _buildMarkers(
+            eventsToShow,
+            currentUser,
+            hideEventPins: heatmapEnabled,
+          ),
           polylines: _buildPolylines(eventsToShow),
           onTap: _handleMapTap,
           mapType: MapType.normal,
@@ -436,7 +626,31 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
           zoomGesturesEnabled: gesturesEnabled,
           tiltGesturesEnabled: gesturesEnabled,
           rotateGesturesEnabled: gesturesEnabled,
+          heatmaps: !kIsWeb && heatmapEnabled
+              ? buildMapHeatmaps(heatmapPoints, zoom: _currentZoom)
+              : const {},
         ),
+        MapHeatmapOverlay(
+          controller: _mapController,
+          points: heatmapPoints,
+          enabled: kIsWeb && heatmapEnabled,
+          zoom: _currentZoom,
+        ),
+        if (nearbyFilter.enabled &&
+            _nearbyMaskCenterPx != null &&
+            _nearbyMaskRadiusPx != null)
+          Positioned.fill(
+            child: NearbyFilterMaskOverlay(
+              center: _nearbyMaskCenterPx!,
+              radius: _nearbyMaskRadiusPx!,
+              dimColor: _mapDarkMode
+                  ? Colors.black.withValues(alpha: 0.55)
+                  : Colors.black.withValues(alpha: 0.42),
+              borderColor: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.55),
+            ),
+          ),
         // Map style toggle (light/dark) – top right
         SafeArea(
           child: Align(
@@ -469,12 +683,15 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
             ),
           ),
         ),
-        // Mode selector: Cleanup / Report (below map type dropdown, icon row, and My pins only row)
+        // Mode selector: Cleanup / Report (below map type dropdown, icon row, and filter rows)
         SafeArea(
           child: Align(
             alignment: Alignment.topLeft,
             child: Padding(
-              padding: const EdgeInsets.only(top: 150, left: 12),
+              padding: EdgeInsets.only(
+                top: _modeSelectorTopPadding(context),
+                left: 12,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -691,10 +908,11 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
 
   Set<Marker> _buildMarkers(
     List<ActionSchema>? events,
-    UserSchema? currentUser,
-  ) {
+    UserSchema? currentUser, {
+    bool hideEventPins = false,
+  }) {
     final Set<Marker> out = {};
-    if (events != null) {
+    if (!hideEventPins && events != null) {
       for (final a in events) {
         if (a.latitude == null || a.longitude == null) continue;
         // Filter by actionType first, then check event_data.type
@@ -1220,14 +1438,32 @@ class _MapModeButton extends StatelessWidget {
                       )
                     : null,
               ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontWeight: isActive ? FontWeight.bold : null,
-                  color: isActive
-                      ? theme.colorScheme.primary
-                      : theme.textTheme.bodySmall?.color,
+              const SizedBox(height: 6),
+              Material(
+                elevation: 2,
+                borderRadius: BorderRadius.circular(6),
+                color: isActive
+                    ? theme.colorScheme.primaryContainer.withValues(
+                        alpha: isLight ? 0.95 : 0.9,
+                      )
+                    : theme.colorScheme.surface.withValues(
+                        alpha: isLight ? 0.92 : 0.88,
+                      ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
+                  child: Text(
+                    label,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.2,
+                      color: isActive
+                          ? theme.colorScheme.onPrimaryContainer
+                          : theme.colorScheme.onSurface,
+                    ),
+                  ),
                 ),
               ),
             ],

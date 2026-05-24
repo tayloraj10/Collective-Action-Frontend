@@ -11,6 +11,7 @@ import 'package:collective_action_frontend/screens/maps/components/cleanup_map_w
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:collective_action_frontend/utils/map_filter_utils.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
@@ -317,7 +318,131 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           ],
                         ),
                       ),
-                      // My pins only filter (below icon row, when logged in)
+                      // Nearby area filter
+                      Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Tooltip(
+                                message: ref.watch(mapNearbyFilterProvider).enabled
+                                    ? 'Show all pins on the map'
+                                    : mapNearbyFilterOffTooltip(
+                                        ref
+                                            .watch(mapNearbyFilterProvider)
+                                            .radiusMiles,
+                                      ),
+                                child: Material(
+                                  elevation: 2,
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Theme.of(context).colorScheme.surface,
+                                  child: InkWell(
+                                    onTap: () {
+                                      final notifier = ref.read(
+                                        mapNearbyFilterProvider.notifier,
+                                      );
+                                      notifier.setEnabled(
+                                        !ref.read(mapNearbyFilterProvider).enabled,
+                                      );
+                                    },
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 8,
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            ref.watch(mapNearbyFilterProvider).enabled
+                                                ? Icons.my_location
+                                                : Icons.my_location_outlined,
+                                            size: 22,
+                                            color:
+                                                ref.watch(mapNearbyFilterProvider).enabled
+                                                ? Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary
+                                                : null,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            'Nearby only',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .labelMedium
+                                                ?.copyWith(
+                                                  fontWeight:
+                                                      ref.watch(
+                                                        mapNearbyFilterProvider,
+                                                      ).enabled
+                                                      ? FontWeight.w600
+                                                      : null,
+                                                  color:
+                                                      ref.watch(
+                                                        mapNearbyFilterProvider,
+                                                      ).enabled
+                                                      ? Theme.of(
+                                                          context,
+                                                        ).colorScheme.primary
+                                                      : null,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              if (ref.watch(mapNearbyFilterProvider).enabled)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: Material(
+                                    elevation: 2,
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: Theme.of(context).colorScheme.surface,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 4,
+                                      ),
+                                      child: DropdownButton<double>(
+                                        value: ref
+                                            .watch(mapNearbyFilterProvider)
+                                            .radiusMiles,
+                                        underline: const SizedBox.shrink(),
+                                        isDense: true,
+                                        items: kMapNearbyFilterRadiusOptions
+                                            .map(
+                                              (miles) => DropdownMenuItem(
+                                                value: miles,
+                                                child: Text(
+                                                  formatMapNearbyRadiusLabel(
+                                                    miles,
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
+                                        onChanged: (value) {
+                                          if (value != null) {
+                                            ref
+                                                .read(
+                                                  mapNearbyFilterProvider.notifier,
+                                                )
+                                                .setRadiusMiles(value);
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      // My pins only filter (when logged in)
                       if (ref.watch(currentUserProvider).value != null)
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
@@ -399,6 +524,75 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             ),
                           ),
                         ),
+                      // Heatmap overlay toggle
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Tooltip(
+                          message: ref.watch(mapHeatmapEnabledProvider)
+                              ? 'Hide heatmap'
+                              : 'Show activity heatmap',
+                          child: Material(
+                            elevation: 2,
+                            borderRadius: BorderRadius.circular(8),
+                            color: Theme.of(context).colorScheme.surface,
+                            child: InkWell(
+                              onTap: () {
+                                ref
+                                    .read(mapHeatmapEnabledProvider.notifier)
+                                    .setEnabled(
+                                      !ref.read(mapHeatmapEnabledProvider),
+                                    );
+                              },
+                              borderRadius: BorderRadius.circular(8),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 8,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      ref.watch(mapHeatmapEnabledProvider)
+                                          ? Icons.blur_on
+                                          : Icons.blur_off,
+                                      size: 22,
+                                      color: ref.watch(mapHeatmapEnabledProvider)
+                                          ? Theme.of(
+                                              context,
+                                            ).colorScheme.primary
+                                          : null,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'Heatmap',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium
+                                          ?.copyWith(
+                                            fontWeight:
+                                                ref.watch(
+                                                  mapHeatmapEnabledProvider,
+                                                )
+                                                ? FontWeight.w600
+                                                : null,
+                                            color:
+                                                ref.watch(
+                                                  mapHeatmapEnabledProvider,
+                                                )
+                                                ? Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary
+                                                : null,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
