@@ -3,14 +3,21 @@ import 'dart:async';
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
+import 'package:collective_action_frontend/components/confirmation_dialog.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
+import 'package:collective_action_frontend/models/map_area.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
+import 'package:collective_action_frontend/providers/hotspot_provider.dart';
+import 'package:collective_action_frontend/providers/map_area_geometry_provider.dart';
 import 'package:collective_action_frontend/providers/map_events_provider.dart';
 import 'package:collective_action_frontend/providers/map_provider.dart';
 import 'package:collective_action_frontend/providers/map_zoom_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
+import 'package:collective_action_frontend/screens/maps/components/area_captain_map_badges.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_info_dialog.dart';
+import 'package:collective_action_frontend/screens/maps/components/hotspot_event_dialog.dart';
+import 'package:collective_action_frontend/screens/maps/components/hotspot_info_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/map_heatmap_overlay.dart';
 import 'package:collective_action_frontend/screens/maps/components/nearby_filter_mask_overlay.dart';
 import 'package:collective_action_frontend/screens/maps/components/pin_confirmation_bar.dart';
@@ -20,9 +27,12 @@ import 'package:collective_action_frontend/screens/maps/components/trash_report_
 import 'package:collective_action_frontend/screens/maps/components/trash_report_event_info_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/map_styles.dart';
 import 'package:collective_action_frontend/services/actions_service.dart';
+import 'package:collective_action_frontend/services/hotspot_service.dart';
 import 'package:collective_action_frontend/services/photos_service.dart';
 import 'package:collective_action_frontend/utils/heatmap_utils.dart';
 import 'package:collective_action_frontend/utils/map_filter_utils.dart';
+import 'package:collective_action_frontend/utils/map_area_geometry.dart';
+import 'package:collective_action_frontend/utils/map_area_utils.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -96,6 +106,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   BitmapDescriptor? _trashMarkerIcon;
   BitmapDescriptor? _plantingMarkerIcon;
   BitmapDescriptor? _currentLocationMarkerIcon;
+  BitmapDescriptor? _hotspotMarkerIcon;
 
   GoogleMapController? _mapController;
   LatLng? _userLocation;
@@ -107,12 +118,18 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
 
   Timer? _inactivityTimer;
   Timer? _nearbyMaskGeometryDebounce;
+  Timer? _captainBadgeGeometryDebounce;
+  Timer? _areaTooltipTimer;
   bool _showInstruction = false;
   final bool _isDisposed = false;
 
   /// Screen-space center and radius for the nearby-filter dim overlay.
   Offset? _nearbyMaskCenterPx;
   double? _nearbyMaskRadiusPx;
+
+  String? _areaTooltipName;
+  Offset? _areaTooltipOffset;
+  List<AreaCaptainBadgeLayout> _captainBadgeLayouts = [];
 
   void _resetInactivityTimer() {
     _inactivityTimer?.cancel();
@@ -142,6 +159,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   void dispose() {
     _inactivityTimer?.cancel();
     _nearbyMaskGeometryDebounce?.cancel();
+    _captainBadgeGeometryDebounce?.cancel();
+    _areaTooltipTimer?.cancel();
     _mapController = null;
     super.dispose();
   }
@@ -201,6 +220,81 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     } catch (_) {}
   }
 
+  void _scheduleCaptainBadgeUpdate() {
+    if (!_isCleanupCampaign || _mapController == null) return;
+    final visibility = ref.read(mapAreaLayersVisibleProvider);
+    if (!visibility.showAreas || visibility.showNeighborhoods) {
+      if (_captainBadgeLayouts.isNotEmpty) {
+        setState(() => _captainBadgeLayouts = []);
+      }
+      return;
+    }
+    _captainBadgeGeometryDebounce?.cancel();
+    _captainBadgeGeometryDebounce = Timer(const Duration(milliseconds: 32), () {
+      if (mounted) unawaited(_updateCaptainBadgePositions());
+    });
+  }
+
+  List<MapAreaPolygonFeature> _boroughGeometryFeatures(
+    AsyncValue<List<MapAreaGeometryRegion>>? geometryAsync,
+  ) {
+    final regions = geometryAsync?.value;
+    if (regions == null) return [];
+    for (final region in regions) {
+      for (final layer in region.layers) {
+        if (layer.id == 'boroughs') return layer.features;
+      }
+    }
+    return [];
+  }
+
+  Future<void> _updateCaptainBadgePositions() async {
+    if (!mounted || !_isCleanupCampaign || _mapController == null) return;
+
+    final backendAreas =
+        ref.read(mapAreasForCampaignProvider(widget.campaign.id)).value ??
+        const [];
+    final captains =
+        ref.read(areaCaptainsForCampaignProvider(widget.campaign.id)).value ??
+        const [];
+    if (captains.isEmpty) {
+      if (_captainBadgeLayouts.isNotEmpty) {
+        setState(() => _captainBadgeLayouts = []);
+      }
+      return;
+    }
+
+    final boroughFeatures = _boroughGeometryFeatures(
+      ref.read(mapAreaGeometryProvider),
+    );
+    final grouped = groupCaptainsByAreaId(captains);
+    final controller = _mapController!;
+    final layouts = <AreaCaptainBadgeLayout>[];
+
+    for (final area in backendAreas.where((a) => a.areaType == 'borough')) {
+      final assignments = grouped[area.id];
+      if (assignments == null || assignments.isEmpty) continue;
+      final anchor = areaBadgeAnchor(area, boroughFeatures);
+      if (anchor == null) continue;
+      try {
+        final screenPoint = await controller.getScreenCoordinate(anchor);
+        layouts.add(
+          AreaCaptainBadgeLayout(
+            area: area,
+            assignments: assignments,
+            screenOffset: Offset(
+              screenPoint.x.toDouble(),
+              screenPoint.y.toDouble(),
+            ),
+          ),
+        );
+      } catch (_) {}
+    }
+
+    if (!mounted) return;
+    setState(() => _captainBadgeLayouts = layouts);
+  }
+
   Future<void> _loadMarkerIcons() async {
     if (!mounted) return;
     const config = ImageConfiguration(size: Size(40, 40));
@@ -220,6 +314,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       currentLocationConfig,
       _kAssetCurrentLocation,
     );
+    if (!mounted) return;
+    final hotspot = await createHotspotMarkerIcon();
     if (mounted) {
       setState(() {
         _cleanupMarkerIcon = clean;
@@ -227,6 +323,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         _trashMarkerIcon = trash;
         _plantingMarkerIcon = planting;
         _currentLocationMarkerIcon = currentLocation;
+        _hotspotMarkerIcon = hotspot;
       });
     }
   }
@@ -259,6 +356,12 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   BitmapDescriptor _iconForCurrentLocation() =>
       _currentLocationMarkerIcon ??
       BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
+  BitmapDescriptor _iconForHotspot() =>
+      _hotspotMarkerIcon ??
+      BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange);
+
+  bool get _isCleanupCampaign =>
+      widget.campaign.mapCampaignType == MapCampaignTypeEnum.cleanupMap.value;
 
   bool get _isPlantingCampaign =>
       widget.campaign.mapCampaignType == MapCampaignTypeEnum.plantingMap.value;
@@ -383,6 +486,17 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       allPoints.addAll(polyline.points);
     }
 
+    if (_isCleanupCampaign) {
+      final hotspots =
+          ref.read(mapHotspotsForCampaignProvider(widget.campaign.id)).value ??
+          const [];
+      for (final h in hotspots) {
+        if (h.active) {
+          allPoints.add(LatLng(h.latitude, h.longitude));
+        }
+      }
+    }
+
     if (allPoints.isEmpty) return false;
 
     // Calculate bounds
@@ -473,6 +587,12 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       top += 44;
     }
     top += 44; // Heatmap toggle row on map screen
+    if (_isCleanupCampaign) {
+      top += 44; // Areas toggle row on map screen
+      if (ref.watch(mapAreaLayersVisibleProvider).showAreas) {
+        top += 44; // Neighborhoods toggle row on map screen
+      }
+    }
     return top;
   }
 
@@ -529,13 +649,81 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         _scheduleNearbyMaskGeometryUpdate();
       }
     });
+    ref.listen<MapAreaLayersVisibleState>(
+      mapAreaLayersVisibleProvider,
+      (prev, next) {
+        if (!mounted || _isDisposed) return;
+        if (next.showNeighborhoods || !next.showAreas) {
+          if (_captainBadgeLayouts.isNotEmpty) {
+            setState(() => _captainBadgeLayouts = []);
+          }
+          return;
+        }
+        if (prev?.showNeighborhoods == true && !next.showNeighborhoods) {
+          _scheduleCaptainBadgeUpdate();
+        }
+      },
+    );
     ref.watch(mapFilterMySubmissionsOnlyProvider);
     final heatmapEnabled = ref.watch(mapHeatmapEnabledProvider);
     final nearbyFilter = ref.watch(mapNearbyFilterProvider);
     final eventsAsync = ref.watch(
       mapEventsForCampaignProvider(widget.campaign.id),
     );
+    final hotspotsAsync = _isCleanupCampaign
+        ? ref.watch(mapHotspotsForCampaignProvider(widget.campaign.id))
+        : null;
+    final captainsAsync = _isCleanupCampaign
+        ? ref.watch(areaCaptainsForCampaignProvider(widget.campaign.id))
+        : null;
+    final hotspots = hotspotsAsync?.value ?? const [];
+    final captains = captainsAsync?.value ?? const [];
     final currentUser = ref.watch(currentUserProvider).value;
+    final canManageHotspots = _isCleanupCampaign &&
+        canUserManageHotspots(
+          userId: currentUser?.id,
+          captainsAsync: captainsAsync ?? const AsyncValue.data([]),
+        );
+    if (_isCleanupCampaign && captainsAsync != null) {
+      ref.listen(areaCaptainsForCampaignProvider(widget.campaign.id), (
+        prev,
+        next,
+      ) {
+        if (!canUserManageHotspots(
+          userId: ref.read(currentUserProvider).value?.id,
+          captainsAsync: next,
+        )) {
+          if (mounted && _mode == 'hotspot') {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) setState(() => _mode = null);
+            });
+          }
+        }
+      });
+    }
+    ref.listen(currentUserProvider, (prev, next) {
+      if (!_isCleanupCampaign) return;
+      if (!canUserManageHotspots(
+        userId: next.value?.id,
+        captainsAsync: ref.read(
+          areaCaptainsForCampaignProvider(widget.campaign.id),
+        ),
+      )) {
+        if (mounted && _mode == 'hotspot') {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _mode = null);
+          });
+        }
+      }
+    });
+    final backendAreasAsync = _isCleanupCampaign
+        ? ref.watch(mapAreasForCampaignProvider(widget.campaign.id))
+        : null;
+    final geometryAsync = _isCleanupCampaign
+        ? ref.watch(mapAreaGeometryProvider)
+        : null;
+    final areaLayerVisibility = ref.watch(mapAreaLayersVisibleProvider);
+    final backendAreas = backendAreasAsync?.value ?? const [];
     final rawEvents = eventsAsync.value;
     final eventsToShow = _filterMapEvents(
       rawEvents,
@@ -545,8 +733,31 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     );
     final heatmapPoints = _heatmapPointsFromEvents(eventsToShow);
     final campaignDrawerOpen = ref.watch(campaignDrawerOpenProvider);
+    final areaCaptainsSheetOpen = ref.watch(areaCaptainsSheetOpenProvider);
+    final areaPolygons = _buildAreaBoundaryPolygons(
+      geometryAsync: geometryAsync,
+      backendAreas: backendAreas,
+      captains: captains,
+      currentUserId: currentUser?.id,
+      showAreas: areaLayerVisibility.showAreas,
+      showNeighborhoods: areaLayerVisibility.showNeighborhoods,
+      enableAreaTap: _mode == null && !_pinDropped,
+    );
     final gesturesEnabled =
-        !_isAddEventDialogOpen && !_isInfoDialogOpen && !campaignDrawerOpen;
+        !_isAddEventDialogOpen &&
+        !_isInfoDialogOpen &&
+        !campaignDrawerOpen &&
+        !areaCaptainsSheetOpen;
+
+    if (_isCleanupCampaign &&
+        _mapController != null &&
+        captainsAsync?.value != null &&
+        areaLayerVisibility.showAreas &&
+        !areaLayerVisibility.showNeighborhoods) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _scheduleCaptainBadgeUpdate();
+      });
+    }
 
     if (nearbyFilter.enabled &&
         _userLocation != null &&
@@ -603,19 +814,36 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
               setState(() => _currentZoom = zoom);
             }
             _scheduleNearbyMaskGeometryUpdate();
+            _scheduleCaptainBadgeUpdate();
           },
           onCameraMove: (CameraPosition position) {
             if (mounted && !_isDisposed) {
               setState(() => _currentZoom = position.zoom);
             }
+            _clearAreaTooltip();
             _scheduleNearbyMaskGeometryUpdate();
           },
-          onCameraIdle: () => _scheduleNearbyMaskGeometryUpdate(),
-          markers: _buildMarkers(
-            eventsToShow,
-            currentUser,
-            hideEventPins: heatmapEnabled,
-          ),
+          onCameraIdle: () {
+            _scheduleNearbyMaskGeometryUpdate();
+            _scheduleCaptainBadgeUpdate();
+          },
+          markers: {
+            ..._buildMarkers(
+              eventsToShow,
+              currentUser,
+              hideEventPins: heatmapEnabled,
+            ),
+            ..._buildHotspotMarkers(
+              hotspots,
+              captains,
+              hideWhenHeatmap: heatmapEnabled,
+            ),
+          },
+          circles: {
+            ..._buildHotspotCircles(hotspots, hideWhenHeatmap: heatmapEnabled),
+            ..._buildHotspotPreviewCircles(),
+          },
+          polygons: areaPolygons,
           polylines: _buildPolylines(eventsToShow),
           onTap: _handleMapTap,
           mapType: MapType.normal,
@@ -651,6 +879,36 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
               ).colorScheme.primary.withValues(alpha: 0.55),
             ),
           ),
+        if (_areaTooltipName != null && _areaTooltipOffset != null)
+          Positioned(
+            left: _areaTooltipOffset!.dx,
+            top: _areaTooltipOffset!.dy,
+            child: IgnorePointer(
+              child: Material(
+                elevation: 4,
+                borderRadius: BorderRadius.circular(8),
+                color: Theme.of(context).colorScheme.inverseSurface,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  child: Text(
+                    _areaTooltipName!,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onInverseSurface,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        if (_isCleanupCampaign &&
+            areaLayerVisibility.showAreas &&
+            !areaLayerVisibility.showNeighborhoods &&
+            _captainBadgeLayouts.isNotEmpty)
+          ...buildAreaCaptainBadgeWidgets(_captainBadgeLayouts),
         // Map style toggle (light/dark) – top right
         SafeArea(
           child: Align(
@@ -692,42 +950,60 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
                 top: _modeSelectorTopPadding(context),
                 left: 12,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (_isPlantingCampaign)
-                    _MapModeButton(
-                      imageAsset: _kAssetPlanting,
-                      label: 'Planting',
-                      tooltip: 'Add a tree or wildflower planting',
-                      isActive: _mode == 'planting',
-                      onTap: () => _setMode('planting'),
-                    )
-                  else ...[
-                    _MapModeButton(
-                      imageAsset: _kAssetClean,
-                      label: 'Cleanup',
-                      tooltip: 'Add a cleanup',
-                      isActive: _mode == 'cleanup',
-                      onTap: () => _setMode('cleanup'),
-                    ),
-                    const SizedBox(height: 14),
-                    _MapModeButton(
-                      imageAsset: _kAssetTrash,
-                      label: 'Report',
-                      tooltip: 'Report trash',
-                      isActive: _mode == 'trash_report',
-                      onTap: () => _setMode('trash_report'),
-                    ),
-                  ],
-                  // _MapModeButton(
-                  //   imageAsset: _kAssetDraw,
-                  //   label: 'Route',
-                  //   tooltip: 'Draw Cleanup Route',
-                  //   isActive: _mode == 'route',
-                  //   onTap: () => _setMode('route'),
-                  // ),
-                ],
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.sizeOf(context).height * 0.45,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (_isPlantingCampaign)
+                        _MapModeButton(
+                          imageAsset: _kAssetPlanting,
+                          label: 'Planting',
+                          tooltip: 'Add a tree or wildflower planting',
+                          isActive: _mode == 'planting',
+                          onTap: () => _setMode('planting'),
+                        )
+                      else ...[
+                        _MapModeButton(
+                          imageAsset: _kAssetClean,
+                          label: 'Cleanup',
+                          tooltip: 'Add a cleanup',
+                          isActive: _mode == 'cleanup',
+                          onTap: () => _setMode('cleanup'),
+                        ),
+                        const SizedBox(height: 14),
+                        _MapModeButton(
+                          imageAsset: _kAssetTrash,
+                          label: 'Report',
+                          tooltip: 'Report trash',
+                          isActive: _mode == 'trash_report',
+                          onTap: () => _setMode('trash_report'),
+                        ),
+                        if (canManageHotspots) ...[
+                          const SizedBox(height: 14),
+                          _MapModeButton(
+                            label: 'Hotspot',
+                            tooltip: 'Add a targeted cleanup hotspot',
+                            isActive: _mode == 'hotspot',
+                            onTap: () => _setMode('hotspot'),
+                            icon: Icons.local_fire_department,
+                            iconColor: const Color(0xFFFF6D00),
+                          ),
+                        ],
+                      ],
+                      // _MapModeButton(
+                      //   imageAsset: _kAssetDraw,
+                      //   label: 'Route',
+                      //   tooltip: 'Draw Cleanup Route',
+                      //   isActive: _mode == 'route',
+                      //   onTap: () => _setMode('route'),
+                      // ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -756,6 +1032,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
                           ? 'Tap map to add a tree or wildflower planting'
                           : _mode == 'cleanup'
                           ? 'Tap map to add a cleanup location'
+                          : _mode == 'hotspot'
+                          ? 'Tap map to mark a hotspot ($hotspotRadiusDescription target area)'
                           : 'Tap map to report trash',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
@@ -964,6 +1242,177 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     return out;
   }
 
+  Set<Marker> _buildHotspotMarkers(
+    List<MapHotspotModel> hotspots,
+    List<AreaCaptainModel> captains, {
+    bool hideWhenHeatmap = false,
+  }) {
+    if (hideWhenHeatmap) return {};
+    final Set<Marker> out = {};
+    for (final h in hotspots) {
+      if (!h.active) continue;
+      out.add(
+        Marker(
+          markerId: MarkerId('hotspot_${h.id}'),
+          position: LatLng(h.latitude, h.longitude),
+          icon: _iconForHotspot(),
+          zIndexInt: 1000,
+          onTap: () => _showHotspotInfoDialog(h, captains),
+        ),
+      );
+    }
+    return out;
+  }
+
+  Set<Circle> _buildHotspotCircles(
+    List<MapHotspotModel> hotspots, {
+    bool hideWhenHeatmap = false,
+  }) {
+    if (hideWhenHeatmap) return {};
+    return hotspots.where((h) => h.active).map((h) {
+      return buildHotspotRadiusCircle(
+        circleId: CircleId('hotspot_circle_${h.id}'),
+        center: LatLng(h.latitude, h.longitude),
+      );
+    }).toSet();
+  }
+
+  Set<Circle> _buildHotspotPreviewCircles() {
+    if (_mode != 'hotspot' || _droppedPosition == null) return {};
+    return {
+      buildHotspotRadiusCircle(
+        circleId: const CircleId('hotspot_preview'),
+        center: _droppedPosition!,
+        fillAlpha: 0.22,
+      ),
+    };
+  }
+
+  List<MapAreaModel> _captainAllowedAreas() {
+    final currentUser = ref.read(currentUserProvider).value;
+    if (currentUser?.id == null) return [];
+
+    var areas = ref.read(userCaptainAreasProvider(widget.campaign.id));
+    if (areas.isNotEmpty) return areas;
+
+    return captainAreasForUser(
+      userId: currentUser!.id,
+      captains:
+          ref.read(areaCaptainsForCampaignProvider(widget.campaign.id)).value ??
+          const [],
+      areas:
+          ref.read(mapAreasForCampaignProvider(widget.campaign.id)).value ??
+          const [],
+    );
+  }
+
+  MapAreaModel? _captainAreaAtPosition(LatLng position) {
+    final allowedAreas = _captainAllowedAreas();
+    if (allowedAreas.isEmpty) return null;
+
+    final regions = ref.read(mapAreaGeometryProvider).value;
+    final features = regions == null
+        ? const <MapAreaPolygonFeature>[]
+        : _boroughGeometryFeatures(AsyncValue.data(regions));
+
+    return detectCaptainAreaForPoint(
+      latitude: position.latitude,
+      longitude: position.longitude,
+      captainAreas: allowedAreas,
+      geometryFeatures: features,
+    );
+  }
+
+  Set<Polygon> _buildAreaBoundaryPolygons({
+    required AsyncValue<List<MapAreaGeometryRegion>>? geometryAsync,
+    required List<MapAreaModel> backendAreas,
+    required List<AreaCaptainModel> captains,
+    required String? currentUserId,
+    required bool showAreas,
+    required bool showNeighborhoods,
+    required bool enableAreaTap,
+  }) {
+    if (!showAreas) return {};
+    final regions = geometryAsync?.value;
+    if (regions == null || regions.isEmpty) return {};
+
+    final features = <MapAreaPolygonFeature>[];
+    for (final region in regions) {
+      for (final layer in region.layers) {
+        if (layer.id == 'neighborhoods') {
+          if (showNeighborhoods) features.addAll(layer.features);
+        } else if (!showNeighborhoods) {
+          features.addAll(layer.features);
+        }
+      }
+    }
+    if (features.isEmpty) return {};
+
+    return buildAreaPolygons(
+      features: features,
+      backendAreas: backendAreas,
+      captains: captains,
+      currentUserId: currentUserId,
+      onFeatureTap: enableAreaTap
+          ? (feature) => _showAreaFeatureTooltip(feature)
+          : null,
+    );
+  }
+
+  void _clearAreaTooltip() {
+    _areaTooltipTimer?.cancel();
+    if (_areaTooltipName == null && _areaTooltipOffset == null) return;
+    if (!mounted) return;
+    setState(() {
+      _areaTooltipName = null;
+      _areaTooltipOffset = null;
+    });
+  }
+
+  Future<void> _showAreaFeatureTooltip(MapAreaPolygonFeature feature) async {
+    if (!mounted) return;
+    _resetInactivityTimer();
+
+    final centroid = featureCentroid(feature);
+    final controller = _mapController;
+    if (centroid == null || controller == null) return;
+
+    _areaTooltipTimer?.cancel();
+    final screenPoint = await controller.getScreenCoordinate(centroid);
+    if (!mounted) return;
+
+    setState(() {
+      _areaTooltipName = feature.name;
+      _areaTooltipOffset = computeAreaTooltipTopLeft(
+        centroidScreen: Offset(
+          screenPoint.x.toDouble(),
+          screenPoint.y.toDouble(),
+        ),
+        name: feature.name,
+        featureSlug: feature.slug,
+        captainBadges: _captainBadgeLayouts,
+      );
+    });
+
+    _areaTooltipTimer = Timer(const Duration(seconds: 3), _clearAreaTooltip);
+  }
+
+  Future<void> _showHotspotInfoDialog(
+    MapHotspotModel hotspot,
+    List<AreaCaptainModel> captains,
+  ) async {
+    if (mounted) setState(() => _isInfoDialogOpen = true);
+    await showDialog<bool>(
+      context: context,
+      builder: (c) => HotspotInfoDialog(
+        hotspot: hotspot,
+        campaignId: widget.campaign.id,
+        captains: captains,
+      ),
+    );
+    if (mounted) setState(() => _isInfoDialogOpen = false);
+  }
+
   Future<void> _showEventInfoDialog(
     BuildContext context,
     ActionSchema action,
@@ -1065,6 +1514,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
 
   void _handleMapTap(LatLng position) {
     _resetInactivityTimer();
+    _clearAreaTooltip();
     if (ref.read(campaignDrawerOpenProvider)) {
       // Don't close the drawer if a full-screen overlay (e.g. photo viewer) was
       // just closed—the same tap can hit the map and would wrongly close the sheet.
@@ -1087,6 +1537,18 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         _updateTempPolyline();
       });
     } else {
+      if (_mode == 'hotspot') {
+        if (_captainAreaAtPosition(position) == null) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              CustomSnackBar.warning(
+                'Place the hotspot inside a borough you captain',
+              ),
+            );
+          }
+          return;
+        }
+      }
       setState(() {
         _tempMarkers.clear();
         _tempMarkers.add(
@@ -1097,6 +1559,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
                 ? _iconForCleanup()
                 : _mode == 'planting'
                 ? _iconForPlanting()
+                : _mode == 'hotspot'
+                ? _iconForHotspot()
                 : _iconForTrash(),
           ),
         );
@@ -1237,6 +1701,118 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       if (created != null) {
         _createdActionPositionOverride[created.id] = droppedPosition;
       }
+    } else if (_droppedType == 'hotspot') {
+      final currentUser = ref.read(currentUserProvider).value;
+      if (currentUser?.id == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            CustomSnackBar.info('Sign in to add hotspots'),
+          );
+        }
+        return;
+      }
+      final captainsAsync =
+          ref.read(areaCaptainsForCampaignProvider(widget.campaign.id));
+      if (!canUserManageHotspots(
+        userId: currentUser!.id,
+        captainsAsync: captainsAsync,
+      )) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            CustomSnackBar.warning('You must be an area captain to add hotspots'),
+          );
+        }
+        return;
+      }
+      var allowedAreas = _captainAllowedAreas();
+      if (allowedAreas.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            CustomSnackBar.warning('You must be an area captain to add hotspots'),
+          );
+        }
+        return;
+      }
+      final detectedArea = _captainAreaAtPosition(droppedPosition);
+      if (detectedArea == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            CustomSnackBar.warning(
+              'Hotspot must be inside a borough you captain',
+            ),
+          );
+        }
+        return;
+      }
+      final existingHotspots =
+          ref.read(mapHotspotsForCampaignProvider(widget.campaign.id)).value ??
+          const [];
+      final existingHotspot = activeHotspotForArea(
+        existingHotspots,
+        detectedArea.id,
+      );
+      if (existingHotspot != null) {
+        final boroughName = areaDisplayName(detectedArea);
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => ConfirmationDialog(
+            title: 'Replace hotspot?',
+            content:
+                '$boroughName already has a hotspot (“${existingHotspot.title}”). '
+                'Adding this one will replace it on the map.',
+            confirmText: 'Replace',
+            confirmColor: const Color(0xFFFF6D00),
+          ),
+        );
+        if (confirmed != true || !mounted) return;
+      }
+      if (mounted) setState(() => _isAddEventDialogOpen = true);
+      final result = await showDialog<HotspotEventDialogResult>(
+        context: context,
+        builder: (c) => HotspotEventDialog(
+          position: droppedPosition,
+          allowedAreas: [detectedArea],
+          suggestedArea: detectedArea,
+        ),
+      );
+      if (mounted) setState(() => _isAddEventDialogOpen = false);
+      if (result == null || !mounted) return;
+      if (_captainAreaAtPosition(droppedPosition)?.id != result.area.id) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            CustomSnackBar.warning(
+              'Hotspot must be inside ${areaDisplayName(result.area)}',
+            ),
+          );
+        }
+        return;
+      }
+      try {
+        await ref.read(hotspotServiceProvider).createHotspot(
+              campaignId: widget.campaign.id,
+              mapAreaId: result.area.id,
+              title: result.title,
+              description: result.description.isEmpty ? null : result.description,
+              latitude: droppedPosition.latitude,
+              longitude: droppedPosition.longitude,
+              createdBy: currentUser.id!,
+            );
+        if (mounted) {
+          AppConstants.playSuccessCelebration(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            CustomSnackBar.success(
+              existingHotspot != null ? 'Hotspot replaced' : 'Hotspot added',
+            ),
+          );
+        }
+        ref.invalidate(mapHotspotsForCampaignProvider(widget.campaign.id));
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            CustomSnackBar.error('Failed to add hotspot: $e'),
+          );
+        }
+      }
     } else {
       if (mounted) setState(() => _isAddEventDialogOpen = true);
       final result = await showDialog<TrashReportEventDialogResult>(
@@ -1363,6 +1939,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
 class _MapModeButton extends StatelessWidget {
   const _MapModeButton({
     this.imageAsset,
+    this.icon,
+    this.iconColor,
     required this.label,
     required this.tooltip,
     required this.isActive,
@@ -1370,6 +1948,8 @@ class _MapModeButton extends StatelessWidget {
   });
 
   final String? imageAsset;
+  final IconData? icon;
+  final Color? iconColor;
 
   final String label;
   final String tooltip;
@@ -1431,10 +2011,11 @@ class _MapModeButton extends StatelessWidget {
                 ),
                 child: imageAsset == null
                     ? Icon(
-                        Icons.add_location_alt,
-                        color: isActive
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.onSurfaceVariant,
+                        icon ?? Icons.add_location_alt,
+                        color: iconColor ??
+                            (isActive
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurfaceVariant),
                       )
                     : null,
               ),

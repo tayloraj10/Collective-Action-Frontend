@@ -28,6 +28,20 @@ final campaignDrawerOpenProvider =
     NotifierProvider<CampaignDrawerOpenNotifier, bool>(
         CampaignDrawerOpenNotifier.new);
 
+/// True while the area captains bottom sheet is open; map disables gestures.
+class AreaCaptainsSheetOpenNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void setOpen(bool value) {
+    state = value;
+  }
+}
+
+final areaCaptainsSheetOpenProvider =
+    NotifierProvider<AreaCaptainsSheetOpenNotifier, bool>(
+        AreaCaptainsSheetOpenNotifier.new);
+
 /// Set when a full-screen overlay (e.g. PhotoViewerDialog) was just closed.
 /// The map ignores "tap to close drawer" for a short window so the same tap
 /// doesn't close the campaign info sheet.

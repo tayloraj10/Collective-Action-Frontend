@@ -1,0 +1,175 @@
+import 'package:collective_action_frontend/models/map_area.dart';
+import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
+import 'package:flutter/material.dart';
+/// One borough/area captain badge anchored on the map.
+class AreaCaptainBadgeLayout {
+  const AreaCaptainBadgeLayout({
+    required this.area,
+    required this.assignments,
+    required this.screenOffset,
+  });
+
+  final MapAreaModel area;
+  final List<AreaCaptainModel> assignments;
+
+  /// Screen position of the borough's middle-left anchor.
+  final Offset screenOffset;
+}
+
+/// Vertical centering offset for the badge chip.
+const kCaptainBadgeChipHeight = 36.0;
+
+/// Inset from the west edge so the chip sits inside the borough.
+const kCaptainBadgeInsetPx = 8.0;
+
+/// Upper bound for captain badge chip width (varies with avatar count).
+const kCaptainBadgeChipMaxWidth = 112.0;
+
+const _kAreaTooltipPaddingH = 20.0;
+const _kAreaTooltipPaddingV = 12.0;
+const _kAreaTooltipCharWidth = 8.0;
+const _kOverlapMargin = 8.0;
+
+/// Screen rect for a captain badge chip (for overlap checks).
+Rect captainBadgeScreenRect(AreaCaptainBadgeLayout layout) {
+  return Rect.fromLTWH(
+    layout.screenOffset.dx + kCaptainBadgeInsetPx,
+    layout.screenOffset.dy - (kCaptainBadgeChipHeight / 2),
+    kCaptainBadgeChipMaxWidth,
+    kCaptainBadgeChipHeight,
+  );
+}
+
+Size estimateAreaTooltipSize(String name) {
+  final width = (name.length * _kAreaTooltipCharWidth + _kAreaTooltipPaddingH)
+      .clamp(60.0, 220.0);
+  return Size(width, 28.0 + _kAreaTooltipPaddingV);
+}
+
+/// Top-left screen position for an area name tooltip, avoiding captain badges.
+Offset computeAreaTooltipTopLeft({
+  required Offset centroidScreen,
+  required String name,
+  required String featureSlug,
+  required List<AreaCaptainBadgeLayout> captainBadges,
+}) {
+  final tooltipSize = estimateAreaTooltipSize(name);
+  var topLeft = Offset(centroidScreen.dx - 50, centroidScreen.dy - 36);
+  var tooltipRect = Rect.fromLTWH(
+    topLeft.dx,
+    topLeft.dy,
+    tooltipSize.width,
+    tooltipSize.height,
+  );
+
+  final matchingBadge = captainBadges
+      .where((badge) => badge.area.slug == featureSlug)
+      .firstOrNull;
+  if (matchingBadge == null) return topLeft;
+
+  final badgeRect = captainBadgeScreenRect(matchingBadge);
+  if (!tooltipRect.overlaps(badgeRect.inflate(_kOverlapMargin))) {
+    return topLeft;
+  }
+
+  final candidates = <Offset>[
+    Offset(
+      badgeRect.right + _kOverlapMargin,
+      badgeRect.center.dy - tooltipSize.height / 2,
+    ),
+    Offset(
+      badgeRect.center.dx - tooltipSize.width / 2,
+      badgeRect.top - tooltipSize.height - _kOverlapMargin,
+    ),
+    Offset(
+      badgeRect.left - tooltipSize.width - _kOverlapMargin,
+      badgeRect.center.dy - tooltipSize.height / 2,
+    ),
+    Offset(
+      badgeRect.center.dx - tooltipSize.width / 2,
+      badgeRect.bottom + _kOverlapMargin,
+    ),
+  ];
+
+  for (final candidate in candidates) {
+    final candidateRect = Rect.fromLTWH(
+      candidate.dx,
+      candidate.dy,
+      tooltipSize.width,
+      tooltipSize.height,
+    );
+    if (!candidateRect.overlaps(badgeRect.inflate(_kOverlapMargin))) {
+      return candidate;
+    }
+  }
+
+  // Last resort: far to the right of the badge.
+  return Offset(badgeRect.right + _kOverlapMargin, topLeft.dy);
+}
+
+/// Positioned badge widgets for the map [Stack] — no full-screen overlay layer.
+List<Widget> buildAreaCaptainBadgeWidgets(List<AreaCaptainBadgeLayout> badges) {
+  return [
+    for (final badge in badges)
+      Positioned(
+        left: badge.screenOffset.dx + kCaptainBadgeInsetPx,
+        top: badge.screenOffset.dy - (kCaptainBadgeChipHeight / 2),
+        child: CaptainBadgeChip(
+          captainUserIds:
+              badge.assignments.map((a) => a.captainUserId).toList(),
+        ),
+      ),
+  ];
+}
+
+class CaptainBadgeChip extends StatelessWidget {
+  const CaptainBadgeChip({
+    super.key,
+    required this.captainUserIds,
+  });
+
+  final List<String> captainUserIds;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Material(
+      elevation: 4,
+      shadowColor: Colors.black.withValues(alpha: 0.35),
+      color: theme.colorScheme.surface.withValues(alpha: 0.94),
+      borderRadius: BorderRadius.circular(24),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(4, 4, 8, 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (var i = 0; i < captainUserIds.length && i < 3; i++)
+              Transform.translate(
+                offset: Offset(i * -6.0, 0),
+                child: UserAvatar(
+                  userId: captainUserIds[i],
+                  radius: 14,
+                  showTooltip: true,
+                  showProfileOnTap: true,
+                ),
+              ),
+            if (captainUserIds.length > 3)
+              Padding(
+                padding: const EdgeInsets.only(left: 2),
+                child: Text(
+                  '+${captainUserIds.length - 3}',
+                  style: theme.textTheme.labelSmall,
+                ),
+              ),
+            const SizedBox(width: 4),
+            Icon(
+              Icons.military_tech_outlined,
+              size: 16,
+              color: theme.colorScheme.primary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

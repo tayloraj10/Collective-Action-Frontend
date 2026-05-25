@@ -2,9 +2,11 @@ import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/components/custom_app_bar.dart';
 import 'package:collective_action_frontend/components/leaderboard_dialog.dart';
 import 'package:collective_action_frontend/components/stats_dialog.dart';
+import 'package:collective_action_frontend/providers/map_area_geometry_provider.dart';
 import 'package:collective_action_frontend/providers/map_provider.dart';
 import 'package:collective_action_frontend/providers/map_zoom_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
+import 'package:collective_action_frontend/screens/maps/components/area_captains_sheet.dart';
 import 'package:collective_action_frontend/screens/maps/components/campaign_info_sheet.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_map_widget.dart';
 // import 'package:collective_action_frontend/screens/maps/components/zip_code_map_widget.dart'; // restore when re-enabling zip code map
@@ -315,6 +317,41 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 constraints: const BoxConstraints(),
                               ),
                             ),
+                            if (_selectedCampaignType ==
+                                MapCampaignTypeEnum.cleanupMap) ...[
+                              const SizedBox(width: 6),
+                              Material(
+                                elevation: 2,
+                                borderRadius: BorderRadius.circular(8),
+                                color: Theme.of(context).colorScheme.surface,
+                                child: IconButton(
+                                  icon: const Icon(Icons.military_tech_outlined),
+                                  onPressed: () => scheduleAfterTap(
+                                    context,
+                                    () {
+                                      ref
+                                          .read(areaCaptainsSheetOpenProvider.notifier)
+                                          .setOpen(true);
+                                      showModalBottomSheet<void>(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        showDragHandle: false,
+                                        builder: (_) => AreaCaptainsSheet(
+                                          campaignId: selectedCampaign.id,
+                                        ),
+                                      ).whenComplete(() {
+                                        ref
+                                            .read(areaCaptainsSheetOpenProvider.notifier)
+                                            .setOpen(false);
+                                      });
+                                    },
+                                  ),
+                                  tooltip: 'Area Captains',
+                                  padding: const EdgeInsets.all(8),
+                                  constraints: const BoxConstraints(),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -593,6 +630,151 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           ),
                         ),
                       ),
+                      if (_selectedCampaignType == MapCampaignTypeEnum.cleanupMap)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Tooltip(
+                                message: ref.watch(mapAreaLayersVisibleProvider).showAreas
+                                    ? 'Hide area boundaries'
+                                    : 'Show borough/area boundaries',
+                                child: Material(
+                                  elevation: 2,
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Theme.of(context).colorScheme.surface,
+                                  child: InkWell(
+                                    onTap: () {
+                                      ref
+                                          .read(mapAreaLayersVisibleProvider.notifier)
+                                          .setShowAreas(
+                                            !ref
+                                                .read(mapAreaLayersVisibleProvider)
+                                                .showAreas,
+                                          );
+                                    },
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 8,
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            ref.watch(mapAreaLayersVisibleProvider).showAreas
+                                                ? Icons.layers
+                                                : Icons.layers_outlined,
+                                            size: 22,
+                                            color:
+                                                ref.watch(mapAreaLayersVisibleProvider).showAreas
+                                                ? Theme.of(context).colorScheme.primary
+                                                : null,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            'Areas',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .labelMedium
+                                                ?.copyWith(
+                                                  fontWeight:
+                                                      ref.watch(mapAreaLayersVisibleProvider).showAreas
+                                                      ? FontWeight.w600
+                                                      : null,
+                                                  color:
+                                                      ref.watch(mapAreaLayersVisibleProvider).showAreas
+                                                      ? Theme.of(context).colorScheme.primary
+                                                      : null,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              if (ref.watch(mapAreaLayersVisibleProvider).showAreas)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: Tooltip(
+                                    message: ref
+                                            .watch(mapAreaLayersVisibleProvider)
+                                            .showNeighborhoods
+                                        ? 'Hide neighborhood boundaries'
+                                        : 'Show neighborhood boundaries',
+                                    child: Material(
+                                      elevation: 2,
+                                      borderRadius: BorderRadius.circular(8),
+                                      color: Theme.of(context).colorScheme.surface,
+                                      child: InkWell(
+                                        onTap: () {
+                                          ref
+                                              .read(mapAreaLayersVisibleProvider.notifier)
+                                              .setShowNeighborhoods(
+                                                !ref
+                                                    .read(mapAreaLayersVisibleProvider)
+                                                    .showNeighborhoods,
+                                              );
+                                        },
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 8,
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                ref
+                                                        .watch(mapAreaLayersVisibleProvider)
+                                                        .showNeighborhoods
+                                                    ? Icons.grid_view
+                                                    : Icons.grid_view_outlined,
+                                                size: 22,
+                                                color: ref
+                                                        .watch(mapAreaLayersVisibleProvider)
+                                                        .showNeighborhoods
+                                                    ? Theme.of(context).colorScheme.primary
+                                                    : null,
+                                              ),
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                'Neighborhoods',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .labelMedium
+                                                    ?.copyWith(
+                                                      fontWeight: ref
+                                                              .watch(
+                                                                mapAreaLayersVisibleProvider,
+                                                              )
+                                                              .showNeighborhoods
+                                                          ? FontWeight.w600
+                                                          : null,
+                                                      color: ref
+                                                              .watch(
+                                                                mapAreaLayersVisibleProvider,
+                                                              )
+                                                              .showNeighborhoods
+                                                          ? Theme.of(context).colorScheme.primary
+                                                          : null,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
                     ],
                   ),
                 ),
