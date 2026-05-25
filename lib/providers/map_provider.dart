@@ -71,6 +71,72 @@ final mapHeatmapEnabledProvider =
       MapHeatmapEnabledNotifier.new,
     );
 
+/// Pin categories that can be hidden independently on map views.
+enum MapPinCategory {
+  cleanup,
+  trashReport,
+  planting,
+  hotspot,
+}
+
+class MapPinVisibilityState {
+  const MapPinVisibilityState({
+    this.cleanup = true,
+    this.trashReport = true,
+    this.planting = true,
+    this.hotspot = true,
+  });
+
+  final bool cleanup;
+  final bool trashReport;
+  final bool planting;
+  final bool hotspot;
+
+  bool isVisible(MapPinCategory category) => switch (category) {
+        MapPinCategory.cleanup => cleanup,
+        MapPinCategory.trashReport => trashReport,
+        MapPinCategory.planting => planting,
+        MapPinCategory.hotspot => hotspot,
+      };
+
+  MapPinVisibilityState copyWith({
+    bool? cleanup,
+    bool? trashReport,
+    bool? planting,
+    bool? hotspot,
+  }) {
+    return MapPinVisibilityState(
+      cleanup: cleanup ?? this.cleanup,
+      trashReport: trashReport ?? this.trashReport,
+      planting: planting ?? this.planting,
+      hotspot: hotspot ?? this.hotspot,
+    );
+  }
+}
+
+class MapPinVisibilityNotifier extends Notifier<MapPinVisibilityState> {
+  @override
+  MapPinVisibilityState build() => const MapPinVisibilityState();
+
+  void setVisible(MapPinCategory category, bool visible) {
+    state = switch (category) {
+      MapPinCategory.cleanup => state.copyWith(cleanup: visible),
+      MapPinCategory.trashReport => state.copyWith(trashReport: visible),
+      MapPinCategory.planting => state.copyWith(planting: visible),
+      MapPinCategory.hotspot => state.copyWith(hotspot: visible),
+    };
+  }
+
+  void toggle(MapPinCategory category) {
+    setVisible(category, !state.isVisible(category));
+  }
+}
+
+final mapPinVisibilityProvider =
+    NotifierProvider<MapPinVisibilityNotifier, MapPinVisibilityState>(
+      MapPinVisibilityNotifier.new,
+    );
+
 final activeMapCampaignsProvider =
     AsyncNotifierProvider<ActiveMapCampaignsNotifier, List<MapCampaignSchema>>(
       ActiveMapCampaignsNotifier.new,

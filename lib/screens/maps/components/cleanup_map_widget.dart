@@ -13,6 +13,7 @@ import 'package:collective_action_frontend/providers/map_provider.dart';
 import 'package:collective_action_frontend/providers/map_zoom_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/screens/maps/components/area_captain_map_badges.dart';
+import 'package:collective_action_frontend/screens/maps/components/area_captains_sheet.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_info_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/hotspot_event_dialog.dart';
@@ -32,6 +33,7 @@ import 'package:collective_action_frontend/utils/heatmap_utils.dart';
 import 'package:collective_action_frontend/utils/map_filter_utils.dart';
 import 'package:collective_action_frontend/utils/map_area_geometry.dart';
 import 'package:collective_action_frontend/utils/map_area_utils.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -459,7 +461,11 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       filterMySubmissionsOnly: ref.read(mapFilterMySubmissionsOnlyProvider),
       nearbyFilter: ref.read(mapNearbyFilterProvider),
     );
-    final markers = _buildMarkers(eventsToShow, currentUser);
+    final markers = _buildMarkers(
+      eventsToShow,
+      currentUser,
+      pinVisibility: ref.read(mapPinVisibilityProvider),
+    );
     final polylines = _buildPolylines(eventsToShow);
 
     // Collect all LatLng positions from markers and polylines (exclude user location)
@@ -549,7 +555,10 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     return events;
   }
 
-  List<WeightedLatLng> _heatmapPointsFromEvents(List<ActionSchema>? events) {
+  List<WeightedLatLng> _heatmapPointsFromEvents(
+    List<ActionSchema>? events, {
+    required MapPinVisibilityState pinVisibility,
+  }) {
     if (events == null) return [];
     final points = <WeightedLatLng>[];
     for (final a in events) {
@@ -566,6 +575,9 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
           eventType == _kActionTypeTreePlanting.value ||
           eventType == _kActionTypeWildflowerPlanting.value;
       if (!isCleanup && !isTrash && !isPlanting) continue;
+      if (isCleanup && !pinVisibility.cleanup) continue;
+      if (isTrash && !pinVisibility.trashReport) continue;
+      if (isPlanting && !pinVisibility.planting) continue;
       final position =
           _createdActionPositionOverride[a.id] ??
           LatLng(a.latitude!.toDouble(), a.longitude!.toDouble());
@@ -665,6 +677,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     });
     ref.watch(mapFilterMySubmissionsOnlyProvider);
     final heatmapEnabled = ref.watch(mapHeatmapEnabledProvider);
+    final pinVisibility = ref.watch(mapPinVisibilityProvider);
     final nearbyFilter = ref.watch(mapNearbyFilterProvider);
     final eventsAsync = ref.watch(
       mapEventsForCampaignProvider(widget.campaign.id),
@@ -731,7 +744,10 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       filterMySubmissionsOnly: ref.read(mapFilterMySubmissionsOnlyProvider),
       nearbyFilter: nearbyFilter,
     );
-    final heatmapPoints = _heatmapPointsFromEvents(eventsToShow);
+    final heatmapPoints = _heatmapPointsFromEvents(
+      eventsToShow,
+      pinVisibility: pinVisibility,
+    );
     final campaignDrawerOpen = ref.watch(campaignDrawerOpenProvider);
     final areaCaptainsSheetOpen = ref.watch(areaCaptainsSheetOpenProvider);
     final areaPolygons = _buildAreaBoundaryPolygons(
@@ -832,15 +848,21 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
               eventsToShow,
               currentUser,
               hideEventPins: heatmapEnabled,
+              pinVisibility: pinVisibility,
             ),
             ..._buildHotspotMarkers(
               hotspots,
               captains,
               hideWhenHeatmap: heatmapEnabled,
+              showHotspots: pinVisibility.hotspot,
             ),
           },
           circles: {
-            ..._buildHotspotCircles(hotspots, hideWhenHeatmap: heatmapEnabled),
+            ..._buildHotspotCircles(
+              hotspots,
+              hideWhenHeatmap: heatmapEnabled,
+              showHotspots: pinVisibility.hotspot,
+            ),
             ..._buildHotspotPreviewCircles(),
           },
           polygons: areaPolygons,
@@ -908,7 +930,10 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
             areaLayerVisibility.showAreas &&
             !areaLayerVisibility.showNeighborhoods &&
             _captainBadgeLayouts.isNotEmpty)
-          ...buildAreaCaptainBadgeWidgets(_captainBadgeLayouts),
+          ...buildAreaCaptainBadgeWidgets(
+            _captainBadgeLayouts,
+            onOpenCaptainsSheet: _openAreaCaptainsSheet,
+          ),
         // Map style toggle (light/dark) – top right
         SafeArea(
           child: Align(
@@ -964,6 +989,10 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
                           label: 'Planting',
                           tooltip: 'Add a tree or wildflower planting',
                           isActive: _mode == 'planting',
+                          pinsVisible: pinVisibility.planting,
+                          onToggleVisibility: () => ref
+                              .read(mapPinVisibilityProvider.notifier)
+                              .toggle(MapPinCategory.planting),
                           onTap: () => _setMode('planting'),
                         )
                       else ...[
@@ -972,6 +1001,10 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
                           label: 'Cleanup',
                           tooltip: 'Add a cleanup',
                           isActive: _mode == 'cleanup',
+                          pinsVisible: pinVisibility.cleanup,
+                          onToggleVisibility: () => ref
+                              .read(mapPinVisibilityProvider.notifier)
+                              .toggle(MapPinCategory.cleanup),
                           onTap: () => _setMode('cleanup'),
                         ),
                         const SizedBox(height: 14),
@@ -980,6 +1013,10 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
                           label: 'Report',
                           tooltip: 'Report trash',
                           isActive: _mode == 'trash_report',
+                          pinsVisible: pinVisibility.trashReport,
+                          onToggleVisibility: () => ref
+                              .read(mapPinVisibilityProvider.notifier)
+                              .toggle(MapPinCategory.trashReport),
                           onTap: () => _setMode('trash_report'),
                         ),
                         if (canManageHotspots) ...[
@@ -988,6 +1025,10 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
                             label: 'Hotspot',
                             tooltip: 'Add a targeted cleanup hotspot',
                             isActive: _mode == 'hotspot',
+                            pinsVisible: pinVisibility.hotspot,
+                            onToggleVisibility: () => ref
+                                .read(mapPinVisibilityProvider.notifier)
+                                .toggle(MapPinCategory.hotspot),
                             onTap: () => _setMode('hotspot'),
                             icon: Icons.local_fire_department,
                             iconColor: const Color(0xFFFF6D00),
@@ -1188,6 +1229,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     List<ActionSchema>? events,
     UserSchema? currentUser, {
     bool hideEventPins = false,
+    required MapPinVisibilityState pinVisibility,
   }) {
     final Set<Marker> out = {};
     if (!hideEventPins && events != null) {
@@ -1206,6 +1248,9 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
             eventType == _kActionTypeTreePlanting.value ||
             eventType == _kActionTypeWildflowerPlanting.value;
         if (!isCleanup && !isTrash && !isPlanting) continue;
+        if (isCleanup && !pinVisibility.cleanup) continue;
+        if (isTrash && !pinVisibility.trashReport) continue;
+        if (isPlanting && !pinVisibility.planting) continue;
         final isScheduledCleanup = isCleanup && _isScheduledCleanup(a);
         final position =
             _createdActionPositionOverride[a.id] ??
@@ -1246,8 +1291,9 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     List<MapHotspotSchema> hotspots,
     List<AreaCaptainSchema> captains, {
     bool hideWhenHeatmap = false,
+    bool showHotspots = true,
   }) {
-    if (hideWhenHeatmap) return {};
+    if (hideWhenHeatmap || !showHotspots) return {};
     final Set<Marker> out = {};
     for (final h in hotspots) {
       if (!h.active) continue;
@@ -1267,8 +1313,9 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   Set<Circle> _buildHotspotCircles(
     List<MapHotspotSchema> hotspots, {
     bool hideWhenHeatmap = false,
+    bool showHotspots = true,
   }) {
-    if (hideWhenHeatmap) return {};
+    if (hideWhenHeatmap || !showHotspots) return {};
     return hotspots.where((h) => h.active).map((h) {
       return buildHotspotRadiusCircle(
         circleId: CircleId('hotspot_circle_${h.id}'),
@@ -1411,6 +1458,22 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       ),
     );
     if (mounted) setState(() => _isInfoDialogOpen = false);
+  }
+
+  void _openAreaCaptainsSheet() {
+    scheduleAfterTap(context, () {
+      ref.read(areaCaptainsSheetOpenProvider.notifier).setOpen(true);
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: false,
+        builder: (_) => AreaCaptainsSheet(campaignId: widget.campaign.id),
+      ).whenComplete(() {
+        if (mounted) {
+          ref.read(areaCaptainsSheetOpenProvider.notifier).setOpen(false);
+        }
+      });
+    });
   }
 
   Future<void> _showEventInfoDialog(
@@ -1954,6 +2017,8 @@ class _MapModeButton extends StatelessWidget {
     required this.tooltip,
     required this.isActive,
     required this.onTap,
+    this.pinsVisible = true,
+    this.onToggleVisibility,
   });
 
   final String? imageAsset;
@@ -1963,103 +2028,144 @@ class _MapModeButton extends StatelessWidget {
   final String label;
   final String tooltip;
   final bool isActive;
+  final bool pinsVisible;
   final VoidCallback onTap;
+  final VoidCallback? onToggleVisibility;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isLight = theme.brightness == Brightness.light;
     return PointerInterceptor(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Tooltip(
-          message: tooltip,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: imageAsset == null
-                      ? theme.colorScheme.surfaceContainerHighest
-                      : null,
-                  image: imageAsset == null
-                      ? null
-                      : DecorationImage(
-                          image: AssetImage(imageAsset!),
-                          fit: BoxFit.cover,
-                        ),
-                  borderRadius: const BorderRadius.all(Radius.circular(24)),
-                  border: isLight
-                      ? (isActive
-                            ? Border.all(
-                                color: theme.colorScheme.primary,
-                                width: 4,
-                              )
-                            : null)
-                      : isActive
-                      ? Border.all(color: theme.colorScheme.primary, width: 4)
-                      : Border.all(
-                          color: theme.colorScheme.outline.withValues(
-                            alpha: 0.3,
-                          ),
-                          width: 1,
-                        ),
-                  boxShadow: isActive
-                      ? [
-                          BoxShadow(
-                            color: theme.colorScheme.primary.withValues(
-                              alpha: 0.5,
-                            ),
-                            blurRadius: 8,
-                            spreadRadius: 1,
-                          ),
-                        ]
-                      : null,
-                ),
-                child: imageAsset == null
-                    ? Icon(
-                        icon ?? Icons.add_location_alt,
-                        color:
-                            iconColor ??
-                            (isActive
-                                ? theme.colorScheme.primary
-                                : theme.colorScheme.onSurfaceVariant),
-                      )
-                    : null,
-              ),
-              const SizedBox(height: 6),
-              Material(
-                elevation: 2,
-                borderRadius: BorderRadius.circular(6),
-                color: isActive
-                    ? theme.colorScheme.primaryContainer.withValues(
-                        alpha: isLight ? 0.95 : 0.9,
-                      )
-                    : theme.colorScheme.surface.withValues(
-                        alpha: isLight ? 0.92 : 0.88,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Opacity(
+            opacity: pinsVisible ? 1 : 0.45,
+            child: GestureDetector(
+              onTap: onTap,
+              child: Tooltip(
+                message: tooltip,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: imageAsset == null
+                            ? theme.colorScheme.surfaceContainerHighest
+                            : null,
+                        image: imageAsset == null
+                            ? null
+                            : DecorationImage(
+                                image: AssetImage(imageAsset!),
+                                fit: BoxFit.cover,
+                              ),
+                        borderRadius: const BorderRadius.all(Radius.circular(24)),
+                        border: isLight
+                            ? (isActive
+                                  ? Border.all(
+                                      color: theme.colorScheme.primary,
+                                      width: 4,
+                                    )
+                                  : null)
+                            : isActive
+                            ? Border.all(color: theme.colorScheme.primary, width: 4)
+                            : Border.all(
+                                color: theme.colorScheme.outline.withValues(
+                                  alpha: 0.3,
+                                ),
+                                width: 1,
+                              ),
+                        boxShadow: isActive
+                            ? [
+                                BoxShadow(
+                                  color: theme.colorScheme.primary.withValues(
+                                    alpha: 0.5,
+                                  ),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
+                                ),
+                              ]
+                            : null,
                       ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  child: Text(
-                    label,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.2,
+                      child: imageAsset == null
+                          ? Icon(
+                              icon ?? Icons.add_location_alt,
+                              color:
+                                  iconColor ??
+                                  (isActive
+                                      ? theme.colorScheme.primary
+                                      : theme.colorScheme.onSurfaceVariant),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(height: 6),
+                    Material(
+                      elevation: 2,
+                      borderRadius: BorderRadius.circular(6),
                       color: isActive
-                          ? theme.colorScheme.onPrimaryContainer
-                          : theme.colorScheme.onSurface,
+                          ? theme.colorScheme.primaryContainer.withValues(
+                              alpha: isLight ? 0.95 : 0.9,
+                            )
+                          : theme.colorScheme.surface.withValues(
+                              alpha: isLight ? 0.92 : 0.88,
+                            ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        child: Text(
+                          label,
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.2,
+                            color: isActive
+                                ? theme.colorScheme.onPrimaryContainer
+                                : theme.colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          if (onToggleVisibility != null)
+            Padding(
+              padding: const EdgeInsets.only(left: 2, top: 14),
+              child: Tooltip(
+                message: pinsVisible
+                    ? 'Hide $label pins on map'
+                    : 'Show $label pins on map',
+                child: Material(
+                  color: theme.colorScheme.surface.withValues(alpha: 0.88),
+                  elevation: 1,
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: onToggleVisibility,
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Icon(
+                        pinsVisible
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                        size: 16,
+                        color: pinsVisible
+                            ? theme.colorScheme.onSurfaceVariant
+                            : theme.colorScheme.outline,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
-        ),
+            ),
+        ],
       ),
     );
   }
