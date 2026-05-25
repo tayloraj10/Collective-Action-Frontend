@@ -1,4 +1,4 @@
-import 'package:collective_action_frontend/models/map_area.dart';
+import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
 import 'package:flutter/material.dart';
 /// One borough/area captain badge anchored on the map.
@@ -9,8 +9,8 @@ class AreaCaptainBadgeLayout {
     required this.screenOffset,
   });
 
-  final MapAreaModel area;
-  final List<AreaCaptainModel> assignments;
+  final MapAreaSchema area;
+  final List<AreaCaptainSchema> assignments;
 
   /// Screen position of the borough's middle-left anchor.
   final Offset screenOffset;

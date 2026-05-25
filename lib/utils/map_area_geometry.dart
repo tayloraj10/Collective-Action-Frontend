@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:collective_action_frontend/models/map_area.dart';
+import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -368,8 +368,8 @@ typedef MapAreaPolygonTapCallback =
 /// Build Google Maps [Polygon]s from loaded geometry features.
 Set<Polygon> buildAreaPolygons({
   required List<MapAreaPolygonFeature> features,
-  required List<MapAreaModel> backendAreas,
-  required List<AreaCaptainModel> captains,
+  required List<MapAreaSchema> backendAreas,
+  required List<AreaCaptainSchema> captains,
   required String? currentUserId,
   MapAreaPolygonTapCallback? onFeatureTap,
   double fillAlpha = 0.18,

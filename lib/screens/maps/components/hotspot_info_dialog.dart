@@ -1,6 +1,6 @@
+import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
-import 'package:collective_action_frontend/models/map_area.dart';
 import 'package:collective_action_frontend/providers/hotspot_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
@@ -22,9 +22,9 @@ class HotspotInfoDialog extends ConsumerStatefulWidget {
     required this.captains,
   });
 
-  final MapHotspotModel hotspot;
+  final MapHotspotSchema hotspot;
   final String campaignId;
-  final List<AreaCaptainModel> captains;
+  final List<AreaCaptainSchema> captains;
 
   @override
   ConsumerState<HotspotInfoDialog> createState() => _HotspotInfoDialogState();
@@ -66,12 +66,12 @@ class _HotspotInfoDialogState extends ConsumerState<HotspotInfoDialog> {
     return isCaptainOfArea(widget.captains, user?.id, widget.hotspot.mapAreaId);
   }
 
-  List<AreaCaptainModel> get _areaCaptains {
+  List<AreaCaptainSchema> get _areaCaptains {
     final list = captainsForArea(widget.captains, widget.hotspot.mapAreaId);
     return [...list]..sort((a, b) => a.createdAt.compareTo(b.createdAt));
   }
 
-  AreaCaptainModel? get _mainCaptainAssignment =>
+  AreaCaptainSchema? get _mainCaptainAssignment =>
       _areaCaptains.isEmpty ? null : _areaCaptains.first;
 
   bool get _canManageCaptains {
@@ -150,7 +150,7 @@ class _HotspotInfoDialogState extends ConsumerState<HotspotInfoDialog> {
 
     final newCaptainId = await showDialog<String>(
       context: context,
-      builder: (c) => _CaptainUserIdDialog(areaName: widget.hotspot.areaName),
+      builder: (c) => _CaptainUserIdDialog(areaName: hotspotAreaName(widget.hotspot)),
     );
     if (newCaptainId == null || !mounted) return;
 
@@ -164,7 +164,7 @@ class _HotspotInfoDialogState extends ConsumerState<HotspotInfoDialog> {
       if (mounted) {
         ref.invalidate(areaCaptainsForCampaignProvider(widget.campaignId));
         ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar.success('Captain added for ${widget.hotspot.areaName}'),
+          CustomSnackBar.success('Captain added for ${hotspotAreaName(widget.hotspot)}'),
         );
       }
     } catch (e) {
@@ -178,7 +178,7 @@ class _HotspotInfoDialogState extends ConsumerState<HotspotInfoDialog> {
     }
   }
 
-  Future<void> _removeCaptain(AreaCaptainModel assignment) async {
+  Future<void> _removeCaptain(AreaCaptainSchema assignment) async {
     final user = ref.read(currentUserProvider).value;
     if (user?.id == null) return;
 
@@ -222,7 +222,7 @@ class _HotspotInfoDialogState extends ConsumerState<HotspotInfoDialog> {
     final maxH = (size.height * 0.78).clamp(320.0, 560.0);
     final areaLabel = area != null
         ? '${areaDisplayName(area)} (${areaTypeLabel(area)})'
-        : widget.hotspot.areaName;
+        : hotspotAreaName(widget.hotspot);
 
     return Dialog(
       elevation: 8,
@@ -582,7 +582,7 @@ class _CaptainRow extends ConsumerWidget {
     required this.onRemove,
   });
 
-  final AreaCaptainModel assignment;
+  final AreaCaptainSchema assignment;
   final bool isMainCaptain;
   final bool canRemove;
   final VoidCallback onRemove;

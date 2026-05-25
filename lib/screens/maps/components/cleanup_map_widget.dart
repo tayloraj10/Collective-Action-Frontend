@@ -5,7 +5,6 @@ import 'package:collective_action_frontend/app/constants.dart';
 import 'package:collective_action_frontend/app/theme.dart';
 import 'package:collective_action_frontend/components/confirmation_dialog.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
-import 'package:collective_action_frontend/models/map_area.dart';
 import 'package:collective_action_frontend/providers/action_provider.dart';
 import 'package:collective_action_frontend/providers/hotspot_provider.dart';
 import 'package:collective_action_frontend/providers/map_area_geometry_provider.dart';
@@ -492,7 +491,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
           const [];
       for (final h in hotspots) {
         if (h.active) {
-          allPoints.add(LatLng(h.latitude, h.longitude));
+          allPoints.add(LatLng(h.latitude.toDouble(), h.longitude.toDouble()));
         }
       }
     }
@@ -1243,8 +1242,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   }
 
   Set<Marker> _buildHotspotMarkers(
-    List<MapHotspotModel> hotspots,
-    List<AreaCaptainModel> captains, {
+    List<MapHotspotSchema> hotspots,
+    List<AreaCaptainSchema> captains, {
     bool hideWhenHeatmap = false,
   }) {
     if (hideWhenHeatmap) return {};
@@ -1254,7 +1253,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       out.add(
         Marker(
           markerId: MarkerId('hotspot_${h.id}'),
-          position: LatLng(h.latitude, h.longitude),
+          position: LatLng(h.latitude.toDouble(), h.longitude.toDouble()),
           icon: _iconForHotspot(),
           zIndexInt: 1000,
           onTap: () => _showHotspotInfoDialog(h, captains),
@@ -1265,14 +1264,14 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   }
 
   Set<Circle> _buildHotspotCircles(
-    List<MapHotspotModel> hotspots, {
+    List<MapHotspotSchema> hotspots, {
     bool hideWhenHeatmap = false,
   }) {
     if (hideWhenHeatmap) return {};
     return hotspots.where((h) => h.active).map((h) {
       return buildHotspotRadiusCircle(
         circleId: CircleId('hotspot_circle_${h.id}'),
-        center: LatLng(h.latitude, h.longitude),
+        center: LatLng(h.latitude.toDouble(), h.longitude.toDouble()),
       );
     }).toSet();
   }
@@ -1288,7 +1287,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     };
   }
 
-  List<MapAreaModel> _captainAllowedAreas() {
+  List<MapAreaSchema> _captainAllowedAreas() {
     final currentUser = ref.read(currentUserProvider).value;
     if (currentUser?.id == null) return [];
 
@@ -1306,7 +1305,7 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     );
   }
 
-  MapAreaModel? _captainAreaAtPosition(LatLng position) {
+  MapAreaSchema? _captainAreaAtPosition(LatLng position) {
     final allowedAreas = _captainAllowedAreas();
     if (allowedAreas.isEmpty) return null;
 
@@ -1325,8 +1324,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
 
   Set<Polygon> _buildAreaBoundaryPolygons({
     required AsyncValue<List<MapAreaGeometryRegion>>? geometryAsync,
-    required List<MapAreaModel> backendAreas,
-    required List<AreaCaptainModel> captains,
+    required List<MapAreaSchema> backendAreas,
+    required List<AreaCaptainSchema> captains,
     required String? currentUserId,
     required bool showAreas,
     required bool showNeighborhoods,
@@ -1398,8 +1397,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
   }
 
   Future<void> _showHotspotInfoDialog(
-    MapHotspotModel hotspot,
-    List<AreaCaptainModel> captains,
+    MapHotspotSchema hotspot,
+    List<AreaCaptainSchema> captains,
   ) async {
     if (mounted) setState(() => _isInfoDialogOpen = true);
     await showDialog<bool>(

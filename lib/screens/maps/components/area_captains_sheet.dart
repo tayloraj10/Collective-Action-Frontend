@@ -1,6 +1,5 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/components/custom_snack_bar.dart';
-import 'package:collective_action_frontend/models/map_area.dart';
 import 'package:collective_action_frontend/providers/hotspot_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/services/user_service.dart';
@@ -120,7 +119,7 @@ class AreaCaptainsSheet extends ConsumerWidget {
   Future<void> _assignCaptain(
     BuildContext context,
     WidgetRef ref,
-    MapAreaModel area,
+    MapAreaSchema area,
     String captainUserId,
     String actingUserId,
   ) async {
@@ -148,7 +147,7 @@ class AreaCaptainsSheet extends ConsumerWidget {
   Future<void> _promptAndAssignCaptain(
     BuildContext context,
     WidgetRef ref,
-    MapAreaModel area,
+    MapAreaSchema area,
     UserSchema actingUser,
   ) async {
     final newId = await showDialog<String>(
@@ -165,7 +164,7 @@ class AreaCaptainsSheet extends ConsumerWidget {
   Future<void> _removeCaptain(
     BuildContext context,
     WidgetRef ref,
-    AreaCaptainModel assignment,
+    AreaCaptainSchema assignment,
     UserSchema? currentUser,
     bool isAdmin,
   ) async {
@@ -202,13 +201,13 @@ class _AreaCaptainTile extends StatelessWidget {
     this.onAddCaptain,
   });
 
-  final MapAreaModel area;
-  final List<AreaCaptainModel> assignments;
+  final MapAreaSchema area;
+  final List<AreaCaptainSchema> assignments;
   final String? currentUserId;
   final bool isAdmin;
   final bool canAddCaptain;
   final VoidCallback? onAddCaptain;
-  final void Function(AreaCaptainModel assignment) onRemove;
+  final void Function(AreaCaptainSchema assignment) onRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -285,7 +284,7 @@ class _CaptainRow extends StatelessWidget {
     required this.onRemove,
   });
 
-  final AreaCaptainModel assignment;
+  final AreaCaptainSchema assignment;
   final bool canRemove;
   final VoidCallback onRemove;
 

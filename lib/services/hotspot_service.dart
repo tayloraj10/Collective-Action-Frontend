@@ -1,11 +1,9 @@
-import 'dart:convert';
 import 'dart:ui' as ui;
 
+import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/app/constants.dart';
-import 'package:collective_action_frontend/models/map_area.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart' as http;
 
 /// Visual target radius for cleanup hotspots on the map.
 const kHotspotRadiusFeet = 500;
@@ -36,54 +34,51 @@ Circle buildHotspotRadiusCircle({
 }
 
 class HotspotService {
-  HotspotService({String? baseUrl}) : _baseUrl = baseUrl ?? AppConstants.backendBaseUrl;
+  late final MapHotspotsApi _api;
 
-  final String _baseUrl;
-
-  Future<List<MapAreaModel>> fetchAreas(String campaignId) async {
-    final uri = Uri.parse('$_baseUrl/map-hotspots/campaign/$campaignId/areas');
-    final response = await http.get(uri);
-    if (response.statusCode != 200) {
-      throw Exception('Failed to fetch map areas: ${response.body}');
-    }
-    final list = jsonDecode(response.body) as List<dynamic>;
-    return list
-        .map((e) => MapAreaModel.fromJson(e as Map<String, dynamic>))
-        .toList();
+  HotspotService({String? baseUrl}) {
+    final client = ApiClient(basePath: baseUrl ?? AppConstants.backendBaseUrl);
+    _api = MapHotspotsApi(client);
   }
 
-  Future<List<MapHotspotModel>> fetchHotspots(
+  Future<List<MapAreaSchema>> fetchAreas(String campaignId) async {
+    try {
+      return await _api
+              .listAreasMapHotspotsCampaignCampaignIdAreasGet(campaignId) ??
+          [];
+    } catch (e) {
+      throw Exception('Failed to fetch map areas: $e');
+    }
+  }
+
+  Future<List<MapHotspotSchema>> fetchHotspots(
     String campaignId, {
     bool includeInactive = false,
   }) async {
-    final uri = Uri.parse('$_baseUrl/map-hotspots/campaign/$campaignId').replace(
-      queryParameters: {
-        if (includeInactive) 'include_inactive': 'true',
-      },
-    );
-    final response = await http.get(uri);
-    if (response.statusCode != 200) {
-      throw Exception('Failed to fetch hotspots: ${response.body}');
+    try {
+      return await _api.listHotspotsMapHotspotsCampaignCampaignIdGet(
+            campaignId,
+            includeInactive: includeInactive,
+          ) ??
+          [];
+    } catch (e) {
+      throw Exception('Failed to fetch hotspots: $e');
     }
-    final list = jsonDecode(response.body) as List<dynamic>;
-    return list
-        .map((e) => MapHotspotModel.fromJson(e as Map<String, dynamic>))
-        .toList();
   }
 
-  Future<List<AreaCaptainModel>> fetchAreaCaptains(String campaignId) async {
-    final uri = Uri.parse('$_baseUrl/map-hotspots/campaign/$campaignId/area-captains');
-    final response = await http.get(uri);
-    if (response.statusCode != 200) {
-      throw Exception('Failed to fetch area captains: ${response.body}');
+  Future<List<AreaCaptainSchema>> fetchAreaCaptains(String campaignId) async {
+    try {
+      return await _api
+              .listAreaCaptainsMapHotspotsCampaignCampaignIdAreaCaptainsGet(
+                campaignId,
+              ) ??
+          [];
+    } catch (e) {
+      throw Exception('Failed to fetch area captains: $e');
     }
-    final list = jsonDecode(response.body) as List<dynamic>;
-    return list
-        .map((e) => AreaCaptainModel.fromJson(e as Map<String, dynamic>))
-        .toList();
   }
 
-  Future<MapHotspotModel> createHotspot({
+  Future<MapHotspotSchema> createHotspot({
     required String campaignId,
     required String mapAreaId,
     required String title,
@@ -92,102 +87,101 @@ class HotspotService {
     required double longitude,
     required String createdBy,
   }) async {
-    final uri = Uri.parse('$_baseUrl/map-hotspots/');
-    final body = jsonEncode({
-      'map_campaign_id': campaignId,
-      'map_area_id': mapAreaId,
-      'title': title,
-      if (description != null && description.isNotEmpty) 'description': description,
-      'latitude': latitude,
-      'longitude': longitude,
-      'created_by': createdBy,
-    });
-    final response = await http.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: body,
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Failed to create hotspot: ${response.body}');
+    try {
+      final result = await _api.createHotspotMapHotspotsPost(
+        MapHotspotCreateSchema(
+          mapCampaignId: campaignId,
+          mapAreaId: mapAreaId,
+          title: title,
+          description: description,
+          latitude: latitude,
+          longitude: longitude,
+          createdBy: createdBy,
+        ),
+      );
+      if (result == null) {
+        throw Exception('Create hotspot returned no data');
+      }
+      return result;
+    } catch (e) {
+      throw Exception('Failed to create hotspot: $e');
     }
-    return MapHotspotModel.fromJson(
-      jsonDecode(response.body) as Map<String, dynamic>,
-    );
   }
 
-  Future<MapHotspotModel> updateHotspot({
+  Future<MapHotspotSchema> updateHotspot({
     required String hotspotId,
     required String actingUserId,
     String? title,
     String? description,
     bool? active,
   }) async {
-    final uri = Uri.parse('$_baseUrl/map-hotspots/$hotspotId');
-    final body = <String, dynamic>{
-      'acting_user_id': actingUserId,
-      if (title != null) 'title': title,
-      if (description != null) 'description': description,
-      if (active != null) 'active': active,
-    };
-    final response = await http.patch(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(body),
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Failed to update hotspot: ${response.body}');
+    try {
+      final result = await _api.updateHotspotMapHotspotsHotspotIdPatch(
+        hotspotId,
+        MapHotspotUpdateSchema(
+          actingUserId: actingUserId,
+          title: title,
+          description: description,
+          active: active,
+        ),
+      );
+      if (result == null) {
+        throw Exception('Update hotspot returned no data');
+      }
+      return result;
+    } catch (e) {
+      throw Exception('Failed to update hotspot: $e');
     }
-    return MapHotspotModel.fromJson(
-      jsonDecode(response.body) as Map<String, dynamic>,
-    );
   }
 
   Future<void> deleteHotspot({
     required String hotspotId,
     required String actingUserId,
   }) async {
-    final uri = Uri.parse('$_baseUrl/map-hotspots/$hotspotId').replace(
-      queryParameters: {'acting_user_id': actingUserId},
-    );
-    final response = await http.delete(uri);
-    if (response.statusCode != 204) {
-      throw Exception('Failed to delete hotspot: ${response.body}');
+    try {
+      await _api.deleteHotspotMapHotspotsHotspotIdDelete(
+        hotspotId,
+        actingUserId,
+      );
+    } catch (e) {
+      throw Exception('Failed to delete hotspot: $e');
     }
   }
 
-  Future<AreaCaptainModel> assignCaptain({
+  Future<AreaCaptainSchema> assignCaptain({
     required String mapAreaId,
     required String captainUserId,
     required String actingUserId,
   }) async {
-    final uri = Uri.parse('$_baseUrl/map-hotspots/area-captains/assign');
-    final response = await http.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'map_area_id': mapAreaId,
-        'captain_user_id': captainUserId,
-        'acting_user_id': actingUserId,
-      }),
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Failed to assign captain: ${response.body}');
+    try {
+      final result =
+          await _api.assignAreaCaptainMapHotspotsAreaCaptainsAssignPost(
+        AreaCaptainAssignSchema(
+          mapAreaId: mapAreaId,
+          captainUserId: captainUserId,
+          actingUserId: actingUserId,
+        ),
+      );
+      if (result == null) {
+        throw Exception('Assign captain returned no data');
+      }
+      return result;
+    } catch (e) {
+      throw Exception('Failed to assign captain: $e');
     }
-    return AreaCaptainModel.fromJson(
-      jsonDecode(response.body) as Map<String, dynamic>,
-    );
   }
 
   Future<void> removeCaptain({
     required String assignmentId,
     required String actingUserId,
   }) async {
-    final uri = Uri.parse('$_baseUrl/map-hotspots/area-captains/$assignmentId').replace(
-      queryParameters: {'acting_user_id': actingUserId},
-    );
-    final response = await http.delete(uri);
-    if (response.statusCode != 204) {
-      throw Exception('Failed to remove captain: ${response.body}');
+    try {
+      await _api.removeAreaCaptainMapHotspotsAreaCaptainsAssignmentIdDelete(
+        assignmentId,
+        actingUserId,
+      );
+    } catch (e) {
+      throw Exception('Failed to remove captain: $e');
     }
   }
 }

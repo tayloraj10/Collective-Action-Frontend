@@ -1,22 +1,47 @@
 import 'dart:math' as math;
 
-import 'package:collective_action_frontend/models/map_area.dart';
+import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/utils/map_area_geometry.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 /// Default map center when focusing on NYC (initial seed region).
 const nycMapCenter = (40.7128, -73.9500);
 
-/// Return the first [areas] whose bounds contain the point, or null.
-MapAreaModel? detectAreaForPoint(
+const _areaTypeLabels = <String, String>{
+  'borough': 'Borough',
+  'neighborhood': 'Neighborhood',
+  'city': 'City',
+  'town': 'Town',
+  'region': 'Region',
+  'custom': 'Custom',
+};
+
+const _areaNameOverrides = <String, String>{
+  'nyc-bronx': 'The Bronx',
+};
+
+bool mapAreaBoundsContains(
+  MapAreaBoundsSchema bounds,
   double latitude,
   double longitude,
-  List<MapAreaModel> areas,
+) {
+  return latitude >= bounds.minLat &&
+      latitude <= bounds.maxLat &&
+      longitude >= bounds.minLng &&
+      longitude <= bounds.maxLng;
+}
+
+/// Return the first [areas] whose bounds contain the point, or null.
+MapAreaSchema? detectAreaForPoint(
+  double latitude,
+  double longitude,
+  List<MapAreaSchema> areas,
 ) {
   for (final area in areas) {
     if (!area.active) continue;
     final bounds = area.bounds;
-    if (bounds != null && bounds.contains(latitude, longitude)) {
+    if (bounds != null &&
+        mapAreaBoundsContains(bounds, latitude, longitude)) {
       return area;
     }
   }
@@ -24,10 +49,10 @@ MapAreaModel? detectAreaForPoint(
 }
 
 /// Like [detectAreaForPoint] but uses map geometry when available (stricter).
-MapAreaModel? detectCaptainAreaForPoint({
+MapAreaSchema? detectCaptainAreaForPoint({
   required double latitude,
   required double longitude,
-  required List<MapAreaModel> captainAreas,
+  required List<MapAreaSchema> captainAreas,
   required List<MapAreaPolygonFeature> geometryFeatures,
 }) {
   if (captainAreas.isEmpty) return null;
@@ -54,16 +79,12 @@ MapAreaModel? detectCaptainAreaForPoint({
   return detectAreaForPoint(latitude, longitude, captainAreas);
 }
 
-String areaTypeLabel(MapAreaModel area) {
-  return area.areaTypeEnum?.label ?? area.areaType;
+String areaTypeLabel(MapAreaSchema area) {
+  return _areaTypeLabels[area.areaType] ?? area.areaType;
 }
 
-const _areaNameOverrides = <String, String>{
-  'nyc-bronx': 'The Bronx',
-};
-
 /// Preferred display name for a backend map area (handles legacy seed names).
-String areaDisplayName(MapAreaModel area) {
+String areaDisplayName(MapAreaSchema area) {
   final slug = area.slug;
   if (slug != null && _areaNameOverrides.containsKey(slug)) {
     return _areaNameOverrides[slug]!;
@@ -71,9 +92,15 @@ String areaDisplayName(MapAreaModel area) {
   return area.name;
 }
 
+String hotspotAreaName(MapHotspotSchema hotspot) {
+  final area = hotspot.area;
+  if (area != null) return areaDisplayName(area);
+  return 'Unknown area';
+}
+
 /// Map anchor at the middle-left of a borough (badge renders just inside the west edge).
 LatLng? areaBadgeAnchor(
-  MapAreaModel area,
+  MapAreaSchema area,
   List<MapAreaPolygonFeature> geometryFeatures,
 ) {
   final slug = area.slug;
@@ -97,7 +124,7 @@ LatLng? areaBadgeAnchor(
   if (bounds == null) return null;
   return LatLng(
     (bounds.minLat + bounds.maxLat) / 2,
-    bounds.minLng,
+    bounds.minLng.toDouble(),
   );
 }
 

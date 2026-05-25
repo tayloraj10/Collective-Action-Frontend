@@ -1,4 +1,4 @@
-import 'package:collective_action_frontend/models/map_area.dart';
+import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/services/hotspot_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,17 +8,17 @@ final hotspotServiceProvider = Provider<HotspotService>((ref) {
 });
 
 final mapAreasForCampaignProvider =
-    FutureProvider.family<List<MapAreaModel>, String>((ref, campaignId) async {
+    FutureProvider.family<List<MapAreaSchema>, String>((ref, campaignId) async {
   return ref.read(hotspotServiceProvider).fetchAreas(campaignId);
 });
 
 final mapHotspotsForCampaignProvider =
-    FutureProvider.family<List<MapHotspotModel>, String>((ref, campaignId) async {
+    FutureProvider.family<List<MapHotspotSchema>, String>((ref, campaignId) async {
   return ref.read(hotspotServiceProvider).fetchHotspots(campaignId);
 });
 
 final areaCaptainsForCampaignProvider =
-    FutureProvider.family<List<AreaCaptainModel>, String>((ref, campaignId) async {
+    FutureProvider.family<List<AreaCaptainSchema>, String>((ref, campaignId) async {
   return ref.read(hotspotServiceProvider).fetchAreaCaptains(campaignId);
 });
 
@@ -33,7 +33,7 @@ bool userIdsMatch(String? a, String? b) {
 
 bool isUserAreaCaptain({
   required String? userId,
-  required List<AreaCaptainModel> captains,
+  required List<AreaCaptainSchema> captains,
 }) {
   if (userId == null || userId.isEmpty) return false;
   return captains.any((c) => userIdsMatch(c.captainUserId, userId));
@@ -42,7 +42,7 @@ bool isUserAreaCaptain({
 /// True when [userId] may add hotspots (must be assigned captain; not admin-only).
 bool canUserManageHotspots({
   required String? userId,
-  required AsyncValue<List<AreaCaptainModel>> captainsAsync,
+  required AsyncValue<List<AreaCaptainSchema>> captainsAsync,
 }) {
   if (userId == null || userId.isEmpty) return false;
   return captainsAsync.when(
@@ -52,10 +52,10 @@ bool canUserManageHotspots({
   );
 }
 
-List<MapAreaModel> captainAreasForUser({
+List<MapAreaSchema> captainAreasForUser({
   required String? userId,
-  required List<AreaCaptainModel> captains,
-  required List<MapAreaModel> areas,
+  required List<AreaCaptainSchema> captains,
+  required List<MapAreaSchema> areas,
 }) {
   if (userId == null || userId.isEmpty) return [];
   final captainAreaIds = captains
@@ -64,7 +64,7 @@ List<MapAreaModel> captainAreasForUser({
       .toSet();
   if (captainAreaIds.isEmpty) return [];
 
-  final byId = <String, MapAreaModel>{};
+  final byId = <String, MapAreaSchema>{};
   for (final captain in captains) {
     if (userIdsMatch(captain.captainUserId, userId) && captain.area != null) {
       byId[captain.area!.id] = captain.area!;
@@ -80,7 +80,7 @@ List<MapAreaModel> captainAreasForUser({
 
 /// Areas where the current user is captain for the given campaign.
 final userCaptainAreasProvider =
-    Provider.family<List<MapAreaModel>, String>((ref, campaignId) {
+    Provider.family<List<MapAreaSchema>, String>((ref, campaignId) {
   final userId = ref.watch(currentUserProvider.select((u) => u.value?.id));
   if (userId == null) return [];
 
@@ -110,7 +110,7 @@ final canManageHotspotsProvider = Provider.family<bool, String>((ref, campaignId
 });
 
 bool isCaptainOfArea(
-  List<AreaCaptainModel> captains,
+  List<AreaCaptainSchema> captains,
   String? userId,
   String mapAreaId,
 ) {
@@ -124,24 +124,24 @@ bool isCaptainOfArea(
 
 bool canManageAreaHotspots({
   required bool isAdmin,
-  required List<AreaCaptainModel> captains,
+  required List<AreaCaptainSchema> captains,
   required String? userId,
   required String mapAreaId,
 }) {
   return isAdmin || isCaptainOfArea(captains, userId, mapAreaId);
 }
 
-List<AreaCaptainModel> captainsForArea(
-  List<AreaCaptainModel> captains,
+List<AreaCaptainSchema> captainsForArea(
+  List<AreaCaptainSchema> captains,
   String mapAreaId,
 ) {
   return captains.where((c) => c.mapAreaId == mapAreaId).toList();
 }
 
-Map<String, List<AreaCaptainModel>> groupCaptainsByAreaId(
-  List<AreaCaptainModel> captains,
+Map<String, List<AreaCaptainSchema>> groupCaptainsByAreaId(
+  List<AreaCaptainSchema> captains,
 ) {
-  final grouped = <String, List<AreaCaptainModel>>{};
+  final grouped = <String, List<AreaCaptainSchema>>{};
   for (final c in captains) {
     grouped.putIfAbsent(c.mapAreaId, () => []).add(c);
   }
@@ -149,8 +149,8 @@ Map<String, List<AreaCaptainModel>> groupCaptainsByAreaId(
 }
 
 /// Active hotspot for a borough, if any (at most one should be active per area).
-MapHotspotModel? activeHotspotForArea(
-  List<MapHotspotModel> hotspots,
+MapHotspotSchema? activeHotspotForArea(
+  List<MapHotspotSchema> hotspots,
   String mapAreaId,
 ) {
   for (final hotspot in hotspots) {

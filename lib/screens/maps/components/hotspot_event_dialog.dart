@@ -1,4 +1,4 @@
-import 'package:collective_action_frontend/models/map_area.dart';
+import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/services/hotspot_service.dart';
 import 'package:collective_action_frontend/utils/map_area_utils.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +13,7 @@ class HotspotEventDialogResult {
 
   final String title;
   final String description;
-  final MapAreaModel area;
+  final MapAreaSchema area;
 }
 
 /// Dialog to create a cleanup hotspot at a map location.
@@ -26,8 +26,8 @@ class HotspotEventDialog extends StatefulWidget {
   });
 
   final LatLng position;
-  final List<MapAreaModel> allowedAreas;
-  final MapAreaModel? suggestedArea;
+  final List<MapAreaSchema> allowedAreas;
+  final MapAreaSchema? suggestedArea;
 
   @override
   State<HotspotEventDialog> createState() => _HotspotEventDialogState();
@@ -37,7 +37,7 @@ class _HotspotEventDialogState extends State<HotspotEventDialog> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  late MapAreaModel _selectedArea;
+  late MapAreaSchema _selectedArea;
 
   @override
   void initState() {
@@ -136,7 +136,7 @@ class _HotspotEventDialogState extends State<HotspotEventDialog> {
                 textCapitalization: TextCapitalization.sentences,
               ),
               const SizedBox(height: 12),
-              DropdownButtonFormField<MapAreaModel>(
+              DropdownButtonFormField<MapAreaSchema>(
                 initialValue: _selectedArea,
                 decoration: const InputDecoration(labelText: 'Area'),
                 items: widget.allowedAreas
