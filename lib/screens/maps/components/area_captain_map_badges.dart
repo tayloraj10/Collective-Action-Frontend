@@ -1,6 +1,9 @@
 import 'package:collective_action_frontend/api/lib/api.dart';
 import 'package:collective_action_frontend/screens/dashboard/components/social/user_avatar.dart';
+import 'package:collective_action_frontend/utils/map_area_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
+
 /// One borough/area captain badge anchored on the map.
 class AreaCaptainBadgeLayout {
   const AreaCaptainBadgeLayout({
@@ -108,15 +111,22 @@ Offset computeAreaTooltipTopLeft({
 }
 
 /// Positioned badge widgets for the map [Stack] — no full-screen overlay layer.
-List<Widget> buildAreaCaptainBadgeWidgets(List<AreaCaptainBadgeLayout> badges) {
+List<Widget> buildAreaCaptainBadgeWidgets(
+  List<AreaCaptainBadgeLayout> badges, {
+  VoidCallback? onOpenCaptainsSheet,
+}) {
   return [
     for (final badge in badges)
       Positioned(
         left: badge.screenOffset.dx + kCaptainBadgeInsetPx,
         top: badge.screenOffset.dy - (kCaptainBadgeChipHeight / 2),
-        child: CaptainBadgeChip(
-          captainUserIds:
-              badge.assignments.map((a) => a.captainUserId).toList(),
+        child: PointerInterceptor(
+          child: CaptainBadgeChip(
+            area: badge.area,
+            captainUserIds:
+                badge.assignments.map((a) => a.captainUserId).toList(),
+            onOpenCaptainsSheet: onOpenCaptainsSheet,
+          ),
         ),
       ),
   ];
@@ -125,49 +135,86 @@ List<Widget> buildAreaCaptainBadgeWidgets(List<AreaCaptainBadgeLayout> badges) {
 class CaptainBadgeChip extends StatelessWidget {
   const CaptainBadgeChip({
     super.key,
+    required this.area,
     required this.captainUserIds,
+    this.onOpenCaptainsSheet,
   });
 
+  final MapAreaSchema area;
   final List<String> captainUserIds;
+  final VoidCallback? onOpenCaptainsSheet;
+
+  String get _tooltipMessage {
+    final areaName = areaDisplayName(area);
+    if (captainUserIds.length <= 1) {
+      return 'Area captain for $areaName';
+    }
+    return 'Area captains for $areaName';
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Material(
-      elevation: 4,
-      shadowColor: Colors.black.withValues(alpha: 0.35),
-      color: theme.colorScheme.surface.withValues(alpha: 0.94),
-      borderRadius: BorderRadius.circular(24),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(4, 4, 8, 4),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (var i = 0; i < captainUserIds.length && i < 3; i++)
-              Transform.translate(
-                offset: Offset(i * -6.0, 0),
-                child: UserAvatar(
-                  userId: captainUserIds[i],
-                  radius: 14,
-                  showTooltip: true,
-                  showProfileOnTap: true,
+    final overflowCount =
+        captainUserIds.length > 3 ? captainUserIds.length - 3 : 0;
+
+    return Tooltip(
+      message: _tooltipMessage,
+      waitDuration: const Duration(milliseconds: 400),
+      child: Material(
+        elevation: 4,
+        shadowColor: Colors.black.withValues(alpha: 0.35),
+        color: theme.colorScheme.surface.withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(24),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < captainUserIds.length && i < 3; i++)
+                Transform.translate(
+                  offset: Offset(i * -6.0, 0),
+                  child: UserAvatar(
+                    userId: captainUserIds[i],
+                    radius: 14,
+                    showProfileOnTap: true,
+                  ),
+                ),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onOpenCaptainsSheet,
+                  borderRadius: BorderRadius.circular(16),
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      captainUserIds.isEmpty ? 8 : 6,
+                      2,
+                      8,
+                      2,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (overflowCount > 0)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 4),
+                            child: Text(
+                              '+$overflowCount',
+                              style: theme.textTheme.labelSmall,
+                            ),
+                          ),
+                        Icon(
+                          Icons.military_tech_outlined,
+                          size: 16,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            if (captainUserIds.length > 3)
-              Padding(
-                padding: const EdgeInsets.only(left: 2),
-                child: Text(
-                  '+${captainUserIds.length - 3}',
-                  style: theme.textTheme.labelSmall,
-                ),
-              ),
-            const SizedBox(width: 4),
-            Icon(
-              Icons.military_tech_outlined,
-              size: 16,
-              color: theme.colorScheme.primary,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

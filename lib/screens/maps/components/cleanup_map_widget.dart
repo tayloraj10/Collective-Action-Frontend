@@ -13,6 +13,7 @@ import 'package:collective_action_frontend/providers/map_provider.dart';
 import 'package:collective_action_frontend/providers/map_zoom_provider.dart';
 import 'package:collective_action_frontend/providers/user_provider.dart';
 import 'package:collective_action_frontend/screens/maps/components/area_captain_map_badges.dart';
+import 'package:collective_action_frontend/screens/maps/components/area_captains_sheet.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/cleanup_event_info_dialog.dart';
 import 'package:collective_action_frontend/screens/maps/components/hotspot_event_dialog.dart';
@@ -32,6 +33,7 @@ import 'package:collective_action_frontend/utils/heatmap_utils.dart';
 import 'package:collective_action_frontend/utils/map_filter_utils.dart';
 import 'package:collective_action_frontend/utils/map_area_geometry.dart';
 import 'package:collective_action_frontend/utils/map_area_utils.dart';
+import 'package:collective_action_frontend/utils/safe_navigation.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -908,7 +910,10 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
             areaLayerVisibility.showAreas &&
             !areaLayerVisibility.showNeighborhoods &&
             _captainBadgeLayouts.isNotEmpty)
-          ...buildAreaCaptainBadgeWidgets(_captainBadgeLayouts),
+          ...buildAreaCaptainBadgeWidgets(
+            _captainBadgeLayouts,
+            onOpenCaptainsSheet: _openAreaCaptainsSheet,
+          ),
         // Map style toggle (light/dark) – top right
         SafeArea(
           child: Align(
@@ -1411,6 +1416,22 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       ),
     );
     if (mounted) setState(() => _isInfoDialogOpen = false);
+  }
+
+  void _openAreaCaptainsSheet() {
+    scheduleAfterTap(context, () {
+      ref.read(areaCaptainsSheetOpenProvider.notifier).setOpen(true);
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: false,
+        builder: (_) => AreaCaptainsSheet(campaignId: widget.campaign.id),
+      ).whenComplete(() {
+        if (mounted) {
+          ref.read(areaCaptainsSheetOpenProvider.notifier).setOpen(false);
+        }
+      });
+    });
   }
 
   Future<void> _showEventInfoDialog(
