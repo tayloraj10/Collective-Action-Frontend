@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "description": "Static map area boundary geometries. Link features to backend map_areas via slugMap or slugFromName. Add new regions/layers here as you expand beyond NYC.",
+  "regions": [
+    {
+      "id": "nyc",
+      "label": "New York City",
+      "defaultCenter": { "lat": 40.7128, "lng": -73.95 },
+      "layers": [
+        {
+          "id": "boroughs",
+          "label": "Boroughs",
+          "areaType": "borough",
+          "assetPath": "assets/data/map_areas/nyc/boroughs.geojson",
+          "featureNameProperty": "borough",
+          "slugMap": {
+            "Manhattan": "nyc-manhattan",
+            "Brooklyn": "nyc-brooklyn",
+            "Queens": "nyc-queens",
+            "Bronx": "nyc-bronx",
+            "Staten Island": "nyc-staten-island"
+          },
+          "displayNameMap": {
+            "Bronx": "The Bronx"
+          },
+          "defaultVisible": true,
+          "source": "https://github.com/haghard/streams-recipes (NYC borough boundaries, Pedia Cities derived)"
+        },
+        {
+          "id": "neighborhoods",
+          "label": "Neighborhoods",
+          "areaType": "neighborhood",
+          "assetPath": "assets/data/map_areas/nyc/neighborhoods.geojson",
+          "featureNameProperty": "name",
+          "slugProperty": "nta2020",
+          "slugFromName": {
+            "prefix": "nyc-nta-",
+            "lowerCase": true
+          },
+          "defaultVisible": false,
+          "source": "NYC DCP 2020 Neighborhood Tabulation Areas (NTA2020), NYC Planning ArcGIS FeatureServer — residential NTAs only."
+        }
+      ]
+    }
+  ]
+}

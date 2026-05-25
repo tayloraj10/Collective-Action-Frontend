@@ -14,7 +14,7 @@ Name | Type | Description | Notes
 **cleanupCount** | **int** |  | [optional] [default to 0]
 **trashReportCount** | **int** |  | [optional] [default to 0]
 **totalBags** | **int** |  | [optional] [default to 0]
-**totalPounds** | **num** |  | [optional] [default to 0]
+**totalPounds** | **num** |  | [optional] [default to 0.0]
 **treePlantingCount** | **int** |  | [optional] [default to 0]
 **wildflowerPlantingCount** | **int** |  | [optional] [default to 0]
 **totalPlantings** | **int** |  | [optional] [default to 0]

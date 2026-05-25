@@ -6,6 +6,7 @@ import 'package:collective_action_frontend/screens/dashboard/components/social/u
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:collective_action_frontend/screens/maps/components/map_action_id_badge.dart';
 import 'package:collective_action_frontend/utils/safe_navigation.dart';
 
 class ProfilePage extends ConsumerWidget {
@@ -359,6 +360,29 @@ class UserProfileView extends ConsumerWidget {
                     ],
                   ),
                 ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: isMobile ? 96 : 140,
+                      child: Text(
+                        'User ID',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    MapActionIdBadge(
+                      actionId: userId,
+                      onHeader: false,
+                      copiedMessage: 'User ID copied',
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 18),
               Divider(height: 1, thickness: 1, color: Colors.grey.shade200),
               const SizedBox(height: 18),

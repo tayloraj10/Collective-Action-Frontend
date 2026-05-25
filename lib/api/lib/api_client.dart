@@ -202,6 +202,10 @@ class ApiClient {
           return ActionUpdateSchema.fromJson(value);
         case 'AddProjectMemberSchema':
           return AddProjectMemberSchema.fromJson(value);
+        case 'AreaCaptainAssignSchema':
+          return AreaCaptainAssignSchema.fromJson(value);
+        case 'AreaCaptainSchema':
+          return AreaCaptainSchema.fromJson(value);
         case 'CategoryCreate':
           return CategoryCreate.fromJson(value);
         case 'CategorySchema':
@@ -246,6 +250,14 @@ class ApiClient {
           return LinkUpdateSchema.fromJson(value);
         case 'LocationSchema':
           return LocationSchema.fromJson(value);
+        case 'MapAreaBoundsSchema':
+          return MapAreaBoundsSchema.fromJson(value);
+        case 'MapAreaCreateSchema':
+          return MapAreaCreateSchema.fromJson(value);
+        case 'MapAreaSchema':
+          return MapAreaSchema.fromJson(value);
+        case 'MapAreaTypeEnum':
+          return MapAreaTypeEnumTypeTransformer().decode(value);
         case 'MapCampaignCreateSchema':
           return MapCampaignCreateSchema.fromJson(value);
         case 'MapCampaignSchema':
@@ -254,6 +266,12 @@ class ApiClient {
           return MapCampaignStatsSchema.fromJson(value);
         case 'MapCampaignTypeEnum':
           return MapCampaignTypeEnumTypeTransformer().decode(value);
+        case 'MapHotspotCreateSchema':
+          return MapHotspotCreateSchema.fromJson(value);
+        case 'MapHotspotSchema':
+          return MapHotspotSchema.fromJson(value);
+        case 'MapHotspotUpdateSchema':
+          return MapHotspotUpdateSchema.fromJson(value);
         case 'MemberIdsByRole':
           return MemberIdsByRole.fromJson(value);
         case 'PreviewUserSchema':

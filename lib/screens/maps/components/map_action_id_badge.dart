@@ -7,10 +7,12 @@ class MapActionIdBadge extends StatelessWidget {
     super.key,
     required this.actionId,
     this.onHeader = true,
+    this.copiedMessage = 'Action ID copied',
   });
 
   final String actionId;
   final bool onHeader;
+  final String copiedMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +33,9 @@ class MapActionIdBadge extends StatelessWidget {
         onTap: () {
           Clipboard.setData(ClipboardData(text: actionId));
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Action ID copied'),
-              duration: Duration(seconds: 2),
+            SnackBar(
+              content: Text(copiedMessage),
+              duration: const Duration(seconds: 2),
             ),
           );
         },

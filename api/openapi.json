@@ -789,6 +789,333 @@
                 }
             }
         },
+        "/map-hotspots/campaign/{campaign_id}/areas": {
+            "get": {
+                "tags": [
+                    "map-hotspots"
+                ],
+                "summary": "List Areas",
+                "operationId": "list_areas_map_hotspots_campaign__campaign_id__areas_get",
+                "parameters": [
+                    {
+                        "name": "campaign_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Campaign Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/MapAreaSchema"
+                                    },
+                                    "title": "Response List Areas Map Hotspots Campaign  Campaign Id  Areas Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map-hotspots/areas": {
+            "post": {
+                "tags": [
+                    "map-hotspots"
+                ],
+                "summary": "Create Area",
+                "operationId": "create_area_map_hotspots_areas_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MapAreaCreateSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MapAreaSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map-hotspots/campaign/{campaign_id}/area-captains": {
+            "get": {
+                "tags": [
+                    "map-hotspots"
+                ],
+                "summary": "List Area Captains",
+                "operationId": "list_area_captains_map_hotspots_campaign__campaign_id__area_captains_get",
+                "parameters": [
+                    {
+                        "name": "campaign_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Campaign Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/AreaCaptainSchema"
+                                    },
+                                    "title": "Response List Area Captains Map Hotspots Campaign  Campaign Id  Area Captains Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map-hotspots/area-captains/assign": {
+            "post": {
+                "tags": [
+                    "map-hotspots"
+                ],
+                "summary": "Assign Area Captain",
+                "operationId": "assign_area_captain_map_hotspots_area_captains_assign_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AreaCaptainAssignSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AreaCaptainSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map-hotspots/area-captains/{assignment_id}": {
+            "delete": {
+                "tags": [
+                    "map-hotspots"
+                ],
+                "summary": "Remove Area Captain",
+                "operationId": "remove_area_captain_map_hotspots_area_captains__assignment_id__delete",
+                "parameters": [
+                    {
+                        "name": "assignment_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Assignment Id"
+                        }
+                    },
+                    {
+                        "name": "acting_user_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Acting User Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
+                    }
+                }
+            }
+        },
+        "/map-hotspots/campaign/{campaign_id}": {
+            "get": {
+                "tags": [
+                    "map-hotspots"
+                ],
+                "summary": "List Hotspots",
+                "operationId": "list_hotspots_map_hotspots_campaign__campaign_id__get",
+                "parameters": [
+                    {
+                        "name": "campaign_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Campaign Id"
+                        }
+                    },
+                    {
+                        "name": "include_inactive",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false,
+                            "title": "Include Inactive"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/MapHotspotSchema"
+                                    },
+                                    "title": "Response List Hotspots Map Hotspots Campaign  Campaign Id  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map-hotspots/": {
+            "post": {
+                "tags": [
+                    "map-hotspots"
+                ],
+                "summary": "Create Hotspot",
+                "operationId": "create_hotspot_map_hotspots__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MapHotspotCreateSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MapHotspotSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map-hotspots/{hotspot_id}": {
+            "patch": {
+                "tags": [
+                    "map-hotspots"
+                ],
+                "summary": "Update Hotspot",
+                "operationId": "update_hotspot_map_hotspots__hotspot_id__patch",
+                "parameters": [
+                    {
+                        "name": "hotspot_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Hotspot Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MapHotspotUpdateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MapHotspotSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "map-hotspots"
+                ],
+                "summary": "Delete Hotspot",
+                "operationId": "delete_hotspot_map_hotspots__hotspot_id__delete",
+                "parameters": [
+                    {
+                        "name": "hotspot_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Hotspot Id"
+                        }
+                    },
+                    {
+                        "name": "acting_user_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Acting User Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
+                    }
+                }
+            }
+        },
         "/projects/": {
             "get": {
                 "tags": [
@@ -4595,6 +4922,92 @@
                 "title": "AddProjectMemberSchema",
                 "description": "Body for adding a user to a project."
             },
+            "AreaCaptainAssignSchema": {
+                "properties": {
+                    "map_area_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Map Area Id"
+                    },
+                    "captain_user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Captain User Id"
+                    },
+                    "acting_user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Acting User Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "map_area_id",
+                    "captain_user_id",
+                    "acting_user_id"
+                ],
+                "title": "AreaCaptainAssignSchema"
+            },
+            "AreaCaptainSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "map_area_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Map Area Id"
+                    },
+                    "captain_user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Captain User Id"
+                    },
+                    "assigned_by_user_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Assigned By User Id"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Updated At"
+                    },
+                    "area": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/MapAreaSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "map_area_id",
+                    "captain_user_id",
+                    "created_at",
+                    "updated_at"
+                ],
+                "title": "AreaCaptainSchema"
+            },
             "Body_upload_profile_photo_photos_profile__user_id__post": {
                 "properties": {
                     "file": {
@@ -4882,12 +5295,12 @@
                     "lat": {
                         "type": "number",
                         "title": "Lat",
-                        "default": 0
+                        "default": 0.0
                     },
                     "lng": {
                         "type": "number",
                         "title": "Lng",
-                        "default": 0
+                        "default": 0.0
                     },
                     "number": {
                         "type": "integer",
@@ -5841,6 +6254,190 @@
                 "type": "object",
                 "title": "LocationSchema"
             },
+            "MapAreaBoundsSchema": {
+                "properties": {
+                    "min_lat": {
+                        "type": "number",
+                        "title": "Min Lat"
+                    },
+                    "max_lat": {
+                        "type": "number",
+                        "title": "Max Lat"
+                    },
+                    "min_lng": {
+                        "type": "number",
+                        "title": "Min Lng"
+                    },
+                    "max_lng": {
+                        "type": "number",
+                        "title": "Max Lng"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "min_lat",
+                    "max_lat",
+                    "min_lng",
+                    "max_lng"
+                ],
+                "title": "MapAreaBoundsSchema"
+            },
+            "MapAreaCreateSchema": {
+                "properties": {
+                    "map_campaign_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Map Campaign Id"
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 1,
+                        "title": "Name"
+                    },
+                    "area_type": {
+                        "$ref": "#/components/schemas/MapAreaTypeEnum"
+                    },
+                    "slug": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 100
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Slug"
+                    },
+                    "parent_area_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Parent Area Id"
+                    },
+                    "bounds": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/MapAreaBoundsSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "sort_order": {
+                        "type": "integer",
+                        "title": "Sort Order",
+                        "default": 0
+                    },
+                    "acting_user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Acting User Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "map_campaign_id",
+                    "name",
+                    "area_type",
+                    "acting_user_id"
+                ],
+                "title": "MapAreaCreateSchema"
+            },
+            "MapAreaSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "map_campaign_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Map Campaign Id"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "area_type": {
+                        "type": "string",
+                        "title": "Area Type"
+                    },
+                    "slug": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Slug"
+                    },
+                    "parent_area_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Parent Area Id"
+                    },
+                    "bounds": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/MapAreaBoundsSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "sort_order": {
+                        "type": "integer",
+                        "title": "Sort Order",
+                        "default": 0
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "title": "Active",
+                        "default": true
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "map_campaign_id",
+                    "name",
+                    "area_type"
+                ],
+                "title": "MapAreaSchema"
+            },
+            "MapAreaTypeEnum": {
+                "type": "string",
+                "enum": [
+                    "borough",
+                    "neighborhood",
+                    "city",
+                    "town",
+                    "region",
+                    "custom"
+                ],
+                "title": "MapAreaTypeEnum",
+                "description": "Granularity of a map area — boroughs today, neighborhoods/cities/towns later."
+            },
             "MapCampaignCreateSchema": {
                 "properties": {
                     "title": {
@@ -6037,7 +6634,7 @@
                     "total_pounds": {
                         "type": "number",
                         "title": "Total Pounds",
-                        "default": 0
+                        "default": 0.0
                     },
                     "tree_planting_count": {
                         "type": "integer",
@@ -6067,6 +6664,196 @@
                     "Planting Map"
                 ],
                 "title": "MapCampaignTypeEnum"
+            },
+            "MapHotspotCreateSchema": {
+                "properties": {
+                    "map_campaign_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Map Campaign Id"
+                    },
+                    "map_area_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Map Area Id"
+                    },
+                    "title": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 1,
+                        "title": "Title"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 2000
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "title": "Latitude"
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "title": "Longitude"
+                    },
+                    "created_by": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Created By"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "map_campaign_id",
+                    "map_area_id",
+                    "title",
+                    "latitude",
+                    "longitude",
+                    "created_by"
+                ],
+                "title": "MapHotspotCreateSchema"
+            },
+            "MapHotspotSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "map_campaign_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Map Campaign Id"
+                    },
+                    "map_area_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Map Area Id"
+                    },
+                    "title": {
+                        "type": "string",
+                        "title": "Title"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "title": "Latitude"
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "title": "Longitude"
+                    },
+                    "created_by": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Created By"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "title": "Active",
+                        "default": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Updated At"
+                    },
+                    "area": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/MapAreaSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "map_campaign_id",
+                    "map_area_id",
+                    "title",
+                    "latitude",
+                    "longitude",
+                    "created_by",
+                    "created_at",
+                    "updated_at"
+                ],
+                "title": "MapHotspotSchema"
+            },
+            "MapHotspotUpdateSchema": {
+                "properties": {
+                    "title": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 255,
+                                "minLength": 1
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Title"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 2000
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description"
+                    },
+                    "active": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Active"
+                    },
+                    "acting_user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Acting User Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "acting_user_id"
+                ],
+                "title": "MapHotspotUpdateSchema"
             },
             "MemberIdsByRole": {
                 "properties": {
@@ -7243,7 +8030,7 @@
                     "total_pounds": {
                         "type": "number",
                         "title": "Total Pounds",
-                        "default": 0
+                        "default": 0.0
                     },
                     "tree_planting_count": {
                         "type": "integer",
