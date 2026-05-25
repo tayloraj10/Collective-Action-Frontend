@@ -648,21 +648,21 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         _scheduleNearbyMaskGeometryUpdate();
       }
     });
-    ref.listen<MapAreaLayersVisibleState>(
-      mapAreaLayersVisibleProvider,
-      (prev, next) {
-        if (!mounted || _isDisposed) return;
-        if (next.showNeighborhoods || !next.showAreas) {
-          if (_captainBadgeLayouts.isNotEmpty) {
-            setState(() => _captainBadgeLayouts = []);
-          }
-          return;
+    ref.listen<MapAreaLayersVisibleState>(mapAreaLayersVisibleProvider, (
+      prev,
+      next,
+    ) {
+      if (!mounted || _isDisposed) return;
+      if (next.showNeighborhoods || !next.showAreas) {
+        if (_captainBadgeLayouts.isNotEmpty) {
+          setState(() => _captainBadgeLayouts = []);
         }
-        if (prev?.showNeighborhoods == true && !next.showNeighborhoods) {
-          _scheduleCaptainBadgeUpdate();
-        }
-      },
-    );
+        return;
+      }
+      if (prev?.showNeighborhoods == true && !next.showNeighborhoods) {
+        _scheduleCaptainBadgeUpdate();
+      }
+    });
     ref.watch(mapFilterMySubmissionsOnlyProvider);
     final heatmapEnabled = ref.watch(mapHeatmapEnabledProvider);
     final nearbyFilter = ref.watch(mapNearbyFilterProvider);
@@ -678,7 +678,8 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
     final hotspots = hotspotsAsync?.value ?? const [];
     final captains = captainsAsync?.value ?? const [];
     final currentUser = ref.watch(currentUserProvider).value;
-    final canManageHotspots = _isCleanupCampaign &&
+    final canManageHotspots =
+        _isCleanupCampaign &&
         canUserManageHotspots(
           userId: currentUser?.id,
           captainsAsync: captainsAsync ?? const AsyncValue.data([]),
@@ -1704,21 +1705,24 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       final currentUser = ref.read(currentUserProvider).value;
       if (currentUser?.id == null) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            CustomSnackBar.info('Sign in to add hotspots'),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(CustomSnackBar.info('Sign in to add hotspots'));
         }
         return;
       }
-      final captainsAsync =
-          ref.read(areaCaptainsForCampaignProvider(widget.campaign.id));
+      final captainsAsync = ref.read(
+        areaCaptainsForCampaignProvider(widget.campaign.id),
+      );
       if (!canUserManageHotspots(
         userId: currentUser!.id,
         captainsAsync: captainsAsync,
       )) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            CustomSnackBar.warning('You must be an area captain to add hotspots'),
+            CustomSnackBar.warning(
+              'You must be an area captain to add hotspots',
+            ),
           );
         }
         return;
@@ -1727,7 +1731,9 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
       if (allowedAreas.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            CustomSnackBar.warning('You must be an area captain to add hotspots'),
+            CustomSnackBar.warning(
+              'You must be an area captain to add hotspots',
+            ),
           );
         }
         return;
@@ -1787,11 +1793,15 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         return;
       }
       try {
-        await ref.read(hotspotServiceProvider).createHotspot(
+        await ref
+            .read(hotspotServiceProvider)
+            .createHotspot(
               campaignId: widget.campaign.id,
               mapAreaId: result.area.id,
               title: result.title,
-              description: result.description.isEmpty ? null : result.description,
+              description: result.description.isEmpty
+                  ? null
+                  : result.description,
               latitude: droppedPosition.latitude,
               longitude: droppedPosition.longitude,
               createdBy: currentUser.id!,
@@ -1807,9 +1817,9 @@ class _CleanupMapWidgetState extends ConsumerState<CleanupMapWidget> {
         ref.invalidate(mapHotspotsForCampaignProvider(widget.campaign.id));
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            CustomSnackBar.error('Failed to add hotspot: $e'),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(CustomSnackBar.error('Failed to add hotspot: $e'));
         }
       }
     } else {
@@ -2011,7 +2021,8 @@ class _MapModeButton extends StatelessWidget {
                 child: imageAsset == null
                     ? Icon(
                         icon ?? Icons.add_location_alt,
-                        color: iconColor ??
+                        color:
+                            iconColor ??
                             (isActive
                                 ? theme.colorScheme.primary
                                 : theme.colorScheme.onSurfaceVariant),
