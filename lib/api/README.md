@@ -124,6 +124,15 @@ Class | Method | HTTP request | Description
 *MapCampaignsApi* | [**listMapCampaignsByCreatorMapCampaignsCreatorUserIdGet**](doc//MapCampaignsApi.md#listmapcampaignsbycreatormapcampaignscreatoruseridget) | **GET** /map-campaigns/creator/{user_id} | List Map Campaigns By Creator
 *MapCampaignsApi* | [**listMapCampaignsByTypeMapCampaignsByTypeCampaignTypeGet**](doc//MapCampaignsApi.md#listmapcampaignsbytypemapcampaignsbytypecampaigntypeget) | **GET** /map-campaigns/by-type/{campaign_type} | List Map Campaigns By Type
 *MapCampaignsApi* | [**listMapCampaignsMapCampaignsGet**](doc//MapCampaignsApi.md#listmapcampaignsmapcampaignsget) | **GET** /map-campaigns/ | List Map Campaigns
+*MapHotspotsApi* | [**assignAreaCaptainMapHotspotsAreaCaptainsAssignPost**](doc//MapHotspotsApi.md#assignareacaptainmaphotspotsareacaptainsassignpost) | **POST** /map-hotspots/area-captains/assign | Assign Area Captain
+*MapHotspotsApi* | [**createAreaMapHotspotsAreasPost**](doc//MapHotspotsApi.md#createareamaphotspotsareaspost) | **POST** /map-hotspots/areas | Create Area
+*MapHotspotsApi* | [**createHotspotMapHotspotsPost**](doc//MapHotspotsApi.md#createhotspotmaphotspotspost) | **POST** /map-hotspots/ | Create Hotspot
+*MapHotspotsApi* | [**deleteHotspotMapHotspotsHotspotIdDelete**](doc//MapHotspotsApi.md#deletehotspotmaphotspotshotspotiddelete) | **DELETE** /map-hotspots/{hotspot_id} | Delete Hotspot
+*MapHotspotsApi* | [**listAreaCaptainsMapHotspotsCampaignCampaignIdAreaCaptainsGet**](doc//MapHotspotsApi.md#listareacaptainsmaphotspotscampaigncampaignidareacaptainsget) | **GET** /map-hotspots/campaign/{campaign_id}/area-captains | List Area Captains
+*MapHotspotsApi* | [**listAreasMapHotspotsCampaignCampaignIdAreasGet**](doc//MapHotspotsApi.md#listareasmaphotspotscampaigncampaignidareasget) | **GET** /map-hotspots/campaign/{campaign_id}/areas | List Areas
+*MapHotspotsApi* | [**listHotspotsMapHotspotsCampaignCampaignIdGet**](doc//MapHotspotsApi.md#listhotspotsmaphotspotscampaigncampaignidget) | **GET** /map-hotspots/campaign/{campaign_id} | List Hotspots
+*MapHotspotsApi* | [**removeAreaCaptainMapHotspotsAreaCaptainsAssignmentIdDelete**](doc//MapHotspotsApi.md#removeareacaptainmaphotspotsareacaptainsassignmentiddelete) | **DELETE** /map-hotspots/area-captains/{assignment_id} | Remove Area Captain
+*MapHotspotsApi* | [**updateHotspotMapHotspotsHotspotIdPatch**](doc//MapHotspotsApi.md#updatehotspotmaphotspotshotspotidpatch) | **PATCH** /map-hotspots/{hotspot_id} | Update Hotspot
 *PhotosApi* | [**deleteAllSubmissionPhotosPhotosSubmissionSubmissionIdDelete**](doc//PhotosApi.md#deleteallsubmissionphotosphotossubmissionsubmissioniddelete) | **DELETE** /photos/submission/{submission_id} | Delete All Submission Photos
 *PhotosApi* | [**deleteProfilePhotoPhotosProfileUserIdDelete**](doc//PhotosApi.md#deleteprofilephotophotosprofileuseriddelete) | **DELETE** /photos/profile/{user_id} | Delete Profile Photo
 *PhotosApi* | [**deleteSubmissionPhotoPhotosSubmissionSubmissionIdPhotoFilenameDelete**](doc//PhotosApi.md#deletesubmissionphotophotossubmissionsubmissionidphotofilenamedelete) | **DELETE** /photos/submission/{submission_id}/{photo_filename} | Delete Submission Photo
@@ -188,6 +197,8 @@ Class | Method | HTTP request | Description
  - [ActionTypeValuesEnum](doc//ActionTypeValuesEnum.md)
  - [ActionUpdateSchema](doc//ActionUpdateSchema.md)
  - [AddProjectMemberSchema](doc//AddProjectMemberSchema.md)
+ - [AreaCaptainAssignSchema](doc//AreaCaptainAssignSchema.md)
+ - [AreaCaptainSchema](doc//AreaCaptainSchema.md)
  - [CategoryCreate](doc//CategoryCreate.md)
  - [CategorySchema](doc//CategorySchema.md)
  - [CleanupEventData](doc//CleanupEventData.md)
@@ -210,10 +221,17 @@ Class | Method | HTTP request | Description
  - [LinkSchema](doc//LinkSchema.md)
  - [LinkUpdateSchema](doc//LinkUpdateSchema.md)
  - [LocationSchema](doc//LocationSchema.md)
+ - [MapAreaBoundsSchema](doc//MapAreaBoundsSchema.md)
+ - [MapAreaCreateSchema](doc//MapAreaCreateSchema.md)
+ - [MapAreaSchema](doc//MapAreaSchema.md)
+ - [MapAreaTypeEnum](doc//MapAreaTypeEnum.md)
  - [MapCampaignCreateSchema](doc//MapCampaignCreateSchema.md)
  - [MapCampaignSchema](doc//MapCampaignSchema.md)
  - [MapCampaignStatsSchema](doc//MapCampaignStatsSchema.md)
  - [MapCampaignTypeEnum](doc//MapCampaignTypeEnum.md)
+ - [MapHotspotCreateSchema](doc//MapHotspotCreateSchema.md)
+ - [MapHotspotSchema](doc//MapHotspotSchema.md)
+ - [MapHotspotUpdateSchema](doc//MapHotspotUpdateSchema.md)
  - [MemberIdsByRole](doc//MemberIdsByRole.md)
  - [PreviewUserSchema](doc//PreviewUserSchema.md)
  - [ProjectCreateSchema](doc//ProjectCreateSchema.md)

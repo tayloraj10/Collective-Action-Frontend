@@ -61,6 +61,9 @@ String parameterToString(dynamic value) {
   if (value is EventDataType) {
     return EventDataTypeTypeTransformer().encode(value).toString();
   }
+  if (value is MapAreaTypeEnum) {
+    return MapAreaTypeEnumTypeTransformer().encode(value).toString();
+  }
   if (value is MapCampaignTypeEnum) {
     return MapCampaignTypeEnumTypeTransformer().encode(value).toString();
   }

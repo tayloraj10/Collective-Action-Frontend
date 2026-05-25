@@ -13,8 +13,8 @@ part of collective_action_api;
 class CleanupWaypoint {
   /// Returns a new [CleanupWaypoint] instance.
   CleanupWaypoint({
-    this.lat = 0,
-    this.lng = 0,
+    this.lat = 0.0,
+    this.lng = 0.0,
     this.number = 0,
   });
 
