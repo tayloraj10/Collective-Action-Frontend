@@ -65,7 +65,6 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
   final _formKey = GlobalKey<FormState>();
   String? _name;
   String? _email;
-  String? _photoUrl;
   String? _city;
   String? _state;
   String? _country;
@@ -114,7 +113,6 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
       if (user != null) {
         _name = user.name;
         _email = user.email;
-        _photoUrl = user.photoUrl;
         _city = user.location?.city;
         _state = user.location?.state;
         _country = user.location?.country;
@@ -132,7 +130,6 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
         _initialValues = {
           'name': _name,
           'email': _email,
-          'photoUrl': _photoUrl,
           'city': _city,
           'state': _state,
           'country': _country,
@@ -279,6 +276,7 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
       email: _email!,
       name: nullIfBlank(_name),
       userType: _userType ?? user.userType,
+      admin: user.admin ?? false,
       location: LocationSchema(
         city: nullIfBlank(city),
         state: nullIfBlank(state),
@@ -310,7 +308,6 @@ class _UserSettingsPageState extends ConsumerState<SettingsPage> {
         _initialValues = {
           'name': _name,
           'email': _email,
-          'photoUrl': _photoUrl,
           'city': _city,
           'state': _state,
           'country': _country,

@@ -66,15 +66,44 @@ class UserNotifier extends AsyncNotifier<UserSchema?> {
   }
 
   Future<UserSchema?> updateUser(UserUpdate userData) async {
-    state = const AsyncLoading();
+    final previousUser = state.value;
     try {
       final updated = await UserService().updateUser(dbUserId, userData);
-      state = await AsyncValue.guard(() async {
-        return await UserService().fetchUserByUserID(userId: dbUserId);
-      });
-      return updated;
+      if (updated == null) {
+        throw Exception('Update returned no user');
+      }
+
+      // Profile photo is saved via a separate endpoint; keep it if the PATCH
+      // response doesn't include one.
+      final photoUrl =
+          (updated.photoUrl == null || updated.photoUrl!.isEmpty)
+          ? previousUser?.photoUrl
+          : updated.photoUrl;
+      final merged = photoUrl == updated.photoUrl
+          ? updated
+          : UserSchema(
+              id: updated.id,
+              email: updated.email,
+              name: updated.name,
+              photoUrl: photoUrl,
+              userType: updated.userType,
+              isActive: updated.isActive,
+              admin: updated.admin,
+              location: updated.location,
+              socialLinks: updated.socialLinks,
+              firebaseUserId: updated.firebaseUserId,
+              createdAt: updated.createdAt,
+              updatedAt: updated.updatedAt,
+            );
+
+      state = AsyncValue.data(merged);
+      return merged;
     } catch (e, st) {
-      state = AsyncError(e, st);
+      if (previousUser != null) {
+        state = AsyncValue.data(previousUser);
+      } else {
+        state = AsyncError(e, st);
+      }
       rethrow;
     }
   }
