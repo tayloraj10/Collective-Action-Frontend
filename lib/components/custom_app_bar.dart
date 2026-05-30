@@ -197,7 +197,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           SelectableText(
-                            'support@collectiveaction.us',
+                            AppConstants.supportEmail,
                             style: TextStyle(
                               fontSize: 13,
                               color: Theme.of(context).colorScheme.primary,
