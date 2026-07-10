@@ -51,7 +51,14 @@ class DefaultFirebaseOptions {
     appId: '1:978597455378:web:025826306fd68860311acb',
     messagingSenderId: '978597455378',
     projectId: 'collective-action-fd893',
-    authDomain: 'collective-action-fd893.firebaseapp.com',
+    // Deliberately overridden from the FlutterFire-generated default
+    // (collective-action-fd893.firebaseapp.com). This app is served from the
+    // custom domain collectiveaction.us via Firebase Hosting, which already
+    // proxies /__/auth/** for that domain. Keeping authDomain pointed at
+    // *.firebaseapp.com makes Safari/WebKit treat the auth handshake as
+    // third-party storage and silently block it (ITP) — if you rerun
+    // `flutterfire configure`, restore this override afterward.
+    authDomain: 'collectiveaction.us',
     storageBucket: 'collective-action-fd893.firebasestorage.app',
     measurementId: 'G-9ZMRHB7JGW',
   );
