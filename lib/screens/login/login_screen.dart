@@ -208,6 +208,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final redirectError = ref.watch(authRedirectErrorProvider);
     final displayedError = _errorMessage ?? redirectError;
+
+    // Mobile-web Google sign-in uses signInWithRedirect, which fully
+    // navigates away and back — the original _handleGoogleSignIn() call never
+    // resumes on the reloaded page. Once UserDataSyncObserver picks up the
+    // completed redirect and authStateProvider emits the signed-in user,
+    // navigate away from the login screen here instead.
+    ref.listen<AsyncValue<User?>>(authStateProvider, (previous, next) {
+      if (next.value != null) {
+        safeGo(context, _postLoginRoute());
+      }
+    });
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(color: AppColors.lightBlue),
