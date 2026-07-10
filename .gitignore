@@ -46,6 +46,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Gradle/Android build artifacts in vendored packages
+third_party/**/.gradle/
+third_party/**/build/
 # Firebase configuration files (contains sensitive credentials)
 google-services.json
 GoogleService-Info.plist

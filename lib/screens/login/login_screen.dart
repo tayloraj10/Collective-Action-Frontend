@@ -111,8 +111,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             email: email,
             firebaseUserId: firebaseUser.uid,
           );
-          final createdUser =
-              await UserService().createUser(userCreate);
+          final createdUser = await UserService().createUser(userCreate);
           // Set global currentUserProvider
           if (createdUser != null) {
             await ref.read(currentUserProvider.notifier).setUser(createdUser);
@@ -132,8 +131,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         final firebaseUser = await authService.signInWithEmail(email, password);
         // Fetch app user from backend (users table) and set global provider
         if (firebaseUser != null) {
-          final appUser = await UserService()
-              .fetchUserByFirebaseID(userId: firebaseUser.uid);
+          final appUser = await UserService().fetchUserByFirebaseID(
+            userId: firebaseUser.uid,
+          );
           if (appUser != null) {
             await ref.read(currentUserProvider.notifier).setUser(appUser);
           }
@@ -155,6 +155,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _handleGoogleSignIn() async {
     setState(() => _errorMessage = null);
+    ref.read(authRedirectErrorProvider.notifier).set(null);
     setState(() => _isLoading = true);
 
     try {
@@ -165,8 +166,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         // Try to fetch user from backend (users table)
         UserSchema? appUser;
         try {
-          appUser = await UserService()
-              .fetchUserByFirebaseID(userId: firebaseUser.uid);
+          appUser = await UserService().fetchUserByFirebaseID(
+            userId: firebaseUser.uid,
+          );
         } catch (e) {
           appUser = null;
         }
@@ -204,6 +206,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final redirectError = ref.watch(authRedirectErrorProvider);
+    final displayedError = _errorMessage ?? redirectError;
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(color: AppColors.lightBlue),
@@ -342,7 +346,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           const SizedBox(height: 16),
 
                           // Error Message
-                          if (_errorMessage != null)
+                          if (displayedError != null)
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
@@ -359,7 +363,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
-                                      _errorMessage!,
+                                      displayedError,
                                       style: TextStyle(
                                         color: Colors.red.shade700,
                                         fontSize: 13,
@@ -369,7 +373,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ],
                               ),
                             ),
-                          if (_errorMessage != null) const SizedBox(height: 12),
+                          if (displayedError != null)
+                            const SizedBox(height: 12),
 
                           // Submit Button
                           SizedBox(

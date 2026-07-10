@@ -8,3 +8,17 @@ final authStateProvider = StreamProvider<User?>((ref) {
   final authService = ref.watch(authServiceProvider);
   return authService.authStateChanges;
 });
+
+/// Set when a mobile-web Google redirect sign-in (see [AuthService.signInWithGoogle])
+/// completes with an error after the app reloads. Cleared once shown.
+class AuthRedirectErrorNotifier extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void set(String? value) => state = value;
+}
+
+final authRedirectErrorProvider =
+    NotifierProvider<AuthRedirectErrorNotifier, String?>(
+      AuthRedirectErrorNotifier.new,
+    );
